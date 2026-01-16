@@ -1,0 +1,26 @@
+\textbf{定义}
+
+设\((P,\preceq)\)是有限偏序集，对任意在\(P\)上的函数\(f,g\)，如果：
+
+\[g(y) = \sum_{x\preceq y}f(x) \quad{(\forall y \in P)},\]
+
+设\(\zeta(x,y)\)函数：
+
+\[\zeta(x,y) =  \begin{cases}
+ 1 & x\preceq y \\
+ 0 & \text{otherwise}
+\end{cases}.\]
+
+则可将第一个式子拓展到整个\(P\)上，并视\(\zeta\)为矩阵的作用，\(\vec g = \zeta \vec f\).
+
+如果矩阵\(\zeta\)可逆，那么其逆矩阵称为Mobius矩阵\(\mu\)，满足：
+
+\[f(y) = \sum_{x\preceq y}\mu(x,y)g(x) \quad (\forall y \in P).\]
+
+对于很多特殊的反演\(\mu\)存在特殊的闭式。比如：
+
+整数除约偏序\((d\mid n)\)：\(\mu(d,n)=\mu(n/d)\)，右侧\(\mu\)为数论Mobius函数。
+
+子集偏序：\(\mu(T,S)=(-1)^{|S|-|T|}\)，当\(T\subseteq S\)。
+
+……

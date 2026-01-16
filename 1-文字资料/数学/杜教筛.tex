@@ -1,0 +1,26 @@
+\textbf{杜教筛}
+
+计算 \(S(n) = \sum_{i=1}^{n}f(i)\) ， \(f\) 为积性函数。
+
+构造 \(h,g\) ，使得 \(h=f*g\) （狄利克雷卷积）
+
+\[\begin{aligned}
+\sum_{i=1}^n h(i) &= \sum_{i=1}^n\sum_{d | i}g(d)f\left(\frac{i}{d}\right) \\
+                             &= \sum_{d=1}^n g(d) \sum_{i=1}^{\lfloor\frac{n}{d}\rfloor}f(i) \\
+                             &= \sum_{d=1}^n g(d) S(\lfloor\frac{n}{d}\rfloor).
+\end{aligned}\]
+
+提出右边第一项：
+
+\[g(1)S(n) = \sum_{i=1}^n h(i) - \sum_{d=2}^ng(d) S(\lfloor\frac{n}{d}\rfloor).\]
+
+预处理 \(g\) 的前缀和，整除分块，递归处理。最终的时间复杂度为 \(O(n^{\frac{3}{4}})\) .
+
+注意时间复杂度需要通过记忆化保证。
+
+
+\textbf{优化}
+
+我们可以预处理较小一部分的 \(S\) 。
+
+结论是预处理前 \(O(n^{\frac{2}{3}})\) 的 \(S\) ，可以将时间复杂度优化到 \(O(n^\frac{2}{3})\) .

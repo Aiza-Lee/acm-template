@@ -1,0 +1,44 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "build",
+			"type": "shell",
+			"command": "g++ -std=c++23 -DLOCAL -DDEBUG -g -O0 -fdiagnostics-color=always \"${file}\" -o \"${fileDirname}/${fileBasenameNoExtension}\"",
+			"windows": {
+				"command": "g++ -std=c++23 -DLOCAL -DDEBUG -g -O0 -fdiagnostics-color=always \"${file}\" -o \"${fileDirname}\\${fileBasenameNoExtension}.exe\"",
+				"options": {
+					"shell": {
+						"executable": "cmd.exe",
+						"args": ["/C"]
+					}
+				}
+			},
+			"group": "build",
+			"problemMatcher": "$gcc"
+		},
+		{
+			"label": "build-and-run",
+			"type": "shell",
+			"command": "\"${fileDirname}/${fileBasenameNoExtension}\" < \"${workspaceFolder}/input.txt\"",
+			"windows": {
+				"command": "\"\"${fileDirname}\\${fileBasenameNoExtension}.exe\" < \"${workspaceFolder}\\input.txt\"\"",
+				"options": {
+					"shell": {
+						"executable": "cmd.exe",
+						"args": ["/C"]
+					}
+				}
+			},
+			"dependsOn": "build",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"focus": true,
+				"panel": "shared"
+			}
+		}
+	]
+}
