@@ -1,0 +1,41 @@
+\textbf{基本构造}
+
+\textbf{1. 空类 (Empty Class)} \\
+含有一个大小为 $0$ 的对象。
+\[ \mathcal E \]
+EGF：$E(x)=1$
+
+\textbf{2. 原子类 (Atomic Class)} \\
+含有一个大小为 $1$ 的对象。
+\[ \mathcal Z \]
+EGF：$Z(x)=x$
+
+\textbf{3. 不相交并 (Disjoint Union)} \\
+集合的并。
+\[ \mathcal A + \mathcal B \]
+EGF：$A(x) + B(x)$ \quad 系数：$c_n = a_n + b_n$
+
+\textbf{4. 标记乘法 (Labeled Product)} \\
+标记对象的组合。
+\[ \mathcal A \star \mathcal B \]
+EGF：$A(x)B(x)$ \quad 系数：$c_n = \sum_{i+j=n}\binom{n}{i}a_ib_j$
+
+\textbf{复合构造}
+
+\textbf{5. 序列 (Sequence)} \\
+$\mathcal A$ 中对象构成的序列。
+\[ \text{SEQ}(\mathcal A) = \mathcal E + (\mathcal A \star \mathcal A) + (\mathcal A \star \mathcal A \star \mathcal A) + \cdots \]
+EGF：
+\[ \sum_{k \ge 0} A(x)^k = \frac{1}{1-A(x)} \]
+
+\textbf{6. 集合 (Set)} \\
+$\mathcal A$ 中对象构成的无序集合。
+\[ \text{SET}(\mathcal{A}) = \prod_{\alpha \in \mathcal A} \text{SET}(\{\alpha\}) = \text{SEQ}(\mathcal{A}) / \mathfrak{S} \]
+EGF：
+\[ \sum_{k \ge 0} \frac{1}{k!} A(x)^k = \exp(A(x)) \]
+
+\textbf{7. 循环 (Cycle)} \\
+$\mathcal A$ 中对象构成的循环排列。
+\[ \text{CYC}(\mathcal{A}) = (\text{SEQ}(\mathcal{A}) \setminus \mathcal{E}) / \mathfrak{C} \]
+EGF：
+\[ \sum_{k \ge 1} \frac{1}{k} A(x)^k = \ln \frac{1}{1 - A(x)} \]
