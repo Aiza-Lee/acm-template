@@ -4,23 +4,29 @@
  * 模板参数:
  * 		T: 坐标类型，默认为i64
  * 		K: 维度，默认为2
+ * 		VT: 附加值类型，默认为 int
  * interface:
- * 		KDTree(int max_nodes): 			// 构造函数，指定最大节点数，内部实现会回收节点
+ * 		KDTree(int siz): 			// 构造函数，指定最大节点数，内部实现会回收节点
  *  	insert(Point pt):				// 插入节点，pt为Point类型，包含坐标信息
  * 		query_nearest(Point pt):		// 查询与pt最近的点的距离平方
+ * 		query_box(Point lower, Point upper): // 查询矩形范围内点权值和
  * note:
- * 		1. 插入操作均摊O(log^2 n)，查询操作O(n^(1-1/K))
+ * 		1. 时间复杂度：
+ * 			- 插入：采用二进制分组重构，均摊 O(log^2 n)
+ * 			- 最近点查询 (NN)：平均 O(log n)，最坏 O(n^(1-1/K))
+ * 			- 矩形区域查询 (Box)：最坏 O(n^(1-1/K))
+ * 			- 空间复杂度：O(n)
  * 		2. 该版本kd-tree不支持删除操作，只能通过标记删除实现
  * 		3. 二进制分组实现，每次插入会合并siz相同的子树，保证每个子kd-tree的节点数均为2的幂次方
  */
-template<typename T = i64, int K = 2, typename VT>
+template<typename T = i64, int K = 2, typename VT = int>
 struct KDTree {
-	#define min_val(u, dim) min_val[(u) * K + (dim)]
-	#define max_val(u, dim) max_val[(u) * K + (dim)]
+	#define min_val(u, dim) min_v[(u) * K + (dim)]
+	#define max_val(u, dim) max_v[(u) * K + (dim)]
 
 	struct Point {
 		VT value; // 附加值，支持加法运算符重载
-		T x[K];
+		std::array<T, K> x;
 			  T& operator[](int i)		 { return x[i]; }
 		const T& operator[](int i) const { return x[i]; }
 		// 计算与另一个点的距离平方
@@ -31,21 +37,16 @@ struct KDTree {
 		}
 	};
 
-	std::unique_ptr<int[]> ls, rs, sz;
-	std::unique_ptr<Point[]> p;
-	std::unique_ptr<T[]> min_val, max_val;
+	std::vector<int> ls, rs, sz;
+	std::vector<Point> p;
+	std::vector<T> min_v, max_v;
+	std::vector<VT> sum;
 
 	int tot;
 	std::vector<int> roots, rubbish;
 
-	KDTree(int max_nodes) : tot(0) {
-		ls.reset(new int[max_nodes + 1]);
-		rs.reset(new int[max_nodes + 1]);
-		sz.reset(new int[max_nodes + 1]);
-		p.reset(new Point[max_nodes + 1]);
-		min_val.reset(new T[(max_nodes + 1) * K]);
-		max_val.reset(new T[(max_nodes + 1) * K]);
-	}
+	KDTree(int siz) : tot(0), ls(siz + 1), rs(siz + 1), sz(siz + 1), p(siz + 1), 
+		min_v((siz + 1) * K), max_v((siz + 1) * K), sum(siz + 1) {}
 
 	int _new_node(Point pt) {
 		int u;
@@ -57,14 +58,17 @@ struct KDTree {
 		}
 		p[u] = pt;
 		ls[u] = rs[u] = 0; sz[u] = 1;
+		sum[u] = pt.value;
 		return u;
 	}
 	void _push_up(int u) {
 		sz[u] = 1;
+		sum[u] = p[u].value;
 		rep(i, 0, K - 1) min_val(u, i) = max_val(u, i) = p[u][i];
 		
 		if (ls[u]) {
 			sz[u] += sz[ls[u]];
+			sum[u] += sum[ls[u]];
 			rep(i, 0, K - 1) {
 				min_val(u, i) = std::min(min_val(u, i), min_val(ls[u], i));
 				max_val(u, i) = std::max(max_val(u, i), max_val(ls[u], i));
@@ -72,6 +76,7 @@ struct KDTree {
 		}
 		if (rs[u]) {
 			sz[u] += sz[rs[u]];
+			sum[u] += sum[rs[u]];
 			rep(i, 0, K - 1) {
 				min_val(u, i) = std::min(min_val(u, i), min_val(rs[u], i));
 				max_val(u, i) = std::max(max_val(u, i), max_val(rs[u], i));
@@ -140,5 +145,50 @@ struct KDTree {
 		ans_min = std::numeric_limits<T>::max();
 		for (int root : roots) _query(root, pt); // 在所有根节点中查询
 		return ans_min;
+	}
+
+	// 查询矩形范围内点权值和
+	VT _query_box(int u, const Point& lower, const Point& upper) {
+		if (!u) return 0;
+		// 如果当前节点的包围盒完全在查询范围内，直接返回sum
+		bool full_in = true;
+		rep(i, 0, K - 1) {
+			if (min_val(u, i) < lower[i] || max_val(u, i) > upper[i]) {
+				full_in = false;
+				break;
+			}
+		}
+		if (full_in) return sum[u];
+
+		// 如果当前节点包围盒完全在查询范围外，直接返回0
+		bool full_out = false;
+		rep(i, 0, K - 1) {
+			if (max_val(u, i) < lower[i] || min_val(u, i) > upper[i]) {
+				full_out = true;
+				break;
+			}
+		}
+		if (full_out) return 0;
+
+		VT res = 0;
+		// 检查当前点是否在范围内
+		bool p_in = true;
+		rep(i, 0, K - 1) {
+			if (p[u][i] < lower[i] || p[u][i] > upper[i]) {
+				p_in = false;
+				break;
+			}
+		}
+		if (p_in) res += p[u].value;
+
+		res += _query_box(ls[u], lower, upper);
+		res += _query_box(rs[u], lower, upper);
+		return res;
+	}
+
+	VT query_box(Point lower, Point upper) {
+		VT res = 0;
+		for (int root : roots) res += _query_box(root, lower, upper);
+		return res;
 	}
 };
