@@ -10,8 +10,9 @@
  * 		calc_sizes()		// 计算每个节点的endpos集合大小(即子串出现次数)
  * 		calc_sub_cnt()		// 计算每个节点出发能构成的本质不同子串数
  * 		kth_substring(k)	// 求第k小本质不同子串 (需先调用calc_sub_cnt)
- * 		get_lcs(string s)	// 求与字符串s的最长公共子串长度 * 		first_pos(u)					// 获取节点u代表的子串第一次出现的结束位置
- * 		calc_total_length()				// 计算所有本质不同子串的总长度 * 
+ * 		get_lcs(string s)	// 求与字符串s的最长公共子串长度
+ * 		first_pos(u)		// 获取节点u代表的子串第一次出现的结束位置
+ * 		calc_total_length()	// 计算所有本质不同子串的总长度
  * note:
  * 		1. 节点数不超过 2*|S|-1，边数不超过 3*|S|-4。
  * 		2. 核心概念:
