@@ -5,7 +5,7 @@
  * 时间复杂度: O(n^(3/4) / log n) 或者 O(n^{1-\epsilon})
  * 计算 F(n) = \sum_{i=1}^{n} f(i), f(i) 满足:
  * 1. f 为积性函数
- * 2. f(p^c) 可由多个形如 p^k 的单项式组合而成，模板中提供的最大的处理的k为4
+ * 2. f(p) 可由多个形如 p^k 的单项式组合而成，模板中提供的最大的处理的k为4
  * 
  * 使用方法：
  * Min25 o {n, {{k1, s1}, {k2, s2}, ...}, f_p_c};
@@ -124,5 +124,13 @@ public:
 		cal_Fprimes();
 
 		return add(cal_F(1, global_n), 1);
+	}
+
+	int solve_prime_sum() {
+		euler_sieve();
+		init_ids();
+		cal_Fprimes();
+
+		return Fprime[id(global_n)];
 	}
 };
