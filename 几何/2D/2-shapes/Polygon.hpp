@@ -1,6 +1,6 @@
 #pragma once
-#include "../base/Point.hpp"
-#include "../shapes/Segment.hpp"
+#include "../1-base/Point.hpp"
+#include "../2-shapes/Segment.hpp"
 namespace Geo2D {
 
 using Polygon = std::vector<Point>;

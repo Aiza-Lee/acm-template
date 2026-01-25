@@ -1,6 +1,6 @@
 #pragma once
-#include "../base/Point.hpp"
-#include "../base/Line.hpp"
+#include "../1-base/Point.hpp"
+#include "../1-base/Line.hpp"
 namespace Geo2D {
 
 struct Circle {
