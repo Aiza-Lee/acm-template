@@ -7,8 +7,8 @@
  * 		VT: 附加值类型，默认为 int
  * interface:
  * 		KDTree(int siz): 			// 构造函数，指定最大节点数，内部实现会回收节点
- *  	insert(Point pt):				// 插入节点，pt为Point类型，包含坐标信息
- * 		query_nearest(Point pt):		// 查询与pt最近的点的距离平方
+ *  	insert(Point pt):			// 插入节点，pt为Point类型，包含坐标信息
+ * 		query_nearest(Point pt):	// 查询与pt最近的点的距离平方
  * 		query_box(Point lower, Point upper): // 查询矩形范围内点权值和
  * note:
  * 		1. 时间复杂度：
