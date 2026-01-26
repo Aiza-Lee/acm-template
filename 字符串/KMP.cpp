@@ -32,7 +32,8 @@ struct KMP {
 		int m = s.length();
 		pi.assign(m, 0);
 		// j 代表当前匹配的前缀长度，也即 s[0...j-1] 是 s[0...i] 的后缀
-		for (int i = 1, j = 0; i < m; i++) {
+		int j = 0;
+		rep(i, 1, m - 1) {
 			while (j > 0 && s[i] != s[j]) j = pi[j - 1];
 			if (s[i] == s[j]) j++;
 			pi[i] = j;
@@ -48,7 +49,8 @@ struct KMP {
 		int n = t.length(), m = s.length();
 		if (m == 0) return occ;
 		
-		for (int i = 0, j = 0; i < n; i++) {
+		int j = 0;
+		rep(i, 0, n - 1) {
 			while (j > 0 && t[i] != s[j]) j = pi[j - 1];
 			if (t[i] == s[j]) j++;
 			if (j == m) {

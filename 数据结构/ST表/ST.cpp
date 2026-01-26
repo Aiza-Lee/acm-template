@@ -1,24 +1,52 @@
 #include "aizalib.h"
+
 /**
- * ST表
- * 构造函数传入数组长度n和数组指针vl(从1开始)
+ * Sparse Table (ST表)
+ * 算法介绍:
+ * 		ST表用于解决静态区间最值查询 (RMQ) 问题，也可用于其他可重复贡献问题（如 GCD）。
+ * 		预处理时间复杂度 O(N log N)，查询时间复杂度 O(1)。
+ * 		基于倍增思想，st[j][i] 表示以 i 为起点，长度为 2^j 的区间的最值。
+ * 
+ * 模板参数:
+ * 		T: 元素类型
+ * 		Merge: 合并函数对象，用于定义区间运算规则 (如 max, min, gcd)
+ * 
+ * Interface:
+ * 		SparseTable(const std::vector<T>& a, Merge merge = Merge())
+ * 		T query(int l, int r): 查询闭区间 [l, r] 的结果 (0-based)
+ * 
+ * Note:
+ * 		1. 时间复杂度: 预处理 O(N log N), 查询 O(1)
+ * 		2. 空间复杂度: O(N log N)
+ * 		3. 0-based indexing
+ * 		4. 适用场景: 静态区间 RMQ, 区间 GCD 等。不支持修改。
  */
-struct ST {
-	std::vector<std::vector<int>> st;
-	std::vector<int> lg2;
-	size_t n;
-	ST(size_t n, int* vl) : n(n) {
-		lg2.resize(n + 1);
-		rep(i, 2, n) lg2[i] = lg2[i / 2] + 1;
 
-		st.resize(lg2[n] + 1, std::vector<int>(n + 1));
+template <typename T, typename Merge = std::function<T(const T&, const T&)>>
+struct SparseTable {
+	int n;
+	std::vector<std::vector<T>> st;
+	std::vector<int> lg;
+	Merge merge;
 
-		rep(i, 1, n) st[0][i] = vl[i];
-		rep(p, 1, lg2[n]) rep(i, 1, n - (1 << p) + 1)
-			st[p][i] = std::max(st[p - 1][i], st[p - 1][i + (1 << (p - 1))]);
+	SparseTable(const std::vector<T>& a, Merge merge = Merge()) : n(a.size()), merge(merge) {
+		lg.assign(n + 1, 0);
+		rep(i, 2, n) lg[i] = lg[i / 2] + 1;
+
+		int K = lg[n];
+		st.assign(K + 1, std::vector<T>(n));
+
+		rep(i, 0, n - 1) st[0][i] = a[i];
+
+		rep(j, 1, K) {
+			rep(i, 0, n - (1 << j)) {
+				st[j][i] = merge(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
+			}
+		}
 	}
-	int query(int lm, int rm) {
-		int k = lg2[rm - lm + 1];
-		return std::max(st[k][lm], st[k][rm - (1 << k) + 1]);
+
+	T query(int l, int r) {
+		int j = lg[r - l + 1];
+		return merge(st[j][l], st[j][r - (1 << j) + 1]);
 	}
 };

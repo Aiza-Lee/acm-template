@@ -19,12 +19,17 @@
  * 		1. 时间复杂度: O(M \alpha(N)) 或 O(M \log N)
  * 		2. 空间复杂度: O(N + M)
  * 		3. 1-based indexing
+ * 		4. 适用场景: 需要求有向图必经点、支配关系、必经边等问题。
+ * 		5. 使用方法:
+ * 			- 实例化 LengauerTarjan(n)。
+ * 			- 调用 add_edge(u, v) 加边。
+ * 			- 调用 build(s) 构建，结果存通过 query_idom(u) 或访问 dom_tree 获取。
  */
 
 struct Graph {
 	int n;
 	std::vector<std::vector<int>> adj;
-	std::vector<std::vector<int>> rev; // 反向图，用于计算 semi-dominator
+	std::vector<std::vector<int>> rev;
 
 	Graph(int n) : n(n), adj(n + 1), rev(n + 1) {}
 
@@ -38,20 +43,12 @@ struct LengauerTarjan {
 	int n;
 	Graph graph;
 
-	// dfn: DFS 序
-	// raw_rev: DFS 序映射回节点编号
-	// fa: DFS 树上的父节点
-	// sdom: 半必经点
-	// idom: 最近支配点
-	// dsu, mn: 带权并查集辅助数组
 	std::vector<int> dfn, raw_rev, fa, sdom, idom;
 	std::vector<int> dsu, mn;
-		
-	// semi_bucket: 用于延迟计算 idom
+	
 	std::vector<std::vector<int>> semi_bucket;
-	// dom_tree: 最终的支配树结构
 	std::vector<std::vector<int>> dom_tree;
-		
+	
 	int timer;
 
 	LengauerTarjan(int n) : n(n), graph(n), 
@@ -67,7 +64,6 @@ struct LengauerTarjan {
 		graph.add_edge(u, v);
 	}
 
-	// 带权并查集查找，同时维护路径上 sdom 的 DFS 序最小的节点
 	int find(int u) {
 		if (dsu[u] == u) return u;
 		int root = find(dsu[u]);
@@ -89,61 +85,47 @@ struct LengauerTarjan {
 	}
 
 	void build(int s) {
-		// 重置状态
 		timer = 0;
 		std::fill(dfn.begin(), dfn.end(), 0);
 		std::fill(idom.begin(), idom.end(), 0);
 		std::iota(dsu.begin(), dsu.end(), 0);
 		std::iota(mn.begin(), mn.end(), 0);
 		std::iota(sdom.begin(), sdom.end(), 0);
-		for(auto& vec : semi_bucket) vec.clear();
-		for(auto& vec : dom_tree) vec.clear();
+		
+		rep(i, 0, n) {
+			semi_bucket[i].clear();
+			dom_tree[i].clear();
+		}
 
 		dfs(s);
 
-		// 按 DFS 序逆序处理
 		per(i, timer, 2) {
 			int u = raw_rev[i];
-			
-			// 1. 计算 semi-dominator
 			for (int v : graph.rev[u]) {
-				if (!dfn[v]) continue; // 跳过不可达的前驱
+				if (!dfn[v]) continue;
 				find(v);
-				// 取 v 的祖先中 sdom 的 dfn 最小者
 				if (dfn[sdom[mn[v]]] < dfn[sdom[u]]) {
 					sdom[u] = sdom[mn[v]];
 				}
 			}
-			
-			// 将 u 加入其 sdom 的桶中
 			semi_bucket[sdom[u]].push_back(u);
-			dsu[u] = fa[u]; // 在并查集中连接到父节点
-			
-			// 2. 利用路径压缩计算 idom (可能只是近似值，后续修正)
-			// 处理以当前节点 u 的父节点 p 为 sdom 的所有节点 v
-			int p = fa[u];
-			for (int v : semi_bucket[p]) {
+			dsu[u] = fa[u];
+			for (int v : semi_bucket[fa[u]]) {
 				find(v);
-				if (sdom[mn[v]] == p) {
-					idom[v] = p;
+				if (sdom[mn[v]] == fa[u]) {
+					idom[v] = fa[u];
 				} else {
-					idom[v] = mn[v]; // 暂时记录，idom[v] = idom[mn[v]]，推迟到最后一步处理
+					idom[v] = mn[v];
 				}
 			}
-			semi_bucket[p].clear();
+			semi_bucket[fa[u]].clear();
 		}
 
-		// 3. 修正 idom
 		rep(i, 2, timer) {
 			int u = raw_rev[i];
 			if (idom[u] != sdom[u]) {
 				idom[u] = idom[idom[u]];
 			}
-		}
-		
-		// 构建支配树边
-		rep(i, 2, timer) {
-			int u = raw_rev[i];
 			dom_tree[idom[u]].push_back(u);
 		}
 	}
