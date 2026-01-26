@@ -43,7 +43,7 @@ struct LengauerTarjan {
 	int n;
 	Graph graph;
 
-	std::vector<int> dfn, raw_rev, fa, sdom, idom;
+	std::vector<int> dfn, inv_dfn, fa, sdom, idom;
 	std::vector<int> dsu, mn;
 	
 	std::vector<std::vector<int>> semi_bucket;
@@ -52,7 +52,7 @@ struct LengauerTarjan {
 	int timer;
 
 	LengauerTarjan(int n) : n(n), graph(n), 
-							dfn(n + 1), raw_rev(n + 1), fa(n + 1), sdom(n + 1), idom(n + 1), 
+							dfn(n + 1), inv_dfn(n + 1), fa(n + 1), sdom(n + 1), idom(n + 1), 
 							dsu(n + 1), mn(n + 1), 
 							semi_bucket(n + 1), dom_tree(n + 1), timer(0) {
 		std::iota(dsu.begin(), dsu.end(), 0);
@@ -75,7 +75,7 @@ struct LengauerTarjan {
 
 	void dfs(int u) {
 		dfn[u] = ++timer;
-		raw_rev[timer] = u;
+		inv_dfn[timer] = u;
 		for (int v : graph.adj[u]) {
 			if (!dfn[v]) {
 				fa[v] = u;
@@ -100,7 +100,7 @@ struct LengauerTarjan {
 		dfs(s);
 
 		per(i, timer, 2) {
-			int u = raw_rev[i];
+			int u = inv_dfn[i];
 			for (int v : graph.rev[u]) {
 				if (!dfn[v]) continue;
 				find(v);
@@ -122,7 +122,7 @@ struct LengauerTarjan {
 		}
 
 		rep(i, 2, timer) {
-			int u = raw_rev[i];
+			int u = inv_dfn[i];
 			if (idom[u] != sdom[u]) {
 				idom[u] = idom[idom[u]];
 			}
