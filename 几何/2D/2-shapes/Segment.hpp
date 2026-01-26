@@ -5,7 +5,8 @@ namespace Geo2D {
 
 struct Segment {
 	Point a, b;
-	Segment(Point a = Point(), Point b = Point()) : a(a), b(b) {}
+	Segment() : a(Point()), b(Point()) {}
+	Segment(Point a, Point b) : a(a), b(b) {}
 };
 
 /**

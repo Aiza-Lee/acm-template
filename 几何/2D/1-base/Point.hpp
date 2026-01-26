@@ -4,7 +4,8 @@ namespace Geo2D {
 
 struct Point {
 	ld x, y;
-	Point(ld x = 0, ld y = 0) : x(x), y(y) {}
+	Point() : x(0), y(0) {}
+	Point(ld x, ld y) : x(x), y(y) {}
 		
 	Point operator+(const Point& p) const { return Point(x + p.x, y + p.y); }
 	Point operator-(const Point& p) const { return Point(x - p.x, y - p.y); }

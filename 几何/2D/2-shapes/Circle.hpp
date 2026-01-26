@@ -5,7 +5,8 @@ namespace Geo2D {
 
 struct Circle {
 	Point c; ld r;
-	Circle(Point c = Point(), ld r = 0) : c(c), r(r) {}
+	Circle() : c(Point()), r(0) {}
+	Circle(Point c, ld r) : c(c), r(r) {}
 	bool contains(Point p) const { return dcmp(c.dist_to(p), r) <= 0; }
 	// 圆周上的点，angle为弧度
 	Point point(ld angle) const {
