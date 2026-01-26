@@ -1,5 +1,5 @@
-#include "../shapes/Circle.hpp"
-#include "../shapes/Triangle.hpp"
+#include "../2-shapes/Circle.hpp"
+#include "../2-shapes/Triangle.hpp"
 namespace Geo2D {
 
 /**

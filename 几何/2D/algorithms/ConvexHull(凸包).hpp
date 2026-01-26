@@ -1,5 +1,5 @@
 #pragma once
-#include "../shapes/Polygon.hpp"
+#include "../2-shapes/Polygon.hpp"
 
 namespace Geo2D {
 /**

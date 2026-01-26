@@ -1,5 +1,5 @@
 #pragma once
-#include "../base/Line.hpp"
+#include "../1-base/Line.hpp"
 
 namespace Geo2D {
 
