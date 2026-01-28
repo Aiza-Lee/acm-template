@@ -1,7 +1,23 @@
 #include "aizalib.h"
 
 /**
- * 简化的方阵模板
+ * Simple Matrix (简易方阵)
+ * 算法介绍:
+ * 		固定大小的方阵模板，支持加减乘、快速幂及行列式计算。
+ * 
+ * 模板参数:
+ * 		[R]: 矩阵维度 (Rows = Cols = R)
+ * 		[T]: 元素类型 (默认支持 double, Mint 等域类型)
+ * 
+ * Interface:
+ * 		Matrix<R, T> Identity(): 返回单位矩阵
+ * 		Matrix<R, T> transpose(): 返回转置矩阵
+ * 		T det(): 计算行列式 (Gaussian Elimination, O(R^3))
+ * 
+ * Note:
+ * 		1. 时间复杂度: 乘法 O(R^3), 行列式 O(R^3)
+ * 		2. 适用场景: R <= 500 的方阵运算
+ * 		3. 若 T 为浮点数，det() 使用最大主元消元保证精度。
  */
 template<size_t R, typename T>
 struct Matrix {
@@ -41,11 +57,33 @@ struct Matrix {
 		return res;
 	}
 	T det() const {
-		Matrix<R, T> tmp;
-		T res = static_cast<T>(1);
-		rep(i, 0, R - 1) rep(j, i + 1, R - 1) {
-			
+		Matrix<R, T> tmp = *this;
+		T res = 1;
+		rep(i, 0, R - 1) {
+			int k = i;
+			rep(j, i + 1, R - 1) {
+				if constexpr (std::is_floating_point_v<T>) {
+					if (std::abs(tmp[j][i]) > std::abs(tmp[k][i])) k = j;
+				} else {
+					if (tmp[j][i] != T(0) && tmp[k][i] == T(0)) k = j;
+				}
+			}
+
+			if (tmp[k][i] == T(0)) return T(0);
+
+			if (k != i) {
+				rep(j, i, R - 1) std::swap(tmp[i][j], tmp[k][j]);
+				res = -res;
+			}
+
+			res *= tmp[i][i];
+			T inv = T(1) / tmp[i][i];
+			rep(j, i + 1, R - 1) {
+				T mul = tmp[j][i] * inv;
+				rep(l, i, R - 1) tmp[j][l] -= mul * tmp[i][l];
+			}
 		}
+		return res;
 	}
 
 	friend Matrix<R, T> fast_pow(const Matrix<R, T>& mat, int power) {
