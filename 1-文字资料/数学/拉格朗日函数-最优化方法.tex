@@ -1,33 +1,51 @@
 \textbf{拉格朗日函数}
 
-问题形式：
+\textbf{问题形式}
+\[\begin{aligned} 
+\min_{x\in\mathbb R^n} \quad & f(x) \\
+\text{s.t.} \quad & h_i(x) = 0, \quad i=1,\dots,m \\
+& g_j(x) \le 0, \quad j=1,\dots,p 
+\end{aligned}\]
 
-\[\begin{aligned} \min_{x\in\mathbb R^n} f(x) \quad \text{s.t.} \\ h(x) = 0 &\quad h:\mathbb R^n\rightarrow\mathbb R^m,\\ g(x) \le 0 &\quad g:\mathbb R^n\rightarrow\mathbb R^p. \end{aligned}\]
-
-拉格朗日函数：
-
-\[\mathcal L(x,\lambda,\mu) = f(x) + \lambda^Th + \mu^Tg.\]
-
-其中\(\lambda \in \mathbb R^m,\mu \in \mathbb R^p\).
-
- 
+\textbf{拉格朗日函数}
+\[\mathcal L(x,\lambda,\mu) = f(x) + \sum_{i=1}^m \lambda_i h_i(x) + \sum_{j=1}^p \mu_j g_j(x)\]
+其中 \(\lambda \in \mathbb R^m, \mu \in \mathbb R^p\) 为拉格朗日乘子。
 
 \textbf{KKT条件（必要条件）}
 
-设\(x^*\)为局部最优解，则存在\(\lambda^*\)与\(\mu^*\)使得以下KKT条件成立：
+设 \(x^*\) 为局部最优解，且满足正则性条件（如 LICQ），则存在 \(\lambda^*, \mu^*\) 使得：
 
-- 可行性
+\begin{itemize}
+    \item \textbf{平稳性}（Stationarity）：
+    \[ \nabla f(x^*) + \sum_{i=1}^m \lambda_i^* \nabla h_i(x^*) + \sum_{j=1}^p \mu_j^* \nabla g_j(x^*) = 0 \]
+    \item \textbf{原始可行性}（Primal Feasibility）：
+    \[ h_i(x^*) = 0, \quad g_j(x^*) \le 0 \]
+    \item \textbf{对偶可行性}（Dual Feasibility）：
+    \[ \mu_j^* \ge 0 \]
+    \item \textbf{互补松弛}（Complementary Slackness）：
+    \[ \mu_j^* g_j(x^*) = 0 \]
+\end{itemize}
 
-\[h(x^*) = 0, \quad g(x^*)\le 0.\]
+\textbf{对偶理论}
 
-- 非负性
+\textbf{对偶函数}
+定义拉格朗日对偶函数 \(g: \mathbb R^m \times \mathbb R^p \to \mathbb R\)：
+\[ g(\lambda, \mu) = \inf_{x \in \mathcal{D}} \mathcal{L}(x, \lambda, \mu) \]
+性质：\(g(\lambda, \mu)\) 是凹函数。
 
-\[\mu^* \ge 0.\]
+\textbf{对偶问题}
+\[ \max_{\lambda, \mu} g(\lambda, \mu) \quad \text{s.t.} \quad \mu \ge 0 \]
+设 \(d^*\) 为对偶问题最优值，\(p^*\) 为原问题最优值。
 
-- 站点
+\textbf{弱对偶性}（Weak Duality）
+\[ d^* \le p^* \]
+恒成立。
 
-\[\nabla_x\mathcal L(x,\lambda, \mu) = \nabla f(x^*) + J_h(x^*){\lambda^*}^T + J_g(x^*){\mu^*}^T = 0.\]
+\textbf{强对偶性}（Strong Duality）
+\[ d^* = p^* \]
+通常在凸优化问题满足 \textbf{Slater条件} 时成立。
 
-- 互补松弛
-
-\[{\mu^*}^Tg(x^*) = 0. \]
+\textbf{Slater条件}
+若原问题为凸问题（\(f, g_j\) 凸，\(h_i\) 仿射），且存在 \(x \in \text{relint}(\mathcal{D})\) 使得：
+\[ \forall i, h_i(x)=0, \quad \forall j, g_j(x) < 0 \]
+则强对偶性成立。
