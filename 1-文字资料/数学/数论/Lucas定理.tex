@@ -1,0 +1,20 @@
+\textbf{Lucas定理}
+
+对于质数 $p$，非负整数 $n, m$，有：
+\[ \binom{n}{m} \equiv \binom{\lfloor n/p \rfloor}{\lfloor m/p \rfloor} \cdot \binom{n \bmod p}{m \bmod p} \pmod p \]
+即若 $n, m$ 的 $p$ 进制展开为 $n = (n_k \dots n_1 n_0)_p, m = (m_k \dots m_1 m_0)_p$，则：
+\[ \binom{n}{m} \equiv \prod_{i=0}^k \binom{n_i}{m_i} \pmod p \]
+
+\textbf{扩展 Lucas 定理}
+计算 $\binom{n}{m} \pmod M$，其中 $M$ 不一定是质数。
+
+将 $M$ 分解质因数 $M = \prod p_i^{c_i}$。
+对于每个 $p_i^{c_i}$，计算 $\binom{n}{m} \pmod{p_i^{c_i}}$。
+最后使用中国剩余定理合并结果。
+
+计算 $\binom{n}{m} \pmod{p^k}$：
+\[ \binom{n}{m} = \frac{n!}{m!(n-m)!} \]
+不能直接求逆元，因为分母可能包含 $p$ 的因子。
+计算 $n! \pmod{p^k}$ 时，先提取出所有 $p$ 的倍数。
+$n! = p^{\sum_{j=1}^{\infty} \lfloor n/p^j \rfloor} \cdot \underbrace{\prod_{i=1, p \nmid i}^n i}_{\text{部分 A}} $
+部分 A 也具有循环性质，循环节长度为 $p^k$，可以递归或循环计算。

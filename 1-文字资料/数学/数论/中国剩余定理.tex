@@ -1,0 +1,21 @@
+\textbf{中国剩余定理 (CRT)}
+设 $m_1, m_2, \dots, m_n$ 两两互质，$M = \prod_{i=1}^n m_i, M_i = M/m_i$。
+方程组
+\[
+\begin{cases}
+x \equiv a_1 \pmod{m_1} \\
+x \equiv a_2 \pmod{m_2} \\
+\vdots \\
+x \equiv a_n \pmod{m_n}
+\end{cases}
+\]
+在 $\pmod M$ 下有唯一解：
+\[ x \equiv \sum_{i=1}^n a_i M_i (M_i^{-1} \pmod{m_i}) \pmod M \]
+
+\textbf{扩展中国剩余定理 (ExCRT)}
+当 $m_i$ 不两两互质时，采用两两合并的方法。
+对于两个方程：
+\[ \begin{cases} x \equiv a_1 \pmod{m_1} \\ x \equiv a_2 \pmod{m_2} \end{cases} \]
+转化为 $x = k_1 m_1 + a_1 = k_2 m_2 + a_2 \implies k_1 m_1 - k_2 m_2 = a_2 - a_1$。
+用扩展欧几里得求出一组特解，若 $\gcd(m_1, m_2) \nmid (a_2 - a_1)$ 则无解。
+否则通解为 $x \equiv x_0 \pmod{\text{lcm}(m_1, m_2)}$。
