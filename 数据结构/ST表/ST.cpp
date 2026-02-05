@@ -13,12 +13,12 @@
  * 
  * Interface:
  * 		SparseTable(const std::vector<T>& a, Merge merge = Merge())
- * 		T query(int l, int r): 查询闭区间 [l, r] 的结果 (0-based)
+ * 		T query(int l, int r): 查询闭区间 [l, r] 的结果 (1-based)
  * 
  * Note:
  * 		1. 时间复杂度: 预处理 O(N log N), 查询 O(1)
  * 		2. 空间复杂度: O(N log N)
- * 		3. 0-based indexing
+ * 		3. 1-based indexing
  * 		4. 适用场景: 静态区间 RMQ, 区间 GCD 等。不支持修改。
  */
 
@@ -29,17 +29,17 @@ struct SparseTable {
 	std::vector<int> lg;
 	Merge merge;
 
-	SparseTable(const std::vector<T>& a, Merge merge = Merge()) : n(a.size()), merge(merge) {
+	SparseTable(const std::vector<T>& a, Merge merge = Merge()) : n(a.size() - 1), merge(merge) {
 		lg.assign(n + 1, 0);
 		rep(i, 2, n) lg[i] = lg[i / 2] + 1;
 
 		int K = lg[n];
-		st.assign(K + 1, std::vector<T>(n));
+		st.assign(K + 1, std::vector<T>(n + 1));
 
-		rep(i, 0, n - 1) st[0][i] = a[i];
+		rep(i, 1, n) st[0][i] = a[i - 1];
 
 		rep(j, 1, K) {
-			rep(i, 0, n - (1 << j)) {
+			rep(i, 1, n - (1 << j) + 1) {
 				st[j][i] = merge(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
 			}
 		}
