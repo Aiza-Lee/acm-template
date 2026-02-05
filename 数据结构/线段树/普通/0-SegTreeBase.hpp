@@ -4,12 +4,17 @@
  * 通用线段树模板
  * 实现了一般模式下通用的 区间修改，区间查询，线段树二分
  * 
+ * 核心设计:
+ *   Info:       存储所有信息（包括结构固有信息和动态维护信息）。
+ *               - init: 		用于 Query 和 Build，执行完整的合并（Length + Value）。
+ *               - operator+:	用于 Modify，执行增量/局部合并（仅更新 Value，假设 Length 不变），优化常数。
+ *   Tag:        存储懒惰标记。
+ * 
  * Requirements:
- *   StaticInfo:	operator+(rhs)
- *   Info:			operator+(rhs)
- *   Tag:			merge(rhs), has_value(), apply_to(Info&, const StaticInfo&)
+ *   Info:			operator+(rhs), update(l, r)
+ *   Tag:			merge(rhs), has_value(), apply_to(Info&)
  */
-template<class Info, class Tag, class StaticInfo>
+template<class Info, class Tag>
 struct SegTree {
 #define ls p << 1, l, mid
 #define rs p << 1 | 1, mid + 1, r
@@ -17,10 +22,9 @@ struct SegTree {
 	int n;
 	std::vector<Info> info;
 	std::vector<Tag> tag;
-	std::vector<StaticInfo> si;
 
 	SegTree() {}
-	SegTree(int n) : n(n), info(4 * n), tag(4 * n), si(4 * n) {}
+	SegTree(int n) : n(n), info(4 * n), tag(4 * n) {}
 		
 	template<typename InitFunc>
 	SegTree(int n, InitFunc init) : SegTree(n) {
@@ -29,14 +33,13 @@ struct SegTree {
 	template<typename InitFunc>
 	void _build(const InitFunc &init, int p, int l, int r) {
 		if (l == r) {
-			init(l, si[p], info[p]);
+			init(l, info[p]);
 			return;
 		}
 		int mid = (l + r) >> 1;
 		_build(init, ls);
 		_build(init, rs);
-		si[p] = si[p << 1] + si[p << 1 | 1];
-		_push_up(p);
+		info[p].init(info[p << 1], info[p << 1 | 1]);
 	}
 
 	/// Public Interface ///
@@ -49,7 +52,7 @@ struct SegTree {
 		info[p] = info[p << 1] + info[p << 1 | 1];
 	}
 	void _add_tag(int p, const Tag &v) {
-		v.apply_to(info[p], si[p]);
+		v.apply_to(info[p]);
 		tag[p].merge(v);
 	}
 	void _push_down(int p) {
