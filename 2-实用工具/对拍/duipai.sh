@@ -26,14 +26,14 @@ while true; do
 	((t++))
 	printf "\rTest: %d" $t
 
-	./g > in
-	./m < in > out
+	./g > data.in
+	./m < data.in > data.out
 
 	if [ "$4" == "spj" ]; then
-		./s in out > ans || break
+		./s data.in data.out > data.ans || break
 	else
-		./s < in > ans
-		diff -w out ans || break
+		./s < data.in > data.ans
+		diff -w data.out data.ans || break
 	fi
 done
 echo -e "\nWA!"

@@ -24,17 +24,17 @@ set t=0
 set /a t+=1
 echo Test: %t%
 
-g.exe > in
-m.exe < in > out
+g.exe > data.in
+m.exe < data.in > data.out
 
 if "%MODE%"=="spj" (
 	:: SPJ Mode: s.exe input user_out
-	s.exe in out > ans
+	s.exe data.in data.out > data.ans
 	if errorlevel 1 goto error
 ) else (
 	:: Normal Mode: diff with std output
-	s.exe < in > ans
-	fc /W out ans > nul
+	s.exe < data.in > data.ans
+	fc /W data.out data.ans > nul
 	if errorlevel 1 goto error
 )
 
