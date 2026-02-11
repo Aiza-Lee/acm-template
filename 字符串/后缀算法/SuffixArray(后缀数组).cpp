@@ -18,7 +18,7 @@
  * 		2. rk[i]: 起始位置为i的后缀的排名 (1-based, 值域 1~n)
  * 		3. height[i]: LCP(suffix(sa[i]), suffix(sa[i-1]))
  * 		4. 构造复杂度 O(N log N)
- * 		5. 内部实现使用 1-based 索引，为了兼容性，输入字符串s会被拷贝并前置一个占位符。
+ * 		5. 内部实现使用 1-based 索引，输入字符串s会被拷贝并前置一个占位符。
  */
 struct SuffixArray {
 	int n, m;

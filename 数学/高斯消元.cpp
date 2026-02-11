@@ -20,58 +20,81 @@
 
 struct Gauss {
 	static constexpr double EPS = 1e-9;
-
-	// 返回值: 0-无解, 1-唯一解, 2-无穷多解
-	// a[i][0..n-1] 为系数矩阵, a[i][n] 为常数项
-	// 注意: 传入的 a 会被修改
+	// 0-No solution, 1-Unique, 2-Infinite
 	static int solve(std::vector<std::vector<double>>& a, std::vector<double>& ans) {
-		int n = a.size();
-		int m = a[0].size() - 1;  // m 为未知数个数
-
-		std::vector<int> pos(m, -1);	 // pos[i] 表示第 i 个未知数在第几行被消元
-
-		int row = 0;						 // 当前处理的行
-		rep(col, 0, m - 1) {	 // 枚举列(未知数)
-			// 找到当前列绝对值最大的行(主元选择)
+		int n = a.size(), m = a[0].size() - 1, row = 0;
+		std::vector<int> pos(m, -1);
+		rep(col, 0, m - 1) {
 			int pivot = row;
-			rep(i, row + 1, n - 1) if (std::abs(a[i][col]) > std::abs(a[pivot][col])) 
-				pivot = i;
-
+			rep(i, row + 1, n - 1) if (std::abs(a[i][col]) > std::abs(a[pivot][col])) pivot = i;
 			if (std::abs(a[pivot][col]) < EPS) continue;
-
-			std::swap(a[pivot], a[row]);
-			pos[col] = row;
-
-			// 消元：将当前列下方的元素变为 0
+			std::swap(a[pivot], a[row]); pos[col] = row;
 			rep(i, row + 1, n - 1) if (std::abs(a[i][col]) > EPS) {
 				double factor = a[i][col] / a[row][col];
-				rep(j, col, m) 
-					a[i][j] -= a[row][j] * factor;
+				rep(j, col, m) a[i][j] -= a[row][j] * factor;
 			}
 			row++;
 		}
-
-		// 检查是否有矛盾(无解)
-		rep(i, row, n - 1) if (std::abs(a[i][m]) > EPS) 
-			return 0;  // 无解
-
-		// 回代求解
+		rep(i, row, n - 1) if (std::abs(a[i][m]) > EPS) return 0;
 		ans.assign(m, 0);
-		per(col, m - 1, 0) {
-			if (pos[col] != -1) {
-				int r	 = pos[col];
-				ans[col] = a[r][m];
-				rep(j, col + 1, m - 1) {
-					ans[col] -= a[r][j] * ans[j];
-				}
-				ans[col] /= a[r][col];
-			}
+		per(col, m - 1, 0) if (pos[col] != -1) {
+			int r = pos[col]; ans[col] = a[r][m];
+			rep(j, col + 1, m - 1) ans[col] -= a[r][j] * ans[j];
+			ans[col] /= a[r][col];
 		}
+		rep(col, 0, m - 1) if (pos[col] == -1) return 2;
+		return 1;
+	}
+};
 
-		// 检查是否有自由变元(无穷多解)
-		rep(col, 0, m - 1) if (pos[col] == -1) 
-			return 2;  // 无穷多解
-
-		return 1;  // 唯一解
+/**
+ * 整数高斯消元 (Integer Gauss Elimination)
+ * 算法介绍:
+ * 		用于求解线性方程组 Ax = B 的整数解。
+ * 		使用辗转相除法 (欧几里得算法) 进行消元，避免浮点误差，通过 GCD 性质化简系数。
+ * 
+ * 模板参数:
+ * 		None
+ * 
+ * Interface:
+ * 		int solve(std::vector<std::vector<i64>>& a, std::vector<i64>& ans)
+ * 
+ * Note:
+ * 		1. Time: O(N^2 (N + log(MaxVal)))
+ * 		2. Space: O(N^2)
+ * 		3. 返回值: 0-无整数解, 1-有解 (如果存在自由变元，此代码将其视为0求特解)
+ */
+struct IntegerGauss {
+	// 1-Has solution, 0-No solution
+	static int solve(std::vector<std::vector<i64>>& a, std::vector<i64>& ans) {
+		int n = a.size(), m = a[0].size() - 1, row = 0;
+		if (n == 0) return 0;
+		rep(col, 0, m - 1) {
+			if (row >= n) break;
+			int pivot = row;
+			while (pivot < n && a[pivot][col] == 0) pivot++;
+			if (pivot == n) continue;
+			if (pivot != row) std::swap(a[row], a[pivot]);
+			rep(i, row + 1, n - 1) {
+				while (a[i][col] != 0) {
+					i64 div = a[row][col] / a[i][col];
+					rep(j, col, m) a[row][j] -= div * a[i][j];
+					std::swap(a[row], a[i]);
+				}
+			}
+			row++;
+		}
+		ans.assign(m, 0);
+		rep(i, row, n - 1) if (a[i][m] != 0) return 0;
+		per(i, row - 1, 0) {
+			int pivot_col = -1;
+			rep(j, 0, m - 1) if (a[i][j] != 0) { pivot_col = j; break; }
+			if (pivot_col == -1) continue;
+			i64 rhs = a[i][m];
+			rep(j, pivot_col + 1, m - 1) rhs -= a[i][j] * ans[j];
+			if (rhs % a[i][pivot_col] != 0) return 0; 
+			ans[pivot_col] = rhs / a[i][pivot_col];
+		}
+		return 1;
 	}
 };
