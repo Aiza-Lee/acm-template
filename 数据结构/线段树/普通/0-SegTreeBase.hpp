@@ -109,3 +109,35 @@ struct SegTree {
 #undef ls
 #undef rs
 };
+
+/*
+// --- Info & Tag Template ---
+struct Info {
+	int len = 1;
+	// i64 sum = 0;
+	// i64 min = INF;
+
+	// Init from value (used in build/modify leaf)
+	// Info(int v = 0) : len(1), sum(v) {} 
+
+	// PushUp logic
+	friend Info operator+(const Info& a, const Info& b) {
+		return { a.len + b.len };
+	}
+};
+
+struct Tag {
+	// i64 add = 0;
+	// i64 mul = 1;
+
+	bool has_value() const { return false; /* return add != 0 || mul != 1; }
+	
+	void merge(const Tag& t) {
+		// add = (add + t.add);
+	}
+	
+	void apply_to(Info& info) const {
+		// info.sum += add * info.len;
+	}
+};
+*/

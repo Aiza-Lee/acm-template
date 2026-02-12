@@ -10,9 +10,6 @@ using pii = std::pair<int, int>;
 const int N = 1e5 + 5, M = 1e5 + 5;
 const double EPS = 1e-10;
 
-std::mt19937 rnd(20050930);
-std::mt19937_64 rnd64(20050930);
-
 #define rep(i, a, b) for (int i = (a); i <= (b); ++i)
 #define per(i, a, b) for (int i = (a); i >= (b); --i)
 
@@ -25,9 +22,6 @@ std::mt19937_64 rnd64(20050930);
 	#define DEN(x) ((void)0);
 	#define AST(x) ((void)0);
 #endif
-
-int rand_int(int mn, int mx);
-bool is_prime(int x);
 
 const int md = 998244353;
 int mod(i64 x) { return (x %= md) < 0 ? x + md : x; }
