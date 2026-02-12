@@ -5,13 +5,12 @@
  * 实现了一般模式下通用的 区间修改，区间查询，线段树二分
  * 
  * 核心设计:
- *   Info:       存储所有信息（包括结构固有信息和动态维护信息）。
- *               - init: 		用于 Query 和 Build，执行完整的合并（Length + Value）。
- *               - operator+:	用于 Modify，执行增量/局部合并（仅更新 Value，假设 Length 不变），优化常数。
+ *   Info:       存储所有信息（包括结构固有信息如长度等，以及动态维护信息）。
+ *               - operator+:	用于合并左右子节点信息 (PushUp)。
  *   Tag:        存储懒惰标记。
  * 
  * Requirements:
- *   Info:			operator+(rhs), update(l, r)
+ *   Info:			operator+(rhs)
  *   Tag:			merge(rhs), has_value(), apply_to(Info&)
  */
 template<class Info, class Tag>
@@ -39,7 +38,7 @@ struct SegTree {
 		int mid = (l + r) >> 1;
 		_build(init, ls);
 		_build(init, rs);
-		info[p].init(info[p << 1], info[p << 1 | 1]);
+		_push_up(p);
 	}
 
 	/// Public Interface ///
