@@ -9,8 +9,7 @@
  * 		其本质是分治，在分治树的每一层预处理经过中点的区间的前缀/后缀信息。
  * 		
  * 模板参数:
- * 		T: 维护的值类型
- * 		Op: 合并仿函数，Op(a, b)
+ * 		T: 维护的值类型，需重载 operator+ (需满足结合律，不要求交换律)
  * 
  * Interface:
  * 		build(a): 传入 1-based 数组构建
@@ -22,14 +21,13 @@
  * 		3. 内部补齐为 2 的幂次以利用位运算快速定位层级。
  */
 
-template<typename T, typename Op = std::plus<T>>
+template<typename T>
 struct CatTree {
 	int n, size, log_n;
 	std::vector<std::vector<T>> st;
-	Op op;
 	T unit; // 单位元 (用于非法情况或 padding，视具体运算而定，求max需设为-INF)
 
-	CatTree(int n, Op op = Op(), T unit = T()) : n(n), op(op), unit(unit) {
+	CatTree(int n, T unit = T()) : n(n), unit(unit) {
 		// 补齐到 2 的幂次，方便位运算定位
 		log_n = std::bit_width((unsigned int)n);
 		size = 1 << log_n;
@@ -47,10 +45,10 @@ struct CatTree {
 			// i <= mid: suffix(i, mid)
 			// i > mid : prefix(mid+1, i)
 			st[dep][mid] = st[0][mid];
-			per(i, mid - 1, l) st[dep][i] = op(st[0][i], st[dep][i + 1]);
+			per(i, mid - 1, l) st[dep][i] = st[0][i] + st[dep][i + 1];
 			
 			st[dep][mid + 1] = st[0][mid + 1];
-			rep(i, mid + 2, r) st[dep][i] = op(st[dep][i - 1], st[0][i]);
+			rep(i, mid + 2, r) st[dep][i] = st[dep][i - 1] + st[0][i];
 
 			self(self, dep + 1, l, mid);
 			self(self, dep + 1, mid + 1, r);
@@ -62,6 +60,6 @@ struct CatTree {
 		if (l == r) return st[0][l];
 		
 		int d = log_n - std::bit_width((unsigned int)((l - 1) ^ (r - 1))) + 1;
-		return op(st[d][l], st[d][r]);
+		return st[d][l] + st[d][r];
 	}
 };
