@@ -1,0 +1,83 @@
+\textbf{竞赛图 (Tournament Graph)}
+
+\textbf{定义}
+$n$ 个顶点的有向图，对于任意两个不同的顶点 $u, v$，恰有一条边连接 $u \to v$ 或 $v \to u$。竞赛图可视作完全图给每一条边定向后的结果。
+
+\textbf{兰道定理 (Landau's Theorem)}
+一个非负整数序列 $s_1 \le s_2 \le \dots \le s_n$ 是某个 $n$ 阶竞赛图的出度序列（Score Sequence），当且仅当满足以下条件：
+\[
+\sum_{i=1}^k s_i \ge \binom{k}{2}, \quad \forall 1 \le k < n, \quad \text{且} \quad \sum_{i=1}^n s_i = \binom{n}{2}
+\]
+\textbf{推论（SCC 分布）}：
+将出度序列升序排列后，若在下标 $k_1, k_2, \dots, k_m = n$ 处满足等号 $\sum_{i=1}^{k_j} s_i = \binom{k_j}{2}$，则这些位置是强连通分量（SCC）的分割点。
+具体来说，缩点后的 DAG 是一条链 $C_1 \to C_2 \to \dots \to C_m$，其中 $C_1$ 包含 $s_1 \dots s_{k_1}$ 对应的点，$C_2$ 包含 $s_{k_1+1} \dots s_{k_2}$ 对应的点，以此类推。
+这意味着：\textbf{出度序列唯一确定了竞赛图的强连通分量大小及拓扑结构}。
+
+\textbf{核心性质}
+\begin{enumerate}
+    \item \textbf{哈密顿路 (Redei's Theorem)}：任意竞赛图都存在一条哈密顿路径。
+    \item \textbf{强连通性 (Camion's Theorem)}：竞赛图强连通 $\iff$ 存在哈密顿回路。
+    \item \textbf{泛圈性 (Moon's Theorem)}：若 $n$ 阶竞赛图强连通，则对于任意顶点 $v$ 和任意 $k \in [3, n]$，都存在包含 $v$ 的长度为 $k$ 的回路。
+    \begin{itemize}
+        \item \textbf{推论}：强连通竞赛图包含 $3, 4, \dots, n$ 长度的环。
+    \end{itemize} 
+    \item \textbf{传递性}：竞赛图不含环 $\iff$ 它是传递的（$u \to v, v \to w \implies u \to w$） $\iff$ 出度序列为 $0, 1, \dots, n-1$（即 DAG，具有唯一的拓扑序）。
+    \item \textbf{SCC缩点形态}：竞赛图缩点后的 DAG 呈\textbf{线性链状}（$C_1 \to C_2 \to \dots \to C_m$），即任意 $u \in C_i, v \in C_j (i < j)$，都有 $u \to v$。
+    \begin{itemize}
+        \item 这种结构导致竞赛图的拓扑排序（Topological Sort）是唯一的（如果不考虑同一SCC内部顺序）。
+    \end{itemize}
+\end{enumerate}
+
+\textbf{计数相关}
+\begin{enumerate}
+    \item \textbf{三元环计数}：
+    $n$ 阶竞赛图中三元环的数量等于总的三元组数量 $\binom{n}{3}$ 减去非循环三元组的数量。非循环三元组必有一个点出度为 2（在该三元组诱导子图中）。
+    \[
+    \text{三元环数量} = \binom{n}{3} - \sum_{i=1}^n \binom{d_i}{2}
+    \]
+    其中 $d_i$ 是顶点 $i$ 的出度。
+    \item \textbf{最大三元环数}：当各点出度尽可能接近（即 $|d_i - d_j| \le 1$）时，三元环数量最多。
+    \begin{itemize}
+        \item $n$ 为奇数时，最大数量为 $\frac{n(n^2-1)}{24}$（正则竞赛图）。
+        \item $n$ 为偶数时，最大数量为 $\frac{n(n^2-4)}{24}$。
+    \end{itemize}
+    \item \textbf{线性性}：包含最多 3-环的竞赛图是正则的（或接近正则），包含最少 3-环（0 个）的竞赛图是传递的。
+\end{enumerate}
+
+\textbf{算法与构造}
+\begin{enumerate}
+    \item \textbf{寻找哈密顿路径} ($O(n \log n)$ 或 $O(n)$)：
+    \begin{itemize}
+        \item \textbf{归纳法/插入法}：假设已知 $v_1 \to v_2 \to \dots \to v_k$ 是前 $k$ 个点的路径。考虑新点 $u$，若 $u \to v_1$，则插在头部；若 $v_k \to u$，插在尾部；否则存在 $i$ 使得 $v_i \to u \to v_{i+1}$，插在中间。使用二分查找可达 $O(n \log n)$。
+    \end{itemize}
+    \item \textbf{寻找哈密顿回路} ($O(n^2)$ 或 $O(n)$)：
+    \begin{itemize}
+        \item 若已知强连通，先找一条哈密顿路径 $v_1 \to \dots \to v_n$。
+        \item 若 $v_n \to v_1$，则构成回路。
+        \item 否则，必存在 $i$ 使得 $v_i \to v_1$ 且 $v_n \to v_{i+1}$（这构成了一个 $3 \le len < n$ 的环加上路径剩余部分），可以通过调整构造出回路。
+    \end{itemize}
+    \item \textbf{寻找一个三元环} ($O(n)$)：
+    \begin{itemize}
+        \item 仅判断是否存在：检查出度序列是否为 $0, 1, \dots, n-1$（传递图无环）。
+        \item 构造：若存在，遍历所有点 $u$，找到出度最小的邻居 $v$（ 即 $u \to v$ 且 $out(v)$ 最小）。若 $out(v) < out(u)$，则必存在 $w$ 使得 $v \to w \to u$。实际上，只需遍历边 $(u, v)$，若 $out(v) < out(u)$ 则极大概率在环中。
+    \end{itemize}
+\end{enumerate}
+
+\textbf{特殊结论}
+\begin{itemize}
+    \item \textbf{国王 (King)}：
+    \begin{itemize}
+        \item \textbf{定义}：若顶点 $K$ 满足对于任意其他顶点 $v$，要么 $K \to v$，要么存在 $w$ 使得 $K \to w \to v$（即 $K$ 到任意点的距离 $\le 2$），则称 $K$ 为国王。
+        \item \textbf{Landau (1953)}：任意竞赛图都至少存在一个国王。特别地，**出度最大的点一定是国王**（可能有多个出度最大的点，它们都是国王；但也可能存在出度不是最大的国王）。
+        \item \textbf{数量性质}：
+        \begin{itemize}
+            \item 竞赛图没有“独裁者”（出度为 $n-1$ 的点）$\iff$ 原图强连通 $\iff$ 竞赛图至少有 3 个国王。
+            \item 实际上，强连通竞赛图中，国王的数量 $k$ 满足 $3 \le k \le n$。例如 $n$ 为奇数的正则竞赛图，所有点都是国王。
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{1-0 矩阵性质}：竞赛图的邻接矩阵 $A$ 满足 $A + A^T = J - I$（$J$ 为全1矩阵，$I$ 为单位阵）。
+    \item \textbf{翻转性质}：翻转竞赛图中任意一个三元环（$u \to v \to w \to u$）的方向（变为 $u \leftarrow v \leftarrow w \leftarrow u$），所有点的\textbf{出度不变}。
+    \begin{itemize}
+        \item \emph{解释}：在环中每个点都贡献了 1 个出度。翻转后，每个点依然贡献 1 个出度（指向原来的上家）。此性质常用于证明兰道定理的可行性：任意合法的出度序列都可以通过不断翻转三元环从传递图得到。
+    \end{itemize}
+\end{itemize}
