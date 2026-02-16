@@ -1,0 +1,33 @@
+\textbf{[容斥原理]}
+
+\textbf{定理}：
+设 $S$ 为有限集合，$A_1, A_2, \dots, A_n \subseteq S$，则
+\[
+\left| \bigcup_{i=1}^n A_i \right| = \sum_{\emptyset \neq T \subseteq \{1, \dots, n\}} (-1)^{|T|-1} \left| \bigcap_{i \in T} A_i \right|
+\]
+补集形式（常用于求解满足 \textbf{0个性质} 的元素个数）：
+\[
+\left| \bigcap_{i=1}^n \overline{A_i} \right| = |S| - \left| \bigcup_{i=1}^n A_i \right| = \sum_{T \subseteq \{1, \dots, n\}} (-1)^{|T|} \left| \bigcap_{i \in T} A_i \right|
+\]
+
+\textbf{[Min-Max 容斥]}
+
+对于集合 $S$，设 $\max(S)$ 为集合中元素的最大值，$\min(S)$ 为最小值，则：
+\[
+\max(S) = \sum_{\emptyset \neq T \subseteq S} (-1)^{|T|-1} \min(T)
+\]
+\[
+\min(S) = \sum_{\emptyset \neq T \subseteq S} (-1)^{|T|-1} \max(T)
+\]
+推广到第 $k$ 大值 ($\max_k(S)$)：
+\[
+\max\nolimits_k(S) = \sum_{\emptyset \neq T \subseteq S} (-1)^{|T|-k} \binom{|T|-1}{k-1} \min(T)
+\]
+\textbf{期望形式}：若元素值为随机变量，公式依然成立（即 $E[\max(S)] = \sum E[\min(T)] \dots$）。
+常用场景：求一堆随机变量中 \textbf{所有变量都出现} 的期望时间（即最后一个变量出现的期望时间），转化为求 \textbf{至少一个变量出现} 的期望时间。
+
+\textbf{[常用结论]}
+
+1.  \textbf{错排问题}：$D_n = n! \sum_{k=0}^n \frac{(-1)^k}{k!} \approx \frac{n!}{e}$。
+2.  \textbf{欧拉函数}：$\varphi(n) = n \prod_{p|n} (1 - \frac{1}{p})$ 本质是容斥原理。
+3.  \textbf{不定方程解数}：求 $\sum x_i = S, 0 \le x_i \le b_i$，令属性 $P_i$ 为 $x_i \ge b_i + 1$，利用容斥计算不满足条件的方案数。
