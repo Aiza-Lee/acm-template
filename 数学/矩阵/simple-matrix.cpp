@@ -40,8 +40,12 @@ struct Matrix {
 	Matrix<R, T> operator-(const Matrix<R, T>& rhv) const { return Matrix<R, T>(*this) -= rhv; }
 	Matrix<R, T> operator*(const Matrix<R, T>& rhv) const {
 		Matrix<R, T> res(false);
-		FOREACH(i, j) rep(k, 0, R - 1)
-			res[i][j] += raw[i][k] * rhv[k][j];
+		rep(i, 0, R - 1)
+			rep(k, 0, R - 1) {
+				T r = raw[i][k];
+				rep(j, 0, R - 1)
+					res[i][j] += r * rhv[k][j];
+			}
 		return res;
 	}
 	Matrix<R, T> operator^(int power) const { return fast_pow(*this, power); }

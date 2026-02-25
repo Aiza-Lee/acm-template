@@ -106,8 +106,12 @@ struct GMatrix {
 
 	GMatrix operator*(const GMatrix& rhv) const {
 		GMatrix res; // 此时 res 已经是全 zero()
-		FOREACH(i, j) rep(k, 0, N - 1)
-			res[i][j] = Semiring::add(res[i][j], Semiring::mul(raw[i][k], rhv[k][j]));
+		rep(i, 0, N - 1)
+			rep(k, 0, N - 1) {
+				T r = raw[i][k];
+				rep(j, 0, N - 1)
+					res[i][j] = Semiring::add(res[i][j], Semiring::mul(r, rhv[k][j]));
+			}
 		return res;
 	}
 

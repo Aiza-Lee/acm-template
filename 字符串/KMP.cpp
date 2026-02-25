@@ -20,8 +20,8 @@
  * 			- 统计前缀出现次数等问题可在 Fail Tree 上进行。
  */
 struct KMP {
-	std::vector<int> pi;
-	std::string s;
+	std::vector<int> pi; // pi[i]: s[0...i]的最长相等真前缀和真后缀长度
+	std::string s;       // 模式串
 
 	/**
 	 * 初始化模式串，计算 pi 数组
