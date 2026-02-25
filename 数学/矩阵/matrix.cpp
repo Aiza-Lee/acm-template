@@ -91,9 +91,11 @@ struct Matrix {
 		using ResType = decltype(raw[0][0] * rhv[0][0]);
 		Matrix<R, N, ResType> res;
 		rep(i, 0, R - 1)
-			for (int j = 0; j < N; ++j)
-				for (int k = 0; k < C; ++k)
-					res[i][j] += raw[i][k] * rhv[k][j];
+			rep(k, 0, C - 1) {
+				ResType r = raw[i][k];
+				rep(j, 0, N - 1)
+					res[i][j] += r * rhv[k][j];
+			}
 		return res;
 	}
 	template<typename T2>
