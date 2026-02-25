@@ -2,8 +2,8 @@
 
 class BitTree {
 private:
-	std::vector<int> vl;
-	int n;
+	std::vector<int> vl; // vl[i]: 树状数组节点值
+	int n;              // 数组大小
 	int _lowbit(int x) { return x & -x; }
 	
 public:

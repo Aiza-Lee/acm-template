@@ -8,8 +8,8 @@
  *      2. K=2: 朋友/敌人, K=3: 食物链 (A吃B, B吃C, C吃A)
  */
 struct SpeciesDSU {
-	int n, k;
-	std::vector<int> fa;
+	int n, k;            // n: 元素个数, k: 种类数
+	std::vector<int> fa; // fa[i]: 节点i的父节点
 
 	SpeciesDSU(int n, int k = 2) : n(n), k(k), fa(n * k + 1) {
 		std::iota(fa.begin(), fa.end(), 0);

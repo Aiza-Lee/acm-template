@@ -37,13 +37,17 @@ struct KDTree {
 		}
 	};
 
-	std::vector<int> ls, rs, sz;
-	std::vector<Point> p;
-	std::vector<T> min_v, max_v;
-	std::vector<VT> sum;
+	std::vector<int> ls;   // ls[u]: 左子节点
+	std::vector<int> rs;   // rs[u]: 右子节点
+	std::vector<int> sz;   // sz[u]: 子树大小
+	std::vector<Point> p;  // p[u]: 节点u存储的点
+	std::vector<T> min_v;  // min_v[u*K+d]: 子树u在第d维的最小值
+	std::vector<T> max_v;  // max_v[u*K+d]: 子树u在第d维的最大值
+	std::vector<VT> sum;   // sum[u]: 子树附加值之和
 
-	int tot;
-	std::vector<int> roots, rubbish;
+	int tot;                  // 当前总节点数
+	std::vector<int> roots;   // roots: 二进制分组的根节点
+	std::vector<int> rubbish; // rubbish: 内存回收池
 
 	KDTree(int siz) : tot(0), ls(siz + 1), rs(siz + 1), sz(siz + 1), p(siz + 1), 
 		min_v((siz + 1) * K), max_v((siz + 1) * K), sum(siz + 1) {}
