@@ -45,10 +45,12 @@ struct SAM {
 
 	std::vector<Node> nodes;
 	int last; // 上一个插入字符对应的状态
+	std::vector<int> pos_id; // pos_id[i]: 原串 s[0...i] 对应的状态编号
 
 	SAM(int n = 0) {
 		nodes.reserve(n * 2 + 1);
 		last = 0;
+		pos_id.reserve(n);
 		nodes.emplace_back(); // Root: node 0
 	}
 
@@ -86,6 +88,7 @@ struct SAM {
 			}
 		}
 		last = cur;
+		pos_id.push_back(last);
 	}
 
 	void extend(const std::string& s) {
