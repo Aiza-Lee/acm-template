@@ -1,0 +1,87 @@
+\textbf{离散微积分 (Finite Calculus)}
+
+离散微积分（有限微积分）处理定义在整数域上的函数的差分与和分，类似于连续微积分中的微分与积分。
+
+\textbf{差分算子 (Difference Operator)}
+前向差分算子 $\Delta$ 定义为：
+\[
+\Delta f(x) = f(x+1) - f(x)
+\]
+这对应于连续微积分中的导数 $D f(x)$。
+高阶差分公式：
+\[
+\Delta^n f(x) = \sum_{k=0}^n (-1)^{n-k} \binom{n}{k} f(x+k)
+\]
+
+\textbf{下降阶乘幂 (Falling Factorial)}
+为了使差分运算形式简洁，引入下降阶乘幂：
+\[
+x^{\underline{n}} = x(x-1)(x-2)\cdots(x-n+1) = \frac{x!}{(x-n)!}
+\]
+性质：
+\[
+\Delta (x^{\underline{n}}) = n x^{\underline{n-1}}
+\]
+这就好比 $D(x^n) = n x^{n-1}$。这使得多项式在该基底下的差分变得极其简单。
+
+\textbf{数论倒数}
+当 $n < 0$ 时，定义：
+\[
+x^{\underline{-n}} = \frac{1}{(x+1)(x+2)\cdots(x+n)}
+\]
+此时同样满足 $\Delta (x^{\underline{n}}) = n x^{\underline{n-1}}$。
+
+\textbf{不定和分 (Indefinite Sum)}
+如果 $\Delta g(x) = f(x)$，则称 $g(x)$ 是 $f(x)$ 的不定和分，记作：
+\[
+\sum f(x) \delta x = g(x) + C
+\]
+
+\textbf{定和分 (Definite Sum)}
+基本定理：
+\[
+\sum_{i=a}^{b-1} f(i) = \sum_{a}^{b} f(x) \delta x = g(b) - g(a)
+\]
+\textit{注意：求和上界是 $b-1$（即左闭右开区间 $[a, b)$）。}
+
+\textbf{常用求和公式}
+\begin{itemize}
+    \item $\sum x^{\underline{m}} \delta x = \frac{x^{\underline{m+1}}}{m+1} + C$ \quad ($m \neq -1$)
+    \item $\sum c^x \delta x = \frac{c^x}{c-1} + C$ \quad ($c \neq 1$)
+    \item $\sum \binom{x}{m} \delta x = \binom{x}{m+1} + C$
+    \item $\sum H_x \delta x = x H_x - x + C$ \quad ($H_x$ 为调和数)
+\end{itemize}
+
+\textbf{分部求和法则 (Summation by Parts)}
+对应于分部积分 $\int u dv = uv - \int v du$：
+\[
+\sum u \Delta v \delta x = uv - \sum E v \Delta u \delta x
+\]
+其中 $E$ 是位移算子，$Ev(x) = v(x+1)$。
+即：
+\[
+\sum_{x=a}^{b-1} u(x) \Delta v(x) = [u(x)v(x)]_a^b - \sum_{x=a}^{b-1} v(x+1) \Delta u(x)
+\]
+这个公式在处理形如 $\sum P(i) \cdot r^i$ 的求和时非常有用（其中 $P(i)$ 是多项式）。
+
+\textbf{OI中的常见应用}
+
+\textbf{1. 自然数幂和 $\sum_{i=0}^n i^k$}
+利用第二类斯特林数将普通幂转化为下降阶乘幂：
+\[
+x^n = \sum_{k=0}^n S_2(n,k) x^{\underline{k}}
+\]
+代入求和：
+\[
+\sum_{x=0}^n x^k = \sum_{x=0}^n \sum_{j=0}^k S_2(k, j) x^{\underline{j}} = \sum_{j=0}^k S_2(k, j) \sum_{x=0}^n x^{\underline{j}}
+\]
+利用 $\sum_{x=0}^n x^{\underline{j}} = \frac{(n+1)^{\underline{j+1}}}{j+1}$，可以在 $O(k^2)$ 或 $O(k \log k)$ 时间内求解。
+
+\textbf{2. 差分法 (Difference Method)}
+对于多项式 $f(n)$，其 $k$ 阶差分 $\Delta^k f(n)$ 最终为常数（若 $k = \deg(f)$），更高阶为 0。
+这可以用于构造通项公式，或者通过预处理差分表来计算前缀和。
+牛顿级数展开：
+\[
+f(x) = \sum_{i=0}^\infty \binom{x}{i} \Delta^i f(0)
+\]
+这在已知 $f(0), f(1), \dots, f(n)$ 时可以 $O(n^2)$ 插值求任意 $f(x)$。
