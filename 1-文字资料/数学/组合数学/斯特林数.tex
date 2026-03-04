@@ -1,0 +1,69 @@
+\textbf{斯特林数 (Stirling Numbers)}
+
+斯特林数分为两类，分别对应不同的组合意义和多项式基底转换性质。
+
+\textbf{第一类斯特林数}
+
+\textbf{定义}
+无符号第一类斯特林数 $\left[ \begin{matrix} n \\ k \end{matrix} \right]$ (或 $c(n, k)$) 表示将 $n$ 个不同元素排成 $k$ 个轮换（Cycle）的方案数。
+有符号第一类斯特林数 $s(n, k)$ 定义为 $s(n, k) = (-1)^{n-k} \left[ \begin{matrix} n \\ k \end{matrix} \right]$。
+
+\textbf{递推式}
+\[
+\left[ \begin{matrix} n \\ k \end{matrix} \right] = \left[ \begin{matrix} n-1 \\ k-1 \end{matrix} \right] + (n-1) \left[ \begin{matrix} n-1 \\ k \end{matrix} \right]
+\]
+边界：$\left[ \begin{matrix} n \\ n \end{matrix} \right] = 1, \left[ \begin{matrix} n \\ 0 \end{matrix} \right] = 0 (n \ge 1)$。
+
+\textbf{性质（多项式基底转换）}
+第一类斯特林数是上升/下降阶乘幂展开为普通幂的系数：
+\begin{itemize}
+    \item 上升阶乘幂：$x^{\overline{n}} = \sum_{k=0}^n \left[ \begin{matrix} n \\ k \end{matrix} \right] x^k$
+    \item 下降阶乘幂：$x^{\underline{n}} = \sum_{k=0}^n (-1)^{n-k} \left[ \begin{matrix} n \\ k \end{matrix} \right] x^k = \sum_{k=0}^n s(n, k) x^k$
+\end{itemize}
+
+\textbf{生成函数}
+\begin{itemize}
+    \item 行生成函数：即上述阶乘幂多项式。
+    \item 列生成函数 (EGF)：
+    \[
+    \sum_{n=k}^{\infty} \left[ \begin{matrix} n \\ k \end{matrix} \right] \frac{x^n}{n!} = \frac{(-\ln(1-x))^k}{k!}
+    \]
+\end{itemize}
+
+\textbf{第二类斯特林数}
+
+\textbf{定义}
+第二类斯特林数 $\left\{ \begin{matrix} n \\ k \end{matrix} \right\}$ (或 $S(n, k)$) 表示将 $n$ 个不同元素划分为 $k$ 个非空子集的方案数。
+
+\textbf{递推式}
+\[
+\left\{ \begin{matrix} n \\ k \end{matrix} \right\} = \left\{ \begin{matrix} n-1 \\ k-1 \end{matrix} \right\} + k \left\{ \begin{matrix} n-1 \\ k \end{matrix} \right\}
+\]
+
+\textbf{通项公式}
+利用容斥原理可得：
+\[
+\left\{ \begin{matrix} n \\ k \end{matrix} \right\} = \frac{1}{k!} \sum_{j=0}^{k} (-1)^{k-j} \binom{k}{j} j^n
+\]
+该公式可用于卷积计算一行斯特林数。
+
+\textbf{性质（多项式基底转换）}
+第二类斯特林数是普通幂展开为下降阶乘幂的系数：
+\[
+x^n = \sum_{k=0}^n \left\{ \begin{matrix} n \\ k \end{matrix} \right\} x^{\underline{k}}
+\]
+
+\textbf{生成函数}
+\begin{itemize}
+    \item 行生成函数：即上述普通幂多项式。
+    \item 列生成函数 (EGF)：
+    \[
+    \sum_{n=k}^{\infty} \left\{ \begin{matrix} n \\ k \end{matrix} \right\} \frac{x^n}{n!} = \frac{(e^x-1)^k}{k!}
+    \]
+\end{itemize}
+
+\textbf{斯特林反演}
+两类斯特林数互为反演矩阵：
+\[
+f(n) = \sum_{k=0}^n \left\{ \begin{matrix} n \\ k \end{matrix} \right\} g(k) \iff g(n) = \sum_{k=0}^n s(n, k) f(k)
+\]

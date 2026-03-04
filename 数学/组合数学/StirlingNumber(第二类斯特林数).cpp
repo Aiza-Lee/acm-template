@@ -2,14 +2,13 @@
 
 /**
  * 第二类斯特林数 (Stirling Number of Second Kind)
- * 算法介绍: 将 n 个不同元素划分为 k 个非空集合的方案数。
+ * 算法介绍: S2[n][k] 表示将 n 个不同元素划分为 k 个非空集合的方案数。
  * 模板参数: N (预处理最大范围)
  * Interface: 
- * 		int sum_powers(i64 n, int k); // 计算 sum_{i=0}^n i^k
+ *      int sum_powers(i64 n, int k); // 计算 sum_{i=0}^n i^k
  * Note:
- * 		1. Time: Build O(N^2), Query O(k log MOD)
- * 		2. Space: O(N^2)
- * 		3. 递推式: S2[n][k] = S2[n-1][k-1] + k * S2[n-1][k]
+ *      1. Time: Build O(N^2)
+ *      2. See specific math formulas in text material (斯特林数.tex)
  */
 
 template<int N>
@@ -38,5 +37,21 @@ struct StirlingS2 {
 			ans = add(ans, term);
 		}
 		return ans;
+	}
+
+	// 普通多项式转下降幂多项式 (O(k^2))
+	// F(x) = sum_{i=0}^k a[i] * x^i
+	//      => sum_{j=0}^{k-1} b[j] * x^{\underline{j}}
+	std::vector<int> ordinary_to_falling(const std::vector<int>& a) {
+		int k = a.size();
+		std::vector<int> b(k, 0);
+		rep(i, 0, k - 1) {
+			if (a[i] == 0) continue;
+			// x^i = sum_{j=0}^i S(i, j) * x^{\underline{j}}
+			rep(j, 0, i) {
+				b[j] = add(b[j], mul(a[i], S[i][j]));
+			}
+		}
+		return b;
 	}
 };
