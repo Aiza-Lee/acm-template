@@ -1,85 +1,113 @@
 #include "aizalib.h"
+
+/**
+ * ISAP (Improved Shortest Augment Path)
+ * 算法介绍: 改进的最短增广路算法。
+ * 		1. 预处理: 反向 BFS 从 t 到 s 计算距离标号 d[i]（即到汇点的距离）。
+ * 		2. 增广: DFS 寻找增广路，沿着 d[u] = d[v] + 1 的路径行走。
+ * 		3. 动态更新: 增广受阻时，提升当前点高度 d[u] = min(d[v]) + 1，从而在不重新 BFS 的情况下寻找新路径。
+ * 		4. GAP 优化: 记录每种距离标号的节点数量。若断层 (gap[dist] == 0)，则 s 无法到达 t。
+ * 		5. 当前弧优化: 记录每个点遍历到的边，避免重复尝试无效边。
+ * 算法关系:
+ * 		ISAP 可以视作 Dinic 的一种优化实现。
+ * 		Dinic 需要多次 BFS 建立分层图，而 ISAP 仅需一次反向 BFS 初始化，后续通过 relabel 操作动态维护距离标号。
+ * 		ISAP 在大多数测试数据下比 Dinic 更快，且 GAP 优化能极早发现不可达情况。
+ * 模板参数: Cap (容量类型)
+ * Interface: 
+ * 		add_edge(u, v, w)
+ * 		solve(s, t) -> max_flow
+ * Note:
+ * 		1. Time Complexity: O(V^2 * E)
+ * 		   - 虽然上界与 Dinic 相同，但实战中通常更快。
+ * 		2. 1-based indexing.
+ */
+
+template<typename Cap>
 struct Graph {
-	struct Edge { int v, w, nxt; };
-	std::vector<Edge> e;
+	struct Edge { int v, nxt; Cap w; };
+	int n;
 	std::vector<int> head;
-	int n, m, edge_cnt = 1;
-	// note: 节点的下标从 0 开始
-	Graph(int n, int m) : n(n), m(m), head(n), e(2 * m + 2) {}
-	
-	void addedge(int u, int v, int w) {
-		e[++edge_cnt] = {v, w, head[u]}; head[u] = edge_cnt;
-		e[++edge_cnt] = {u, 0, head[v]}; head[v] = edge_cnt;
+	std::vector<Edge> e;
+	int ec = 1;
+
+	Graph(int n, int m = 0) : n(n), head(n + 1), e(2 * m + 2) {}
+
+	void add_edge(int u, int v, Cap w) {
+		if (ec + 2 > (int)e.size()) e.resize(ec * 2 + 2);
+		e[++ec] = {v, head[u], w}; head[u] = ec;
+		e[++ec] = {u, head[v], 0}; head[v] = ec;
 	}
 };
-/**
- * ISAP最大流
- * interface:
- * 		INF									// 无穷流量
- * 		ISAP(int S, int T, Graph& g)		// 构造函数，ST为源汇点，g为整张图
- * 		calc_maxflow()						// 返回最大流，注意是否溢出
- * note:
- * 		1.一般情况下的时间复杂度: O(V^2 * E)
- * 		2.在单位容量的情况下，复杂度优化到 O(m * sqrt(n)) or O(min{n^(2/3),sqrt(m)} * m)
- * 		3.在最大流大小 F 有限制的情况下，时间复杂度可以使用 O(m * F) 估计
- * 		4.节点的编号统一从 0 开始
- */
-struct ISAP {
-	static constexpr int INF = INT_MAX / 2;
-	Graph& g;
-	std::vector<int> gap, dep;	// gap: 距离标号计数, dep: 距离标号
-	std::vector<int> cur;		// cur: 当前弧优化数组
-	int n, S, T;				// n: 点数, m: 边数, S: 源点, T: 汇点
-	
-	ISAP(int S, int T, Graph& g) : n(g.n), S(S), T(T), g(g), 
-		gap(g.n + 5), dep(g.n), cur(g.n) {}
 
-	void _bfs() {
-		std::queue<int> q;
-		dep[T] = 1;
-		++gap[dep[T]];
-		q.push(T);
+template<typename Cap = i64>
+struct ISAP {
+	static constexpr Cap INF = std::numeric_limits<Cap>::max();
+	
+	Graph<Cap> g;
+	std::vector<int> d, gap, cur;	// d: 距离标号, gap: 标号计数, cur: 当前弧
+	int n, s, t;
+
+	ISAP(int n, int m = 0) : g(n, m), d(n + 1), gap(n + 1), cur(n + 1), n(n) {}
+
+	void add_edge(int u, int v, Cap w) {
+		g.add_edge(u, v, w);
+	}
+
+	void bfs() {
+		std::fill(d.begin(), d.end(), n);
+		std::fill(gap.begin(), gap.end(), 0);
+		std::deque<int> q;
+		
+		q.push_back(t); d[t] = 0; 
+		
 		while (!q.empty()) {
-			int u = q.front(); q.pop();
+			int u = q.front(); q.pop_front();
+			gap[d[u]]++; 
 			for (int i = g.head[u]; i; i = g.e[i].nxt) {
-				int v = g.e[i].v, w = g.e[i].w;
-				if (dep[v]) continue;
-				dep[v] = dep[u] + 1;
-				++gap[dep[v]];
-				q.push(v);
+				int v = g.e[i].v;
+				// 反向边 (i ^ 1) 容量 > 0 表示 v -> u 有边。
+				if (g.e[i ^ 1].w > 0 && d[v] == n) {
+					d[v] = d[u] + 1;
+					q.push_back(v);
+				}
 			}
 		}
 	}
 
-	int _dfs(int u, int flow) {
-		if (u == T) return flow;
-		int res = 0;
-		for (int i = cur[u]; i; i = g.e[i].nxt) {
-			cur[u] = i;
+	Cap dfs(int u, Cap flow) {
+		if (u == t) return flow;
+		
+		Cap res = 0;
+		for (int& i = cur[u]; i; i = g.e[i].nxt) {
 			int v = g.e[i].v;
-			if (g.e[i].w && dep[v] + 1 == dep[u]) {
-				int tmp = _dfs(v, std::min(g.e[i].w, flow - res));
-				if (tmp) {
-					res += tmp;
-					g.e[i].w -= tmp;
-					g.e[i ^ 1].w += tmp;
+			if (g.e[i].w > 0 && d[u] == d[v] + 1) {
+				Cap k = dfs(v, std::min(flow - res, g.e[i].w));
+				if (k) {
+					g.e[i].w -= k;
+					g.e[i ^ 1].w += k;
+					res += k;
+					if (res == flow) return res;
 				}
-				if (flow == res) return res;
 			}
 		}
-		// Gap优化: 如果距离为dep[u]的点只有一个,则直接断开源点
-		if (--gap[dep[u]] == 0) dep[S] = n + 1;
-		++gap[++dep[u]];
+		
+		if (--gap[d[u]] == 0) d[s] = n + 1; // Gap optimization
+		d[u]++;
+		gap[d[u]]++;
+		cur[u] = g.head[u];
 		return res;
 	}
 
-	i64 calc_maxflow() {
-		i64 maxflow = 0;
-		_bfs();  // 初始化距离标号
-		while (dep[S] <= n) {  // 源点可达汇点时继续
-			rep(i, 0, n - 1) cur[i] = g.head[i];  // 重置当前弧
-			maxflow += _dfs(S, INF); 
+	Cap solve(int s, int t) {
+		this->s = s; this->t = t;
+		bfs();
+		if (d[s] >= n) return 0;
+		std::copy(g.head.begin(), g.head.end(), cur.begin());
+
+		Cap max_flow = 0;
+		while (d[s] < n) {
+			max_flow += dfs(s, INF);
 		}
-		return maxflow;
+		return max_flow;
 	}
 };
