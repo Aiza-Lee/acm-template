@@ -1,0 +1,28 @@
+\textbf{无序多重集算子 (\(\mathcal{E}\))}
+
+无序多重集算子（因不区分选取顺序，常名 $\text{MSET}$ 算子）表示从组合类 $\mathcal{A}$ 中可重复地无序选取元素。设 $A(x)$ 为 $\mathcal{A}$ 的普通生成函数 (OGF)。
+
+\textbf{定长无序集 $\mathcal{E}_k$ 与递推计算}
+
+引入辅助变量 $y$ 记录选取个数，其二元生成函数为：
+\[
+\mathcal{E}(y, x) = \exp\left( \sum_{i=1}^\infty \frac{A(x^i)}{i} y^i \right)
+\]
+多项式中 $y^k$ 的系数即为 $k$ 元无序集 $E_k(x) = \mathcal{E}_k(A(x))$。令 $E_0(x)=1$，通过对 $y$ 求导比较系数，可得便于代码编程的递推式：
+\[
+E_k(x) = \frac{1}{k} \sum_{i=1}^k A(x^i) E_{k-i}(x)
+\]
+展开前三项得：
+\begin{align*}
+E_1(x) &= A(x) \\
+E_2(x) &= \frac{1}{2}\left( A(x)^2 + A(x^2) \right) \\
+E_3(x) &= \frac{1}{6}\left( A(x)^3 + 3A(x)A(x^2) + 2A(x^3) \right)
+\end{align*}
+
+\textbf{无穷无序集与欧拉变换 (Euler Transform)}
+
+若对选取数量不加限制，即 $\mathcal{E}(A(x)) = \sum_{k=0}^\infty E_k(x)$，对应的结果称为欧拉变换，常用于从“无标号连通块”构造“无标号图”的计数：
+\[
+\mathcal{E}(A(x)) = \exp\left( \sum_{i=1}^\infty \frac{A(x^i)}{i} \right) = \prod_{i=1}^\infty \frac{1}{(1-x^i)^{a_i}}
+\]
+其中 $a_i = [x^i]A(x)$。右侧等号的组合意义直观：每种大小为 $i$ 且内部结构相同的连通块可以选取任意次产生贡献，由于大小为 $i$ 的此类连通块共有 $a_i$ 种，故进行 $a_i$ 次连乘 $\left(\frac{1}{1-x^i}\right)$。

@@ -1,0 +1,26 @@
+\textbf{不对称定理 (Dissymmetry Theorem)}
+
+不对称定理 (Dissymmetry Theorem) 是基于组合物种理论 (Theory of Combinatorial Species) 的一个重要结构定理，旨在通过消除自同构（即“对称性”）的干扰，将无根（无标记或有标记）结构的计数转化为带有根（被固定点或边）结构的计数。该定理在无根树等具有高度对称性图类的组合枚举中具有核心地位。
+
+\textbf{组合物种同构与证明}
+
+对于树及一般的无环连通结构，定义如下组合物种：
+\begin{itemize}
+    \item \(\mathcal{A}\)：无根树物种。
+    \item \(\mathcal{A}^\bullet\)：以单个顶点为根的树物种。
+    \item \(\mathcal{A}^{-}\)：以一条无向边为根的树物种。
+    \item \(\mathcal{A}^{\bullet-}\)：以一条有向边为根的树物种。
+\end{itemize}
+
+不对称定理给出如下的自然同构：
+\[
+\mathcal{A} + \mathcal{A}^{\bullet-} = \mathcal{A}^\bullet + \mathcal{A}^{-}
+\]
+
+对于一棵树，其中心可能是一个唯一的顶点或一条唯一的边。我们可以通过讨论标记的点或边是否在中心来证明该定理：
+\begin{itemize}
+    \item 若树的中心是一个顶点：则 \(\mathcal{A}\) 对应这棵树，此时中心为一个点，无中心边。右侧的 \(\mathcal{A}^\bullet\) 若标记中心点，恰好对应左侧的 \(\mathcal{A}\)；若不标记中心点，其结构与左侧 \(\mathcal{A}^{\bullet-}\) 以及右侧 \(\mathcal{A}^{-}\) 之间可以建立等价一一对应关系（由于非中心点总是与其指向中心的边成对）。
+    \item 若树的中心是一条边：则该树没有唯一的中心点。\(\mathcal{A}\) 对应这棵树。右侧的 \(\mathcal{A}^{-}\) 若标记在中心边，恰好对应左侧的 \(\mathcal{A}\)。此外其它非中心点或边带来的标记，在等号两端同样通过点与指向中心的边建立了一一对应。
+\end{itemize}
+因此不论中心是点还是边，等式两侧均同构。
+
