@@ -1,7 +1,7 @@
 #include "aizalib.h"
 /**
  * Simplified Poly Template
- * Features: +, -, *, inv, deriv, integral
+ * Features: +, -, *, inverse, deriv, integral
  * 
  * Note:
  * 		1. Omitted: exp/ln/sqrt/trig/eval to save lines.
@@ -60,10 +60,10 @@ struct Poly : std::vector<int> {
 		return a;
 	}
 
-	Poly inv(int n = -1) const {
+	Poly inverse(int n = -1) const {
 		if (n == -1) n = size();
 		if (n == 1) return {::inv((*this)[0])};
-		Poly b = inv((n + 1) / 2);
+		Poly b = inverse((n + 1) / 2);
 		Poly a = *this; a.resize(n);
 		int len = 1; while (len < 2 * n) len <<= 1;
 		a.resize(len); Poly c = b; c.resize(len);

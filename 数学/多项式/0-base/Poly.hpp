@@ -264,6 +264,10 @@ public:
 
 	Poly inverse(int n = -1) const {
 		if (n == -1) n = size();
+		if ((int)size() < n) {
+			Poly A = *this; A.resize(n);
+			return A.inverse(n);
+		}
 		Poly res(n);
 		_inv_impl(data(), n, res.data());
 		return res;
@@ -271,6 +275,10 @@ public:
 
 	Poly ln(int n = -1) const {
 		if (n == -1) n = size();
+		if ((int)size() < n) {
+			Poly A = *this; A.resize(n);
+			return A.ln(n);
+		}
 		Poly res(n);
 		_ln_impl(data(), n, res.data());
 		return res;
@@ -278,6 +286,10 @@ public:
 
 	Poly exp(int n = -1) const {
 		if (n == -1) n = size();
+		if ((int)size() < n) {
+			Poly A = *this; A.resize(n);
+			return A.exp(n);
+		}
 		Poly res(n);
 		_exp_impl(data(), n, res.data());
 		return res;
@@ -285,6 +297,10 @@ public:
 
 	Poly sqrt(int n = -1) const {
 		if (n == -1) n = size();
+		if ((int)size() < n) {
+			Poly A = *this; A.resize(n);
+			return A.sqrt(n);
+		}
 		Poly res(n);
 		_sqrt_impl(data(), n, res.data());
 		return res;
@@ -292,6 +308,10 @@ public:
 
 	Poly pow(int k, int n = -1) const {
 		if (n == -1) n = size();
+		if ((int)size() < n) {
+			Poly A = *this; A.resize(n);
+			return A.pow(k, n);
+		}
 		Poly res(n);
 		_pow_impl(data(), n, k, res.data());
 		return res;

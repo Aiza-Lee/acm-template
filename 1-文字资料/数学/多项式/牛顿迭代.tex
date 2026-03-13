@@ -1,0 +1,17 @@
+\textbf{牛顿迭代 (Newton's Method)}
+
+\noindent
+\textbf{原理}:
+用于求解多项式方程 $F(A(x)) \equiv 0 \pmod{x^n}$。
+假设已经求出模 $x^{\lceil n/2 \rceil}$ 下的解 $A_0(x)$，则模 $x^n$ 下的解 $A(x)$ 可以通过泰勒展开近似得到：
+\[ F(A(x)) \equiv F(A_0(x)) + F'(A_0(x)) (A(x) - A_0(x)) \equiv 0 \pmod{x^n} \]
+从而得到迭代公式：
+\[ A(x) \equiv A_0(x) - \frac{F(A_0(x))}{F'(A_0(x))} \pmod{x^n} \]
+其中 $F'(A)$ 是 $F$ 对 $A$ 的导数（不是对 $x$ 求导）。
+
+\noindent
+\textbf{一般步骤}:
+1. 确定方程 $F(A(x)) = 0$。
+2. 计算导数 $F'(A)$。
+3. 递归求解：$n=1$ 时直接计算常量；$n>1$ 时先递归求 $n/2$，再套用公式。
+4. 时间复杂度通常为 $T(n) = T(n/2) + O(n \log n) = O(n \log n)$。
