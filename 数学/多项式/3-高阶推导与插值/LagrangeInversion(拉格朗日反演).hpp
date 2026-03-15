@@ -1,5 +1,5 @@
 #pragma once
-#include "0-base/Poly.hpp"
+#include "../0-base/Poly.hpp"
 
 namespace Lagrange {
 

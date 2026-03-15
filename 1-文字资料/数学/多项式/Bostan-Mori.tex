@@ -1,0 +1,27 @@
+\textbf{Bostan-Mori(常系数线性递推)}
+
+Bostan-Mori 算法用于在 $O(k \log k \log n)$ 的时间内求出有理分式 $\frac{P(x)}{Q(x)}$ 的第 $n$ 项系数，或求常系数线性递推的第 $n$ 项。
+
+\textbf{核心原理}
+
+通过将分子分母同乘 $Q(-x)$，可以消去分母中的奇数次项：
+\[
+[x^n] \frac{P(x)}{Q(x)} = [x^n] \frac{P(x)Q(-x)}{Q(x)Q(-x)}
+\]
+由于分母 $Q(x)Q(-x)$ 是偶函数，只包含偶数次项，可令 $V(x^2) = Q(x)Q(-x)$。
+令分子 $U(x) = P(x)Q(-x) = U_{\text{even}}(x^2) + x U_{\text{odd}}(x^2)$，则：
+\[
+\frac{P(x)}{Q(x)} = \frac{U_{\text{even}}(x^2) + x U_{\text{odd}}(x^2)}{V(x^2)}
+\]
+因此，要提取 $x^n$ 的系数：
+若 $n$ 为偶数：$[x^n] \frac{P(x)}{Q(x)} = [x^{n/2}] \frac{U_{\text{even}}(x)}{V(x)}$\\
+若 $n$ 为奇数：$[x^n] \frac{P(x)}{Q(x)} = [x^{(n-1)/2}] \frac{U_{\text{odd}}(x)}{V(x)}$
+
+每次操作将 $n$ 规模减半，多项式度数保持 $O(k)$，经过 $\log n$ 次迭代即可达到 $n=0$ 的边界条件 $[x^0] \frac{P(x)}{Q(x)} = \frac{[x^0]P(x)}{[x^0]Q(x)}$。总时间复杂度为 $O(k \log k \log n)$。
+
+\textbf{用于求解线性递推数列}
+
+设常系数线性递推数列为 $a_n = \sum_{i=1}^k c_i a_{n-i}$，已知前 $k$ 项 $a_0, \dots, a_{k-1}$。
+构造分母多项式 $Q(x) = 1 - \sum_{i=1}^k c_i x^i$。
+根据生成函数关系 $A(x)Q(x) = P(x)$，可以得到分子多项式 $P(x) = (A(x) Q(x)) \bmod x^k$。
+由此，问题转化为求取 $[x^n] \frac{P(x)}{Q(x)}$，直接套用 Bostan-Mori 算法即可求解。

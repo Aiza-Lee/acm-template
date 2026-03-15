@@ -45,15 +45,15 @@
  * 		2. 余数的大小会被调整为 b.size()-1
  */
 template<int MD = 998244353, int G = 3, int IMG_UNIT = 86583718>
-struct Poly : public std::vector<int> {
+struct Polynomial : public std::vector<int> {
 	using Core = PolyCore<MD, G>;
 	using std::vector<int>::vector;
-	Poly(const std::vector<int>& v) : std::vector<int>(v) {}
-	Poly(std::vector<int>&& v) : std::vector<int>(std::move(v)) {}
-	Poly(std::initializer_list<int> l) : std::vector<int>(l) {}
+	Polynomial(const std::vector<int>& v) : std::vector<int>(v) {}
+	Polynomial(std::vector<int>&& v) : std::vector<int>(std::move(v)) {}
+	Polynomial(std::initializer_list<int> l) : std::vector<int>(l) {}
 
-	Poly operator+(const Poly& b) const {
-		Poly res(std::max(size(), b.size()));
+	Polynomial operator+(const Polynomial& b) const {
+		Polynomial res(std::max(size(), b.size()));
 		rep(i, 0, (int)res.size() - 1) {
 			int v1 = (i < (int)size()) ? (*this)[i] : 0;
 			int v2 = (i < (int)b.size()) ? b[i] : 0;
@@ -62,8 +62,8 @@ struct Poly : public std::vector<int> {
 		return res;
 	}
 
-	Poly operator-(const Poly& b) const {
-		Poly res(std::max(size(), b.size()));
+	Polynomial operator-(const Polynomial& b) const {
+		Polynomial res(std::max(size(), b.size()));
 		rep(i, 0, (int)res.size() - 1) {
 			int v1 = (i < (int)size()) ? (*this)[i] : 0;
 			int v2 = (i < (int)b.size()) ? b[i] : 0;
@@ -72,107 +72,107 @@ struct Poly : public std::vector<int> {
 		return res;
 	}
 
-	Poly operator*(const Poly& b) const {
+	Polynomial operator*(const Polynomial& b) const {
 		if (empty() || b.empty()) return {};
-		Poly res(size() + b.size() - 1);
+		Polynomial res(size() + b.size() - 1);
 		Core::mul(data(), size(), b.data(), b.size(), res.data());
 		return res;
 	}
 
-	Poly operator*(int k) const {
-		Poly res = *this;
+	Polynomial operator*(int k) const {
+		Polynomial res = *this;
 		for (int& x : res) x = Core::mul(x, k);
 		return res;
 	}
 
-	Poly& operator+=(const Poly& b) { return *this = *this + b; }
-	Poly& operator-=(const Poly& b) { return *this = *this - b; }
-	Poly& operator*=(const Poly& b) { return *this = *this * b; }
-	Poly& operator*=(int k) { return *this = *this * k; }
+	Polynomial& operator+=(const Polynomial& b) { return *this = *this + b; }
+	Polynomial& operator-=(const Polynomial& b) { return *this = *this - b; }
+	Polynomial& operator*=(const Polynomial& b) { return *this = *this * b; }
+	Polynomial& operator*=(int k) { return *this = *this * k; }
 
-	Poly deriv() const {
+	Polynomial deriv() const {
 		if (empty()) return {};
-		Poly res(size() - 1);
+		Polynomial res(size() - 1);
 		Core::deriv(data(), size(), res.data());
 		return res;
 	}
 
-	Poly integral() const {
+	Polynomial integral() const {
 		if (empty()) return {};
-		Poly res(size() + 1);
+		Polynomial res(size() + 1);
 		Core::integral(data(), size(), res.data());
 		return res;
 	}
 
-	Poly inverse(int n = -1) const {
+	Polynomial inverse(int n = -1) const {
 		if (n == -1) n = size();
-		if ((int)size() < n) { Poly A = *this; A.resize(n); return A.inverse(n); }
-		Poly res(n);
+		if ((int)size() < n) { Polynomial A = *this; A.resize(n); return A.inverse(n); }
+		Polynomial res(n);
 		Core::inv_impl(data(), n, res.data());
 		return res;
 	}
 
-	Poly ln(int n = -1) const {
+	Polynomial ln(int n = -1) const {
 		if (n == -1) n = size();
-		if ((int)size() < n) { Poly A = *this; A.resize(n); return A.ln(n); }
-		Poly res(n);
+		if ((int)size() < n) { Polynomial A = *this; A.resize(n); return A.ln(n); }
+		Polynomial res(n);
 		Core::ln(data(), n, res.data());
 		return res;
 	}
 
-	Poly exp(int n = -1) const {
+	Polynomial exp(int n = -1) const {
 		if (n == -1) n = size();
-		if ((int)size() < n) { Poly A = *this; A.resize(n); return A.exp(n); }
-		Poly res(n);
+		if ((int)size() < n) { Polynomial A = *this; A.resize(n); return A.exp(n); }
+		Polynomial res(n);
 		Core::exp(data(), n, res.data());
 		return res;
 	}
 
-	Poly sqrt(int n = -1) const {
+	Polynomial sqrt(int n = -1) const {
 		if (n == -1) n = size();
-		if ((int)size() < n) { Poly A = *this; A.resize(n); return A.sqrt(n); }
-		Poly res(n);
+		if ((int)size() < n) { Polynomial A = *this; A.resize(n); return A.sqrt(n); }
+		Polynomial res(n);
 		Core::sqrt(data(), n, res.data());
 		return res;
 	}
 
-	Poly pow(int k, int n = -1) const {
+	Polynomial pow(int k, int n = -1) const {
 		if (n == -1) n = size();
-		if ((int)size() < n) { Poly A = *this; A.resize(n); return A.pow(k, n); }
-		Poly res(n);
+		if ((int)size() < n) { Polynomial A = *this; A.resize(n); return A.pow(k, n); }
+		Polynomial res(n);
 		Core::pow(data(), n, k, res.data());
 		return res;
 	}
 
-	Poly sin(int n = -1) const {
+	Polynomial sin(int n = -1) const {
 		if (n == -1) n = size();
-		Poly A(n);
+		Polynomial A(n);
 		// Note: size constraint check
 		rep(i, 0, std::min(n, (int)size()) - 1) A[i] = Core::mul((*this)[i], IMG_UNIT);
 		auto E1 = A.exp(n), E2 = E1.inverse(n);
-		Poly res = E1 - E2;
+		Polynomial res = E1 - E2;
 		int inv2i = Core::inv(Core::mul(2, IMG_UNIT));
 		for (int& x : res) x = Core::mul(x, inv2i);
 		return res;
 	}
 
-	Poly cos(int n = -1) const {
+	Polynomial cos(int n = -1) const {
 		if (n == -1) n = size();
-		Poly A(n);
+		Polynomial A(n);
 		rep(i, 0, std::min(n, (int)size()) - 1) A[i] = Core::mul((*this)[i], IMG_UNIT);
 		auto E1 = A.exp(n), E2 = E1.inverse(n);
-		Poly res = E1 + E2;
+		Polynomial res = E1 + E2;
 		int inv2 = Core::inv(2);
 		for (int& x : res) x = Core::mul(x, inv2);
 		return res;
 	}
 
-	Poly tan(int n = -1) const {
+	Polynomial tan(int n = -1) const {
 		if (n == -1) n = size(); 
 		return sin(n) * cos(n).inverse(n);
 	}
 
-	std::pair<Poly, Poly> div_mod(const Poly& b) const {
+	std::pair<Polynomial, Polynomial> div_mod(const Polynomial& b) const {
 		int n = size() - 1, m = b.size() - 1;
 		if (n < m) return {{0}, *this};
 		auto A = *this, B = b;
@@ -188,10 +188,10 @@ struct Poly : public std::vector<int> {
 		return {Q, R};
 	}
 
-	Poly operator/(const Poly& b) const { return div_mod(b).first; }
-	Poly operator%(const Poly& b) const { return div_mod(b).second; }
-	Poly& operator/=(const Poly& b) { return *this = *this / b; }
-	Poly& operator%=(const Poly& b) { return *this = *this % b; }
+	Polynomial operator/(const Polynomial& b) const { return div_mod(b).first; }
+	Polynomial operator%(const Polynomial& b) const { return div_mod(b).second; }
+	Polynomial& operator/=(const Polynomial& b) { return *this = *this / b; }
+	Polynomial& operator%=(const Polynomial& b) { return *this = *this % b; }
 
 	int eval(int x) const {
 		int res = 0;
@@ -203,9 +203,11 @@ struct Poly : public std::vector<int> {
 		while (!empty() && back() == 0) pop_back();
 	}
 
-	friend Poly operator*(int k, const Poly& a) { return a * k; }
-	friend std::ostream& operator<<(std::ostream& os, const Poly& a) {
+	friend Polynomial operator*(int k, const Polynomial& a) { return a * k; }
+	friend std::ostream& operator<<(std::ostream& os, const Polynomial& a) {
 		rep(i, 0, (int)a.size() - 1) os << a[i] << (i == (int)a.size() - 1 ? "" : " ");
 		return os;
 	}
 };
+
+using Poly = Polynomial<>;

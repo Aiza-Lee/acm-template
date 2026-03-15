@@ -1,4 +1,4 @@
-#include "0-base/Poly.hpp"
+#include "../0-base/Poly.hpp"
 namespace poly_ext {
 	namespace detail {
 	inline void _interp_build(int node, int l, int r, const std::vector<int>& x, std::vector<Poly>& tree) {
