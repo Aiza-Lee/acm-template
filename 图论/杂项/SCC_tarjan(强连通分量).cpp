@@ -1,38 +1,46 @@
 #include "aizalib.h"
 
-struct Graph {
-	size_t siz;
-	std::vector<std::vector<int>> adj;
-	Graph(size_t siz): siz(siz), adj(siz + 1) {}
-	void add_edge(int u, int v) {
-		adj[u].push_back(v);
-	}
-};
 /**
  * Strongly Connected Component (强连通分量)
- * - scc[u] 标记点u所属的强连通分量编号
- * - 对于不联通的图，每个联通块都会被单独处理
+ * 算法介绍: 使用 Tarjan 算法求解有向图的强连通分量。
+ * 模板参数: 无
+ * Interface:
+ * 		SCC(Graph& g): 构造函数，计算 SCC
+ * Note:
+ * 		1. Time: O(V + E)
+ * 		2. Space: O(V)
+ * 		3. 1-based indexing. 对于不连通的图，每个连通块都会被单独处理
  */
+#include "../0-base[ignore]/Graph.cpp"
+
 struct SCC {
-	Graph& g;
-	std::vector<int> dfn, low, scc;
-	std::vector<bool> in_stk;
-	int dfn_cnt, scc_cnt;
-	std::stack<int> stk;
+	Graph& g;                    // 图的引用
+	std::vector<int> dfn;        // dfn[u]: 节点u的DFS序
+	std::vector<int> low;        // low[u]: 节点u能到达的最小DFS序
+	std::vector<int> scc;        // scc[u]: 节点u所属的强连通分量编号
+	std::vector<bool> in_stk;    // in_stk[u]: 节点u是否在栈中
+	int dfn_cnt;                 // DFS序计数器
+	int scc_cnt;                 // 强连通分量计数器
+	std::stack<int> stk;         // Tarjan算法维护的栈
+
 	SCC(Graph& g) : g(g), 
-		dfn(g.siz + 1), low(g.siz + 1), scc(g.siz + 1), in_stk(g.siz + 1, false), 
+		dfn(g.n + 1), low(g.n + 1), scc(g.n + 1), in_stk(g.n + 1, false), 
 		dfn_cnt(0), scc_cnt(0) {
-			rep(i, 1, g.siz) if (!dfn[i])
-				tarjan(i);
+			rep (i, 1, g.n) {
+				if (!dfn[i]) {
+					_tarjan(i);
+				}
+			}
 		}
 
-	void tarjan(int u) {
+private:
+	void _tarjan(int u) {
 		low[u] = dfn[u] = ++dfn_cnt;
 		stk.push(u);
 		in_stk[u] = true;
 		for (int v : g.adj[u]) {
 			if (!dfn[v]) {
-				tarjan(v);
+				_tarjan(v);
 				low[u] = std::min(low[u], low[v]);
 			} else if (in_stk[v]) {
 				low[u] = std::min(low[u], dfn[v]);
@@ -41,7 +49,8 @@ struct SCC {
 		if (low[u] == dfn[u]) {
 			scc_cnt++;
 			while (true) {
-				int x = stk.top(); stk.pop();
+				int x = stk.top(); 
+				stk.pop();
 				in_stk[x] = false;
 				scc[x] = scc_cnt;
 				if (x == u) break;
