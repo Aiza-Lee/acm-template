@@ -20,7 +20,7 @@
  * 		4. 失配树 (Fail Tree) 与 Border性质：
  * 			- pi 数组构成了 Fail Tree，pi[i] 是 i 的父节点。
  * 			- Border 传递性：s 的所有 border 长度等价于 pi[m], pi[pi[m]], ...
- * 			- 弱周期引理：任何字符串 S 的所有 border 长度按由大到小排序后，可以被划分为 O(log|S|) 段等差数列。利用此性质可以优化基于 border 的转移或 DP 达到线性或带小常数对数级别。
+ * 			- 弱周期引理：任何字符串 S 的所有 border 长度按由大到小排序后，可以被划分为 O(log|S|) 段等差数列, 且相邻等差数列会共享一位border.
  */
 struct KMP {
 	std::vector<int> pi;   // pi[i]: s[1...i]的最长相等真前缀和真后缀长度
