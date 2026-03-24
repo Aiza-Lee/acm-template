@@ -5,6 +5,7 @@ using u32 = unsigned int;
 using u64 = unsigned long long;
 using i64 = long long;
 using i128 = __int128;
+using u128 = __uint128_t;
 using ld  = long double;
 using pii = std::pair<int, int>;
 
@@ -53,3 +54,23 @@ int fp(int a, int x) {
 int inv(int x) { return fp(x, md - 2); }
 int divi(int x, int y) { return mul(x, inv(y)); }
 int divi2(int x) { return ((x & 1) ? x + md : x) >> 1; }
+
+struct MathHelper {
+	std::vector<int> fac, ifac, ninv;
+	MathHelper(int n) : fac(n + 1), ifac(n + 1), ninv(n + 1) {
+		fac[0] = 1;
+		rep(i, 1, n) fac[i] = mul(fac[i - 1], i);
+		ifac[n] = inv(fac[n]);
+		per(i, n - 1, 0) ifac[i] = mul(ifac[i + 1], i + 1);
+		ninv[1] = 1;
+		rep(i, 2, n) ninv[i] = mul(ninv[md % i], md - md / i);
+	}
+	int C(int n, int m) {
+		if (n < m || n < 0 || m < 0) return 0;
+		return mul(fac[n], ifac[m], ifac[n - m]);
+	}
+	int A(int n, int m) {
+		if (n < m || n < 0 || m < 0) return 0;
+		return mul(fac[n], ifac[n - m]);
+	}
+};
