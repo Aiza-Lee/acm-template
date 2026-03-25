@@ -40,9 +40,9 @@ using SegHash = SegTree<Info, Tag>;
 
 void example(int n, std::function<u64(int)> f) {
 	H_init(n);
-	SegHash seg(n, [&](int i, Info& info){ 
-		info = {f(i), 1};
-	});
+	std::vector<Info> init(n + 1);
+	rep(i, 1, n) init[i] = {f(i), 1};
+	SegHash seg(init);
 	// ...
 }
 */

@@ -2,49 +2,55 @@
 
 /**
  * Dinic's Algorithm
- * 算法介绍: 基于分层图的最大流算法。
- * 		1. BFS 建立分层图 (level graph)，判断 s 是否能到 t。
- * 		2. DFS 在分层图上多路增广，寻找增广路。
- * 		3. 重复上述步骤直到 s 无法到达 t。
- * 算法关系:
- * 		Dinic 算法是 ISAP 算法的基础。Dinic 每一轮增广前都会显式地通过 BFS 重建分层图。
- * 		而 ISAP 则通过在 DFS 过程中动态修改距离标号来避免重复的 BFS，通常常数更小。
+ * 算法介绍: 基于分层图的最大流算法，每轮先 BFS 建立分层图，再在分层图上 DFS 多路增广。
  * 模板参数: Cap (容量类型)
- * Interface: 
- * 		add_edge(u, v, w)
- * 		solve(s, t) -> max_flow
+ * Interface:
+ * 		Dinic(int n, int m = 0): 初始化 n 个点、预估 m 条原图边的网络
+ * 		void add_edge(int u, int v, Cap w): 添加一条容量为 w 的有向边
+ * 		Cap solve(int s, int t, Cap limit = INF): 返回至多增广 limit 流量后的最大流
  * Note:
- * 		1. Time Complexity:
- * 			- General: O(V^2 * E)
- * 			- Unit Capacity: O(min(V^(2/3), E^(1/2)) * E)
- * 			- Bipartite Matching: O(E * sqrt(V))
- * 		2. 1-based indexing.
+ * 		1. Time: 一般图 O(V^2E)；单位容量网络 O(min(V^(2/3), E^(1/2))E)；二分图匹配 O(E\sqrt{V})
+ * 		2. Space: O(V + E)
+ * 		3. 1-based indexing.
+ * 		4. 用法/技巧:
+ * 			4.1 二分图最大匹配可直接按网络流建模，用 Dinic 求最大流。
+ * 			4.2 若只需发送部分流量，可直接传入 solve(s, t, limit)。
+ * 			4.3 `dep[u] = 0` 的剪枝能减少本轮分层图中的无效搜索。
  */
 
 template<typename Cap>
 struct Graph {
-	struct Edge { int v, nxt; Cap w; };
-	int n;
-	std::vector<int> head;
-	std::vector<Edge> e;
-	int ec = 1;
+	struct Edge {
+		int v, nxt;
+		Cap w;
+	};
 
-	Graph(int n, int m = 0) : n(n), head(n + 1), e(2 * m + 2) {}
+	int n;                 // 点数
+	std::vector<int> head; // 链式前向星表头
+	std::vector<Edge> e;   // 残量网络边集
+	int ec;                // 当前边计数，边下标从 2 开始，便于 i ^ 1 找反边
+
+	Graph(int n, int m = 0) : n(n), head(n + 1, 0), e(std::max(2 * m + 2, 2)), ec(1) {}
 
 	void add_edge(int u, int v, Cap w) {
-		if (ec + 2 > (int)e.size()) e.resize(ec * 2 + 2);
-		e[++ec] = {v, head[u], w}; head[u] = ec;
-		e[++ec] = {u, head[v], 0}; head[v] = ec;
+		AST(1 <= u && u <= n);
+		AST(1 <= v && v <= n);
+		if (ec + 2 >= (int)e.size()) e.resize(std::max((int)e.size() * 2, ec + 3));
+		e[++ec] = {v, head[u], w};
+		head[u] = ec;
+		e[++ec] = {u, head[v], 0};
+		head[v] = ec;
 	}
 };
 
 template<typename Cap = i64>
 struct Dinic {
 	static constexpr Cap INF = std::numeric_limits<Cap>::max();
-	
+
 	Graph<Cap> g;
-	std::vector<int> dep, cur;
-	int n;
+	std::vector<int> dep; // dep[u]: 分层图中点 u 的层数，0 表示当前不可达
+	std::vector<int> cur; // cur[u]: 当前弧优化指针
+	int n;                // 点数
 
 	Dinic(int n, int m = 0) : g(n, m), dep(n + 1), cur(n + 1), n(n) {}
 
@@ -54,49 +60,51 @@ struct Dinic {
 
 	bool bfs(int s, int t) {
 		std::fill(dep.begin(), dep.end(), 0);
-		dep[s] = 1;
 		std::deque<int> q;
+		dep[s] = 1;
 		q.push_back(s);
-		cur[s] = g.head[s];
-		
+
 		while (!q.empty()) {
-			int u = q.front(); q.pop_front();
+			int u = q.front();
+			q.pop_front();
 			for (int i = g.head[u]; i; i = g.e[i].nxt) {
-				int v = g.e[i].v;
-				if (g.e[i].w > 0 && !dep[v]) {
-					dep[v] = dep[u] + 1;
-					cur[v] = g.head[v];
-					if (v == t) return true;
-					q.push_back(v);
-				}
+				auto& e = g.e[i];
+				if (e.w == 0 || dep[e.v]) continue;
+				dep[e.v] = dep[u] + 1;
+				if (e.v == t) return true;
+				q.push_back(e.v);
 			}
 		}
-		return false;
+		return dep[t] != 0;
 	}
 
 	Cap dfs(int u, int t, Cap flow) {
 		if (u == t || flow == 0) return flow;
-		Cap res = 0;
+
+		Cap used = 0;
 		for (int& i = cur[u]; i; i = g.e[i].nxt) {
-			int v = g.e[i].v;
-			if (g.e[i].w > 0 && dep[v] == dep[u] + 1) {
-				Cap k = dfs(v, t, std::min(flow - res, g.e[i].w));
-				if (k > 0) {
-					g.e[i].w -= k;
-					g.e[i ^ 1].w += k;
-					res += k;
-					if (res == flow) return res;
-				}
-			}
+			auto& e = g.e[i];
+			if (e.w == 0 || dep[e.v] != dep[u] + 1) continue;
+			Cap pushed = dfs(e.v, t, std::min(flow - used, e.w));
+			if (pushed == 0) continue;
+			e.w -= pushed;
+			g.e[i ^ 1].w += pushed;
+			used += pushed;
+			if (used == flow) return used;
 		}
-		if (res == 0) dep[u] = 0; // Pruning
-		return res;
+		if (used == 0) dep[u] = 0; // Pruning
+		return used;
 	}
 
-	Cap solve(int s, int t) {
+	Cap solve(int s, int t, Cap limit = INF) {
+		AST(1 <= s && s <= n);
+		AST(1 <= t && t <= n);
+		if (s == t || limit == 0) return 0;
+
 		Cap max_flow = 0;
-		while (bfs(s, t)) {
-			max_flow += dfs(s, t, INF);
+		while (max_flow < limit && bfs(s, t)) {
+			std::copy(g.head.begin(), g.head.end(), cur.begin());
+			max_flow += dfs(s, t, limit - max_flow);
 		}
 		return max_flow;
 	}

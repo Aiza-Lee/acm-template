@@ -3,7 +3,8 @@
 struct Graph {
 	int n;
 	std::vector<std::vector<int>> adj;
-	Graph(int n) : n(n), adj(n + 1) {}
+	std::vector<int> ind, outd;
+	Graph(int n) : n(n), adj(n + 1), ind(n + 1), outd(n + 1) {}
 	void read_graph(int m, bool directed = false) {
 		rep(i, 1, m) {
 			int x, y;
@@ -14,5 +15,7 @@ struct Graph {
 	}
 	void add_edge(int u, int v) {
 		adj[u].push_back(v);
+		++outd[u];
+		++ind[v];
 	}
 };

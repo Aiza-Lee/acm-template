@@ -42,9 +42,9 @@ struct Tag {
 using SegAffine = SegTree<Info, Tag>;
 
 void example(int n, const std::vector<int>& init_val) {
-	SegAffine seg(n, [&](int i, Info& info) {
-		info = { (i64)init_val[i] % MOD, 1 };
-	});
+	std::vector<Info> init(n + 1);
+	rep(i, 1, n) init[i] = {(i64)init_val[i] % MOD, 1};
+	SegAffine seg(init);
 	seg.modify(1, n, {2, 0}); // mul
 	seg.modify(1, n, {1, 3}); // add
 }

@@ -1,112 +1,104 @@
 #include "aizalib.h"
+
 /**
  * 划分树 (Partition Tree)
- * 		划分树是一种基于归并排序（或者说是快速排序的划分过程）思想的数据结构。
- * 		主要用于解决 "静态区间第 k 小值" 问题。
- * 		它的核心思想是将当前区间 [l, r] 的元素根据中位数划分到左右两个子节点中：
- * 		小于等于中位数的元素放入左子树，大于中位数的元素放入右子树，并保持它们在原数组中的相对顺序。
- * 		通过记录每个前缀有多少个元素进入了左子树，可以在 O(log n) 时间内定位到区间第 k 小值。
- * 
- * 模板参数:
- * 		T: 值类型，默认为 i64
- * interface:
- * 		PartitionTree(const vector<T>& arr): 	// 构造函数，传入原数组 (0-based)
- * 		query(int l, int r, int k):				// 查询区间 [l, r] (0-based) 第 k 小的值 (1-based)
- * note:
- * 		1. 时间复杂度：
- * 			- 构建：O(n log n)
- * 			- 查询：O(log n)
- * 			- 空间复杂度：O(n log n)
- * 		2. 不支持修改
- * 		3. 原数组索引是从 0 开始的 (0-based)，即 l, r 范围是 [0, n-1]。k 是从 1 开始的 (1-based)。
+ * 算法介绍: 基于快速排序划分思想维护静态数组，支持区间第 k 小查询。每层按当前值域中位数把元素稳定划分到左右两侧，并记录前缀中进入左侧的元素个数。
+ * 模板参数: T (值类型)
+ * Interface:
+ * 		PartitionTree(const std::vector<T>& a): 用 1-based 数组 a 建树
+ * 		T query(int l, int r, int k): 查询区间 [l, r] 的第 k 小值
+ * Note:
+ * 		1. Time: build O(n log n), query O(log n)
+ * 		2. Space: O(n log n)
+ * 		3. 1-based indexing.
+ * 		4. 用法/技巧:
+ * 			4.1 只支持静态区间第 k 小，不支持修改。
+ * 			4.2 若题目是区间第 k 小的在线查询，划分树常数通常优于主席树，但功能更单一。
+ * 			4.3 构造时传入的数组需为 1-based，即 `a[1..n]` 有效，`a[0]` 留空。
  */
+
 template<typename T = i64>
 struct PartitionTree {
-	std::vector<std::vector<T>> tree;
-	std::vector<std::vector<int>> to_left;
-	std::vector<T> sorted;
-	int n;
+#define LS dep + 1, l, mid
+#define RS dep + 1, mid + 1, r
 
-	PartitionTree(const std::vector<T>& arr) : n(arr.size()) {
-		if (n == 0) return;
-		int max_dep = 0;
-		while ((1 << max_dep) <= n) max_dep++;
-		max_dep += 2; 
+	int n;                          // 数组长度
+	std::vector<std::vector<T>> val; // val[dep][i]: 第 dep 层位置 i 的值
+	std::vector<std::vector<int>> cnt; // cnt[dep][i]: 第 dep 层当前块前缀中被划到左侧的个数
+	std::vector<T> b;               // 排序后的目标序列
 
-		tree.assign(max_dep, std::vector<T>(n));
-		to_left.assign(max_dep, std::vector<int>(n));
-		
-		sorted = arr;
-		std::sort(sorted.begin(), sorted.end());
-		
-		tree[0] = arr;
-		_build(0, 0, n - 1);
+	PartitionTree() : n(0) {}
+
+	PartitionTree(const std::vector<T>& a) {
+		init(a);
+	}
+
+	void init(const std::vector<T>& a) {
+		AST((int)a.size() >= 2);
+		n = (int)a.size() - 1;
+		int lg = 1;
+		while ((1 << lg) <= n) lg++;
+		lg += 2;
+
+		val.assign(lg, std::vector<T>(n + 1));
+		cnt.assign(lg, std::vector<int>(n + 1));
+		b = a;
+		std::sort(b.begin() + 1, b.end());
+		val[0] = a;
+		_build(0, 1, n);
 	}
 
 	void _build(int dep, int l, int r) {
 		if (l == r) return;
-		int mid = l + r >> 1;
-		T mid_val = sorted[mid];
-		
-		// 计算有多少个等于 mid_val 的数需要分到左边
-		// 左子树总共需要吸收 mid - l + 1 个元素
-		int same = mid - l + 1;
-		rep(i, l, r) {
-			if (tree[dep][i] < mid_val) same--;
-		}
-
-		int l_pos = l, r_pos = mid + 1;
-		int cur_to_left = 0; // 记录当前区间 [l, i] 有多少个数去了左子树
-		rep(i, l, r) {
-			T val = tree[dep][i];
-			bool go_left = false;
-			if (val < mid_val) {
-				go_left = true;
-			} else if (val == mid_val && same > 0) {
-				go_left = true;
-				same--;
-			}
-
-			if (go_left) {
-				tree[dep + 1][l_pos++] = val;
-				cur_to_left++;
-			} else {
-				tree[dep + 1][r_pos++] = val;
-			}
-			to_left[dep][i] = cur_to_left;
-		}
-		_build(dep + 1, l, mid);
-		_build(dep + 1, mid + 1, r);
-	}
-
-	T _query(int dep, int l, int r, int ql, int qr, int k) {
-		if (l == r) return tree[dep][l];
 		int mid = (l + r) >> 1;
-		
-		// 计算 [l, ql - 1] 中有多少个数进入了左子树
-		int cnt_pre = (ql == l) ? 0 : to_left[dep][ql - 1];
-		// 计算 [ql, qr] 中有多少个数进入了左子树
-		int cnt_cur = to_left[dep][qr] - cnt_pre;
+		T x = b[mid];
 
-		if (k <= cnt_cur) {
-			// k 在左子树范围内
-			int new_ql = l + cnt_pre;
-			int new_qr = new_ql + cnt_cur - 1;
-			return _query(dep + 1, l, mid, new_ql, new_qr, k);
-		} else {
-			// k 在右子树范围内
-			int pre_right = (ql - l) - cnt_pre; // [l, ql - 1] 中进入右子树的个数
-			int cur_right = (qr - ql + 1) - cnt_cur; // [ql, qr] 中进入右子树的个数
-			int new_ql = mid + 1 + pre_right;
-			int new_qr = new_ql + cur_right - 1;
-			return _query(dep + 1, mid + 1, r, new_ql, new_qr, k - cnt_cur);
+		int same = mid - l + 1;
+		rep(i, l, r) if (val[dep][i] < x) same--;
+
+		int lp = l, rp = mid + 1;
+		cnt[dep][l - 1] = 0;
+		int s = 0;
+		rep(i, l, r) {
+			bool go_l = val[dep][i] < x || (val[dep][i] == x && same > 0);
+			if (go_l && val[dep][i] == x) same--;
+			if (go_l) {
+				val[dep + 1][lp++] = val[dep][i];
+				s++;
+			} else {
+				val[dep + 1][rp++] = val[dep][i];
+			}
+			cnt[dep][i] = s;
 		}
+		_build(LS);
+		_build(RS);
 	}
 
-	T query(int l, int r, int k) {
-		if (l < 0 || r >= n || l > r || k < 1 || k > r - l + 1) {
-			return T{}; // 错误或越界
+	T _query(int dep, int l, int r, int ql, int qr, int k) const {
+		if (l == r) return val[dep][l];
+		int mid = (l + r) >> 1;
+
+		int pre = cnt[dep][ql - 1];
+		int in_l = cnt[dep][qr] - pre;
+		if (k <= in_l) {
+			int nql = l + pre;
+			int nqr = nql + in_l - 1;
+			return _query(LS, nql, nqr, k);
 		}
-		return _query(0, 0, n - 1, l, r, k);
+
+		int pre_r = ql - l - pre;
+		int in_r = qr - ql + 1 - in_l;
+		int nql = mid + 1 + pre_r;
+		int nqr = nql + in_r - 1;
+		return _query(RS, nql, nqr, k - in_l);
 	}
+
+	T query(int l, int r, int k) const {
+		AST(1 <= l && l <= r && r <= n);
+		AST(1 <= k && k <= r - l + 1);
+		return _query(0, 1, n, l, r, k);
+	}
+
+#undef LS
+#undef RS
 };
