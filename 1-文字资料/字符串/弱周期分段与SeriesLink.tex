@@ -1,0 +1,102 @@
+\textbf{弱周期分段与 Series Link}
+
+很多字符串结构上的 \textbf{后缀链 / fail 链} 都有同一种压缩方式：把相邻两个状态长度之差视为公差，按公差是否相同分段；每段内部形成等差数列，而总段数只有 $O(\log n)$。这使得本来需要沿整条链枚举的转移，可以缩成按段转移。其底层原因是 \textbf{弱周期引理}：一条由“最长真后缀”递归得到的长度链，不会出现太多种彼此独立的小周期，因此相同公差会自然聚成很少几段。
+
+\textbf{统一抽象}
+
+设有一条长度严格递减的祖先链
+\[
+L_0 > L_1 > L_2 > \cdots
+\]
+其中每个 $L_{k+1}$ 是 $L_k$ 的某种“最长真后缀结构”。定义
+\[
+d_k = L_k - L_{k+1}
+\]
+若一段连续位置满足 $d_k$ 相同，则对应长度序列为等差数列，可整体处理。弱周期结构保证：这条链按公差分段后，总段数为 $O(\log n)$。
+
+\textbf{弱周期引理}
+
+设字符串 $S$ 的所有 border 长度按严格递减顺序为
+\[
+b_1 > b_2 > \cdots > b_t
+\]
+记相邻两层的长度差为
+\[
+d_i = b_i - b_{i+1}
+\]
+弱周期引理的竞赛常用形式是：\textbf{这些 border 可以划分成 $O(\log |S|)$ 段等差数列。} 等价地说，沿最长真后缀链不断向上跳时，相邻长度差发生变化的次数只有对数级。
+
+直观理解如下：
+\begin{itemize}
+    \item 若相邻两层的长度差相同，则这些 border 共享同一个局部周期，会继续停留在同一段内；
+    \item 若长度差发生变化，通常意味着当前可用周期显著变大；
+    \item 周期不可能很多次只做微小变化，否则会与 border 的重叠结构矛盾。
+\end{itemize}
+
+因此一条很长的 fail 链，虽然节点数可能是线性的，但按“相邻长度差是否相同”分组后，段数只有 $O(\log n)$。这正是后面 \texttt{anc} / \texttt{slink} 压缩的理论基础。
+
+\textbf{KMP 中的形式}
+
+对前缀 $s[1..i]$，考虑 border 链
+\[
+i,\ \pi[i],\ \pi[\pi[i]],\ \dots
+\]
+令
+\[
+\text{diff}[u] = u - \pi[u]
+\]
+若 $\text{diff}[u] = \text{diff}[\pi[u]]$，则 $u,\pi[u],\pi[\pi[u]],\dots$ 处在同一等差段内，可继续压缩；否则在此处开新段。代码中常写作
+\[
+\text{anc}[u] =
+\begin{cases}
+\text{anc}[\pi[u]], & \text{diff}[u] = \text{diff}[\pi[u]] \\
+\pi[u], & \text{otherwise}
+\end{cases}
+\]
+于是沿 border 链转移时，只需枚举各段代表，复杂度为 $O(\log n)$。
+
+\textbf{扩展 PAM 中的形式}
+
+对当前前缀的回文后缀链，考虑
+\[
+\text{len}[x],\ \text{len}[\text{fail}[x]],\ \text{len}[\text{fail}[\text{fail}[x]]],\dots
+\]
+令
+\[
+\text{diff}[x] = \text{len}[x] - \text{len}[\text{fail}[x]]
+\]
+若当前节点与其 fail 父亲的 diff 相同，则它们属于同一段；否则当前节点成为新段起点。于是定义
+\[
+\text{slink}[x] =
+\begin{cases}
+\text{slink}[\text{fail}[x]], & \text{diff}[x] = \text{diff}[\text{fail}[x]] \\
+\text{fail}[x], & \text{otherwise}
+\end{cases}
+\]
+沿回文后缀链做 DP 时，不必逐个回文后缀枚举，只需枚举 series link 链上的段代表，段数同样为 $O(\log n)$。
+
+\textbf{公共模板}
+
+不论是 KMP 还是 ExtPAM，本质都可写成同一个模式。设当前状态为 $u$，父状态为 $fa[u]$，并把状态的“长度”记作 $\text{len}[u]$。定义
+\[
+\text{diff}[u] = \text{len}[u] - \text{len}[fa[u]]
+\]
+再定义压缩祖先
+\[
+\text{up}[u] =
+\begin{cases}
+\text{up}[fa[u]], & \text{diff}[u] = \text{diff}[fa[u]] \\
+fa[u], & \text{otherwise}
+\end{cases}
+\]
+则从 $u$ 沿 $up$ 不断跳，就只会访问每一段的代表，访问次数为 $O(\log n)$。
+
+很多 DP 都可抽象为：
+\[
+dp[i] = \min_{u \in \mathcal{S}_i} \{ \text{transfer}(i, u) \}
+\]
+其中 $\mathcal{S}_i$ 是当前前缀 $i$ 的所有合法后缀状态。朴素做法是枚举整条链；压缩后改为枚举段代表，并给每段维护一个辅助值 $g[u]$：
+\[
+g[u] = \text{该段内所有状态能提供的最优转移值}
+\]
+于是总代价从“按点转移”变成“按段转移”，常见复杂度从 $O(n^2)$ 降到 $O(n \log n)$。

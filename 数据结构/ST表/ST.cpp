@@ -1,52 +1,73 @@
 #include "aizalib.h"
+#include <bit>
 
 /**
- * Sparse Table (ST表)
+ * Sparse Table
  * 算法介绍:
- * 		ST表用于解决静态区间最值查询 (RMQ) 问题，也可用于其他可重复贡献问题（如 GCD）。
- * 		预处理时间复杂度 O(N log N)，查询时间复杂度 O(1)。
- * 		基于倍增思想，st[j][i] 表示以 i 为起点，长度为 2^j 的区间的最值。
- * 
+ * 		基于倍增预处理静态区间信息，适用于 RMQ、GCD 等可重复贡献问题。
+ *
  * 模板参数:
- * 		T: 元素类型
- * 		Merge: 合并函数对象，用于定义区间运算规则 (如 max, min, gcd)
- * 
+ * 		T: 值类型
+ * 		Merge: 合并函数对象，需满足 Merge(const T&, const T&) -> T
+ *
  * Interface:
- * 		SparseTable(const std::vector<T>& a, Merge merge = Merge())
- * 		T query(int l, int r): 查询闭区间 [l, r] 的结果 (1-based)
- * 
+ * 		SparseTable(a, merge): 传入 1-based 数组构建
+ * 		build(a): 重建
+ * 		query(l, r): 查询闭区间 [l, r]
+ *
  * Note:
- * 		1. 时间复杂度: 预处理 O(N log N), 查询 O(1)
- * 		2. 空间复杂度: O(N log N)
- * 		3. 1-based indexing
- * 		4. 适用场景: 静态区间 RMQ, 区间 GCD 等。不支持修改。
+ * 		1. Time: Build O(N log N), Query O(1)
+ * 		2. Space: O(N log N)
+ * 		3. 1-based indexing, a[0] 预留不用
+ * 		4. 用法/技巧: merge 建议传无状态 lambda / functor，避免 std::function 常数
  */
+template<typename Merge, typename T>
+concept STMerge = requires(Merge merge, const T& x, const T& y) {
+	{ merge(x, y) } -> std::same_as<T>;
+};
 
-template <typename T, typename Merge = std::function<T(const T&, const T&)>>
+template<typename T, typename Merge>
+requires STMerge<Merge, T>
 struct SparseTable {
-	int n;
+	int n = 0, lg = 0;
+	std::vector<int> lo;
 	std::vector<std::vector<T>> st;
-	std::vector<int> lg;
 	Merge merge;
 
-	SparseTable(const std::vector<T>& a, Merge merge = Merge()) : n(a.size() - 1), merge(merge) {
-		lg.assign(n + 1, 0);
-		rep(i, 2, n) lg[i] = lg[i / 2] + 1;
+	SparseTable() = default;
+	SparseTable(const std::vector<T>& a, Merge merge) : merge(merge) { build(a); }
 
-		int K = lg[n];
-		st.assign(K + 1, std::vector<T>(n + 1));
+	void build(const std::vector<T>& a) {
+		n = (int)a.size() - 1;
+		if (n <= 0) {
+			lg = 0;
+			lo.assign(1, 0);
+			st.clear();
+			return;
+		}
 
-		rep(i, 1, n) st[0][i] = a[i - 1];
+		lg = std::bit_width((unsigned int)n) - 1;
+		lo.assign(n + 1, 0);
+		rep(i, 2, n) lo[i] = lo[i >> 1] + 1;
 
-		rep(j, 1, K) {
-			rep(i, 1, n - (1 << j) + 1) {
-				st[j][i] = merge(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
-			}
+		st.assign(lg + 1, std::vector<T>(n + 1));
+		rep(i, 1, n) st[0][i] = a[i];
+
+		rep(j, 1, lg) {
+			int half = 1 << (j - 1), len = half << 1;
+			auto& pre = st[j - 1];
+			auto& cur = st[j];
+			rep(i, 1, n - len + 1) cur[i] = merge(pre[i], pre[i + half]);
 		}
 	}
 
-	T query(int l, int r) {
-		int j = lg[r - l + 1];
-		return merge(st[j][l], st[j][r - (1 << j) + 1]);
+	T query(int l, int r) const {
+		AST(1 <= l && l <= r && r <= n);
+		int k = lo[r - l + 1];
+		return merge(st[k][l], st[k][r - (1 << k) + 1]);
 	}
 };
+
+template<typename T, typename Merge>
+requires STMerge<Merge, T>
+SparseTable(const std::vector<T>&, Merge) -> SparseTable<T, Merge>;

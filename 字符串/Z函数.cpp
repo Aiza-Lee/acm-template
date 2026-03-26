@@ -1,31 +1,44 @@
 #include "aizalib.h"
 
 /**
- * Z 函数 (扩展 KMP) 算法模板
- * 
- * interface:
- * 		init(s)				// 初始化模式串 s，计算 z 数组
- * 		match(t)			// 在文本串 t 中查找所有匹配位置
- * 		z					// z 数组，z[i] 表示 s[i...] 与 s 的 LCP 长度
- * 
- * note:
- * 		1. 时间复杂度：init O(N), match O(N + M)。
- * 		2. z[i] 定义：后缀 s[i...n-1] 与 s 的最长公共前缀 (LCP) 的长度。
- * 		3. 本模板中 z[0] = n。
+ * Z Function
+ * 算法介绍:
+ * 		线性求 Z 数组，支持字符串匹配与 border / 周期相关性质。
+ *
+ * 模板参数:
+ * 		无
+ *
+ * Interface:
+ * 		ZFunc(s) / init(s): 初始化模式串
+ * 		match(t): 在文本串中查找所有匹配位置，返回 1-based 起点
+ * 		border_len(): 整个模式串的最长 border 长度
+ * 		min_period(): 返回最小循环节长度
+ * 		z: Z 数组，z[i] 表示 s[i...m] 与 s[1...m] 的 LCP 长度
+ *
+ * Note:
+ * 		1. Time: init O(M), match O(N)
+ * 		2. Space: O(M)
+ * 		3. 内部统一 1-based，模式串记为 s[1...m]，且 z[1] = m
+ * 		4. 用法/技巧: 枚举 i | m 时，若 i + z[i] - 1 == m，则 i - 1 是一个 border 长度
  */
 struct ZFunc {
-	std::vector<int> z;
 	std::string s;
+	int m = 0;
+	std::vector<int> z; // z[i]: s[i...m] 与 s[1...m] 的 LCP 长度
+
+	ZFunc() = default;
+	ZFunc(const std::string& s) { init(s); }
 
 	void init(const std::string& str) {
-		s = str;
-		int n = s.length();
-		z.assign(n, 0);
-		z[0] = n; 
-		int l = 0, r = 0;
-		for (int i = 1; i < n; i++) {
-			if (i <= r) z[i] = std::min(r - i + 1, z[i - l]);
-			while (i + z[i] < n && s[z[i]] == s[i + z[i]]) z[i]++;
+		m = (int)str.size();
+		s = " " + str;
+		z.assign(m + 1, 0);
+		if (m == 0) return;
+
+		z[1] = m;
+		for (int i = 2, l = 1, r = 1; i <= m; ++i) {
+			if (i <= r) z[i] = std::min(r - i + 1, z[i - l + 1]);
+			while (i + z[i] <= m && s[z[i] + 1] == s[i + z[i]]) ++z[i];
 			if (i + z[i] - 1 > r) {
 				l = i;
 				r = i + z[i] - 1;
@@ -33,39 +46,36 @@ struct ZFunc {
 		}
 	}
 
-	/**
-	 * 在文本串 t 中查找所有匹配位置
-	 * 优化：无需显式构造 s + '#' + t 字符串，由 Z 算法逻辑直接在 t 上推导
-	 */
-	std::vector<int> match(const std::string& t) {
+	std::vector<int> match(const std::string& t) const {
 		std::vector<int> occ;
-		int n = s.length(), m = t.length();
-		if (n == 0) return occ;
+		int n = (int)t.size();
+		if (m == 0 || n == 0) return occ;
+		std::string tt = " " + t;
 
-		// l, r 维护的是在 t 中匹配到 s 前缀的区间 [l, r]
-		// 即 t[l...r] == s[0...r-l]
-		int l = 0, r = 0;
-		// 遍历文本串 t
-		for (int i = 0; i < m; i++) {
-			int z_val = 0; // 当前位置 i 对应的 LCP 长度，即 "cur_z[i]"
-			if (i <= r) {
-				// i 在当前匹配区间内，利用 s 自身的 z 数组进行加速
-				z_val = std::min(r - i + 1, z[i - l]);
-			}
-			// 尝试继续向后匹配
-			while (i + z_val < m && z_val < n && t[i + z_val] == s[z_val]) {
-				z_val++;
-			}
-			// 更新匹配区间
-			if (i + z_val - 1 > r) {
+		for (int i = 1, l = 0, r = -1; i <= n; ++i) {
+			int cur = 0;
+			if (i <= r) cur = std::min(r - i + 1, z[i - l + 1]);
+			while (cur < m && i + cur <= n && tt[i + cur] == s[cur + 1]) ++cur;
+			if (i + cur - 1 > r) {
 				l = i;
-				r = i + z_val - 1;
+				r = i + cur - 1;
 			}
-			// 找到一个完整匹配
-			if (z_val == n) {
-				occ.push_back(i);
-			}
+			if (cur == m) occ.emplace_back(i);
 		}
 		return occ;
+	}
+
+	int border_len() const {
+		if (m == 0) return 0;
+		for (int i = 2; i <= m; ++i) {
+			if (i + z[i] - 1 == m) return z[i];
+		}
+		return 0;
+	}
+
+	int min_period() const {
+		if (m == 0) return 0;
+		rep(len, 1, m - 1) if (m % len == 0 && z[len + 1] == m - len) return len;
+		return m;
 	}
 };
