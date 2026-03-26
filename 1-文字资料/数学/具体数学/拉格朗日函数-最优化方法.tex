@@ -1,51 +1,139 @@
-\textbf{拉格朗日函数}
+\textbf{拉格朗日函数 / 对偶 / KKT 速查}
 
-\textbf{问题形式}
-\[\begin{aligned} 
-\min_{x\in\mathbb R^n} \quad & f(x) \\
-\text{s.t.} \quad & h_i(x) = 0, \quad i=1,\dots,m \\
-& g_j(x) \le 0, \quad j=1,\dots,p 
-\end{aligned}\]
-
-\textbf{拉格朗日函数}
-\[\mathcal L(x,\lambda,\mu) = f(x) + \sum_{i=1}^m \lambda_i h_i(x) + \sum_{j=1}^p \mu_j g_j(x)\]
-其中 \(\lambda \in \mathbb R^m, \mu \in \mathbb R^p\) 为拉格朗日乘子。
-
-\textbf{KKT条件（必要条件）}
-
-设 \(x^*\) 为局部最优解，且满足正则性条件（如 LICQ），则存在 \(\lambda^*, \mu^*\) 使得：
-
+\textbf{术语}
 \begin{itemize}
-    \item \textbf{平稳性}（Stationarity）：
-    \[ \nabla f(x^*) + \sum_{i=1}^m \lambda_i^* \nabla h_i(x^*) + \sum_{j=1}^p \mu_j^* \nabla g_j(x^*) = 0 \]
-    \item \textbf{原始可行性}（Primal Feasibility）：
-    \[ h_i(x^*) = 0, \quad g_j(x^*) \le 0 \]
-    \item \textbf{对偶可行性}（Dual Feasibility）：
-    \[ \mu_j^* \ge 0 \]
-    \item \textbf{互补松弛}（Complementary Slackness）：
-    \[ \mu_j^* g_j(x^*) = 0 \]
+	\item 下凸 = convex， 上凸 = concave。
 \end{itemize}
 
-\textbf{对偶理论}
+\textbf{标准形式}
+\[
+\begin{aligned}
+\min_{\mathbf{x}\in\mathbb R^n}\quad & f(\mathbf{x}) \\
+\text{s.t.}\quad & h_i(\mathbf{x})=0,\quad i=1,\dots,m \\
+& g_j(\mathbf{x})\le 0,\quad j=1,\dots,p
+\end{aligned}
+\]
+
+\textbf{拉格朗日函数}
+\[
+\mathcal L(\mathbf{x},\boldsymbol{\lambda},\boldsymbol{\mu})
+=f(\mathbf{x})+\sum_{i=1}^m \lambda_i h_i(\mathbf{x})+\sum_{j=1}^p \mu_j g_j(\mathbf{x}),
+\qquad \mu_j\ge 0
+\]
+\begin{itemize}
+	\item $\lambda_i$ 无符号限制。
+	\item 若原式写成 $g_j(\mathbf{x})\ge 0$，先改成 $-g_j(\mathbf{x})\le 0$。
+\end{itemize}
+
+\textbf{只有等式约束}
+\[
+\mathcal L(\mathbf{x},\boldsymbol{\lambda})=f(\mathbf{x})+\sum_{i=1}^m \lambda_i h_i(\mathbf{x})
+\]
+\[
+\nabla_{\mathbf{x}}\mathcal L(\mathbf{x},\boldsymbol{\lambda})=0,\qquad h_i(\mathbf{x})=0
+\]
 
 \textbf{对偶函数}
-定义拉格朗日对偶函数 \(g: \mathbb R^m \times \mathbb R^p \to \mathbb R\)：
-\[ g(\lambda, \mu) = \inf_{x \in \mathcal{D}} \mathcal{L}(x, \lambda, \mu) \]
-性质：\(g(\lambda, \mu)\) 是凹函数。
+\[
+q(\boldsymbol{\lambda},\boldsymbol{\mu})
+=\inf_{\mathbf{x}\in\mathcal D}\mathcal L(\mathbf{x},\boldsymbol{\lambda},\boldsymbol{\mu})
+\]
+\begin{itemize}
+	\item 对任意 $\boldsymbol{\mu}\ge \mathbf{0}$，有 $q(\boldsymbol{\lambda},\boldsymbol{\mu})\le p^*$。
+	\item $q$ 总是上凸函数。
+\end{itemize}
 
 \textbf{对偶问题}
-\[ \max_{\lambda, \mu} g(\lambda, \mu) \quad \text{s.t.} \quad \mu \ge 0 \]
-设 \(d^*\) 为对偶问题最优值，\(p^*\) 为原问题最优值。
+\[
+\max_{\boldsymbol{\lambda},\boldsymbol{\mu}}\ q(\boldsymbol{\lambda},\boldsymbol{\mu})
+\qquad \text{s.t.}\quad \boldsymbol{\mu}\ge \mathbf{0}
+\]
+\[
+d^*:=\max q(\boldsymbol{\lambda},\boldsymbol{\mu}),\qquad p^*:=\text{原问题最优值}
+\]
 
-\textbf{弱对偶性}（Weak Duality）
-\[ d^* \le p^* \]
-恒成立。
+\textbf{弱对偶 / 强对偶}
+\[
+d^*\le p^*
+\]
+\[
+d^*=p^* \iff \text{强对偶}
+\]
 
-\textbf{强对偶性}（Strong Duality）
-\[ d^* = p^* \]
-通常在凸优化问题满足 \textbf{Slater条件} 时成立。
+\textbf{Slater 条件}
 
-\textbf{Slater条件}
-若原问题为凸问题（\(f, g_j\) 凸，\(h_i\) 仿射），且存在 \(x \in \text{relint}(\mathcal{D})\) 使得：
-\[ \forall i, h_i(x)=0, \quad \forall j, g_j(x) < 0 \]
-则强对偶性成立。
+原问题为下凸优化，且
+\begin{itemize}
+	\item $f,g_j$ 为下凸函数；
+	\item $h_i$ 为仿射函数；
+	\item 存在严格可行点 $\bar{\mathbf{x}}$：
+	\[
+	h_i(\bar{\mathbf{x}})=0,\qquad g_j(\bar{\mathbf{x}})<0
+	\]
+\end{itemize}
+
+\textbf{常用结论}
+\begin{itemize}
+	\item 下凸问题 + Slater $\Rightarrow$ 强对偶。
+	\item 常见有限维情形下，可取到最优乘子。
+\end{itemize}
+
+\textbf{鞍点}
+\[
+\mathcal L(\mathbf{x}^*,\boldsymbol{\lambda},\boldsymbol{\mu})
+\le \mathcal L(\mathbf{x}^*,\boldsymbol{\lambda}^*,\boldsymbol{\mu}^*)
+\le \mathcal L(\mathbf{x},\boldsymbol{\lambda}^*,\boldsymbol{\mu}^*),
+\qquad \forall \mathbf{x},\boldsymbol{\lambda},\boldsymbol{\mu}\ (\boldsymbol{\mu}\ge \mathbf{0})
+\]
+\begin{itemize}
+	\item 固定 $(\boldsymbol{\lambda}^*,\boldsymbol{\mu}^*)$，$\mathbf{x}^*$ 使 $\mathcal L$ 最小。
+	\item 固定 $\mathbf{x}^*$，$(\boldsymbol{\lambda}^*,\boldsymbol{\mu}^*)$ 使 $\mathcal L$ 最大。
+	\item 在下凸问题中，若满足 Slater 且最优解可取到，则
+	\[
+	\text{强对偶} \iff \mathcal L \text{ 存在鞍点}.
+	\]
+\end{itemize}
+
+\textbf{KKT 条件}
+
+若 $\mathbf{x}^*$ 为局部最优解，且满足约束资格条件，则存在 $\boldsymbol{\lambda}^*,\boldsymbol{\mu}^*$ 使
+\begin{itemize}
+	\item 平稳性
+	\[
+	\nabla f(\mathbf{x}^*)+\sum_{i=1}^m \lambda_i^* \nabla h_i(\mathbf{x}^*)+\sum_{j=1}^p \mu_j^* \nabla g_j(\mathbf{x}^*)=\mathbf{0}
+	\]
+	\item 原始可行性
+	\[
+	h_i(\mathbf{x}^*)=0,\qquad g_j(\mathbf{x}^*)\le 0
+	\]
+	\item 对偶可行性
+	\[
+	\boldsymbol{\mu}^*\ge \mathbf{0}
+	\]
+	\item 互补松弛
+	\[
+	\mu_j^*g_j(\mathbf{x}^*)=0
+	\]
+\end{itemize}
+
+\textbf{互补松弛速记}
+\begin{itemize}
+	\item $g_j(\mathbf{x}^*)<0 \Rightarrow \mu_j^*=0$
+	\item $\mu_j^*>0 \Rightarrow g_j(\mathbf{x}^*)=0$
+\end{itemize}
+
+\textbf{KKT 何时可直接判最优}
+\begin{itemize}
+	\item 一般非下凸问题：KKT 只是必要条件。
+	\item 可微下凸优化 + Slater：KKT 也是充分条件。
+	\item 此时 KKT / 强对偶 / 鞍点可视作同一组结论。
+\end{itemize}
+
+\textbf{最后速记}
+\begin{itemize}
+	\item 最小化 + $g\le 0$ $\Rightarrow \mu\ge 0$。
+	\item 先写 $\mathcal L$，再写 KKT。
+	\item 对偶是“最大下界”。
+	\item Slater 用来保证强对偶。
+	\item 非下凸时，KKT 不保证最优。
+\end{itemize}
