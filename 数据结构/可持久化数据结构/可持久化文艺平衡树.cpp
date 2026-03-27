@@ -1,150 +1,178 @@
 #include "aizalib.h"
-
 /**
- * 可持久化文艺平衡树 (Persistent Wenyi Treap)
+ * 可持久化文艺平衡树
+ * 算法介绍: 用隐式 Treap 维护序列，每次 split / merge 时按需拷贝结点，从而支持区间翻转与区间和查询。
+ * 模板参数: None
  * Interface:
- * 		PersistentWenyiTreap(int n)				// 构造函数, n: 版本数量上限
- * 		void insert_after(int version, int k, int vl) // 在版本version的第k个元素后插入vl, 生成新版本
- * 		void erase_at(int version, int k)		// 在版本version中删除第k个元素, 生成新版本
- * 		void flip_seg(int version, int l, int r)// 在版本version中翻转区间[l, r], 生成新版本
- * 		i64 query_seg_sum(int version, int l, int r) // 查询版本version中区间[l, r]的和
- * 		std::vector<int> get_inorder(int version) // 获取版本version的中序遍历结果
- * Notes:
- * 		1. 每次修改操作(insert/erase/flip)均生成新版本，版本号从 1 开始递增
- * 		2. 0 号版本为空树
- * 		3. 支持区间翻转(Lazy Tag)和区间求和
- * 		4. 空间复杂度 O(m log n), m 为操作次数
+ * 		PersistentWenyiTreap(m), init(m): 初始化，预留 m 个线性版本
+ * 		insert_after(ver, k, v): 在 ver 版本中第 k 个元素后插入 v，生成新版本；k=0 表示插到最前
+ * 		erase_at(ver, k): 删除 ver 版本中的第 k 个元素，生成新版本
+ * 		flip_seg(ver, l, r): 翻转 ver 版本中的区间 [l, r]，生成新版本
+ * 		query_seg_sum(ver, l, r): 查询 ver 版本中区间 [l, r] 的元素和
+ * 		get_inorder(ver): 按当前序列顺序导出 ver 版本的所有元素
+ * Note:
+ * 		1. Time: 修改均摊 O(log N)，查询 O(log N)，导出 O(N)
+ * 		2. Space: O(修改次数 log N)
+ * 		3. 版本号采用 0-based；0 号版本为空序列
+ * 		4. 用法/技巧: `query_seg_sum/get_inorder` 不生成新版本
+ * 		5. 用法/技巧: 结点池采用 `reserve + push_back`，超出预留后交给 `vector` 自动扩容
  */
 struct PersistentWenyiTreap {
-	std::vector<int> ls, rs, val, sz, history_root;
-	std::vector<i64> sum;
-	std::vector<bool> rev_tag;
-	std::vector<std::mt19937::result_type> rnk;
-	int tot, cur_version, last_tot;
-	std::mt19937 rng{ std::random_device{}() };
+	struct Node {
+		int l = 0, r = 0;
+		int val = 0, sz = 0;
+		i64 sum = 0;
+		std::uint32_t pri = 0;
+		char rev = 0;
+	};
 
-	PersistentWenyiTreap(int n) {
-		int siz = n * std::log2(n) * 4 + 10;
-		ls.resize(siz); rs.resize(siz); val.resize(siz); sz.resize(siz); rnk.resize(siz);
-		sum.resize(siz); rev_tag.resize(siz);
-		history_root.resize(n + 1);
-		tot = 0; cur_version = 0; last_tot = 0;
+	static constexpr int NODE_PER_VER = 32;
+
+	std::vector<Node> tr;					// Treap 结点池，0 号为空结点
+	std::vector<int> root;					// 各版本根
+	int cur_ver = 0, last_tot = 0;			// 当前最新版本 / 上次操作前结点数
+	std::mt19937 rng{std::random_device{}()};
+
+	PersistentWenyiTreap() { _init_pool(16); }
+	explicit PersistentWenyiTreap(int m) { init(m); }
+
+	void init(int m) {
+		AST(m >= 0);
+		cur_ver = 0;
+		last_tot = 0;
+		root.assign(m + 1, 0);
+		_init_pool(std::max(16, m * NODE_PER_VER + 5));
 	}
 
-	// 判断是否为旧版本节点，0作为空节点
-	inline bool _is_old_version(int id) { return id && id <= last_tot; }
-
-	int new_node(int vl) {
-		ls[++tot] = 0; rs[tot] = 0; sum[tot] = val[tot] = vl; sz[tot] = 1; rnk[tot] = rng();
-		return tot;
+private:
+	void _init_pool(int cap) {
+		tr.clear();
+		tr.reserve(cap);
+		tr.push_back({});
 	}
-	void push_up(int p) {
-		// assert(!_is_old_version(p));
-		sz[p] = sz[ls[p]] + sz[rs[p]] + 1; 
-		sum[p] = sum[ls[p]] + sum[rs[p]] + val[p];
+	bool _is_old(int p) const { return p && p <= last_tot; }
+	int _new_node(int v) {
+		tr.push_back({0, 0, v, 1, v, static_cast<std::uint32_t>(rng()), 0});
+		return (int)tr.size() - 1;
 	}
-	int _clone(int id) {
-		int nw = ++tot;
-		ls[nw] = ls[id]; rs[nw] = rs[id];
-		val[nw] = val[id]; rnk[nw] = rnk[id];
-		sz[nw] = sz[id]; sum[nw] = sum[id];
-		rev_tag[nw] = rev_tag[id];
-		return nw;
+	int _clone(int p) {
+		tr.push_back(tr[p]);
+		return (int)tr.size() - 1;
 	}
-	void add_rev_tag(int p) {
-		// assert(!_is_old_version(p));
+	void _push_up(int p) {
+		tr[p].sz = tr[tr[p].l].sz + tr[tr[p].r].sz + 1;
+		tr[p].sum = tr[tr[p].l].sum + tr[tr[p].r].sum + tr[p].val;
+	}
+	void _apply_rev(int p) {
 		if (!p) return;
-		rev_tag[p].flip();
-		std::swap(ls[p], rs[p]);
+		tr[p].rev ^= 1;
+		std::swap(tr[p].l, tr[p].r);
 	}
-	void push_down(int p) {
-		// assert(!_is_old_version(p));
-		if (rev_tag[p]) {
-			ls[p] = _is_old_version(ls[p]) ? _clone(ls[p]) : ls[p];
-			add_rev_tag(ls[p]);
-			rs[p] = _is_old_version(rs[p]) ? _clone(rs[p]) : rs[p];
-			add_rev_tag(rs[p]);
-			rev_tag[p] = 0;
+	void _push_down(int p) {
+		if (!p || !tr[p].rev) return;
+		if (tr[p].l) {
+			if (_is_old(tr[p].l)) tr[p].l = _clone(tr[p].l);
+			_apply_rev(tr[p].l);
 		}
+		if (tr[p].r) {
+			if (_is_old(tr[p].r)) tr[p].r = _clone(tr[p].r);
+			_apply_rev(tr[p].r);
+		}
+		tr[p].rev = 0;
 	}
-
-	int merge(int x, int y) {
+	int _merge(int x, int y) {
 		if (!x || !y) return x | y;
-		int nw;
-		if (rnk[x] < rnk[y]) {
-			nw = _is_old_version(x) ? _clone(x) : x;
-			push_down(nw);
-			rs[nw] = merge(rs[nw], y);
+		int p;
+		if (tr[x].pri < tr[y].pri) {
+			p = _is_old(x) ? _clone(x) : x;
+			_push_down(p);
+			tr[p].r = _merge(tr[p].r, y);
 		} else {
-			nw = _is_old_version(y) ? _clone(y) : y;
-			push_down(nw);
-			ls[nw] = merge(x, ls[nw]);
+			p = _is_old(y) ? _clone(y) : y;
+			_push_down(p);
+			tr[p].l = _merge(x, tr[p].l);
 		}
-		push_up(nw);
-		return nw;
+		_push_up(p);
+		return p;
 	}
-
-	void split_size(int rt, int k, int& x, int& y) {
-		if (!rt) return x = y = 0, void();
-		if (sz[ls[rt]] + 1 <= k) {
-			x = _is_old_version(rt) ? _clone(rt) : rt;
-			push_down(x);
-			split_size(rs[x], k - sz[ls[x]] - 1, rs[x], y);
-			push_up(x);
+	void _split(int p, int k, int& x, int& y) {
+		if (!p) return x = y = 0, void();
+		if (tr[tr[p].l].sz + 1 <= k) {
+			x = _is_old(p) ? _clone(p) : p;
+			_push_down(x);
+			_split(tr[x].r, k - tr[tr[x].l].sz - 1, tr[x].r, y);
+			_push_up(x);
 		} else {
-			y = _is_old_version(rt) ? _clone(rt) : rt;
-			push_down(y);
-			split_size(ls[y], k, x, ls[y]);
-			push_up(y);
+			y = _is_old(p) ? _clone(p) : p;
+			_push_down(y);
+			_split(tr[y].l, k, x, tr[y].l);
+			_push_up(y);
 		}
 	}
+	void _check_ver(int ver) const { AST(0 <= ver && ver <= cur_ver); }
 
-	// 在第 k 个元素后插入值为 vl 的新节点
-	void insert_after(int version, int k, int vl) {
-		last_tot = tot;
+public:
+	void insert_after(int ver, int k, int v) {
+		_check_ver(ver);
+		AST(0 <= k && k <= tr[root[ver]].sz);
+		last_tot = (int)tr.size() - 1;
 		int x, y;
-		split_size(history_root[version], k - 1, x, y);
-		history_root[++cur_version] = merge(merge(x, new_node(vl)), y);
+		_split(root[ver], k, x, y);
+		root[++cur_ver] = _merge(_merge(x, _new_node(v)), y);
 	}
-	// 删除第 k 个元素
-	void erase_at(int version, int k) {
-		if (k > sz[history_root[version]]) return;
-		last_tot = tot;
+	void erase_at(int ver, int k) {
+		_check_ver(ver);
+		if (k < 1 || k > tr[root[ver]].sz) {
+			root[++cur_ver] = root[ver];
+			return;
+		}
+		last_tot = (int)tr.size() - 1;
 		int x, y, z;
-		split_size(history_root[version], k - 1, x, y);
-		split_size(y, 1, y, z);
-		history_root[++cur_version] = merge(x, z);
+		_split(root[ver], k - 1, x, y);
+		_split(y, 1, y, z);
+		root[++cur_ver] = _merge(x, z);
 	}
-	// 翻转区间[l, r]
-	void flip_seg(int version, int l, int r) {
-		last_tot = tot;
+	void flip_seg(int ver, int l, int r) {
+		_check_ver(ver);
+		if (l > r || l < 1 || r > tr[root[ver]].sz) {
+			root[++cur_ver] = root[ver];
+			return;
+		}
+		last_tot = (int)tr.size() - 1;
 		int x, y, z;
-		split_size(history_root[version], l - 1, x, y);
-		split_size(y, r - l + 1, y, z);
-		int nw = _is_old_version(y) ? _clone(y) : y;
-		add_rev_tag(nw);
-		history_root[++cur_version] = merge(merge(x, nw), z);
+		_split(root[ver], l - 1, x, y);
+		_split(y, r - l + 1, y, z);
+		if (y) {
+			if (_is_old(y)) y = _clone(y);
+			_apply_rev(y);
+		}
+		root[++cur_ver] = _merge(_merge(x, y), z);
 	}
-	// 查询区间[l, r]的和 
-	i64 query_seg_sum(int version, int l, int r) {
-		last_tot = tot; // 查询会产生新版本节点
+	i64 query_seg_sum(int ver, int l, int r) {
+		_check_ver(ver);
+		if (l > r || l < 1 || r > tr[root[ver]].sz) return 0;
+		last_tot = -1;
 		int x, y, z;
-		split_size(history_root[version], l - 1, x, y);
-		split_size(y, r - l + 1, y, z);
-		i64 res = sum[y];
-		history_root[++cur_version] = merge(merge(x, y), z);
+		_split(root[ver], l - 1, x, y);
+		_split(y, r - l + 1, y, z);
+		i64 res = tr[y].sum;
+		root[ver] = _merge(_merge(x, y), z);
 		return res;
 	}
-	// 获取中序遍历结果
-	std::vector<int> get_inorder(int version) {
+	std::vector<int> get_inorder(int ver) const {
+		_check_ver(ver);
 		std::vector<int> res;
-		std::function<void(int)> dfs = [&](int p) {
+		res.reserve(tr[root[ver]].sz);
+		auto dfs = [&](auto&& self, int p, bool flip) -> void {
 			if (!p) return;
-			dfs(ls[p]);
-			res.push_back(val[p]);
-			dfs(rs[p]);
+			bool nxt = flip ^ tr[p].rev;
+			int l = flip ? tr[p].r : tr[p].l;
+			int r = flip ? tr[p].l : tr[p].r;
+			self(self, l, nxt);
+			res.emplace_back(tr[p].val);
+			self(self, r, nxt);
 		};
-		dfs(history_root[version]);
-		return res; // 会触发 NRVO 优化
+		dfs(dfs, root[ver], 0);
+		return res;
 	}
 };

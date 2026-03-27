@@ -1,159 +1,179 @@
 #include "aizalib.h"
-
 /**
  * 可持久化 FHQ Treap
+ * 算法介绍: 用 FHQ Treap 维护有序 multiset，split / merge 时按需拷贝结点以保留历史版本。
+ * 模板参数: None
  * Interface:
- * 		PersistentFHQTreap(int n)				// 构造函数, n: 版本数量上限
- * 		void insert(int version, int vl)		// 在版本version的基础上插入值vl, 生成新版本
- * 		void erase(int version, int vl)			// 在版本version的基础上删除值vl, 生成新版本
- * 		int query_rank(int version, int vl)		// 查询版本version中值vl的排名
- * 		int query_value_at_rank(int version, int k) // 查询版本version中排名为k的值
- * 		int query_pre(int version, int vl)		// 查询版本version中值vl的前驱
- * 		int query_suc(int version, int vl)		// 查询版本version中值vl的后继
- * 		int append_version(int version)			// 将版本version复制一份作为最新版本, 返回新版本号
- * 		std::vector<int> get_inorder(int version) // 获取版本version的中序遍历结果
- * Notes:
- * 		1. 每次 insert/erase 操作会生成一个新版本，版本号从 1 开始递增
- * 		2. 0 号版本为空树
- * 		3. 所有操作时间复杂度均为 O(log n)
- * 		4. 空间复杂度 O(m log n), m 为操作次数
+ * 		PersistentFHQTreap(m), init(m): 初始化，预留 m 个线性版本
+ * 		insert(ver, v): 在 ver 版本基础上插入 v，生成新版本
+ * 		erase(ver, v): 在 ver 版本基础上删除一个值为 v 的点，生成新版本
+ * 		query_rank(ver, v): 查询 v 在 ver 版本中的排名（比它小的数个数 + 1）
+ * 		query_value_at_rank(ver, k): 查询 ver 版本中排名为 k 的值
+ * 		query_pre(ver, v), query_suc(ver, v): 查询 ver 版本中 v 的前驱 / 后继
+ * 		append_version(ver): 复制 ver 版本作为最新版本
+ * 		get_inorder(ver): 按升序导出 ver 版本全部元素
+ * Note:
+ * 		1. Time: 修改均摊 O(log N)，查询 O(log N)，导出 O(N)
+ * 		2. Space: O(修改次数 log N)
+ * 		3. 版本号采用 0-based；0 号版本为空树
+ * 		4. 用法/技巧: 查询不生成新版本；空前驱 / 后继分别返回 `INT_MIN + 1 / INT_MAX`
+ * 		5. 用法/技巧: 结点池采用 `reserve + push_back`，超出预留后交给 `vector` 自动扩容
  */
 struct PersistentFHQTreap {
-	const int INF = INT_MAX;
-	const int NINF = INT_MIN + 1;
+	struct Node {
+		int l = 0, r = 0;
+		int val = 0, sz = 0;
+		std::uint32_t pri = 0;
+	};
 
-	std::vector<int> ls, rs, val, sz, history_root;
-	std::vector<std::mt19937::result_type> rnk;
-	int tot, cur_version, last_tot;
-	std::mt19937 rng{ std::random_device{}() };
+	static constexpr int INF = INT_MAX;
+	static constexpr int NINF = INT_MIN + 1;
+	static constexpr int NODE_PER_VER = 32;
 
-	PersistentFHQTreap(int n) {
-		int siz = n * std::log2(n) * 4 + 10;
-		ls.resize(siz); rs.resize(siz); val.resize(siz); sz.resize(siz); rnk.resize(siz);
-		history_root.resize(n + 1);
-		tot = 0; cur_version = 0; last_tot = 0;
+	std::vector<Node> tr;					// Treap 结点池，0 号为空结点
+	std::vector<int> root;					// 各版本根
+	int cur_ver = 0, last_tot = 0;			// 当前最新版本 / 上次操作前结点数
+	std::mt19937 rng{std::random_device{}()};
+
+	PersistentFHQTreap() { _init_pool(16); }
+	explicit PersistentFHQTreap(int m) { init(m); }
+
+	void init(int m) {
+		AST(m >= 0);
+		cur_ver = 0;
+		last_tot = 0;
+		root.assign(m + 1, 0);
+		_init_pool(std::max(16, m * NODE_PER_VER + 5));
 	}
 
-	// 判断是否为旧版本节点
-	bool _is_old_version(int id) { return id && id <= last_tot; }
-
-	int new_node(int vl) {
-		ls[++tot] = 0; rs[tot] = 0; val[tot] = vl; sz[tot] = 1; rnk[tot] = rng();
-		return tot;
+private:
+	void _init_pool(int cap) {
+		tr.clear();
+		tr.reserve(cap);
+		tr.push_back({});
 	}
-	void push_up(int p) { sz[p] = sz[ls[p]] + sz[rs[p]] + 1; }
-	int _clone(int id) {
-		int nw = ++tot;
-		ls[nw] = ls[id]; rs[nw] = rs[id];
-		val[nw] = val[id]; rnk[nw] = rnk[id];
-		sz[nw] = sz[id];
-		return nw;
+	void _check_ver(int ver) const { AST(0 <= ver && ver <= cur_ver); }
+	bool _is_old(int p) const { return p && p <= last_tot; }
+	int _new_node(int v) {
+		tr.push_back({0, 0, v, 1, static_cast<std::uint32_t>(rng())});
+		return (int)tr.size() - 1;
 	}
-
-	int merge(int x, int y) {
+	int _clone(int p) {
+		tr.push_back(tr[p]);
+		return (int)tr.size() - 1;
+	}
+	void _push_up(int p) { tr[p].sz = tr[tr[p].l].sz + tr[tr[p].r].sz + 1; }
+	int _merge(int x, int y) {
 		if (!x || !y) return x | y;
-		int nw;
-		if (rnk[x] < rnk[y]) {
-			nw = _is_old_version(x) ? _clone(x) : x;
-			rs[nw] = merge(rs[nw], y);
+		int p;
+		if (tr[x].pri < tr[y].pri) {
+			p = _is_old(x) ? _clone(x) : x;
+			tr[p].r = _merge(tr[p].r, y);
 		} else {
-			nw = _is_old_version(y) ? _clone(y) : y;
-			ls[nw] = merge(x, ls[nw]);
+			p = _is_old(y) ? _clone(y) : y;
+			tr[p].l = _merge(x, tr[p].l);
 		}
-		push_up(nw);
-		return nw;
+		_push_up(p);
+		return p;
 	}
-
-	void split_size(int rt, int k, int& x, int& y) {
-		if (!rt) return x = y = 0, void();
-		if (sz[ls[rt]] + 1 <= k) {
-			x = _is_old_version(rt) ? _clone(rt) : rt;
-			split_size(rs[x], k - sz[ls[x]] - 1, rs[x], y);
-			push_up(x);
+	void _split_size(int p, int k, int& x, int& y) {
+		if (!p) return x = y = 0, void();
+		if (tr[tr[p].l].sz + 1 <= k) {
+			x = _is_old(p) ? _clone(p) : p;
+			_split_size(tr[x].r, k - tr[tr[x].l].sz - 1, tr[x].r, y);
+			_push_up(x);
 		} else {
-			y = _is_old_version(rt) ? _clone(rt) : rt;
-			split_size(ls[y], k, x, ls[y]);
-			push_up(y);
+			y = _is_old(p) ? _clone(p) : p;
+			_split_size(tr[y].l, k, x, tr[y].l);
+			_push_up(y);
 		}
 	}
-
-	void split_val(int rt, int vl, int& x, int& y) {
-		if (!rt) return x = y = 0, void();
-		if (val[rt] <= vl) {
-			x = _is_old_version(rt) ? _clone(rt) : rt;
-			split_val(rs[x], vl, rs[x], y);
-			push_up(x);
+	void _split_val(int p, int v, int& x, int& y) {
+		if (!p) return x = y = 0, void();
+		if (tr[p].val <= v) {
+			x = _is_old(p) ? _clone(p) : p;
+			_split_val(tr[x].r, v, tr[x].r, y);
+			_push_up(x);
 		} else {
-			y = _is_old_version(rt) ? _clone(rt) : rt;
-			split_val(ls[y], vl, x, ls[y]);
-			push_up(y);
+			y = _is_old(p) ? _clone(p) : p;
+			_split_val(tr[y].l, v, x, tr[y].l);
+			_push_up(y);
 		}
 	}
 
-	void insert(int version, int vl) {
-		last_tot = tot;
+public:
+	void insert(int ver, int v) {
+		_check_ver(ver);
+		last_tot = (int)tr.size() - 1;
 		int x, y;
-		split_val(history_root[version], vl, x, y);
-		history_root[++cur_version] = merge(merge(x, new_node(vl)), y);
+		_split_val(root[ver], v, x, y);
+		root[++cur_ver] = _merge(_merge(x, _new_node(v)), y);
 	}
-	void erase(int version, int vl) {
-		last_tot = tot;
+	void erase(int ver, int v) {
+		_check_ver(ver);
+		last_tot = (int)tr.size() - 1;
 		int x, y, z;
-		split_val(history_root[version], vl - 1, x, y);
-		split_val(y, vl, y, z);
-		y = merge(ls[y], rs[y]);
-		history_root[++cur_version] = merge(x, merge(y, z));
+		_split_val(root[ver], v - 1, x, y);
+		_split_val(y, v, y, z);
+		y = _merge(tr[y].l, tr[y].r);
+		root[++cur_ver] = _merge(x, _merge(y, z));
 	}
-
-	int query_value_at_rank(int version, int k) {
-		if (sz[history_root[version]] < k) return -1;
-		last_tot = -1; // 优化：查询不产生新版本节点
-		int l, r;
-		split_size(history_root[version], k, l, r);
-		int res = l;
-		while (rs[res]) res = rs[res];
-		history_root[version] = merge(l, r);
-		return val[res];
+	int query_value_at_rank(int ver, int k) {
+		_check_ver(ver);
+		if (k < 1 || k > tr[root[ver]].sz) return -1;
+		last_tot = -1;
+		int x, y;
+		_split_size(root[ver], k, x, y);
+		int p = x;
+		while (tr[p].r) p = tr[p].r;
+		root[ver] = _merge(x, y);
+		return tr[p].val;
 	}
-	int query_rank(int version, int vl) {
-		last_tot = -1; // 优化：查询不产生新版本节点
-		int l, r;
-		split_val(history_root[version], vl - 1, l, r);
-		int rank = sz[l] + 1;
-		history_root[version] = merge(l, r);
-		return rank;
+	int query_rank(int ver, int v) {
+		_check_ver(ver);
+		last_tot = -1;
+		int x, y;
+		_split_val(root[ver], v - 1, x, y);
+		int res = tr[x].sz + 1;
+		root[ver] = _merge(x, y);
+		return res;
 	}
-	int query_pre(int version, int vl) {
-		last_tot = -1; // 优化：查询不产生新版本节点
-		int l, r;
-		split_val(history_root[version], vl - 1, l, r);
-		int pre = l;
-		while (rs[pre]) pre = rs[pre];
-		history_root[version] = merge(l, r);
-		return pre ? val[pre] : NINF;
+	int query_pre(int ver, int v) {
+		_check_ver(ver);
+		last_tot = -1;
+		int x, y;
+		_split_val(root[ver], v - 1, x, y);
+		int p = x;
+		while (tr[p].r) p = tr[p].r;
+		root[ver] = _merge(x, y);
+		return p ? tr[p].val : NINF;
 	}
-	int query_suc(int version, int vl) {
-		last_tot = -1; // 优化：查询不产生新版本节点
-		int l, r;
-		split_val(history_root[version], vl, l, r);
-		int suc = r;
-		while (ls[suc]) suc = ls[suc];
-		history_root[version] = merge(l, r);
-		return suc ? val[suc] : INF;
+	int query_suc(int ver, int v) {
+		_check_ver(ver);
+		last_tot = -1;
+		int x, y;
+		_split_val(root[ver], v, x, y);
+		int p = y;
+		while (tr[p].l) p = tr[p].l;
+		root[ver] = _merge(x, y);
+		return p ? tr[p].val : INF;
 	}
-	int append_version(int version) {
-		history_root[++cur_version] = _clone(history_root[version]);
-		return cur_version;
+	int append_version(int ver) {
+		_check_ver(ver);
+		root[++cur_ver] = root[ver];
+		return cur_ver;
 	}
-	std::vector<int> get_inorder(int version) {
+	std::vector<int> get_inorder(int ver) const {
+		_check_ver(ver);
 		std::vector<int> res;
-		std::function<void(int)> dfs = [&](int p) {
+		res.reserve(tr[root[ver]].sz);
+		auto dfs = [&](auto&& self, int p) -> void {
 			if (!p) return;
-			dfs(ls[p]);
-			res.push_back(val[p]);
-			dfs(rs[p]);
+			self(self, tr[p].l);
+			res.push_back(tr[p].val);
+			self(self, tr[p].r);
 		};
-		dfs(history_root[version]);
+		dfs(dfs, root[ver]);
 		return res;
 	}
 };
