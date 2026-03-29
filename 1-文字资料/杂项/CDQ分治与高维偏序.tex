@@ -1,0 +1,91 @@
+\textbf{递归对象}
+
+设点列 \(P=(p_1,\dots,p_n)\) 已按第 \(1\) 维非降序排序，且
+\[
+p_i=(x_{i,1},\dots,x_{i,k}).
+\]
+定义加权 \(k\) 维偏序计数
+\[
+D_k(P;\alpha,\beta)
+=
+\sum_{\substack{1\le i<j\le n\\x_{i,1}\le x_{j,1},\dots,x_{i,k}\le x_{j,k}}}
+\alpha_i\beta_j.
+\]
+原始点对计数只是特例 \(\alpha_i=\beta_i=1\)。
+
+把 \(P\) 按下标分成左右两半 \(P_L,P_R\)。删去每个点的第一维，得到
+\[
+\widetilde P=(\pi(p_1),\dots,\pi(p_n)),\qquad \pi(p_i)=(x_{i,2},\dots,x_{i,k}).
+\]
+再定义新权值
+\[
+\alpha_i'=
+\begin{cases}
+\alpha_i,& p_i\in P_L,\\
+0,& p_i\in P_R,
+\end{cases}
+\qquad
+\beta_i'=
+\begin{cases}
+0,& p_i\in P_L,\\
+\beta_i,& p_i\in P_R.
+\end{cases}
+\]
+
+由于整体已按第一维排好序，任意跨区间点对自动满足第一维约束，因此有
+\[
+D_k(P;\alpha,\beta)
+=
+D_k(P_L;\alpha,\beta)
++
+D_k(P_R;\alpha,\beta)
++
+D_{k-1}(\widetilde P;\alpha',\beta').
+\]
+
+所以 CDQ 严格递归的不是“原始计数问题”，而是问题族 \(\{D_k\}\)。
+对固定维度 \(k\) 看，它是“分治 + 降维”；对整个问题族看，它才是闭合递归。
+
+
+\textbf{复杂度}
+
+设 \(T_k(n)\) 为求解 \(D_k\) 在 \(n\) 个点上的最坏复杂度，则
+\[
+T_k(n)=2T_k(n/2)+T_{k-1}(n)+O(n),
+\]
+其中 \(O(n)\) 是当前层拆分、归并和辅助维护的线性代价。
+
+一维基例为
+\[
+D_1(P;\alpha,\beta)=\sum_{1\le i<j\le n}\alpha_i\beta_j,
+\]
+线性扫描即可计算，故
+\[
+T_1(n)=\Theta(n).
+\]
+
+若已知
+\[
+T_{k-1}(n)=\Theta(n\log^{k-2}n),
+\]
+则
+\[
+T_k(n)=2T_k(n/2)+\Theta(n\log^{k-2}n).
+\]
+由扩展主定理
+\[
+T(n)=aT(n/b)+\Theta(n^{\log_b a}\log^m n)
+\]
+取
+\[
+a=b=2,\qquad m=k-2,
+\]
+可得
+\[
+T_k(n)=\Theta(n\log^{k-1}n).
+\]
+
+因此对任意 \(k\ge 1\),
+\[
+T_k(n)=\Theta(n\log^{k-1}n).
+\]

@@ -1,0 +1,118 @@
+\textbf{主定理 (Master Theorem)}
+
+\textbf{适用形式}
+
+讨论递推
+\[
+T(n)=aT(n/b)+f(n), \qquad a\ge 1,\ b>1.
+\]
+其中 \(aT(n/b)\) 表示递归子问题代价，\(f(n)\) 表示当前层的非递归代价。
+
+比较基准函数为
+\[
+n^{\log_b a}.
+\]
+它可以理解成递归树各层“临界总代价”的量级。
+
+
+\textbf{标准三种情况}
+
+设 \(\varepsilon>0\)。
+
+1. \[
+f(n)=O(n^{\log_b a-\varepsilon}) \Rightarrow T(n)=\Theta(n^{\log_b a}).
+\]
+
+2. \[
+f(n)=\Theta(n^{\log_b a}\log^k n),\ k\ge 0 \Rightarrow T(n)=\Theta(n^{\log_b a}\log^{k+1} n).
+\]
+
+3. 若
+\[
+f(n)=\Omega(n^{\log_b a+\varepsilon})
+\]
+且满足正则条件
+\[
+af(n/b)\le c f(n)\qquad (c<1),
+\]
+则
+\[
+T(n)=\Theta(f(n)).
+\]
+
+
+\textbf{为什么要比较 \(n^{\log_b a}\)}
+
+递归树第 \(i\) 层有 \(a^i\) 个子问题，每个子问题规模为 \(n/b^i\)。
+若只看“临界函数”
+\[
+\left(\frac{n}{b^i}\right)^{\log_b a},
+\]
+则该层总代价为
+\[
+a^i\left(\frac{n}{b^i}\right)^{\log_b a}
+=
+a^i\cdot n^{\log_b a}\cdot b^{-i\log_b a}
+=
+n^{\log_b a}.
+\]
+因此 \(n^{\log_b a}\) 正是“每层恰好同阶”的分界线。
+
+于是：
+
+1. 若 \(f(n)\) 更小，总代价由叶子层主导；
+
+2. 若 \(f(n)\) 恰好同阶，总代价是层数再乘一个 \(\log n\)；
+
+3. 若 \(f(n)\) 更大，总代价由根部附近主导。
+
+
+\textbf{扩展常用版}
+
+竞赛里更常见的是直接记下面这个版本：
+\[
+T(n)=aT(n/b)+\Theta(n^{\log_b a}\log^k n).
+\]
+
+1. 若 \(k>-1\)，
+\[
+T(n)=\Theta(n^{\log_b a}\log^{k+1} n).
+\]
+
+2. 特别地，当 \(k=0\) 时，就是标准主定理第二种情形。
+
+3. 当
+\[
+f(n)=\Theta\!\left(\frac{n^{\log_b a}}{\log n}\right),
+\]
+可视为边界情形，此时
+\[
+T(n)=\Theta(n^{\log_b a}\log\log n).
+\]
+
+
+\textbf{常见例子}
+
+1. 归并排序：
+\[
+T(n)=2T(n/2)+\Theta(n) \Rightarrow T(n)=\Theta(n\log n).
+\]
+
+2. 二维偏序 / CDQ 基础层：
+\[
+T(n)=2T(n/2)+\Theta(n) \Rightarrow T(n)=\Theta(n\log n).
+\]
+
+3. 高维 CDQ 中常见的递推：
+\[
+T(n)=2T(n/2)+\Theta(n\log^m n) \Rightarrow T(n)=\Theta(n\log^{m+1} n).
+\]
+
+
+\textbf{使用提醒}
+
+1. 主定理只适合“等分型”递推；若分裂比例不固定，通常改用递归树、代入法或 Akra-Bazzi。
+
+2. 第三种情形别漏掉正则条件，否则不能直接得出 \(\Theta(f(n))\)。
+
+3. 若 \(f(n)\) 不是纯多项式乘对数，先尝试把它改写成与 \(n^{\log_b a}\) 比较的形式。

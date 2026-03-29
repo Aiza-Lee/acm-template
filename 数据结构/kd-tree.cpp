@@ -18,6 +18,11 @@
  * 			- 空间复杂度：O(n)
  * 		2. 该版本kd-tree不支持删除操作，只能通过标记删除实现
  * 		3. 二进制分组实现，每次插入会合并siz相同的子树，保证每个子kd-tree的节点数均为2的幂次方
+ * 		4. 若题目只是常规二维数点/矩形计数，通常有更优替代：
+ * 			4.1 静态离线矩形数点，优先考虑扫描线 + 树状数组，复杂度稳定且常数通常更优。
+ * 			4.2 静态在线区间数点 / 第 k 小，可考虑主席树、划分树等基于值域划分的做法。
+ * 			4.3 坐标范围较小且需要在线修改时，可优先考虑二维树状数组 / 二维前缀和。
+ * 			4.4 kd-tree 更适合低维空间中的在线插入、最近点查询、以及一般矩形权值统计。
  */
 template<typename T = i64, int K = 2, typename VT = int>
 struct KDTree {
@@ -49,8 +54,12 @@ struct KDTree {
 	std::vector<int> roots;   // roots: 二进制分组的根节点
 	std::vector<int> rubbish; // rubbish: 内存回收池
 
-	KDTree(int siz) : tot(0), ls(siz + 1), rs(siz + 1), sz(siz + 1), p(siz + 1), 
-		min_v((siz + 1) * K), max_v((siz + 1) * K), sum(siz + 1) {}
+	KDTree(int siz) : tot(0), ls(siz + 1), rs(siz + 1), sz(siz + 1), p(siz + 1),
+		min_v((siz + 1) * K), max_v((siz + 1) * K), sum(siz + 1) {
+		AST(siz >= 0);
+		roots.reserve(std::bit_width((unsigned)std::max(1, siz)) + 1);
+		rubbish.reserve(siz);
+	}
 
 	int _new_node(Point pt) {
 		int u;
@@ -87,16 +96,39 @@ struct KDTree {
 			}
 		}
 	}
-	// 通过pts[l..r]构建子树，d为当前维度
-	int _build(std::vector<Point>& pts, int l, int r, int d) {
+	int _best_dim(const std::vector<Point>& pts, int l, int r) {
+		int best = 0;
+		T best_span = 0;
+		rep(d, 0, K - 1) {
+			T mn = pts[l][d], mx = pts[l][d];
+			rep(i, l + 1, r) mn = std::min(mn, pts[i][d]), mx = std::max(mx, pts[i][d]);
+			if (d == 0 || mx - mn > best_span) best = d, best_span = mx - mn;
+		}
+		return best;
+	}
+	bool _box_in(int u, const Point& lower, const Point& upper) const {
+		rep(i, 0, K - 1) if (min_val(u, i) < lower[i] || max_val(u, i) > upper[i]) return false;
+		return true;
+	}
+	bool _box_out(int u, const Point& lower, const Point& upper) const {
+		rep(i, 0, K - 1) if (max_val(u, i) < lower[i] || min_val(u, i) > upper[i]) return true;
+		return false;
+	}
+	bool _point_in(int u, const Point& lower, const Point& upper) const {
+		rep(i, 0, K - 1) if (p[u][i] < lower[i] || p[u][i] > upper[i]) return false;
+		return true;
+	}
+	// 通过 pts[l..r] 构建子树，按跨度最大维切分
+	int _build(std::vector<Point>& pts, int l, int r) {
 		if (l > r) return 0;
 		int mid = (l + r) >> 1;
+		int d = _best_dim(pts, l, r);
 		std::nth_element(pts.begin() + l, pts.begin() + mid, pts.begin() + r + 1, 
 			[&](const Point& a, const Point& b) { return a[d] < b[d]; });
 		
 		int u = _new_node(pts[mid]);
-		ls[u] = _build(pts, l, mid - 1, (d + 1) % K);
-		rs[u] = _build(pts, mid + 1, r, (d + 1) % K);
+		ls[u] = _build(pts, l, mid - 1);
+		rs[u] = _build(pts, mid + 1, r);
 		_push_up(u);
 		return u;
 	}
@@ -116,7 +148,7 @@ struct KDTree {
 			_traverse(roots.back(), pts);
 			roots.pop_back();
 		}
-		roots.push_back(_build(pts, 0, pts.size() - 1, 0));
+		roots.push_back(_build(pts, 0, pts.size() - 1));
 	}
 
 	// 计算点pt到节点u的包围盒的最小距离平方
@@ -154,37 +186,9 @@ struct KDTree {
 	// 查询矩形范围内点权值和
 	VT _query_box(int u, const Point& lower, const Point& upper) {
 		if (!u) return 0;
-		// 如果当前节点的包围盒完全在查询范围内，直接返回sum
-		bool full_in = true;
-		rep(i, 0, K - 1) {
-			if (min_val(u, i) < lower[i] || max_val(u, i) > upper[i]) {
-				full_in = false;
-				break;
-			}
-		}
-		if (full_in) return sum[u];
-
-		// 如果当前节点包围盒完全在查询范围外，直接返回0
-		bool full_out = false;
-		rep(i, 0, K - 1) {
-			if (max_val(u, i) < lower[i] || min_val(u, i) > upper[i]) {
-				full_out = true;
-				break;
-			}
-		}
-		if (full_out) return 0;
-
-		VT res = 0;
-		// 检查当前点是否在范围内
-		bool p_in = true;
-		rep(i, 0, K - 1) {
-			if (p[u][i] < lower[i] || p[u][i] > upper[i]) {
-				p_in = false;
-				break;
-			}
-		}
-		if (p_in) res += p[u].value;
-
+		if (_box_out(u, lower, upper)) return 0;
+		if (_box_in(u, lower, upper)) return sum[u];
+		VT res = _point_in(u, lower, upper) ? p[u].value : VT();
 		res += _query_box(ls[u], lower, upper);
 		res += _query_box(rs[u], lower, upper);
 		return res;
