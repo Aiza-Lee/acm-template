@@ -48,7 +48,7 @@ std::vector<Point<T>> circle_line_intersection(Circle<T> c, Line<T> l) {
 /**
  * @brief 圆与圆交点
  * note:
- * acm-template/1.不处理两圆完全重合的情况（返回空）。
+ * 		1.不处理两圆完全重合的情况（返回空）。
  */
 template<typename T>
 requires std::is_floating_point_v<T>
@@ -78,7 +78,7 @@ std::vector<Point<T>> circle_circle_intersection(Circle<T> c1, Circle<T> c2) {
  * @brief 过点 p 做圆 c 的切线，返回切点。
  * 
  * note: 
- * acm-template/1.点在圆内无切线；点在圆上有一个切点（即点本身）；点在圆外有两个切点。
+ * 		1.点在圆内无切线；点在圆上有一个切点（即点本身）；点在圆外有两个切点。
  */
 template<typename T>
 requires std::is_floating_point_v<T>

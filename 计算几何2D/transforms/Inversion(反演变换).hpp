@@ -1,6 +1,7 @@
 #pragma once
-#include "../../../0-include/aizalib.h"
+#include "aizalib.h"
 #include "../2-shapes/Circle.hpp"
+#include "../1-base/Line.hpp"
 #include "../1-base/PointFP.hpp"
 
 /**
@@ -37,6 +38,7 @@ struct Inversion {
     }
 
     Circle<T> transform_to_circle(Circle<T> c) const {
+        AST(sgn((c.c - O).len2() - c.r * c.r) != 0);
         T d2 = (c.c - O).len2();
         T ratio = R2 / (d2 - c.r * c.r);
         Point<T> new_c = O + (c.c - O) * ratio;
@@ -45,6 +47,7 @@ struct Inversion {
     }
 
     Line<T> transform_to_line(Circle<T> c) const {
+        AST(sgn((c.c - O).len2() - c.r * c.r) == 0);
         Point<T> oc = c.c - O; 
         T k = R2 / (2 * c.r * c.r); 
         Point<T> p_foot = O + oc * k;
@@ -53,12 +56,14 @@ struct Inversion {
     }
 
     Circle<T> transform_to_circle(Line<T> l) const {
-        Point<T> P = l.projection(O);
+        AST(sgn(l.eval(O)) != 0);
+        Point<T> P = projection(l, O);
         Point<T> P_prime = transform(P);
-        return Circle<T>((O + P_prime) / 2, dist(P_prime, O) / 2);
+        return Circle<T>((O + P_prime) / 2, dist_to(P_prime, O) / 2);
     }
 
     Line<T> transform_to_line(Line<T> l) const {
+        AST(sgn(l.eval(O)) == 0);
         return l;
     }
 };

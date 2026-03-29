@@ -1,10 +1,7 @@
 #pragma once
-#include "../../../../0-include/aizalib.h"
+#include "aizalib.h"
 #include "../../1-base/Line.hpp"
 #include "../../1-base/PointFP.hpp"
-#include <vector>
-#include <algorithm>
-#include <cmath>
 
 /**
  * [HalfPlaneIntersection (半平面交)]
@@ -23,67 +20,64 @@ namespace Geo2D {
 template<typename T>
 requires std::is_floating_point_v<T>
 std::vector<Point<T>> half_plane_intersection(std::vector<Line<T>> lines) {
-	int n = lines.size();
-	std::vector<T> angle_val(n);
-	std::vector<int> order(n);
+	if (lines.size() < 3) return {};
 
-	// 按极角排序直线
-	for (int i = 0; i < n; i++) {
-		angle_val[i] = std::atan2(lines[i].b, lines[i].a);
-		order[i] = i;
-	}
-	std::sort(order.begin(), order.end(), [&](int i, int j) {
-		return sgn(angle_val[i] - angle_val[j]) < 0;
+	auto angle = [&](const Line<T>& l) {
+		return std::atan2(l.a, -l.b);
+	};
+	auto point_on_line = [&](const Line<T>& l) {
+		if (std::abs(l.a) > std::abs(l.b)) return Point<T>(-l.c / l.a, 0);
+		return Point<T>(0, -l.c / l.b);
+	};
+	auto parallel = [&](const Line<T>& x, const Line<T>& y) {
+		return sgn(x.a * y.b - x.b * y.a) == 0;
+	};
+	auto outside = [&](const Line<T>& l, const Point<T>& p) {
+		return l.side(p) < 0;
+	};
+
+	std::sort(lines.begin(), lines.end(), [&](const Line<T>& x, const Line<T>& y) {
+		T ax = angle(x), ay = angle(y);
+		if (sgn(ax - ay) != 0) return ax < ay;
+		return x.eval(point_on_line(y)) > 0;
 	});
 
-	// 去除平行直线
-	std::vector<Line<T>> L;
-	std::vector<Point<T>> intersection_pts;
-	for (int i = 0; i < n; i++) {
-		if (i == 0 || sgn(angle_val[order[i]] - angle_val[order[i-1]]) != 0) {
-			L.push_back(lines[order[i]]);
-		} else {
-			// 平行时保留更靠内的直线（通过 side 或者其他距离判断）
-			// 这里根据具体需求可以添加判定
+	std::vector<Line<T>> ls;
+	ls.reserve(lines.size());
+	for (const auto& l : lines) {
+		if (ls.empty() || !parallel(ls.back(), l)) {
+			ls.push_back(l);
+		} else if (ls.back().eval(point_on_line(l)) > 0) {
+			ls.back() = l;
 		}
 	}
+	if (ls.size() < 3) return {};
 
-	n = L.size();
-	if (n <= 2) return intersection_pts; // 不足三条直线无法构成多边形
-
-	// 半平面交
-	int front = 0, rear = 1;
-	std::vector<int> q(n);
-	q[0] = 0; q[1] = 1;
-
-	auto cross_sign = [&](int x, int y, int z) {
-		return sgn((intersection(L[x], L[y]) - intersection(L[z], L[y])).cross(intersection(L[x], L[y]))); // 逻辑可能需修正，简化处理使用标准半平面交判定
-	};
-	// 修正 cross_sign：判断 L[x], L[y] 的交点是否在 L[z] 的右侧
-	auto point_right_of_line = [&](Point<T> p, const Line<T>& l) {
-		return l.side(p) < 0; // eval(p) < 0
-	};
-
-	for(int i = 2; i < n; i++) {
-		while (front < rear && point_right_of_line(intersection(L[q[rear]], L[q[rear - 1]]), L[i])) rear--;
-		while (front < rear && point_right_of_line(intersection(L[q[front]], L[q[front + 1]]), L[i])) front++;
-		q[++rear] = i;
+	std::deque<Line<T>> q;
+	std::deque<Point<T>> p;
+	for (const auto& l : ls) {
+		while (!p.empty() && outside(l, p.back())) {
+			p.pop_back();
+			q.pop_back();
+		}
+		while (!p.empty() && outside(l, p.front())) {
+			p.pop_front();
+			q.pop_front();
+		}
+		if (!q.empty()) p.push_back(intersection(q.back(), l));
+		q.push_back(l);
 	}
-	// 处理首尾
-	while (front < rear && point_right_of_line(intersection(L[q[rear]], L[q[rear - 1]]), L[q[front]])) rear--;
-	while (front < rear && point_right_of_line(intersection(L[q[front]], L[q[front + 1]]), L[q[rear]])) front++;
-
-	// 计算交点
-	if (rear <= front + 1) return intersection_pts;
-
-	for (int i = front; i < rear; i++) {
-		intersection_pts.push_back(intersection(L[q[i]], L[q[i+1]]));
+	while (!p.empty() && outside(q.front(), p.back())) {
+		p.pop_back();
+		q.pop_back();
 	}
-	if (front < rear) {
-		intersection_pts.push_back(intersection(L[q[front]], L[q[rear]]));
+	while (!p.empty() && outside(q.back(), p.front())) {
+		p.pop_front();
+		q.pop_front();
 	}
-
-	return intersection_pts;
+	if (q.size() < 3) return {};
+	p.push_back(intersection(q.back(), q.front()));
+	return {p.begin(), p.end()};
 }
 
 } // namespace Geo2D

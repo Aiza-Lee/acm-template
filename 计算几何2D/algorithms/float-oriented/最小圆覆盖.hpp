@@ -1,10 +1,7 @@
 #pragma once
-#include "../../../../0-include/aizalib.h"
+#include "aizalib.h"
 #include "../../2-shapes/Circle.hpp"
 #include "../../2-shapes/Triangle.hpp"
-#include <vector>
-#include <algorithm>
-#include <random>
 
 /**
  * [SmallestEnclosingCircle (最小圆覆盖)]
@@ -23,31 +20,31 @@ namespace Geo2D {
 template<typename T>
 requires std::is_floating_point_v<T>
 Circle<T> smallest_enclosing_circle(std::vector<Point<T>> pts) {
-if (pts.empty()) return Circle<T>(Point<T>(0, 0), 0);
-if (pts.size() == 1) return Circle<T>(pts[0], 0);
+	if (pts.empty()) return Circle<T>(Point<T>(0, 0), 0);
+	if (pts.size() == 1) return Circle<T>(pts[0], 0);
 
-std::mt19937 rng(std::random_device{}());
-std::shuffle(pts.begin(), pts.end(), rng);
+	std::mt19937 rng(std::random_device{}());
+	std::shuffle(pts.begin(), pts.end(), rng);
 
-Circle<T> c(pts[0], 0);
-for (int i = 1; i < (int)pts.size(); i++) {
-if (c.contains(pts[i])) continue;
-c = Circle<T>(pts[i], 0);
-for (int j = 0; j < i; j++) {
-if (c.contains(pts[j])) continue;
-c = Circle<T>((pts[i] + pts[j]) / 2, dist_to(pts[i], pts[j]) / 2);
-for (int k = 0; k < j; k++) {
-if (c.contains(pts[k])) continue;
-c = Circle<T>((pts[i] + pts[k]) / 2, dist_to(pts[i], pts[k]) / 2);
-if (c.contains(pts[j])) continue;
-c = Circle<T>((pts[j] + pts[k]) / 2, dist_to(pts[j], pts[k]) / 2);
-if (c.contains(pts[i])) continue;
-Point<T> center = circum_center(pts[i], pts[j], pts[k]);
-c = Circle<T>(center, dist_to(center, pts[i]));
-}
-}
-}
-return c;
+	Circle<T> c(pts[0], 0);
+	for (int i = 1; i < (int)pts.size(); i++) {
+		if (c.contains(pts[i])) continue;
+		c = Circle<T>(pts[i], 0);
+		for (int j = 0; j < i; j++) {
+			if (c.contains(pts[j])) continue;
+			c = Circle<T>((pts[i] + pts[j]) / 2, dist_to(pts[i], pts[j]) / 2);
+			for (int k = 0; k < j; k++) {
+				if (c.contains(pts[k])) continue;
+				c = Circle<T>((pts[i] + pts[k]) / 2, dist_to(pts[i], pts[k]) / 2);
+				if (c.contains(pts[j])) continue;
+				c = Circle<T>((pts[j] + pts[k]) / 2, dist_to(pts[j], pts[k]) / 2);
+				if (c.contains(pts[i])) continue;
+				Point<T> center = circum_center(pts[i], pts[j], pts[k]);
+				c = Circle<T>(center, dist_to(center, pts[i]));
+			}
+		}
+	}
+	return c;
 }
 
 } // namespace Geo2D
