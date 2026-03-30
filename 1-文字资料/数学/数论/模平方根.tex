@@ -1,0 +1,42 @@
+\textbf{模平方根}
+
+\textbf{目标}
+求
+\[
+x^2\equiv a\pmod p
+\]
+其中 $p$ 为奇素数。
+
+\textbf{有解判定}
+令勒让德符号
+\[
+\left(\frac{a}{p}\right)\equiv a^{(p-1)/2}\pmod p.
+\]
+则
+\[
+\left(\frac{a}{p}\right)=
+\begin{cases}
+0 & p\mid a,\\
+1 & a \text{ 是二次剩余},\\
+-1 & a \text{ 是二次非剩余}.
+\end{cases}
+\]
+
+\textbf{特殊情形}
+若
+\[
+p\equiv 3\pmod 4,
+\]
+则一个平方根可直接写成
+\[
+x\equiv a^{(p+1)/4}\pmod p.
+\]
+
+\textbf{一般情形}
+可用 Tonelli-Shanks，在奇素数模下复杂度常记为
+\[
+O(\log^2 p).
+\]
+
+\textbf{快记}
+若得到一个解 $x$，另一个解就是 $p-x$。

@@ -1,0 +1,57 @@
+\textbf{扩展欧几里得与线性同余}
+
+\textbf{裴蜀定理}
+设 $g=\gcd(a,b)$，则
+\[
+ax+by=g
+\]
+有整数解。更一般地，
+\[
+ax+by=c
+\]
+有解当且仅当
+\[
+g\mid c.
+\]
+
+\textbf{通解}
+若 $(x_0,y_0)$ 是 $ax+by=c$ 的一组特解，则
+\[
+x=x_0+k\frac{b}{g},\qquad y=y_0-k\frac{a}{g},\qquad k\in\mathbb{Z}.
+\]
+
+\textbf{线性同余}
+\[
+ax\equiv c\pmod m
+\]
+等价于
+\[
+ax+my=c.
+\]
+设 $g=\gcd(a,m)$，则有解当且仅当
+\[
+g\mid c.
+\]
+有解时模 $m/g$ 下只有一个解类：
+\[
+x\equiv x_0 \pmod{m/g}.
+\]
+
+\textbf{逆元判定}
+\[
+a^{-1}\pmod m
+\]
+存在当且仅当
+\[
+\gcd(a,m)=1.
+\]
+若 $ax+my=1$，则
+\[
+x\equiv a^{-1}\pmod m.
+\]
+
+\textbf{快记}
+\begin{itemize}
+\item exgcd 先求 $ax+by=g$ 的一组解，再按 $c/g$ 缩放。
+\item 线性同余本质就是二元一次不定方程。
+\end{itemize}

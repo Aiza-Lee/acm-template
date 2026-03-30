@@ -1,1 +1,27 @@
-\[x^{-1} \equiv (p\%x)^{-1} \cdot (p - \lfloor p / x\rfloor)  \pmod p.\]
+\textbf{递推逆元}
+
+\textbf{适用条件}
+$p$ 为质数，且 $1\le i<p$。
+
+\textbf{单点递推}
+\[
+i^{-1}\equiv
+-\left\lfloor\frac{p}{i}\right\rfloor (p\bmod i)^{-1}
+\equiv
+\left(p-\left\lfloor\frac{p}{i}\right\rfloor\right)(p\bmod i)^{-1}
+\pmod p.
+\]
+
+\textbf{批量递推}
+设 $\mathrm{inv}[1]=1$，则
+\[
+\mathrm{inv}[i]=
+\left(p-\left\lfloor\frac{p}{i}\right\rfloor\right)\mathrm{inv}[p\bmod i]
+\pmod p,\qquad 2\le i<p.
+\]
+
+\textbf{快记}
+\begin{itemize}
+\item 线性求 $1\sim n$ 逆元，复杂度 $O(n)$。
+\item 该递推默认模数为质数；一般模数请改用 exgcd 判可逆。
+\end{itemize}

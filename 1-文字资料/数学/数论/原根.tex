@@ -1,7 +1,25 @@
-\textbf{原根判定定理} \\
-对于整数 $m>3$ 且 $g\perp m$，$g$ 是模 $m$ 的原根的充分必要条件是，对于 $\varphi(m)$ 的每个素因子 $p$，都有：
+\textbf{原根}
 
-\[g^{\frac{\varphi(m)}{p}}\not\equiv 1\pmod{m}.\]
+\textbf{存在条件}
+模 $m$ 有原根当且仅当
+\[
+m=1,2,4,p^k,2p^k
+\]
+其中 $p$ 为奇素数，$k\ge 1$。
 
-\textbf{原根存在定理} \\
-模 $m$ 有原根的充分必要条件是 $m=1,2,4,p^k,2p^k$，其中 $p$ 是奇素数，$k$ 是正整数。
+\textbf{判定定理}
+设模 $m$ 有原根，$\phi=\varphi(m)$，且 $\gcd(g,m)=1$。
+则 $g$ 是模 $m$ 的原根当且仅当对 $\phi$ 的每个素因子 $q$ 都有
+\[
+g^{\phi/q}\not\equiv 1\pmod m.
+\]
+
+\textbf{求最小原根}
+\begin{itemize}
+\item 先算 $\phi=\varphi(m)$，再分解 $\phi$ 的不同素因子。
+\item 从小到大枚举与 $m$ 互质的 $g$。
+\item 检查上式；第一个通过者即为最小原根。
+\end{itemize}
+
+\textbf{快记}
+若 $m=p$ 为奇素数，只需分解 $p-1$ 再做判定。

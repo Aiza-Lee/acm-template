@@ -1,0 +1,33 @@
+\textbf{乘法阶}
+
+\textbf{定义}
+在
+\[
+\gcd(a,m)=1
+\]
+时，$a$ 在模 $m$ 下的乘法阶记为 $\operatorname{ord}_m(a)$，定义为最小正整数 $k$，使得
+\[
+a^k\equiv 1\pmod m.
+\]
+
+\textbf{基本性质}
+\begin{itemize}
+\item $\operatorname{ord}_m(a)$ 一定存在。
+\item $\operatorname{ord}_m(a)\mid \varphi(m)$。
+\item $a$ 是模 $m$ 的原根，当且仅当 $\operatorname{ord}_m(a)=\varphi(m)$。
+\end{itemize}
+
+\textbf{常用求法}
+\begin{itemize}
+\item 先求 $\phi=\varphi(m)$。
+\item 分解 $\phi$ 的不同质因子。
+\item 从 $\phi$ 开始，对每个质因子 $p$ 尝试把当前答案除以 $p$。
+\item 若
+\[
+a^{ans/p}\equiv 1\pmod m
+\]
+则保留这个缩小。
+\end{itemize}
+
+\textbf{快记}
+乘法阶 = “$\varphi(m)$ 的最小可行因子”。

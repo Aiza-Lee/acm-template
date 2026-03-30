@@ -1,14 +1,39 @@
 \textbf{欧拉定理}
 
-若 $\gcd(a, m) = 1$，则
-\[ a^{\varphi(m)} \equiv 1 \pmod m \]
-
-\textbf{扩展欧拉定理}
-
+\textbf{记号}
 \[
-a^b \equiv \begin{cases} 
-a^{b \pmod{\varphi(m)}} & \gcd(a, m) = 1 \\
-a^b & \gcd(a, m) \neq 1, b < \varphi(m) \\
-a^{b \pmod{\varphi(m)} + \varphi(m)} & \gcd(a, m) \neq 1, b \ge \varphi(m)
-\end{cases} \pmod m
+\varphi(m)=|\{1\le i\le m\mid \gcd(i,m)=1\}|
 \]
+且
+\[
+\varphi(n)=n\prod_{p\mid n}\left(1-\frac{1}{p}\right).
+\]
+
+\textbf{欧拉定理}
+若 $\gcd(a,m)=1$，则
+\[
+a^{\varphi(m)}\equiv 1\pmod m.
+\]
+
+\textbf{费马小定理}
+若 $p$ 为素数且 $p\nmid a$，则
+\[
+a^{p-1}\equiv 1\pmod p.
+\]
+
+\textbf{扩展欧拉降幂}
+\[
+a^b \equiv
+\begin{cases}
+a^{\,b\bmod \varphi(m)} & \gcd(a,m)=1,\\
+a^b & \gcd(a,m)\ne 1,\ b<\varphi(m),\\
+a^{\,b\bmod \varphi(m)+\varphi(m)} & \gcd(a,m)\ne 1,\ b\ge \varphi(m)
+\end{cases}
+\pmod m
+\]
+
+\textbf{快记}
+\begin{itemize}
+\item 只有指数很大时，欧拉降幂才真正有价值。
+\item $\gcd(a,m)\ne 1$ 时，不能直接把指数缩成 $b\bmod \varphi(m)$。
+\end{itemize}

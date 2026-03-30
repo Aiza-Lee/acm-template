@@ -1,0 +1,48 @@
+\textbf{离散开根}
+
+\textbf{目标}
+在素数模 $p$ 下求
+\[
+x^k\equiv a\pmod p.
+\]
+
+\textbf{标准转化}
+若 $a\ne 0$，取模 $p$ 的一个原根 $g$，设
+\[
+x=g^y,\qquad a=g^t.
+\]
+原式等价于
+\[
+g^{ky}\equiv g^t\pmod p
+\]
+即
+\[
+ky\equiv t\pmod{p-1}.
+\]
+
+\textbf{判定与解数}
+令
+\[
+d=\gcd(k,p-1).
+\]
+则有解当且仅当
+\[
+d\mid t.
+\]
+有解时在模 $(p-1)/d$ 意义下先求出一个 $y_0$，再得到
+\[
+y=y_0+i\frac{p-1}{d}\qquad (0\le i<d).
+\]
+于是所有解为
+\[
+x=g^y \pmod p.
+\]
+
+\textbf{特殊情形}
+\begin{itemize}
+\item $a=0$ 时，若 $k>0$，唯一解是 $x=0$。
+\item 求 $t$ 即离散对数，可用 BSGS。
+\end{itemize}
+
+\textbf{快记}
+离散开根 = “原根化 + BSGS 求对数 + 线性同余”。

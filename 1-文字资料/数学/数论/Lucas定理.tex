@@ -1,20 +1,50 @@
-\textbf{Lucas定理}
+\textbf{Lucas 定理}
 
-对于质数 $p$，非负整数 $n, m$，有：
-\[ \binom{n}{m} \equiv \binom{\lfloor n/p \rfloor}{\lfloor m/p \rfloor} \cdot \binom{n \bmod p}{m \bmod p} \pmod p \]
-即若 $n, m$ 的 $p$ 进制展开为 $n = (n_k \dots n_1 n_0)_p, m = (m_k \dots m_1 m_0)_p$，则：
-\[ \binom{n}{m} \equiv \prod_{i=0}^k \binom{n_i}{m_i} \pmod p \]
+\textbf{适用条件}
+$p$ 为素数。
 
-\textbf{扩展 Lucas 定理}
-计算 $\binom{n}{m} \pmod M$，其中 $M$ 不一定是质数。
+\textbf{标准式}
+对非负整数 $n,m$，
+\[
+\binom{n}{m}\equiv
+\binom{\lfloor n/p\rfloor}{\lfloor m/p\rfloor}
+\binom{n\bmod p}{m\bmod p}
+\pmod p.
+\]
 
-将 $M$ 分解质因数 $M = \prod p_i^{c_i}$。
-对于每个 $p_i^{c_i}$，计算 $\binom{n}{m} \pmod{p_i^{c_i}}$。
-最后使用中国剩余定理合并结果。
+\textbf{$p$ 进制形式}
+若
+\[
+n=\sum_i n_ip^i,\qquad m=\sum_i m_ip^i,
+\]
+则
+\[
+\binom{n}{m}\equiv \prod_i \binom{n_i}{m_i}\pmod p.
+\]
+若某位 $m_i>n_i$，该项直接为 $0$。
 
-计算 $\binom{n}{m} \pmod{p^k}$：
-\[ \binom{n}{m} = \frac{n!}{m!(n-m)!} \]
-不能直接求逆元，因为分母可能包含 $p$ 的因子。
-计算 $n! \pmod{p^k}$ 时，先提取出所有 $p$ 的倍数。
-$n! = p^{\sum_{j=1}^{\infty} \lfloor n/p^j \rfloor} \cdot \underbrace{\prod_{i=1, p \nmid i}^n i}_{\text{部分 A}} $
-部分 A 也具有循环性质，循环节长度为 $p^k$，可以递归或循环计算。
+\textbf{扩展 Lucas}
+要求
+\[
+\binom{n}{m}\pmod M,\qquad M=\prod_i p_i^{c_i},
+\]
+做法是：
+\begin{itemize}
+\item 分别计算 $\binom{n}{m}\pmod{p_i^{c_i}}$；
+\item 再用 ExCRT 合并。
+\end{itemize}
+
+\textbf{模 $p^k$ 的核心拆法}
+\[
+\binom{n}{m}=\frac{n!}{m!(n-m)!}
+\]
+但分母可能含 $p$，不能直接求逆。
+常写成
+\[
+n!=p^{v_p(n!)}\cdot f(n),\qquad
+v_p(n!)=\sum_{j\ge 1}\left\lfloor\frac{n}{p^j}\right\rfloor,
+\]
+其中 $f(n)$ 表示去掉所有 $p$ 因子的部分，再利用模 $p^k$ 下的周期性递归计算。
+
+\textbf{快记}
+普通 Lucas 处理“模素数的大组合数”，ExLucas = “拆质因数幂 + ExCRT”。
