@@ -157,9 +157,9 @@ struct KDTree {
 		T res = 0;
 		rep(i, 0, K - 1) {
 			T val = pt[i];
-			T min_v = min_val(u, i), max_v = max_val(u, i);
-			if (val < min_v) res += (min_v - val) * (min_v - val);
-			else if (val > max_v) res += (val - max_v) * (val - max_v);
+			T mn = min_val(u, i), mx = max_val(u, i);
+			if (val < mn) res += (mn - val) * (mn - val);
+			else if (val > mx) res += (val - mx) * (val - mx);
 		}
 		return res;
 	}
