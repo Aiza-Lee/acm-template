@@ -1,5 +1,5 @@
 #pragma once
-#include "Point.hpp"
+#include "PointFP.hpp"
 
 namespace Geo2D {
 
@@ -12,8 +12,8 @@ struct Line {
 
 	// 两点构造有向直线 (p1 -> p2), 左侧为正, 右侧为负
 	Line(Point<T> p1, Point<T> p2) {
-		a = p2.y - p1.y;
-		b = p1.x - p2.x;
+		a = p1.y - p2.y;
+		b = p2.x - p1.x;
 		c = -a * p1.x - b * p1.y;
 	}
 		
@@ -30,7 +30,7 @@ struct Line {
 		return a * p.x + b * p.y + c;
 	}
 
-	// 1: 法向量侧 (右侧), -1: 法向量反侧 (左侧), 0: 直线上
+	// 1: 左侧, -1: 右侧, 0: 直线上
 	int side(Point<T> p) const {
 		return sgn(eval(p));
 	}
@@ -38,15 +38,26 @@ struct Line {
 
 template<typename T>
 requires std::is_floating_point_v<T>
-Point<T> direction(const Line<T>& l) { return normalize(Point<T>(-l.b, l.a)); }
+Point<T> direction(const Line<T>& l) { return normalize(Point<T>(l.b, -l.a)); }
 
 template<typename T>
 requires std::is_floating_point_v<T>
 Point<T> normal(const Line<T>& l) { return normalize(Point<T>(l.a, l.b)); }
 
 template<typename T>
+bool parallel(const Line<T>& l1, const Line<T>& l2) {
+	return sgn(l1.a * l2.b - l1.b * l2.a) == 0;
+}
+
+template<typename T>
+bool same_dir(const Line<T>& l1, const Line<T>& l2) {
+	return parallel(l1, l2) && sgn(l1.a * l2.a + l1.b * l2.b) > 0;
+}
+
+template<typename T>
 requires std::is_floating_point_v<T>
 Point<T> intersection(const Line<T>& l1, const Line<T>& l2) {
+	AST(!parallel(l1, l2));
 	T det = l1.a * l2.b - l1.b * l2.a;
 	return Point<T>((l1.b * l2.c - l1.c * l2.b) / det, (l1.c * l2.a - l1.a * l2.c) / det);
 }

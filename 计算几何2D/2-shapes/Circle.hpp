@@ -1,6 +1,4 @@
 #pragma once
-#include "../1-base/Point.hpp"
-#include "../1-base/PointFP.hpp"
 #include "../1-base/Line.hpp"
 namespace Geo2D {
 
@@ -10,7 +8,7 @@ struct Circle {
 	Point<T> c; T r;
 	Circle() : c(Point<T>()), r(0) {}
 	Circle(Point<T> c, T r) : c(c), r(r) {}
-	bool contains(Point<T> p) const { return cmp(dist_to(c, p), r) <= 0; }
+	bool contains(Point<T> p) const { return cmp(c.dist2(p), r * r) <= 0; }
 	// 圆周上的点，angle为弧度
 	Point<T> point(T angle) const {
 		return Point<T>(c.x + r * std::cos(angle), c.y + r * std::sin(angle));
@@ -38,7 +36,7 @@ std::vector<Point<T>> circle_line_intersection(Circle<T> c, Line<T> l) {
 	}
 		
 	// 两个交点
-	T len2 = std::sqrt(c.r * c.r - d * d);
+	T len2 = safe_sqrt(c.r * c.r - d * d);
 	Point<T> dir = direction(l) * len2;
 	res.push_back(p0 + dir);
 	res.push_back(p0 - dir);
@@ -63,7 +61,7 @@ std::vector<Point<T>> circle_circle_intersection(Circle<T> c1, Circle<T> c2) {
 		return res; // 完全重合
 		
 	T a = (c1.r * c1.r - c2.r * c2.r + d * d) / (2 * d);
-	T h = std::sqrt(std::max((T)0.0, c1.r * c1.r - a * a));
+	T h = safe_sqrt(c1.r * c1.r - a * a);
 		
 	Point<T> v = normalize(c2.c - c1.c);
 	Point<T> mid = c1.c + v * a;
@@ -92,7 +90,7 @@ std::vector<Point<T>> tangents_point_circle(Point<T> p, Circle<T> c) {
 		return res;
 	}
 	
-	T angle_val = std::asin(c.r / d);
+	T angle_val = safe_acos(c.r / d);
 	Point<T> v = normalize(p - c.c) * c.r;
 	res.push_back(c.c + rotate(v, angle_val));
 	res.push_back(c.c + rotate(v, -angle_val));
@@ -124,7 +122,7 @@ std::vector<std::pair<Point<T>, Point<T>>> tangents_circle_circle(Circle<T> c1, 
 
 	// 外公切线
 	if (sgn(d - rdiff) >= 0) {
-		T angle_val = std::acos(rdiff / d);
+		T angle_val = safe_acos(rdiff / d);
 		Point<T> v1 = rotate(v, angle_val);
 		Point<T> v2 = rotate(v, -angle_val);
 		res.push_back({c1.c + v1 * c1.r, c2.c + v1 * c2.r});
@@ -134,7 +132,7 @@ std::vector<std::pair<Point<T>, Point<T>>> tangents_circle_circle(Circle<T> c1, 
 
 	// 内公切线
 	if (sgn(d - rsum) >= 0) {
-		T angle_val = std::acos(rsum / d);
+		T angle_val = safe_acos(rsum / d);
 		Point<T> v1 = rotate(v, angle_val);
 		Point<T> v2 = rotate(v, -angle_val);
 		res.push_back({c1.c + v1 * c1.r, c2.c + v1 * (-c2.r)}); // 注意内切线方向相反

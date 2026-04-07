@@ -27,6 +27,8 @@
  * 7. 分类: isnan isinf isfinite signbit fpclassify nextafter
  */
 
+inline constexpr ld EPS = 1e-10;
+
 inline int sgn(ld x, ld eps = (ld)EPS) {
 	if (x > eps) return 1;
 	if (x < -eps) return -1;

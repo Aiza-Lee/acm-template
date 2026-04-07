@@ -1,5 +1,4 @@
 #pragma once
-#include "aizalib.h"
 #include "../../2-shapes/Circle.hpp"
 #include "../../2-shapes/Polygon.hpp"
 
@@ -8,7 +7,7 @@
  * 算法介绍: 计算圆与简单多边形（不一定是凸多边形）的重叠面积。使用有向面积三角剖分和积分思想。
  * 模板参数: T (浮点数类型，requires std::is_floating_point_v<T>)
  * Interface: 
- *   - T circle_polygon_area(Circle<T> c, Polygon<T> poly)
+ *   - T circle_polygon_area(Circle<T> c, const Polygon<T>& poly)
  * Note:
  * 1. Time: O(N)
  * 2. Space: O(1)
@@ -19,7 +18,7 @@ namespace Geo2D {
 
 template<typename T>
 requires std::is_floating_point_v<T>
-T area_circle_polygon(Circle<T> c, Polygon<T> poly) {
+T circle_polygon_area(Circle<T> c, const Polygon<T>& poly) {
 	auto calc = [&](Point<T> a, Point<T> b) {
 		if (sgn((a - c.c).cross(b - c.c)) == 0) return (T)0.0;
 
@@ -37,7 +36,7 @@ T area_circle_polygon(Circle<T> c, Polygon<T> poly) {
 
 		T t1 = -1, t2 = -1;
 		if (sgn(delta) >= 0) {
-			delta = std::sqrt(std::max((T)0.0, delta));
+			delta = safe_sqrt(delta);
 			t1 = (-B - delta) / (2 * A);
 			t2 = (-B + delta) / (2 * A);
 		}

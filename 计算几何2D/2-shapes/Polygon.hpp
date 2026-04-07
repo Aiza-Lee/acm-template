@@ -1,7 +1,5 @@
 #pragma once
-#include "../1-base/Point.hpp"
-#include "../1-base/PointFP.hpp"
-#include "../2-shapes/Segment.hpp"
+#include "Segment.hpp"
 namespace Geo2D {
 
 template<typename T>
@@ -73,17 +71,17 @@ bool is_convex(const Polygon<T>& poly) {
  * @brief 多边形重心
  */
 template<typename T>
-PointFP polygon_centroid(const Polygon<T>& poly) {
-	PointFP c(0, 0);
+Point<ld> polygon_centroid(const Polygon<T>& poly) {
+	Point<ld> c(0, 0);
 	ld area = 0;
 	int n = poly.size();
 	for (int i = 0; i < n; i++) {
 		int j = (i + 1) % n;
 		ld temp = static_cast<ld>(poly[i].cross(poly[j]));
 		area += temp;
-		c = c + PointFP(poly[i].x + poly[j].x, poly[i].y + poly[j].y) * temp;
+		c = c + Point<ld>(poly[i].x + poly[j].x, poly[i].y + poly[j].y) * temp;
 	}
-	if (sgn(area) == 0) return PointFP(poly[0].x, poly[0].y); // 退化情况
+	if (sgn(area) == 0) return Point<ld>(poly[0].x, poly[0].y); // 退化情况
 	return c / (3.0 * area);
 }
 

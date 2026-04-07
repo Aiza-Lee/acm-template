@@ -18,8 +18,9 @@ T dist_to(const Point<T>& a, const Point<T>& b) {
 template<typename T>
 requires std::is_floating_point_v<T>
 Point<T> normalize(const Point<T>& p) {
-    T l = len(p);
-    return Point<T>(p.x / l, p.y / l);
+	AST(!is_zero(p.len2()));
+	T l = len(p);
+	return Point<T>(p.x / l, p.y / l);
 }
 
 // 向量旋转，rad为弧度，逆时针为正

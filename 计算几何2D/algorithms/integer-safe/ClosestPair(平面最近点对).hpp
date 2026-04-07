@@ -1,5 +1,4 @@
 #pragma once
-#include "aizalib.h"
 #include "../../1-base/Point.hpp"
 
 /**
@@ -10,7 +9,7 @@
  *   - std::pair<Point<T>, Point<T>> closest_point_pair(std::vector<Point<T>>& pts)
  * Note:
  * 1. Time: O(N log N)
- * 2. Space: O(log N) 栈空间 
+ * 2. Space: O(N)
  * 3. 内部使用 len2() 返回的欧氏距离平方比较，因此支持纯整型，防溢出需要注意坐标平方相加后不超上限。
  */
 
@@ -21,68 +20,58 @@ std::pair<Point<T>, Point<T>> closest_point_pair(std::vector<Point<T>>& pts) {
 	int n = pts.size();
 	if (n <= 1) return {Point<T>(), Point<T>()};
 
-	// 按x坐标排序
 	std::sort(pts.begin(), pts.end());
+	std::vector<Point<T>> buf(n), strip(n);
+	struct Node {
+		bool ok;
+		T d2;
+		std::pair<Point<T>, Point<T>> ps;
+	};
+	auto upd = [&](Node& cur, const Point<T>& a, const Point<T>& b) {
+		T d2 = a.dist2(b);
+		if (!cur.ok || cmp(d2, cur.d2) < 0) cur = {true, d2, {a, b}};
+	};
+	auto better = [&](const Node& a, const Node& b) {
+		if (!a.ok) return b;
+		if (!b.ok) return a;
+		return cmp(a.d2, b.d2) <= 0 ? a : b;
+	};
+	auto by_y = [](const Point<T>& a, const Point<T>& b) {
+		int cy = cmp(a.y, b.y);
+		if (cy != 0) return cy < 0;
+		return cmp(a.x, b.x) < 0;
+	};
 
-	// 分治求解
-	std::function<std::pair<Point<T>, Point<T>>(int, int)> solve = [&](int l, int r) -> std::pair<Point<T>, Point<T>> {
+	std::function<Node(int, int)> solve = [&](int l, int r) -> Node {
 		if (r - l <= 3) {
-			// 暴力求解小规模问题
-			std::pair<Point<T>, Point<T>> res = { pts[l], pts[l+1] };
-			T minDist2 = res.first.dist2(res.second);
-
-			rep(i, l, r) {
-				rep(j, i + 1, r) {
-					T d2 = pts[i].dist2(pts[j]);
-					if (cmp(d2, minDist2) < 0) {
-						minDist2 = d2;
-						res = {pts[i], pts[j]};
-					}
-				}
-			}
-			return res;
+			Node cur{false, T(), {}};
+			rep(i, l, r) rep(j, i + 1, r) upd(cur, pts[i], pts[j]);
+			std::sort(pts.begin() + l, pts.begin() + r + 1, by_y);
+			return cur;
 		}
 
 		int mid = (l + r) / 2;
-		std::pair<Point<T>, Point<T>> left = solve(l, mid);
-		std::pair<Point<T>, Point<T>> right = solve(mid + 1, r);
+		T midx = pts[mid].x;
+		Node cur = better(solve(l, mid), solve(mid + 1, r));
 
-		T dl2 = left.first.dist2(left.second);
-		T dr2 = right.first.dist2(right.second);
-		std::pair<Point<T>, Point<T>> res = cmp(dl2, dr2) < 0 ? left : right;
-		T d2 = std::min(dl2, dr2);
+		std::merge(pts.begin() + l, pts.begin() + mid + 1, pts.begin() + mid + 1, pts.begin() + r + 1, buf.begin() + l, by_y);
+		rep(i, l, r) pts[i] = buf[i];
 
-		// 处理跨越中线的情况
-		std::vector<Point<T>> strip;
-		for(int i = l; i <= r; i++) {
-			T dx = pts[i].x - pts[mid].x;
-			if (cmp(dx * dx, d2) < 0) {
-				strip.push_back(pts[i]);
+		int sz = 0;
+		rep(i, l, r) {
+			T dx = pts[i].x - midx;
+			if (cur.ok && cmp(dx * dx, cur.d2) >= 0) continue;
+			for (int j = sz - 1; j >= 0; --j) {
+				T dy = pts[i].y - strip[j].y;
+				if (cur.ok && cmp(dy * dy, cur.d2) >= 0) break;
+				upd(cur, pts[i], strip[j]);
 			}
+			strip[sz++] = pts[i];
 		}
-
-		// 按y坐标排序
-		std::sort(strip.begin(), strip.end(), [](const Point<T>& a, const Point<T>& b) {
-			return cmp(a.y, b.y) < 0;
-		});
-
-		// 检查strip中的点对
-		rep(i, 0, (int)strip.size() - 1) {
-			rep(j, i + 1, (int)strip.size() - 1) {
-				T dy = strip[j].y - strip[i].y;
-				if (cmp(dy * dy, d2) >= 0) break;
-				T dist_2 = strip[i].dist2(strip[j]);
-				if (cmp(dist_2, d2) < 0) {
-					d2 = dist_2;
-					res = {strip[i], strip[j]};
-				}
-			}
-		}
-
-		return res;
+		return cur;
 	};
 
-	return solve(0, n - 1);
+	return solve(0, n - 1).ps;
 }
 
 } // namespace Geo2D

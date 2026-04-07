@@ -1,5 +1,4 @@
 #pragma once
-#include "aizalib.h"
 #include "../../2-shapes/Circle.hpp"
 #include "../../2-shapes/Triangle.hpp"
 

@@ -30,7 +30,8 @@ struct Point {
 
 	// 极角所在半平面: 0 for [0, pi), 1 for [pi, 2pi)
 	int half() const {
-		return (y > 0 || (sgn(y) == 0 && x > 0)) ? 0 : 1;
+		int sy = sgn(y), sx = sgn(x);
+		return (sy > 0 || (sy == 0 && sx > 0)) ? 0 : 1;
 	}
 };
 
