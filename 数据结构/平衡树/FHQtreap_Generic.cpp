@@ -242,18 +242,20 @@ public:
 		_apply_tag(y, t);
 		root = _merge(_merge(x, y), z);
 	}
-	int rank(const T& v) const requires std::totally_ordered<T> {
+	int rank(const T& v) requires std::totally_ordered<T> {
 		int u = root, ans = 0;
 		while (u) {
+			_push_down(u);
 			if (val[u] < v) ans += sz[l[u]] + 1, u = r[u];
 			else u = l[u];
 		}
 		return ans + 1;
 	}
-	T kth(int k) const requires std::totally_ordered<T> {
+	T kth(int k) requires std::totally_ordered<T> {
 		AST(1 <= k && k <= size());
 		int u = root;
 		while (u) {
+			_push_down(u);
 			int l_sz = sz[l[u]];
 			if (l_sz + 1 == k) return val[u];
 			if (k <= l_sz) u = l[u];
@@ -261,22 +263,24 @@ public:
 		}
 		return T{};
 	}
-	T prev(const T& v) const requires std::totally_ordered<T> {
+	T prev(const T& v) requires std::totally_ordered<T> {
 		int u = root;
 		T ans{};
 		bool ok = false;
 		while (u) {
+			_push_down(u);
 			if (val[u] < v) ans = val[u], ok = true, u = r[u];
 			else u = l[u];
 		}
 		AST(ok);
 		return ans;
 	}
-	T next(const T& v) const requires std::totally_ordered<T> {
+	T next(const T& v) requires std::totally_ordered<T> {
 		int u = root;
 		T ans{};
 		bool ok = false;
 		while (u) {
+			_push_down(u);
 			if (v < val[u]) ans = val[u], ok = true, u = l[u];
 			else u = r[u];
 		}
