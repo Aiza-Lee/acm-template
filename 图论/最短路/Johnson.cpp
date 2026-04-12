@@ -32,7 +32,7 @@ struct Graph {
 	Graph(int n, int m = 0) : n(n), head(n + 1), e(m + 1) {}
 
 	void add_edge(int u, int v, T w) {
-		if (ec + 1 >= (int)e.size()) e.resize(ec == 0 ? 2 : ec * 2);
+		if (ec + 1 >= (int)e.size()) e.resize(std::max((int)e.size() * 2, ec + 2));
 		e[++ec] = {v, head[u], w}; head[u] = ec;
 	}
 };
