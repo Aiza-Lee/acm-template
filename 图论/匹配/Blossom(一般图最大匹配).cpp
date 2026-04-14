@@ -9,7 +9,7 @@
  * 		int solve()		返回最大匹配数，并在 mate 中恢复匹配
  * 		std::vector<std::pair<int, int>> matching_edges() const		返回一组匹配边
  * Note:
- * 		1. Time: O(n^3)
+ * 		1. Time: `solve()` 最坏 O(n^3)，更精确地说总计 O(nm + n^3)，单次 `_find_path()` 为 O(m + n^2)
  * 		2. Space: O(n^2)
  * 		3. 1-based indexing. 自环会被自动忽略，重边允许存在。
  * 		4. 用法/技巧:
