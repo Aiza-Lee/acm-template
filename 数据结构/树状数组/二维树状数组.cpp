@@ -6,10 +6,10 @@
  * Interface:
  * 		BitTree2D<T>(n, m), init(n, m): 初始化 n * m 的二维树状数组
  * 		BitTree2D<T>(a), init(a): 用 1-based 矩阵 a 线性建树
- * 		add(x, y, v): 令 a[x][y] += v
- * 		sum_prefix(x, y), pre(x, y): 查询子矩形 [1, x] * [1, y] 的和
- * 		sum(x1, y1, x2, y2), query(...): 查询子矩形 [x1, x2] * [y1, y2] 的和
- * 		all_sum(): 查询整体 [1, n] * [1, m] 的和
+ * 		add(x, y, v)		令 a[x][y] += v
+ * 		sum_prefix(x, y)	查询子矩形 [1, x] * [1, y] 的和
+ * 		sum(x1, y1, x2, y2)	查询子矩形 [x1, x2] * [y1, y2] 的和
+ * 		all_sum()			查询整体 [1, n] * [1, m] 的和
  * Note:
  * 		1. Time: 单次 add / sum_prefix / sum O(log N log M)，线性建树 O(NM)
  * 		2. Space: O(NM)
@@ -66,13 +66,11 @@ struct BitTree2D {
 		}
 		return res;
 	}
-	T pre(int x, int y) const { return sum_prefix(x, y); }
 
 	T sum(int x1, int y1, int x2, int y2) const {
 		AST(1 <= x1 && x1 <= x2 && x2 <= n);
 		AST(1 <= y1 && y1 <= y2 && y2 <= m);
 		return sum_prefix(x2, y2) - sum_prefix(x1 - 1, y2) - sum_prefix(x2, y1 - 1) + sum_prefix(x1 - 1, y1 - 1);
 	}
-	T query(int x1, int y1, int x2, int y2) const { return sum(x1, y1, x2, y2); }
 	T all_sum() const { return sum_prefix(n, m); }
 };

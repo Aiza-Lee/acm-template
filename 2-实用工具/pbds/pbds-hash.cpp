@@ -6,28 +6,20 @@ using namespace __gnu_pbds;
 
 /**
  * PBDS 哈希表 (Hash Table)
- * 模板参数:
- * 		Key, Mapped: 	键值类型
- * 		Hash_Fn: 		哈希函数 (默认 std::hash<Key>)
- * 		Eq_Fn: 			等判函数 (默认 std::equal_to<Key>)
- * 		Comb_Probe_Fn: 	(仅 gp_hash_table) 探测策略，如 linear_probe_fn (默认), quadratic_probe_fn
- * 		Probe_Fn: 		(仅 gp_hash_table) 定义如何计算偏移
- * 		Resize_Policy: 	调整大小策略 (默认 hash_standard_resize_policy)
- * 
- * 两种实现:
- * 		1. cc_hash_table (Collision-Chaining): 拉链法。
- * 		   - 内存占用稍大，删除操作快。
- * 		2. gp_hash_table (General-Probing): 探测法 (开放寻址)。
- * 		   - 内存紧凑，通常比 cc_hash_table 和 std::unordered_map 快 3-10 倍。
- * 		   - 类似 vector 的内存布局，对缓存友好。
- * 
- * interface & Complexity:
- * 		find/insert/[]: 平均 O(1)，最坏 O(N)。
- * 		resize: 		自动扩容。
- * 
- * note:
- * 		1. 必须包含 <ext/pb_ds/assoc_container.hpp> 和 <ext/pb_ds/hash_policy.hpp>。
- * 		2. 竞赛中强烈推荐配合自定义 Hash 函数 (如 splitmix64) 使用 gp_hash_table 以防卡。
+ * 速查:
+ * 		Mapped = null_type 表示 set。
+ * 		gp_hash_table: 开放寻址哈希表，最常用。
+ * 		cc_hash_table: 拉链哈希表。
+ * 		gp_hash_table<Key, Mapped, Hash_Fn, Eq_Fn, Comb_Probe_Fn, Probe_Fn, Resize_Policy>
+ * 		cc_hash_table<Key, Mapped, Hash_Fn, Eq_Fn, Comb_Hash_Fn, Resize_Policy>
+ * Note:
+ * 		1. 常用:
+ * 			gp_hash_table<Key, Mapped, Hash_Fn, Eq_Fn>
+ * 			cc_hash_table<Key, Mapped, Hash_Fn, Eq_Fn>
+ * 		2. 自定义 Key: Hash_Fn 与 Eq_Fn 要匹配；若 Eq_Fn(a, b) 为真，则哈希值也应相同。
+ * 		3. 自定义 Hash_Fn: 返回 size_t；整数键常配 custom_hash 防 hack。
+ * 		4. 手动 resize() 需用 hash_standard_resize_policy<..., true>。
+ * 		5. 需要 <ext/pb_ds/assoc_container.hpp> 和 <ext/pb_ds/hash_policy.hpp>。
  */
 
 // 防止被 Anti-Hash 测试数据卡掉的自定义哈希函数
@@ -45,9 +37,17 @@ struct custom_hash {
 	}
 };
 
-// 探测法哈希表 (Key: i64, Value: int)
-using safe_hash_table = gp_hash_table<
-	i64,
-	int,
-	custom_hash
->;
+// set
+template<typename Key, typename Hash_Fn = std::hash<Key>, typename Eq_Fn = std::equal_to<Key>>
+using hash_set = gp_hash_table<Key, null_type, Hash_Fn, Eq_Fn>;
+
+// gp_hash_table
+template<typename Key, typename Mapped, typename Hash_Fn = std::hash<Key>, typename Eq_Fn = std::equal_to<Key>>
+using hash_map = gp_hash_table<Key, Mapped, Hash_Fn, Eq_Fn>;
+
+// cc_hash_table
+template<typename Key, typename Mapped, typename Hash_Fn = std::hash<Key>, typename Eq_Fn = std::equal_to<Key>>
+using chain_hash_map = cc_hash_table<Key, Mapped, Hash_Fn, Eq_Fn>;
+
+// 整数键 + custom_hash
+using safe_hash_table = hash_map<i64, int, custom_hash>;
