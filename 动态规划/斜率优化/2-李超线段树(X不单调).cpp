@@ -1,75 +1,86 @@
 #include "aizalib.h"
-
+#include <numeric>
 /**
- * 斜率优化 - 李超线段树 (Li Chao Tree)
- * 
- * 算法介绍:
- * 		用于解决 "要求在某个 x 处，求所有已插入直线 y = kx + b 中的最值" 的问题。
- * 		相比单调队列，李超树不需要 X 坐标单调，也不需要 K 单调。
- * 		支持在线插入直线，在线查询单点极值。
- * 		
- * 		时间复杂度: 插入 O(log V), 查询 O(log V). V 为 X 的值域。
- * 		空间复杂度: O(Q log V) (动态开点).
+ * 斜率优化 - 李超线段树
+ * 算法介绍: 维护直线集合，支持在线插入直线、在线查询某个 x 处的最小值。
+ * 模板参数: T
+ * Interface:
+ * 		LiChaoTree<T>(l, r), init(l, r): 初始化定义域 [l, r]
+ * 		add_line(k, b): 插入直线 y = kx + b
+ * 		query(x): 查询最小值
+ * 		clear(): 清空已插入直线
+ * Note:
+ * 		1. Time: 单次 add_line / query O(log V)
+ * 		2. Space: O(Q log V)
+ * 		3. 适用于整数 x；若要求最大值，可整体取反
  */
+template<typename T = i64>
+struct LiChaoTree {
+	static constexpr T INF = std::numeric_limits<T>::max() / 4;
 
-// ===================================
-// 求最小值 (Min)
-// ===================================
-namespace LiChao {
-	const i64 INF = 4e18; // 初始极小值
-	const i64 MIN_X = -1e9, MAX_X = 1e9; // 定义域，根据题目修改
-	
 	struct Line {
-		i64 k, b;
-		i64 eval(i64 x) { return k * x + b; }
+		T k = 0, b = INF;
+		T eval(T x) const { return k * x + b; }
 	};
-
 	struct Node {
 		Line line;
-		int ls, rs;
-	} tr[200005 * 40]; // 空间: 操作次数 * log(值域)
-	int root, cnt;
+		int ls = 0, rs = 0;
+	};
 
-	int new_node() {
-		++cnt;
-		tr[cnt].line = {0, INF}; // 初始为无穷大直线 y = INF
-		tr[cnt].ls = tr[cnt].rs = 0;
-		return cnt;
+	std::vector<Node> tr;
+	T xl = 0, xr = -1;
+	int root = 0;
+
+	LiChaoTree() = default;
+	LiChaoTree(T l, T r) { init(l, r); }
+
+	int _new_node() {
+		tr.emplace_back();
+		return (int)tr.size() - 1;
 	}
 
-	void init() {
-		cnt = 0;
-		root = new_node();
-	}
-
-	// 插入直线 new_l
-	void insert(int &u, i64 l, i64 r, Line new_l) {
-		if (!u) u = new_node();
-		i64 mid = l + ((r - l) >> 1); // 防溢出写法
-		
-		bool better_mid = new_l.eval(mid) < tr[u].line.eval(mid);
-		if (better_mid) std::swap(tr[u].line, new_l);
-
+	void _add(int u, T l, T r, Line x) {
+		T mid = std::midpoint(l, r);
+		bool lef = x.eval(l) < tr[u].line.eval(l);
+		bool cen = x.eval(mid) < tr[u].line.eval(mid);
+		if (cen) std::swap(x, tr[u].line);
 		if (l == r) return;
-
-		// 此时 tr[u].line 在中点更优。
-		// 检查两端，new_l 可能在某一端更优。
-		if (new_l.eval(l) < tr[u].line.eval(l)) insert(tr[u].ls, l, mid, new_l);
-		else if (new_l.eval(r) < tr[u].line.eval(r)) insert(tr[u].rs, mid + 1, r, new_l);
+		if (lef != cen) {
+			if (!tr[u].ls) tr[u].ls = _new_node();
+			_add(tr[u].ls, l, mid, x);
+		} else {
+			if (!tr[u].rs) tr[u].rs = _new_node();
+			_add(tr[u].rs, mid + 1, r, x);
+		}
 	}
 
-	i64 query(int u, i64 l, i64 r, i64 x) {
+	T _query(int u, T l, T r, T x) const {
 		if (!u) return INF;
-		i64 mid = l + ((r - l) >> 1);
-		i64 res = tr[u].line.eval(x);
+		T res = tr[u].line.eval(x);
 		if (l == r) return res;
-		
-		if (x <= mid) res = std::min(res, query(tr[u].ls, l, mid, x));
-		else res = std::min(res, query(tr[u].rs, mid + 1, r, x));
-		return res;
+		T mid = std::midpoint(l, r);
+		if (x <= mid) return std::min(res, _query(tr[u].ls, l, mid, x));
+		return std::min(res, _query(tr[u].rs, mid + 1, r, x));
 	}
-	
-	// 外部接口
-	void add_line(i64 k, i64 b) { insert(root, MIN_X, MAX_X, {k, b}); }
-	i64 query(i64 x) { return query(root, MIN_X, MAX_X, x); }
-}
+
+	void init(T l, T r) {
+		AST(l <= r);
+		xl = l, xr = r;
+		tr.clear();
+		tr.reserve(4);
+		tr.emplace_back();
+		root = _new_node();
+	}
+
+	void add_line(T k, T b) {
+		AST(root);
+		_add(root, xl, xr, Line{k, b});
+	}
+
+	T query(T x) const {
+		AST(root && xl <= x && x <= xr);
+		return _query(root, xl, xr, x);
+	}
+
+	void clear() { init(xl, xr); }
+};

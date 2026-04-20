@@ -1,0 +1,50 @@
+\textbf{数位DP}
+
+典型目标：统计区间 $[L,R]$ 中满足某性质的整数个数，通常转成
+\[
+\operatorname{calc}(R)-\operatorname{calc}(L-1).
+\]
+其中 $\operatorname{calc}(n)$ 表示 $[0,n]$ 的答案。
+
+\textbf{常用状态}
+
+按从高位到低位递推，常见状态为：
+\[
+f[\text{pos}][\text{state}][\text{tight}][\text{lead}]
+\]
+其中：
+\begin{itemize}
+	\item \texttt{pos}：处理到第几位。
+	\item \texttt{state}：题目相关状态，如上一位、各位和、模数、出现次数、自动机节点、mask。
+	\item \texttt{tight}：当前前缀是否与上界完全相同。
+	\item \texttt{lead}：前面是否仍全为前导零。
+\end{itemize}
+
+\textbf{递推视角}
+
+设当前可填数字范围为 $0\sim up$，其中 $up=9$ 或上界该位。枚举本位数字 $d$，做：
+\[
+\text{新状态} = \operatorname{trans}(\text{state}, d, \text{lead}),
+\]
+\[
+f_{\text{next}} += f_{\text{cur}}.
+\]
+若是计数 DP，直接累加；若要求数位和、平方和、值和等，则把“答案量”并入状态或额外维护。
+
+\textbf{常见题型}
+
+\begin{itemize}
+	\item 禁止出现某些数字或相邻模式：状态常取“上一位”。
+	\item 数位和 / 数位积 / 各位异或限制：状态常取累计量。
+	\item 对某模数同余：状态常取当前前缀模值。
+	\item 禁止出现若干子串：状态常取 AC 自动机节点。
+\end{itemize}
+
+\textbf{易错点}
+
+\begin{itemize}
+	\item $0$ 是否计入答案要单独约定。
+	\item 前导零是否参与状态转移要和题意一致。
+	\item \texttt{lead=1} 时，“还没开始填数”和“已经填了若干个 $0$”通常不同。
+	\item 若用记忆化搜索，通常只记 \texttt{tight=0} 的状态；\texttt{lead} 是否可省要看状态定义。
+\end{itemize}

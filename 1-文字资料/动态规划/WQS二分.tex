@@ -1,0 +1,36 @@
+\textbf{WQS二分}
+
+典型目标：求“恰好选 $k$ 个”的最优值。常把原问题写成
+\[
+g(x)=\text{选 }x\text{ 个时的最优值}
+\]
+并假设 $g(x)$ 满足凸性或凹性。
+
+\textbf{标准变形}
+
+引入罚值 $\lambda$，把“选一个的代价”改成 $\lambda$，转成无约束问题：
+\[
+h(\lambda)=\max_x \{g(x)-\lambda x\}
+\]
+或对应的最小化形式。此时只需实现一个 \texttt{check}：返回在当前 $\lambda$ 下的最优值与最优选取个数。
+
+\textbf{二分条件}
+
+若 $\lambda$ 变大时，最优选取个数单调变化，则可二分 $\lambda$ 找到使最优个数逼近 $k$ 的点。
+
+\textbf{答案还原}
+
+设二分得到的参数为 $\lambda^*$，对应无约束最优值为 $h(\lambda^*)$，则原答案通常还原为
+\[
+g(k)=h(\lambda^*)+\lambda^* k
+\]
+最小化问题同理处理符号。
+
+\textbf{易错点}
+
+\begin{itemize}
+	\item 先证明 $g(x)$ 的凸/凹性与个数单调性，再用 WQS。
+	\item \texttt{check} 在共线时必须固定 tie-break，例如总取个数最大或最小。
+	\item 还原答案时，所用的 tie-break 必须和二分方向一致。
+	\item 若 $\lambda$ 为整数，要确认值域与二分边界足够覆盖答案。
+\end{itemize}
