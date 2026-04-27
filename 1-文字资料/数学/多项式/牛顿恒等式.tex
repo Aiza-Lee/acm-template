@@ -1,0 +1,31 @@
+\textbf{牛顿恒等式}
+
+设有 $n$ 个根 $a_1,\dots,a_n$。幂和、基本对称多项式与首一特征多项式分别定义为
+\[
+p_k=\sum_{i=1}^{n}a_i^k,\qquad
+e_k=\sum_{1\le i_1<\cdots<i_k\le n}a_{i_1}\cdots a_{i_k},\qquad
+f(x)=\prod_{i=1}^{n}(x-a_i).
+\]
+其中 $p_0=n,\ e_0=1$。特征多项式展开为
+\[
+f(x)=x^n-e_1x^{n-1}+e_2x^{n-2}-\cdots+(-1)^ne_n.
+\]
+
+\textbf{恒等式}
+
+对 $1\le k\le n$，
+\[
+p_k-e_1p_{k-1}+e_2p_{k-2}-\cdots+(-1)^{k-1}e_{k-1}p_1+(-1)^k k e_k=0.
+\]
+等价地，
+\[
+k e_k=\sum_{i=1}^{k}(-1)^{i-1}e_{k-i}p_i.
+\]
+对 $k>n$，没有 $k e_k$ 项，幂和满足特征多项式给出的线性递推：
+\[
+p_k-e_1p_{k-1}+e_2p_{k-2}-\cdots+(-1)^ne_np_{k-n}=0.
+\]
+
+\textbf{模板对应}
+
+模板在 $p,e,f$ 三种表示之间互相转换。\texttt{Poly} 低位在前存储，因此若 $f(x)=\prod(x-a_i)$，则 $f[n-k]=(-1)^ke_k$。已知 $p_1,\dots,p_n$ 可恢复 $e_0,\dots,e_n$ 和 $f$；已知 $e$ 或 $f$ 可推出 $p_0,\dots,p_m$。从幂和恢复 $e$ 时要除以 $1,\dots,n$，模意义下需保证它们可逆。
