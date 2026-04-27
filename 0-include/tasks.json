@@ -4,9 +4,9 @@
 		{
 			"label": "build",
 			"type": "shell",
-			"command": "g++ -std=c++23 -DLOCAL -DDEBUG -g -O0 -fdiagnostics-color=always \"${file}\" -o \"${fileDirname}/${fileBasenameNoExtension}\"",
+			"command": "g++ -std=c++23 -DLOCAL -DDEBUG -g -O0 -fdiagnostics-color=always \"${file}\" -o \"${fileDirname}/build/${fileBasenameNoExtension}\"",
 			"windows": {
-				"command": "g++ -std=c++23 -DLOCAL -DDEBUG -g -O0 -fdiagnostics-color=always \"${file}\" -o \"${fileDirname}\\${fileBasenameNoExtension}.exe\"",
+				"command": "g++ -std=c++23 -DLOCAL -DDEBUG -g -O0 -fdiagnostics-color=always \"${file}\" -o \"${fileDirname}\\build\\${fileBasenameNoExtension}.exe\"",
 				"options": {
 					"shell": {
 						"executable": "cmd.exe",
@@ -20,9 +20,9 @@
 		{
 			"label": "build-and-run",
 			"type": "shell",
-			"command": "\"${fileDirname}/${fileBasenameNoExtension}\" < \"${workspaceFolder}/input.txt\"",
+			"command": "\"${fileDirname}/build/${fileBasenameNoExtension}\" < \"${workspaceFolder}/input.txt\"",
 			"windows": {
-				"command": "\"\"${fileDirname}\\${fileBasenameNoExtension}.exe\" < \"${workspaceFolder}\\input.txt\"\"",
+				"command": "\"\"${fileDirname}\\build\\${fileBasenameNoExtension}.exe\" < \"${workspaceFolder}\\input.txt\"\"",
 				"options": {
 					"shell": {
 						"executable": "cmd.exe",

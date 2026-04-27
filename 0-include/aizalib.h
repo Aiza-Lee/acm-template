@@ -13,13 +13,13 @@ using pii = std::pair<int, int>;
 #define per(i, a, b) for (int i = (a); i >= (b); --i)
 
 #ifdef LOCAL
-	#define DE(x)  std::cerr << #x << "=" << x << ' ';
-	#define DEN(x) std::cerr << #x << "=" << x << '\n';
+	#define DE(x) std::cerr << #x << "=" << (x) << ' ';
+	#define DEN(x) std::cerr << #x << "=" << (x) << '\n';
 	#define AST(x) assert(x);
 #else
-	#define DE(x) ((void)0);
-	#define DEN(x) ((void)0);
-	#define AST(x) ((void)0);
+	#define DE(x) ;
+	#define DEN(x) ;
+	#define AST(x) ;
 #endif
 
 const int md = 998244353;
