@@ -19,7 +19,7 @@ namespace poly_ext {
  * 		4. fwt 是线性变换，也即 fwt(A+B) = fwt(A)+fwt(B)，以及 fwt(c*A) = c*fwt(A)
  */
 
-inline void fwt_or(std::vector<int>& a, int type) {
+void fwt_or(std::vector<int>& a, int type) {
 	int n = a.size();
 	for (int len = 2; len <= n; len <<= 1) {
 		for (int i = 0; i < n; i += len) {
@@ -31,7 +31,7 @@ inline void fwt_or(std::vector<int>& a, int type) {
 	}
 }
 
-inline void fwt_and(std::vector<int>& a, int type) {
+void fwt_and(std::vector<int>& a, int type) {
 	int n = a.size();
 	for (int len = 2; len <= n; len <<= 1) {
 		for (int i = 0; i < n; i += len) {
@@ -43,7 +43,7 @@ inline void fwt_and(std::vector<int>& a, int type) {
 	}
 }
 
-inline void fwt_xor(std::vector<int>& a, int type) {
+void fwt_xor(std::vector<int>& a, int type) {
 	int n = a.size();
 	int inv2 = inv(2);
 	for (int len = 2; len <= n; len <<= 1) {
@@ -61,7 +61,7 @@ inline void fwt_xor(std::vector<int>& a, int type) {
 	}
 }
 
-inline void fwt_xnor(std::vector<int>& a, int type) {
+void fwt_xnor(std::vector<int>& a, int type) {
 	int n = a.size();
 	int inv2 = inv(2);
 	for (int len = 2; len <= n; len <<= 1) {
