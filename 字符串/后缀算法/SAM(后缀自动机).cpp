@@ -176,7 +176,8 @@ struct SAM {
 	i64 calc_total_length() {
 		i64 ans = 0;
 		rep(i, 1, (int)nodes.size() - 1) {
-			ans += nodes[i].len - nodes[nodes[i].link].len;
+			i64 l = nodes[nodes[i].link].len + 1, r = nodes[i].len;
+			ans += (l + r) * (r - l + 1) / 2;
 		}
 		return ans;
 	}

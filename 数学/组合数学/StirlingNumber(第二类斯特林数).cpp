@@ -28,10 +28,10 @@ struct StirlingS2 {
 	int sum_powers(i64 n, int k) {
 		if (k == 0) return (n + 1) % md;
 		int ans = 0;
-		i64 falling_fact = (n + 1) % md;
+		int falling_fact = mod(n + 1);
 		
 		rep(j, 1, k) {
-			falling_fact = mul(falling_fact, (n + 1 - j) % md);
+			falling_fact = mul(falling_fact, mod(n + 1 - j));
 			int term = mul(falling_fact, fp(j + 1, md - 2)); 
 			term = mul(term, S[k][j]);
 			ans = add(ans, term);

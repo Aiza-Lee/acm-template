@@ -36,7 +36,7 @@ struct NewtonInterpolation {
 		
 		rep(k, 0, (int)diff_0.size() - 1) {
 			ans = add(ans, mul(diff_0[k], binom));
-			binom = mul(binom, (x - k) % md);
+			binom = mul(binom, mod(x - k));
 			binom = mul(binom, fp(k + 1, md - 2));
 		}
 		return ans;

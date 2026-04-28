@@ -77,7 +77,7 @@ struct Matrix {
 	const T* operator[](const size_t i) const { assert(i < R); return raw[i]; }
 	
 	Matrix(bool clear = true) { if (clear) FOREACH(i, j) raw[i][j] = T(); }
-	Matrix(T* data) { FOREACH(i, j) raw[i][j] = data[i * R + j]; }
+	Matrix(T* data) { FOREACH(i, j) raw[i][j] = data[i * C + j]; }
 
 	static Matrix<R, C, T> Identity() {
 		assert(R == C);
@@ -158,7 +158,8 @@ struct Matrix {
 			if (pivot != i)
 				rep(k, 0, 2 * R - 1) std::swap(tmp[i][k], tmp[pivot][k]);
 
-			rep(k, 0, 2 * R - 1) tmp[i][k] /= tmp[i][i];
+			T div = tmp[i][i];
+			rep(k, 0, 2 * R - 1) tmp[i][k] /= div;
 			rep(j, 0, R - 1) {
 				if (j != i) {
 					T f = tmp[j][i];
@@ -168,7 +169,7 @@ struct Matrix {
 		}
 
 		Matrix<R, R, T> res(false);
-		FOREACH(i, j) res[i][j] = tmp[i][j + 4];
+		FOREACH(i, j) res[i][j] = tmp[i][j + R];
 		return res;
 	}
 
