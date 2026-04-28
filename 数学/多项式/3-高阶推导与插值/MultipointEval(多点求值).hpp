@@ -1,6 +1,6 @@
 #pragma once
 #include "aizalib.h"
-#include "Poly.hpp"
+#include "../0-base/Poly.hpp"
 
 namespace poly_ext {
 	struct EvalImpl {
@@ -44,6 +44,6 @@ namespace poly_ext {
 	 */
 	template<typename Poly>
 	std::vector<int> multipoint_eval(const Poly& p, const std::vector<int>& x) {
-		return EvalImpl<Poly>::eval(p, x);
+		return EvalImpl::eval(p, x);
 	}
 }

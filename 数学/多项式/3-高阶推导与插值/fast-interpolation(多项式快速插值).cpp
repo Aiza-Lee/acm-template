@@ -1,6 +1,6 @@
 #include "../0-base/Poly.hpp"
 namespace poly_ext {
-	namespace detail {
+namespace detail {
 	inline void _interp_build(int node, int l, int r, const std::vector<int>& x, std::vector<Poly>& tree) {
 		if (l == r) {
 			tree[node] = Poly({sub(0, x[l]), 1});
@@ -22,7 +22,7 @@ namespace poly_ext {
         auto res = left * tree[node << 1 | 1] + right * tree[node << 1];
 		return res;
 	}
-	} // namespace detail
+} // namespace detail
 
 /**
  * 多项式快速插值
@@ -39,7 +39,8 @@ inline Poly fast_interpolation(const std::vector<int>& x, const std::vector<int>
 
 	auto M = tree[1];
 	auto M_deriv = M.deriv();
-	std::vector<int> denoms = M_deriv.eval(x);
+	std::vector<int> denoms(n);
+	rep(i, 0, n - 1) denoms[i] = M_deriv.eval(x[i]);
 
 	std::vector<int> vals(n);
 	rep(i, 0, n - 1) vals[i] = mul(y[i], inv(denoms[i]));
