@@ -8,8 +8,10 @@
  * Note:
  * 		1. Time: O(N)
  * 		2. Space: O(N)
- * 		3. 性质: u 是 v 的祖先 <=> tin[u] <= tin[v] <= tout[u]
- * 		4. 性质: subtree(u) <=> [tin[u], tout[u]]
+ * 		3. 1-based indexing；输入 g 为树的邻接表，默认根为 1
+ * 		4. 性质: u 是 v 的祖先 <=> tin[u] <= tin[v] <= tout[u]
+ * 		5. 性质: subtree(u) <=> [tin[u], tout[u]]
+ * 		6. 用法/技巧: `tout[u]` 是子树内最大进入时间，不是离开时再加一的时间戳。
  */
 struct TinToutDFS {
 	const std::vector<std::vector<int>>& g;

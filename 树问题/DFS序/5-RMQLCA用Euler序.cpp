@@ -8,7 +8,9 @@
  * Note:
  * 		1. Time: O(N)
  * 		2. Space: O(N)
- * 		3. 性质: 设 first[u] <= first[v]，则 lca(u, v) 为 euler[first[u]..first[v]] 中深度最小者
+ * 		3. 1-based indexing；Euler 序有效位置为 1..2n-1
+ * 		4. 性质: 设 first[u] <= first[v]，则 lca(u, v) 为 euler[first[u]..first[v]] 中深度最小者
+ * 		5. 用法/技巧: 通常对 Euler 序按 dep 建 ST/RMQ，即可 O(1) 查询 LCA。
  */
 struct RMQLCAEulerDFS {
 	const std::vector<std::vector<int>>& g;

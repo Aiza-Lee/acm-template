@@ -23,6 +23,7 @@
  * 		4. `Tag` 需要支持 `merge(rhs)`、`has_value()`、`apply_to(Info&, int l, int r)`
  * 		5. 空结点默认表示其整段区间都处于初始状态，因此 `Info::from_range(l, r)` 必须返回该区间的默认信息
  * 		6. `find_first / find_last` 中的 `pred(info)` 应满足单调性，否则二分结果没有意义
+ * 		7. 当前二分不维护前缀累加器；适合用 `max/min/exists` 等区间信息判定，前缀和二分需另写带 accumulator 的版本
  */
 
 template<class Info>

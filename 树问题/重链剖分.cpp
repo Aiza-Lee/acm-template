@@ -22,7 +22,10 @@
  * 		1. Time: O(N) 预处理，单次链剖相关查询/拆链 O(log N)
  * 		2. Space: O(N)
  * 		3. 全部下标均为 1-based，点权通常映射到 dfn[u]，边权通常映射到更深端点的 dfn
- * 		4. 用法/技巧: `deal_path_edge` 会自动跳过 LCA，对边权线段树更顺手
+ * 		4. 用法/技巧:
+ * 			4.1 `deal_path_edge` 会自动跳过 LCA。
+ * 			4.2 `jump(u, v, k)` 中 k 是边数，k=0 返回 u，k=dist(u,v) 返回 v。
+ * 			4.3 `heuristic_dfs` 默认从传入 u 开始，`keep=false`，执行完会清空当前子树贡献。
  */
 struct Graph {
 	int n;

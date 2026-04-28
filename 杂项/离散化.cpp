@@ -11,6 +11,8 @@
  * Note:
  * 		1. Time: Build O(N log N), Query O(log N)
  * 		2. Space: O(N)
+ * 		3. 1-based indexing；`operator[](i)` 返回第 i 小的原值。
+ * 		4. 用法: `get(x)` 返回 `lower_bound` 位置，通常要求 x 已经加入并经过 `build()`。
  */
 
 template<typename T>
@@ -27,15 +29,15 @@ struct Discretization {
 	}
 
 	// Returns 1-based index
-	int get(const T& x) {
+	int get(const T& x) const {
 		return std::lower_bound(vals.begin(), vals.end(), x) - vals.begin() + 1;
 	}
 
-	int size() {
+	int size() const {
 		return vals.size();
 	}
 
-	const T& operator[](int i) {
+	const T& operator[](int i) const {
 		return vals[i - 1];
 	}
 };

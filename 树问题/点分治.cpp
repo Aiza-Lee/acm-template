@@ -1,5 +1,21 @@
 #include "aizalib.h"
 
+/**
+ * 点分治框架
+ * 算法介绍: 递归选择当前连通块重心，处理跨重心贡献后删除重心并分治子块。
+ * 模板参数: None
+ * Interface:
+ * 		get_size(u, fa): 计算未删除连通块大小
+ * 		get_centroid(u, fa, total): 返回当前块重心
+ * 		centroid_decomp(u): 对 u 所在连通块执行点分治
+ * Note:
+ * 		1. Time: 框架 O(N log N)，实际复杂度取决于 `calc`
+ * 		2. Space: O(N)
+ * 		3. 0/1-based 取决于调用方建图；本片段只要求点编号落在 `adj` 数组范围内
+ * 		4. 用法/技巧:
+ * 			4.1 使用前需在外部定义常量 `N`，并清空 `adj/siz/done`。
+ * 			4.2 两处 `calc(u)` 注释分别用于处理分治层贡献；按题意保留一处或两处。
+ */
 std::vector<int> adj[N];
 int siz[N];
 bool done[N];

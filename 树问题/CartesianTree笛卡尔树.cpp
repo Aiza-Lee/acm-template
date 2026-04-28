@@ -12,7 +12,8 @@
  * 		1. Time: 构造 O(N)
  * 		2. Space: O(N)
  * 		3. 输入序列需为 1-based，`a[0]` 仅作占位
- * 		4. 成员 `root/fa/ls/rs` 可直接使用；相等元素按下标稳定，较小下标更靠上
+ * 		4. 中序遍历一定还原原下标顺序；父子关系满足比较器定义的堆序
+ * 		5. 成员 `root/fa/ls/rs` 可直接使用；相等元素按下标稳定，较小下标更靠上
  */
 template<class T, class Compare>
 concept CartesianCompare = requires(Compare cmp, const T& a, const T& b) {

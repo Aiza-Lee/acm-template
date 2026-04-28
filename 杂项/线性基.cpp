@@ -1,7 +1,18 @@
 #include "aizalib.h"
 /**
- * 维护一组相互独立的向量（长度为N）（按位异或意义下），支持插入新向量和查询当前向量空间的最大值
- * 时间复杂度 O(N^2/32) 每次插入和查询
+ * 线性基
+ * 算法介绍: 维护 GF(2) 上的向量空间，支持插入向量、查询异或最大值，以及保留原向量表示。
+ * 模板参数: N (bitset 长度)
+ * Interface:
+ * 		LinearBasis<N>::insert(x): 尝试插入 x，成功表示线性无关
+ * 		LinearBasis<N>::get_max(): 返回当前张成空间中的最大字典序/数值 bitset
+ * 		RawLinearBasis<N>::insert(x): 插入原始向量
+ * 		RawLinearBasis<N>::solve(v): 查询 v 是否可由已选原始基向量异或表示
+ * Note:
+ * 		1. Time: 每次插入/查询 O(N^2 / word_bits)
+ * 		2. Space: O(N^2 / word_bits)
+ * 		3. 0-based bit indexing；第 i 位表示 `bitset[i]`。
+ * 		4. 用法/技巧: `RawLinearBasis` 的返回 bitset 中第 j 位为 1 表示使用 `basis[j]`。
  */
 template <size_t N>
 struct LinearBasis {

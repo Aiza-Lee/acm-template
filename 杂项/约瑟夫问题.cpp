@@ -30,24 +30,14 @@ int josephus(int n, int k) {
  * @brief 优化跳跃计算，适用于 n 极大、k 较小的情况
  */
 i64 josephus_log(i64 n, i64 k) {
+	if (n == 1) return 0;
 	if (k == 1) return n - 1; // 报数 1，一直淘汰第一个，剩下最后一个
-	i64 res = 0;
-	for (i64 i = 2; i <= n; ) {
-		if (res + k < i) {
-			// 一次跳过多个规模
-			i64 skip = (i - res - 1) / (k - 1);
-			if (i + skip > n) {
-				res = (res + (n + 1 - i) * k) % n;
-				break;
-			}
-			res = (res + skip * k) % (i + skip);
-			i += skip;
-		} else {
-			// 单步递推
-			res = (res + k) % i;
-			i++;
-		}
-	}
+	if (k > n) return (josephus_log(n - 1, k) + k) % n;
+	i64 cnt = n / k;
+	i64 res = josephus_log(n - cnt, k);
+	res -= n % k;
+	if (res < 0) res += n;
+	else res += res / (k - 1);
 	return res;
 }
 

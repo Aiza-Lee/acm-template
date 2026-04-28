@@ -1,9 +1,16 @@
 #include "aizalib.h"
 
 /**
- * Floyd 判圈算法，寻找函数 f 在起点 x0 出发后形成的链表中的环的入口节点
- * 构造函数中，f：一个从节点到下一个节点的映射函数
- * find_enter_point()：返回环的入口节点
+ * Floyd 判圈算法
+ * 算法介绍: 在函数图中用快慢指针寻找从起点可达环的入口。
+ * 模板参数: 无
+ * Interface:
+ * 		FloydCycleFinding(f): 传入后继函数 f(x)
+ * 		find_enter_point(x0): 返回从 x0 出发的环入口
+ * Note:
+ * 		1. Time: O(mu + lambda)，mu 为入环前长度，lambda 为环长
+ * 		2. Space: O(1)
+ * 		3. 用法/技巧: 要求 f 对访问到的点始终有定义；本模板只返回入口，不返回环长。
  */
 struct FloydCycleFinding {
 	std::function<int(int)> f;

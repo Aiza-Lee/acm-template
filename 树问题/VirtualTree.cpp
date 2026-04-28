@@ -5,12 +5,15 @@
  * 算法介绍: 对树上关键点集合构建虚树，保留关键点及LCA，维持原树祖先关系。
  * 模板参数: 无
  * Interface: 
- * 		init(n): 初始化容器大小
- * 		build(h, get_lca, dfn): 构建虚树
+ * 		VirtualTree(n) / init(n): 初始化容器大小
+ * 		build(h, get_lca, dfn): 构建虚树，h 会被排序去重
  * Note:
  * 		1. Time: O(K log K)
  * 		2. Space: O(N)
- * 		3. 1-based indexing (默认根为1)
+ * 		3. 1-based indexing，默认原树根为 1，虚树根也强制包含 1
+ * 		4. 用法/技巧:
+ * 			4.1 `get_lca(u, v)` 与 `dfn[u]` 必须来自同一棵以 1 为根的原树。
+ * 			4.2 `adj` 只清理本次涉及的虚树点；若要遍历结果，建议从 1 出发 DFS。
  */
 
 struct VirtualTree {

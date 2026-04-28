@@ -13,9 +13,12 @@
  * 		T solve(): 返回最小生成树的边权之和。如果不连通返回 -1。
  * 
  * Note:
- * 		1. 时间复杂度: O(E log E)
- * 		2. 空间复杂度: O(V + E)
- * 		3. 适合稀疏图。
+ * 		1. Time: O(E log E)
+ * 		2. Space: O(V + E)
+ * 		3. 1-based indexing，边按无向边加入。
+ * 		4. 用法/技巧:
+ * 			4.1 适合稀疏图；若只需要 MST 权值，通常是首选写法。
+ * 			4.2 `solve()` 每次会重置并查集，因此同一对象可重复求解当前边集。
  */
 
 template<typename T>
@@ -43,6 +46,7 @@ struct Kruskal {
 	}
 
 	T solve() {
+		std::iota(fa.begin(), fa.end(), 0);
 		std::sort(graph.edges.begin(), graph.edges.end(), [](auto& a, auto& b) { return a.w < b.w; });
 		
 		T res = 0; int cnt = 0;

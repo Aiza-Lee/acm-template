@@ -1,18 +1,16 @@
 #include "0-SegTreeBase.hpp"
 
-/*
+/**
  * 区间乘加线段树 (Range Affine Transformation)
- * 支持：区间乘法、区间加法、区间求和
- * 
- * 维护变换 x -> x * mul + add
- * 
- * 标记合并推导:
- * 旧标记 (m1, a1): x -> x * m1 + a1
- * 新标记 (m2, a2): y -> y * m2 + a2
- * 复合: (x * m1 + a1) * m2 + a2 = x * (m1 * m2) + (a1 * m2 + a2)
- * 故新合成标记: mul = m1 * m2, add = a1 * m2 + a2
- * 
- * 初始标记: mul = 1, add = 0
+ * 算法介绍: 基于通用懒标记线段树维护区间仿射变换 `x -> x * mul + add` 与区间和。
+ * 模板参数: 无
+ * Interface:
+ * 		using SegAffine = SegTree<Info, Tag>
+ * 		modify(l, r, {mul, add}): 对区间应用仿射变换
+ * 		query(l, r).sum: 查询区间和
+ * Note:
+ * 		1. Time: 单次修改/查询 O(log N)
+ * 		2. Space: O(N)
  */
 
 constexpr int MOD = 998244353;

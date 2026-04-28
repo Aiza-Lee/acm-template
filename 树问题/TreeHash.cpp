@@ -1,18 +1,21 @@
 #include "aizalib.h"
 
 /**
- * 树哈希 (Tree Hash)
- * 快速判断两棵树是否同构（同构：通过某个定点标号的映射，使两棵树边集相同）
- * 
- * interface:
- * 		TreeHash(int n):			// 构造函数，n为节点数
- * 		add_edge(int u, int v):		// 添加边
- * 		get_rooted_hash(int root):	// 计算以root为根的树的哈希值
- * 		get_unrooted_hash():		// 计算无根树的哈希值(自动寻找重心，处理重心不唯一的情况)
- * note:
- * 		1. 使用了异或移位(Xor-Shift)和随机掩码来减少哈希冲突，概率极低
- * 		2. 时间复杂度 O(N)
- * 		3. 适用于判断树同构
+ * Tree Hash (树哈希)
+ * 算法介绍: 对无序有根树递归混合子树哈希，无根树取重心根的最小哈希代表。
+ * 模板参数: None
+ * Interface:
+ * 		TreeHash(n): 初始化 n 个点
+ * 		add_edge(u, v): 加无向边
+ * 		get_rooted_hash(root): 计算以 root 为根的哈希
+ * 		get_unrooted_hash(): 计算无根树哈希，自动处理单/双重心
+ * Note:
+ * 		1. Time: 单次 rooted / unrooted hash O(N)
+ * 		2. Space: O(N)
+ * 		3. 1-based indexing；调用前需加入 n-1 条树边
+ * 		4. 用法/技巧:
+ * 			4.1 使用随机 mask 降低碰撞概率；若要跨对象比较，需手动设成同一个 mask。
+ * 			4.2 哈希只能概率判断同构；严谨证明场景需改用规范括号序等确定性表示。
  */
 struct TreeHash {
 	int n;

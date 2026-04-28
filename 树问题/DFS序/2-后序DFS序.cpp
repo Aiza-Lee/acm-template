@@ -8,7 +8,9 @@
  * Note:
  * 		1. Time: O(N)
  * 		2. Space: O(N)
- * 		3. 性质: 若 v 是 u 的真后代，则 post[v] < post[u]
+ * 		3. 1-based indexing；输入 g 为树的邻接表，默认根为 1
+ * 		4. 性质: 若 v 是 u 的真后代，则 post[v] < post[u]
+ * 		5. 用法/技巧: 适合做依赖儿子结果的离线顺序或验证祖先-后代后序关系。
  */
 struct PostorderDFS {
 	const std::vector<std::vector<int>>& g;

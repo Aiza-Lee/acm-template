@@ -13,10 +13,12 @@
  * 		T solve(int start_node = 1): 返回最小生成树的边权之和。如果不连通返回 -1。
  * 
  * Note:
- * 		1. 时间复杂度: O(E log E) (使用二叉堆优化)
- * 		2. 空间复杂度: O(V + E)
- * 		3. 适用于稠密图，但在堆优化下对稀疏图也表现良好。
- * 		4. 这里的实现使用 std::priority_queue。
+ * 		1. Time: O(E log E)
+ * 		2. Space: O(V + E)
+ * 		3. 1-based indexing，边按无向边加入。
+ * 		4. 用法/技巧:
+ * 			4.1 使用 `std::priority_queue` 懒删除，适合显式稀疏图；稠密图可改邻接矩阵 O(V^2)。
+ * 			4.2 `solve(s)` 每次会重置 `dis/vis`，同一对象可从任意起点重复求当前图 MST。
  */
 
 template<typename T>
@@ -37,6 +39,8 @@ struct Prim {
 	void add_edge(int u, int v, T w) { graph.add_edge(u, v, w); }
 
 	T solve(int s = 1) {
+		std::fill(dis.begin(), dis.end(), std::numeric_limits<T>::max());
+		std::fill(vis.begin(), vis.end(), false);
 		T res = 0; int cnt = 0;
 		std::priority_queue<std::pair<T, int>, std::vector<std::pair<T, int>>, std::greater<>> pq;
 		

@@ -8,8 +8,10 @@
  * Note:
  * 		1. Time: O(N)
  * 		2. Space: O(N)
- * 		3. 性质: subtree(u) <=> [pre[u], pre[u] + sz[u] - 1]
- * 		4. 性质: v 在 u 子树内 <=> pre[u] <= pre[v] < pre[u] + sz[u]
+ * 		3. 1-based indexing；输入 g 为树的邻接表，默认根为 1
+ * 		4. 性质: subtree(u) <=> [pre[u], pre[u] + sz[u] - 1]
+ * 		5. 性质: v 在 u 子树内 <=> pre[u] <= pre[v] < pre[u] + sz[u]
+ * 		6. 用法/技巧: `id[pre[u]] = u`，可把子树点权映射到连续数组区间。
  */
 struct PreorderDFS {
 	const std::vector<std::vector<int>>& g;
