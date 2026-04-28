@@ -3,9 +3,18 @@
 /**
  * Species DSU (种类并查集 / 扩展域并查集)
  * 算法介绍: 将每个元素拆分成 K 个域，处理 "敌人的敌人是朋友" 或 "三类循环克制" 等问题。
+ * 模板参数: None
+ * Interface:
+ * 		SpeciesDSU(n, k): 初始化 n 个元素、每个元素 k 个域
+ * 		get_id(x, t): 获取元素 x 在第 t 个域的真实编号
+ * 		merge(u, v): 合并两个真实编号
+ * 		same(u, v): 判断两个真实编号是否同集合
+ * 		find(u): 返回真实编号 u 的代表元
  * Note:
- *      1. get_id(x, t): 获取元素 x 在第 t 个域的编号 (0 <= t < K)
- *      2. K=2: 朋友/敌人, K=3: 食物链 (A吃B, B吃C, C吃A)
+ * 		1. Time: 单次 find / merge / same 均摊 O(alpha(nk))
+ * 		2. Space: O(nk)
+ * 		3. 元素 x 使用 1-based indexing；域 type 使用 0-based indexing，满足 0 <= type < k
+ * 		4. 用法/技巧: K=2 常用于朋友/敌人；K=3 常用于食物链循环关系。
  */
 struct SpeciesDSU {
 	int n, k;            // n: 元素个数, k: 种类数
@@ -32,6 +41,8 @@ struct SpeciesDSU {
 	// 获取 x 在第 type 个域的编号 (0 <= type < k)
 	// 1-based indexing for x
 	int get_id(int x, int type) {
+		AST(1 <= x && x <= n);
+		AST(0 <= type && type < k);
 		return type * n + x;
 	}
 };

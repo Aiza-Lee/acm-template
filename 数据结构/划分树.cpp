@@ -15,6 +15,7 @@
  * 			4.1 只支持静态区间第 k 小，不支持修改。
  * 			4.2 若题目是区间第 k 小的在线查询，划分树常数通常优于主席树，但功能更单一。
  * 			4.3 构造时传入的数组需为 1-based，即 `a[1..n]` 有效，`a[0]` 留空。
+ * 			4.4 支持重复值；内部按目标中位数稳定划分以保证重复元素计数正确。
  */
 
 template<typename T = i64>
@@ -57,8 +58,7 @@ struct PartitionTree {
 		rep(i, l, r) if (val[dep][i] < x) same--;
 
 		int lp = l, rp = mid + 1;
-		cnt[dep][l - 1] = 0;
-		int s = 0;
+		int base = cnt[dep][l - 1], s = base;
 		rep(i, l, r) {
 			bool go_l = val[dep][i] < x || (val[dep][i] == x && same > 0);
 			if (go_l && val[dep][i] == x) same--;
@@ -78,8 +78,9 @@ struct PartitionTree {
 		if (l == r) return val[dep][l];
 		int mid = (l + r) >> 1;
 
-		int pre = cnt[dep][ql - 1];
-		int in_l = cnt[dep][qr] - pre;
+		int base = cnt[dep][l - 1];
+		int pre = cnt[dep][ql - 1] - base;
+		int in_l = cnt[dep][qr] - cnt[dep][ql - 1];
 		if (k <= in_l) {
 			int nql = l + pre;
 			int nqr = nql + in_l - 1;

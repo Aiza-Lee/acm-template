@@ -19,7 +19,9 @@
  * 		1. Time: Build O(N log N), Query O(1)
  * 		2. Space: O(N log N)
  * 		3. 1-based indexing, a[0] 预留不用
- * 		4. 用法/技巧: merge 建议传无状态 lambda / functor，避免 std::function 常数
+ * 		4. 用法/技巧:
+ * 			4.1 要求 merge 满足幂等性，如 min / max / gcd；普通求和不适用 O(1) 双块查询。
+ * 			4.2 merge 建议传无状态 lambda / functor，避免 std::function 常数。
  */
 template<typename Merge, typename T>
 concept STMerge = requires(Merge merge, const T& x, const T& y) {
