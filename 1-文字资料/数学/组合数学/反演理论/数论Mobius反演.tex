@@ -1,0 +1,85 @@
+\textbf{数论 Möbius 反演}
+
+\textbf{1. Möbius 函数}
+\[
+\mu(n)=
+\begin{cases}
+1 & n=1,\\
+0 & n\text{ 含平方因子},\\
+(-1)^k & n\text{ 为 }k\text{ 个不同素数的乘积}.
+\end{cases}
+\]
+
+\textbf{2. 核心恒等式}
+\[
+\sum_{d\mid n}\mu(d)=[n=1].
+\]
+写成 Dirichlet 卷积：$\mu * 1 = \varepsilon$。
+
+\textbf{3. 反演公式}
+
+$g = f * 1$ 两边同卷 $\mu$：
+\[
+g * \mu = f * 1 * \mu = f * \varepsilon = f,
+\]
+展开得\textbf{整除型}：
+\[
+g(n)=\sum_{d\mid n}f(d)
+\quad\Longleftrightarrow\quad
+f(n)=\sum_{d\mid n}\mu\!\left(\frac{n}{d}\right)g(d).
+\]
+对偶的\textbf{倍数型}（$N$ 为上界）：
+\[
+g(n)=\sum_{n\mid d,\ d\le N}f(d)
+\quad\Longleftrightarrow\quad
+f(n)=\sum_{n\mid d,\ d\le N}\mu\!\left(\frac{d}{n}\right)g(d).
+\]
+
+\textbf{4. 记号与常用函数}
+
+Dirichlet 卷积：$(f*g)(n)=\sum_{d\mid n}f(d)g(n/d)$。逐点乘：$(f\cdot g)(n)=f(n)g(n)$。二者不可混淆。
+
+\[
+\begin{array}{c|c}
+\text{函数} & \text{定义} \\ \hline
+1(n)      & 1 \\
+\varepsilon(n) & [n=1] \quad\text{(Dirichlet 卷积单位元)} \\
+\text{id}_k(n) & n^k,\qquad \text{id}=\text{id}_1 \\
+\varphi(n)& \sum_{i=1}^n[\gcd(i,n)=1] \quad\text{(Euler 函数)} \\
+d(n)      & \sum_{d\mid n}1 \quad\text{(约数个数)} \\
+\sigma_k(n) & \sum_{d\mid n}d^k,\qquad \sigma=\sigma_1 \quad\text{(约数幂和)}
+\end{array}
+\]
+
+以上函数均为积性函数；$\mu$、$\varphi$、$d$、$\sigma$ 均可线性筛预处理。
+
+\textbf{5. Dirichlet 卷积恒等式}
+
+\[
+\begin{aligned}
+\mu * 1 &= \varepsilon, &
+\varphi * 1 &= \text{id}, \\
+1 * 1   &= d, &
+\text{id}_k * 1 &= \sigma_k.
+\end{aligned}
+\]
+
+四条恒等式均形如 $g = f * 1$，由第 3 节直接反演得 $f = g * \mu$：
+\[
+\varepsilon * \mu = \mu,\qquad
+\varphi = \mu * \text{id},\qquad
+1 = d * \mu,\qquad
+\text{id}_k = \sigma_k * \mu.
+\]
+其中 $\varphi = \mu * \text{id}$ 即 Euler 反演，$\varphi(n)=\sum_{d\mid n}\mu(d)\cdot n/d$。
+
+更一般地，若 $h$ 完全积性，则 $h$ 在 Dirichlet 卷积下的逆为 $\mu\cdot h$（逐点乘），
+故 $g = f * h$ 可反演为 $f = g * (\mu\cdot h)$。
+例如 $h=\text{id}_k$ 完全积性，$g = f * \text{id}_k$ 的反演为 $f = g * (\mu\cdot\text{id}_k)$。
+
+\textbf{快记}
+\begin{itemize}
+\item $\mu * 1 = \varepsilon$ 是一切反演的根：$\mu$ 就是 $1$ 的 Dirichlet 逆元，"卷了 $1$ 就用卷 $\mu$ 消掉"。
+\item 所有 $f * 1 = g$ 形式的恒等式都自然给出 $f = g * \mu$，无需单独记忆反演方向。
+\item $\mu\cdot h$（逐点乘）是完全积性函数 $h$ 的 Dirichlet 逆元；$h=1$ 时退化为 $\mu$ 自身。
+\end{itemize}
