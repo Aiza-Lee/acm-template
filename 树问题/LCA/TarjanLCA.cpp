@@ -34,8 +34,8 @@ struct TarjanLCA {
 		std::iota(p.begin(), p.end(), 0);
 	}
 
-	int find(int x) {
-		return p[x] == x ? x : p[x] = find(p[x]);
+	int _find(int x) {
+		return p[x] == x ? x : p[x] = _find(p[x]);
 	}
 
 	void add_query(int u, int v) {
@@ -48,20 +48,20 @@ struct TarjanLCA {
 		ans.assign(q_cnt, -1);
 		vis.assign(G.n + 1, 0);
 		std::iota(p.begin(), p.end(), 0);
-		dfs(root);
+		_dfs(root);
 		return ans;
 	}
 
-	void dfs(int u) {
+	void _dfs(int u) {
 		vis[u] = 1;
 		for (int v : G.adj[u]) {
 			if (vis[v]) continue; // Assuming tree, child v
-			dfs(v);
+			_dfs(v);
 			p[v] = u; // Union v into u
 		}
 		for (auto& q : queries[u]) {
 			if (vis[q.v]) { // If other endpoint visited, their LCA is find(q.v)
-				ans[q.id] = find(q.v);
+				ans[q.id] = _find(q.v);
 			}
 		}
 	}
