@@ -1,36 +1,33 @@
 #include "aizalib.h"
 
 /**
- * Dynamic Matrix (动态矩阵)
- * 算法介绍:
- * 		支持运行期确定维度的矩阵模板，底层使用一维 std::vector 存储以保证内存连续性。
- * 		适用于题目给定的 N 较大或不固定，无法通过编译期常量指定的情况。
- * 
+ * Matrix (动态矩阵)
  * 模板参数:
- * 		[T]: 元素类型 (e.g. i64, double, Mint)
- * 
+ * 		[T]: 元素类型
  * Interface:
- * 		Matrix(r, c): 构造 r 行 c 列的零矩阵
- * 		static Identity(n): 构造 n*n 单位矩阵
- * 		flatten(): 返回底层 vector 引用
- * 
+ * 		Matrix(r, c)        // r 行 c 列零矩阵
+ * 		Matrix(r, c, val)   // 填充矩阵
+ * 		Matrix(r, c, data)  // 从 C 数组构造
+ * 		static Identity(n)  // n*n 单位矩阵
+ * 		transpose()         // 转置
+ * 		det()               // 行列式 (需方阵)
+ * 		inverse()           // 逆矩阵 (需方阵)
  * Note:
- * 		1. 乘法优化采用了 i-k-j 循环序以利用缓存友好性。
- * 		2. 重载了 [] 运算符，支持 m[i][j] 访问方式。
+ * 		1. 乘法采用 i-k-j 循环序
+ * 		2. det()/inverse() 对浮点类型使用主元消元，非浮点类型使用非零判断
+ * 		3. det()/inverse() 需 T 支持除法和 std::abs (浮点) / != T(0) (非浮点)
  */
 template<typename T>
 struct Matrix {
 	int r, c;
 	std::vector<T> data;
 
-	// 构造函数：r行c列，默认值为0
 	Matrix(int r, int c, T val = T()) : r(r), c(c), data(r * c, val) {}
+	Matrix(int r, int c, const T* ptr) : r(r), c(c), data(ptr, ptr + r * c) {}
 
-	// 支持 mat[i][j] 访问
 	      T* operator[](int i)       { return &data[i * c]; }
 	const T* operator[](int i) const { return &data[i * c]; }
 
-	// 构造单位矩阵
 	static Matrix Identity(int n) {
 		Matrix res(n, n);
 		rep(i, 0, n - 1) res[i][i] = T(1);
@@ -64,13 +61,82 @@ struct Matrix {
 	Matrix operator^(i64 k) const {
 		AST(r == c);
 		Matrix res = Identity(r), base = *this;
-		for (; k; k >>= 1, base *= base) if (k & 1) res *= base;
+		for (; k; k >>= 1, base = base * base) if (k & 1) res = res * base;
 		return res;
 	}
 
 	Matrix& operator+=(const Matrix& rhv) { return *this = *this + rhv; }
 	Matrix& operator-=(const Matrix& rhv) { return *this = *this - rhv; }
 	Matrix& operator*=(const Matrix& rhv) { return *this = *this * rhv; }
+	Matrix& operator*=(T val) {
+		rep(i, 0, r * c - 1) data[i] *= val;
+		return *this;
+	}
+
+	Matrix transpose() const {
+		Matrix res(c, r);
+		rep(i, 0, r - 1) rep(j, 0, c - 1) res[j][i] = (*this)[i][j];
+		return res;
+	}
+
+	T det() const {
+		AST(r == c);
+		Matrix tmp = *this;
+		T res = 1;
+		rep(i, 0, r - 1) {
+			int pivot = i;
+			rep(j, i + 1, r - 1) {
+				if constexpr (std::is_floating_point_v<T>) {
+					if (std::abs(tmp[j][i]) > std::abs(tmp[pivot][i])) pivot = j;
+				} else {
+					if (tmp[j][i] != T(0) && tmp[pivot][i] == T(0)) pivot = j;
+				}
+			}
+			if (tmp[pivot][i] == T(0)) return T(0);
+			if (pivot != i) {
+				rep(k, i, r - 1) std::swap(tmp[i][k], tmp[pivot][k]);
+				res = -res;
+			}
+			res *= tmp[i][i];
+			T inv = T(1) / tmp[i][i];
+			rep(j, i + 1, r - 1) {
+				T mul = tmp[j][i] * inv;
+				rep(k, i, r - 1) tmp[j][k] -= mul * tmp[i][k];
+			}
+		}
+		return res;
+	}
+
+	Matrix inverse() const {
+		AST(r == c);
+		int n = r;
+		Matrix tmp(n, 2 * n);
+		rep(i, 0, n - 1) {
+			rep(j, 0, n - 1) tmp[i][j] = (*this)[i][j];
+			tmp[i][i + n] = T(1);
+		}
+		rep(i, 0, n - 1) {
+			int pivot = i;
+			rep(j, i + 1, n - 1) {
+				if constexpr (std::is_floating_point_v<T>) {
+					if (std::abs(tmp[j][i]) > std::abs(tmp[pivot][i])) pivot = j;
+				}
+			}
+			if (tmp[pivot][i] == T(0)) return Matrix(0, 0);  // singular
+			if (pivot != i)
+				rep(k, 0, 2 * n - 1) std::swap(tmp[i][k], tmp[pivot][k]);
+			T div = tmp[i][i];
+			rep(k, 0, 2 * n - 1) tmp[i][k] /= div;
+			rep(j, 0, n - 1) {
+				if (j == i) continue;
+				T f = tmp[j][i];
+				rep(k, 0, 2 * n - 1) tmp[j][k] -= f * tmp[i][k];
+			}
+		}
+		Matrix res(n, n);
+		rep(i, 0, n - 1) rep(j, 0, n - 1) res[i][j] = tmp[i][j + n];
+		return res;
+	}
 
 	friend std::ostream& operator<<(std::ostream& os, const Matrix& mat) {
 		rep(i, 0, mat.r - 1) {
