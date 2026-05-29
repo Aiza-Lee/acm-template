@@ -21,9 +21,10 @@
  * 		3. 1-based indexing.
  * 		4. 用法/技巧:
  * 			4.1 `Info` 需要支持 `operator+`，用于合并左右儿子信息。
- * 			4.2 `Tag` 需要支持 `merge(rhs)`、`has_value()`、`apply_to(Info&)`。
+ * 			4.2 `Tag` 需要支持 `merge(rhs)`、`has_value()`、`apply_to(Info&, int l, int r)`。
  * 			4.3 `find_first / find_last` 中的 `pred(info)` 应满足单调性，否则二分结果没有意义。
  * 			4.4 当前二分不维护前缀累加器；适合用 `max/min/exists` 等区间信息判定，前缀和二分需另写带 accumulator 的版本。
+ * 			4.5 不需要懒标记时可直接用 `SegNullTag<Info>`，或 `SegTreePoint<Info>` 别名。
  */
 
 template<class Info>
@@ -32,10 +33,17 @@ concept SegInfo = std::default_initializable<Info> && requires(const Info& a, co
 };
 
 template<class Tag, class Info>
-concept SegTag = std::default_initializable<Tag> && requires(Tag tag, const Tag& rhs, Info& info) {
+concept SegTag = std::default_initializable<Tag> && requires(Tag tag, const Tag& rhs, Info& info, int l, int r) {
 	{ rhs.has_value() } -> std::convertible_to<bool>;
 	{ tag.merge(rhs) } -> std::same_as<void>;
-	{ rhs.apply_to(info) } -> std::same_as<void>;
+	{ rhs.apply_to(info, l, r) } -> std::same_as<void>;
+};
+
+template<class Info>
+struct SegNullTag {
+	bool has_value() const { return false; }
+	void merge(const SegNullTag&) {}
+	void apply_to(Info&, int, int) const {}
 };
 
 template<SegInfo Info, class Tag>
@@ -52,6 +60,7 @@ struct SegTree {
 
 	SegTree(int n) : n(n), info(4 * n + 5), tag(4 * n + 5) {
 		AST(n >= 1);
+		_build(std::vector<Info>(n + 1), 1, 1, n);
 	}
 
 	SegTree(const std::vector<Info>& init) : SegTree((int)init.size() - 1) {
@@ -106,24 +115,25 @@ struct SegTree {
 		info[p] = info[p << 1] + info[p << 1 | 1];
 	}
 
-	void _apply(int p, const Tag& v) {
-		v.apply_to(info[p]);
+	void _apply(int p, const Tag& v, int l, int r) {
+		v.apply_to(info[p], l, r);
 		tag[p].merge(v);
 	}
 
-	void _push(int p) {
+	void _push(int p, int l, int r) {
 		if (!tag[p].has_value()) return;
-		_apply(p << 1, tag[p]);
-		_apply(p << 1 | 1, tag[p]);
+		int mid = (l + r) >> 1;
+		_apply(p << 1, tag[p], l, mid);
+		_apply(p << 1 | 1, tag[p], mid + 1, r);
 		tag[p] = Tag();
 	}
 
 	void _modify(int ql, int qr, const Tag& v, int p, int l, int r) {
 		if (ql <= l && r <= qr) {
-			_apply(p, v);
+			_apply(p, v, l, r);
 			return;
 		}
-		_push(p);
+		_push(p, l, r);
 		int mid = (l + r) >> 1;
 		if (ql <= mid) _modify(ql, qr, v, LS);
 		if (qr > mid) _modify(ql, qr, v, RS);
@@ -136,7 +146,7 @@ struct SegTree {
 			tag[p] = Tag();
 			return;
 		}
-		_push(p);
+		_push(p, l, r);
 		int mid = (l + r) >> 1;
 		if (pos <= mid) _set(pos, v, LS);
 		else _set(pos, v, RS);
@@ -145,7 +155,7 @@ struct SegTree {
 
 	Info _query(int ql, int qr, int p, int l, int r) {
 		if (ql <= l && r <= qr) return info[p];
-		_push(p);
+		_push(p, l, r);
 		int mid = (l + r) >> 1;
 		if (qr <= mid) return _query(ql, qr, LS);
 		if (ql > mid) return _query(ql, qr, RS);
@@ -156,7 +166,7 @@ struct SegTree {
 	int _find_first(int ql, int qr, Pred pred, int p, int l, int r) {
 		if (ql <= l && r <= qr && !pred(info[p])) return -1;
 		if (l == r) return l;
-		_push(p);
+		_push(p, l, r);
 		int mid = (l + r) >> 1;
 		if (ql <= mid) {
 			int res = _find_first(ql, qr, pred, LS);
@@ -170,7 +180,7 @@ struct SegTree {
 	int _find_last(int ql, int qr, Pred pred, int p, int l, int r) {
 		if (ql <= l && r <= qr && !pred(info[p])) return -1;
 		if (l == r) return l;
-		_push(p);
+		_push(p, l, r);
 		int mid = (l + r) >> 1;
 		if (qr > mid) {
 			int res = _find_last(ql, qr, pred, RS);
@@ -183,6 +193,9 @@ struct SegTree {
 #undef LS
 #undef RS
 };
+
+template<SegInfo Info>
+using SegTreePoint = SegTree<Info, SegNullTag<Info>>;
 
 /*
 // --- Info & Tag Template ---
@@ -209,8 +222,8 @@ struct Tag {
 		// add = add + rhs.add;
 	}
 
-	void apply_to(Info& info) const {
-		// info.sum += add * info.len;
+	void apply_to(Info& info, int l, int r) const {
+		// info.sum += add * (r - l + 1);
 	}
 };
 */

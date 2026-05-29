@@ -31,8 +31,8 @@ struct Tag {
 		mul = (mul * t.mul) % MOD;
 		add = (add * t.mul + t.add) % MOD;
 	}
-	void apply_to(Info& info) const {
-		info.sum = (info.sum * mul + info.len * add) % MOD;
+	void apply_to(Info& info, int l, int r) const {
+		info.sum = (info.sum * mul + (r - l + 1) * add) % MOD;
 	}
 };
 

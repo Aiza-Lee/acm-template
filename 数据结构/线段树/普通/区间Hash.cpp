@@ -44,8 +44,8 @@ struct Tag {
 	u64 add = 0;
 	bool has_value() const { return add != 0; }
 	void merge(const Tag& t) { add += t.add; }
-	void apply_to(Info& info) const {
-		info.hash += add * H_PRE[info.len];
+	void apply_to(Info& info, int l, int r) const {
+		info.hash += add * H_PRE[r - l + 1];
 	}
 };
 
