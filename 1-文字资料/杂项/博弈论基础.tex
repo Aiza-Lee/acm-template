@@ -1,0 +1,84 @@
+\textbf{公平组合游戏 (Impartial Combinatorial Games)}
+
+一个\textbf{公平组合游戏}满足：
+\begin{itemize}
+\item 两个玩家轮流操作，且双方可执行的移动集合完全相同（公平性）。
+\item 完全信息，无随机因素。
+\item \textbf{正常游戏规则} (normal play convention)：无法移动的一方判负。
+\end{itemize}
+
+游戏状态及其转移关系构成一棵有向图：状态为节点，一次合法移动为一条有向边。终态（无出边的节点）为必败态 (P-position)。
+
+\textbf{SG 定理 (Sprague-Grundy Theorem)}
+
+\textbf{SG 函数定义}
+\[
+\operatorname{SG}(v)=\operatorname{mex}\{\operatorname{SG}(w)\mid v\to w\}
+\]
+其中 $\operatorname{mex}(S)$ 为最小非负整数 $x$ 使得 $x\notin S$。
+
+\textbf{性质}
+\begin{itemize}
+\item $\operatorname{SG}(v)=0$ $\iff$ $v$ 为\textbf{必败态} (P-position)。
+\item $\operatorname{SG}(v)>0$ $\iff$ $v$ 为\textbf{必胜态} (N-position)。
+\item 游戏和 (sum / disjunctive sum) 的 SG 值：
+  \[
+  \operatorname{SG}\left( \sum_{i=1}^{k} G_i \right) = \bigoplus_{i=1}^{k} \operatorname{SG}(G_i) = \operatorname{SG}(G_1) \oplus \operatorname{SG}(G_2) \oplus \cdots \oplus \operatorname{SG}(G_k)
+  \]
+  其中 $\oplus$ 为按位异或 (XOR)。
+\end{itemize}
+
+\textbf{Nim 游戏}
+
+$k$ 堆石子，每步任选一堆取走任意正整数颗。无法移动者输。
+
+\textbf{标准 Nim 的 SG 值}
+一堆大小为 $n$ 的石子的 SG 值为 $n$（正常规则下）。
+
+\textbf{Bouton 定理}
+先手必胜当且仅当所有堆大小的异或非零：
+\[
+a_1\oplus a_2\oplus\cdots\oplus a_k\neq 0.
+\]
+
+\textbf{Misère Nim (反常规则)}
+无法移动者\textbf{赢}。策略几乎与正常规则相同，唯一的例外：
+\begin{itemize}
+\item 若所有堆大小均为 $1$：先手必胜当且仅当堆数 $k$ 为偶数。
+\item 否则：与正常 Nim 策略完全一致（保持异或非零）。
+\end{itemize}
+
+\textbf{常见游戏的 SG 值}
+
+\textbf{减法游戏 (Subtraction Game)}
+每次可取的石子数属于固定集合 $S$。SG 序列\textbf{最终周期}：
+\[
+\operatorname{SG}(n)=\operatorname{mex}\{\,\operatorname{SG}(n-s)\mid s\in S,\;s\le n\,\}.
+\]
+周期以 $n$ 的某一上限后开始重复，可预处理前若干项后逐项递推。
+
+\textbf{Wythoff 游戏}
+两堆石子，每步可从一堆取任意颗，或从两堆取\textbf{相同}颗。必败态为
+\[
+(\lfloor k\phi\rfloor,\;\lfloor k\phi^2\rfloor),\qquad k=0,1,2,\dots
+\]
+其中 $\phi=\frac{1+\sqrt5}{2}$ 为黄金比例。
+
+\textbf{Kayles 游戏}
+一排瓶子，每次可击倒一个或两个相邻的瓶子。SG 值存在较小周期，可递推计算，周期长度约 $12$。
+
+\textbf{有向图游戏 (Games on DAGs)}
+
+若状态转移图是一张 DAG，可按拓扑序 DP 计算 SG 值：
+\[
+\operatorname{SG}[u]=\operatorname{mex}\{\,\operatorname{SG}[v]\mid v\in\operatorname{adj}[u]\,\},\qquad
+\text{按拓扑逆序计算（出度为 $0$ 者 SG 为 $0$）。}
+\]
+
+\textbf{Note}
+\begin{itemize}
+\item 一次 $\operatorname{mex}$ 计算可对后继 SG 值排序后扫描，复杂度 $O(k\log k)$，其中 $k$ 为后继数。若后继数很小可直接用布尔数组做到 $O(k+\operatorname{SG})$。
+\item 对于减法游戏等状态数较大的情况，预处理 SG 至所需 $n$ 即可，无需重现整个周期。
+\item SG 值通常很小：减法游戏中 SG 值多为 $O(\sqrt{n})$，许多常见游戏的 SG 值不会超过几十。
+\item 处理"多个子游戏的和"时，只需分别算每个子游戏的 SG，再异或得到整体结果。
+\end{itemize}

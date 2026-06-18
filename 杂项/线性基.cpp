@@ -83,3 +83,58 @@ struct RawLinearBasis {
 		return {true, ans};
 	}
 };
+
+/**
+ * 带时间戳的线性基
+ * 算法介绍: 在标准线性基上附加时间戳，支持按时间限制查询最大/最小异或值。
+ * 插入时若高位冲突，保留时间戳更大的基向量，将旧的消去高位后继续尝试插入低位，
+ * 保证每个位置的基向量在所有候选中有最大的时间戳。
+ * Interface:
+ *     TimedLinearBasis<N>::insert(x, t): 插入向量 x，时间戳为 t
+ *     TimedLinearBasis<N>::get_max(limit): 查询使用时间戳 <= limit 的基向量的最大异或值
+ *     TimedLinearBasis<N>::get_min(limit): 查询使用时间戳 <= limit 的基向量的最小非零异或值
+ * Note:
+ *     1. Time: 每次 insert/get_max/get_min O(N^2 / word_bits)
+ *     2. Space: O(N^2 / word_bits)
+ *     3. 常用于离线区间线性基查询（如 CF 1100F）：将元素按下标作为时间戳依次插入，
+ *        查询 [l, r] 时调用 get_max(r) 并额外检查基向量对应时间戳 >= l
+ *     4. insert 中 swap 操作与普通线性基的差异：if (time[i] < t) swap(p[i], x), swap(time[i], t);
+ */
+template <size_t N>
+struct TimedLinearBasis {
+	std::bitset<N> p[N];
+	int time[N]{};
+
+	bool insert(std::bitset<N> x, int t) {
+		per(i, N - 1, 0) {
+			if (x[i]) {
+				if (p[i].none()) {
+					p[i] = x;
+					time[i] = t;
+					return true;
+				}
+				if (time[i] < t) {
+					std::swap(p[i], x);
+					std::swap(time[i], t);
+				}
+				x ^= p[i];
+			}
+		}
+		return false;
+	}
+
+	std::bitset<N> get_max(int limit_t) {
+		std::bitset<N> res;
+		per(i, N - 1, 0) {
+			if (!res[i] && p[i].any() && time[i] <= limit_t) res ^= p[i];
+		}
+		return res;
+	}
+
+	std::bitset<N> get_min(int limit_t) {
+		rep(i, 0, N - 1) {
+			if (p[i].any() && time[i] <= limit_t) return p[i];
+		}
+		return {};
+	}
+};

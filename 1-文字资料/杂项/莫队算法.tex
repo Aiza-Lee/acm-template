@@ -1,0 +1,56 @@
+\textbf{算法介绍}
+莫队算法是一种离线处理区间查询的算法。核心思想是对查询重排，使指针在相邻查询间移动的总代价最优，将暴力的 $O(NQ)$ 降到 $O\!\left((N+Q)\sqrt{N}\right)$。
+
+适用场景：
+\begin{itemize}
+\item 询问可离线（预先读取所有查询并重排）。
+\item 已知 $[L,R]$ 的信息可 $O(1)$ 或 $O(\log N)$ 扩展到相邻区间。
+\item 典型问题：区间不同元素个数、众数、逆序对等。
+\end{itemize}
+
+\textbf{基本形式}
+将序列分为大小为 $B$ 的块。对查询 $(L,R)$ 按以下两关键字排序：
+\begin{itemize}
+\item 第一关键字：$L$ 所在块编号。
+\item 第二关键字：$R$。\textbf{奇偶优化}——奇编号块 $R$ 升序，偶编号块 $R$ 降序，使 $R$ 指针在相邻块间不必从末尾跳回开头。
+\end{itemize}
+维护指针 $l,r$，初始 $l=1,\,r=0$。按排序顺序处理每个查询，通过 \texttt{add}/\texttt{remove} 将 $[l,r]$ 调整为目标区间。
+
+\textbf{复杂度与块大小}
+设 $N$ 为序列长度，$Q$ 为查询数。左指针每查询同块内移动 $O(B)$、跨块时 $O(N)$；右指针每块至多扫整段一次。
+\begin{itemize}
+\item $B=\lfloor\sqrt{N}\rfloor$：复杂度 $O\!\left((N+Q)\sqrt{N}\right)$。
+\item $B=\lfloor N/\sqrt{Q}\rfloor$：复杂度 $O(N\sqrt{Q})$，当 $N,Q$ 量级差距较大时更优。
+\end{itemize}
+
+\textbf{带修莫队}
+查询间含单点修改时，加入时间维度形成三维莫队 $(L,R,t)$，每个查询记录其之前执行的修改次数。
+\begin{itemize}
+\item 块大小取 $B=N^{2/3}$，按 $(\mathrm{blk}_L,\,\mathrm{blk}_R,\,t)$ 三关键字排序（$R$ 仍可奇偶优化）。
+\item 时间指针通过 \texttt{apply(t)} 在当前位置应用或回滚一次修改。
+\item 复杂度 $O\!\left(N^{5/3}\right)$。
+\end{itemize}
+
+\textbf{树上莫队}
+将树上路径查询转化为序列上的区间问题。
+
+\textbf{出栈序（Euler Tour）。}对树 DFS，记录每点入栈位置 $in[u]$ 与出栈位置 $out[u]$，节点 $u$ 在序列中出现两次。
+
+\textbf{路径转区间。}设 $in[u]<in[v]$，则 $u$ 到 $v$ 的路径查询对应：若 $u=\operatorname{LCA}(u,v)$，区间为 $[in[u],in[v]]$；否则区间为 $[out[u],in[v]]$，并额外加入 $\operatorname{LCA}(u,v)$。序列中路径节点恰出现一次，非路径节点出现 $0$ 或 $2$ 次；维护 \texttt{vis} 数组，奇数次访问加入贡献、偶数次移除。
+
+\textbf{回滚莫队}
+\texttt{add} 容易但 \texttt{remove} 困难（或反之）时使用。
+
+\textbf{只增莫队。}按 $L$ 所在块分组，块内查询按 $R$ 升序处理：基准位置取该块右边界，$R$ 指针从基准单向右移（只增不删）；每个查询前，$L$ 指针从基准向左临时扩展到目标，回答后回滚 $L$ 方向的所有修改（通过保存被改变量旧值实现）。复杂度仍为 $O(N\sqrt{Q})$。
+
+\textbf{常见适用场景。}区间 $\operatorname{mex}$（加入易、删除难）、区间众数（删除时需知剩余最大频率）等。
+
+\textbf{Note}
+\begin{itemize}
+\item 莫队是离线询问的思想框架，具体实现高度依赖问题本身。
+\item 块大小可按 $N,Q$ 关系微调；差距较大时 $B=N/\sqrt{Q}$ 优于 $B=\sqrt{N}$。
+\item 比较器范例：\texttt{(blk[L]!=blk[L']\ ?\ blk[L]<blk[L']\ :\ (blk[L]\&1\ ?\ R<R'\ :\ R>R'))}。
+\item \texttt{add}/\texttt{remove} 宜内联或写为 lambda，避免函数调用开销。
+\item 带修莫队常数较大，$N\le 10^5$ 通常需卡常。
+\item 树上莫队的关键是节点出现两次的性质，\texttt{vis} 数组每次 toggle 即可。
+\end{itemize}

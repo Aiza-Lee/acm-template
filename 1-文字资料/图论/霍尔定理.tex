@@ -1,0 +1,55 @@
+\textbf{基本设置}
+设 $G=(L\cup R, E)$ 是二分图，对 $S\subseteq L$ 定义邻域 $N(S)=\{v\in R\mid \exists u\in S,\,(u,v)\in E\}$。匹配 $M$ 称为 $L$-\textbf{饱和匹配}（saturating matching）若 $L$ 中每点都被 $M$ 覆盖；若进一步 $|L|=|R|$，$M$ 即为\textbf{完美匹配}。
+
+\textbf{Hall 定理（Marriage Theorem）}
+二分图 $G$ 存在 $L$-饱和匹配，当且仅当 \textbf{Hall 条件} 成立：
+\[
+|N(S)|\ge |S|,\qquad \forall S\subseteq L.
+\]
+
+\textbf{必要性。}若 $M$ 是 $L$-饱和匹配，则 $S\subseteq L$ 在 $M$ 下单射进 $N(S)$，故 $|N(S)|\ge |S|$。
+
+\textbf{充分性（增广路反证）。}设 $M$ 为最大匹配但非 $L$-饱和。取未匹配点 $u\in L$，令 $L',R'$ 为从 $u$ 出发的交错路可达点集。由最大性，$R'$ 中每点都被匹配且匹配回 $L'\setminus\{u\}$，故 $|R'|=|L'|-1$。又 $N(L')\subseteq R'$，得 $|N(L')|\le |R'|=|L'|-1<|L'|$，违反 Hall。具体的构造算法即匈牙利算法。
+
+\textbf{缺陷版（Defect Version）}
+对任意二分图，最大匹配大小为
+\[
+\nu(G)=|L|-\max_{S\subseteq L}\bigl(|S|-|N(S)|\bigr).
+\]
+$d(G)=\max_{S}(|S|-|N(S)|)\ge 0$ 称为 $G$ 的\textbf{亏数}（deficiency），表示 $L$ 距饱和还差几条边。
+
+\textbf{König 定理（等价表述）}
+二分图中最大匹配数等于最小点覆盖数：$\nu(G)=\tau(G)$。
+\begin{itemize}
+\item Hall 与 König 在二分图上互为推论（同为最大流–最小割在 $0/1$ 解上的具体化）。
+\item 推论：二分图最大独立集 $=|V|-\nu(G)$。
+\end{itemize}
+
+\textbf{常见推论}
+
+\textbf{$k$-正则二分图。}若 $G$ 是 $k$-正则（$k\ge 1$）的二分图，则必有 $|L|=|R|$ 且存在完美匹配；进一步，其边集可分解为 $k$ 个互不相交的完美匹配（König 边染色定理）。证明：对任意 $S\subseteq L$，$k|S|=e(S,N(S))\le k|N(S)|$，故 $|N(S)|\ge|S|$，Hall 条件自动成立。
+
+\textbf{系统不同代表元（SDR）。}给定有限集族 $A_1,\dots,A_n$，存在两两不同的 $x_1,\dots,x_n$ 使 $x_i\in A_i$，当且仅当
+\[
+\Bigl|\bigcup_{i\in I}A_i\Bigr|\ge |I|,\qquad \forall I\subseteq\{1,\dots,n\}.
+\]
+对应二分图：左侧为集合 $A_i$，右侧为元素，$A_i$ 与其所含元素连边，存在 SDR $\iff$ 存在 $L$-饱和匹配。
+
+\textbf{Latin 方阵补全。}$n\times n$ 方阵的前 $r$ 行（$r<n$）已构成部分 Latin 方阵时，第 $r+1$ 行总可填充以保持 Latin 性质。证明：以列为 $L$、可填值为 $R$，连边 $(j,v)$ 当且仅当 $v$ 不在第 $j$ 列已出现；此图为 $(n-r)$-正则二分图，由上面推论必有完美匹配。
+
+\textbf{应用范式}
+\begin{itemize}
+\item 验证 Hall 条件需枚举 $S$（指数级），实际判定存在性应直接用匈牙利 / HopcroftKarp 求最大匹配。
+\item 当题目具有结构性（正则、对称、单调子集族）时，Hall 可给出 $O(1)$ 或 $O(n)$ 的存在性证明，免去算法实现。
+\item 匈牙利算法在最后一次增广失败时，由未匹配 $L$ 顶点出发的交错可达点集 $L'$ 即给出亏数最紧子集 $S^*=L'$，$d(G)=|L'|-|N(L')|$。
+\item 拓展：判断"删除某些边/点后是否仍有完美匹配"——常用 Hall 缺陷版的单调性（增加 $L$ 中边只会让 $|N(S)|$ 不减）。
+\end{itemize}
+
+\textbf{Note}
+\begin{itemize}
+\item Hall 只判存在性；匹配的构造仍需匈牙利（$O(VE)$）或 HopcroftKarp（$O(E\sqrt{V})$）。
+\item 缺陷版的典型应用：去掉若干 $L$ 点能否完美匹配、最少需补几条边以达到完美匹配。
+\item 一般图无 Hall 类对应：用 Tutte 定理——$G$ 有完美匹配 $\iff$ 对所有 $S\subseteq V$，$o(G-S)\le |S|$（$o$ 表奇连通分量数）。
+\item 带权场景走 KM 算法或 LP 对偶；一般图随机化判定可用 Tutte 矩阵（行列式 $\not\equiv 0 \iff$ 有完美匹配）。
+\item Hall 条件本质是"流量充分"——构造源汇网络后即为最大流 = $|L|$ 的充要条件。
+\end{itemize}
