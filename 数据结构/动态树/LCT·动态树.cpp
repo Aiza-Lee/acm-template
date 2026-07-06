@@ -1,7 +1,8 @@
 #include "aizalib.h"
 /**
  * Link-Cut Tree (LCT)
- * 算法介绍: 用 Splay 维护动态森林的实链，支持换根、连边、断边、点权修改与路径查询。
+ * 算法介绍: 用 Splay 维护动态森林的实链，支持换根、连边、断边、点权修改、
+ *          路径查询、子树大小查询、连通块大小查询与 LCA 查询。
  * 模板参数: None
  * Interface:
  * 		LCT(n), init(n): 初始化 1...n 个点的动态森林
@@ -14,17 +15,23 @@
  * 		connected(x, y): 判断 x, y 是否连通
  * 		query_sum(x, y): 查询路径 x -> y 上的点权和
  * 		query_size(x, y): 查询路径 x -> y 上的点数
+ * 		query_component_size(x): 返回 x 所在连通块的总点数
+ * 		query_subtree_size(root, x): 以 root 为整棵树根时，返回 x 的子树大小
+ * 		lca(x, y): 返回 x, y 的最近公共祖先，若不连通则返回 0
  * Note:
  * 		1. Time: 单次均摊 O(log N)
  * 		2. Space: O(N)
  * 		3. 结点编号采用 1-based，使用前先 `init(n)`
  * 		4. 用法/技巧: `link/cut` 返回操作是否成功，`query_*` 要求两点连通
  * 		5. 用法/技巧: 当前维护点权路径和；若要维护边权，可把每条边拆成虚点
+ * 		6. 用法/技巧: query_subtree_size 需指定整棵树的根，内部会 make_root(root)
+ * 		7. 用法/技巧: query_component_size 内部会 make_root(x)，会改变树根
+ * 		8. 用法/技巧: lca 通过两次 access 实现，会修改辅助树结构但不影响正确性
  */
 struct LCT {
 private:
 	int n = 0;
-	std::vector<int> fa, siz, stk;
+	std::vector<int> fa, siz, cnt, stk, virt_siz;
 	std::vector<std::array<int, 2>> ch;
 	std::vector<i64> val, sum;
 	std::vector<char> rev;
@@ -36,7 +43,8 @@ private:
 	}
 	void _push_up(int p) {
 		auto [l, r] = ch[p];
-		siz[p] = siz[l] + siz[r] + 1;
+		siz[p] = siz[l] + siz[r] + virt_siz[p] + 1;
+		cnt[p] = cnt[l] + cnt[r] + 1;
 		sum[p] = sum[l] + sum[r] + val[p];
 	}
 	void _apply_rev(int p) {
@@ -79,12 +87,16 @@ private:
 			_rotate(p);
 		}
 	}
-	void _access(int p) {
-		for (int q = 0; p; q = p, p = fa[p]) {
+	int _access(int p) {
+		int q = 0;
+		for (; p; q = p, p = fa[p]) {
 			_splay(p);
+			virt_siz[p] += siz[ch[p][1]];
 			ch[p][1] = q;
+			virt_siz[p] -= siz[q];
 			_push_up(p);
 		}
+		return q;
 	}
 
 public:
@@ -97,12 +109,15 @@ public:
 		fa.assign(n + 1, 0);
 		ch.assign(n + 1, {0, 0});
 		siz.assign(n + 1, 1);
+		cnt.assign(n + 1, 1);
+		virt_siz.assign(n + 1, 0);
 		val.assign(n + 1, 0);
 		sum.assign(n + 1, 0);
 		rev.assign(n + 1, 0);
 		stk.clear();
 		stk.reserve(n + 1);
 		siz[0] = 0;
+		cnt[0] = 0;
 	}
 	void make_root(int p) {
 		_check(p);
@@ -134,7 +149,11 @@ public:
 		_check(x), _check(y);
 		make_root(x);
 		if (find_root(y) == x) return 0;
+		_access(y);
+		_splay(y);
 		fa[x] = y;
+		virt_siz[y] += siz[x];
+		_push_up(y);
 		return 1;
 	}
 	bool cut(int x, int y) {
@@ -160,6 +179,24 @@ public:
 	int query_size(int x, int y) {
 		AST(connected(x, y));
 		split(x, y);
-		return siz[y];
+		return cnt[y];
+	}
+	int query_component_size(int x) {
+		_check(x);
+		make_root(x);
+		return siz[x];
+	}
+	int query_subtree_size(int root, int x) {
+		_check(root), _check(x);
+		make_root(root);
+		_access(x);
+		_splay(x);
+		return virt_siz[x] + 1;
+	}
+	int lca(int x, int y) {
+		_check(x), _check(y);
+		if (!connected(x, y)) return 0;
+		_access(x);
+		return _access(y);
 	}
 };

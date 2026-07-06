@@ -1,0 +1,100 @@
+\textbf{Link-Cut Tree (LCT) — 动态树}
+
+\textbf{核心思想}
+LCT 用 Splay 维护动态森林，将每棵树分解为若干条\textbf{实链 (Preferred Path)}，每条实链用一棵 Splay（称为辅助树，Auxiliary Tree）按深度为键值维护。非实链上的边称为\textbf{虚边 (Virtual Edge)}。
+
+\textbf{基本概念}
+\begin{itemize}
+    \item \textbf{实边/虚边}：每个结点至多有一个实儿子（preferred child）。实边连向实儿子，其余为虚边。实边构成实链，虚边连接不同实链的 Splay 树根。
+    \item \textbf{路径父结点 (Path-Parent)}：Splay 树根结点的 $\text{fa}$ 指针指向其在原树中父结点（虚边），而非 Splay 树根时 $\text{fa}$ 指向 Splay 树中的父结点。
+    \item \textbf{\_is\_root(p)}：判断 $p$ 是否为其 Splay 树的根（即 $\text{ch}[\text{fa}[p]][0] \neq p \land \text{ch}[\text{fa}[p]][1] \neq p$）。
+    \item \textbf{反转标记}：用于换根（make\_root），将路径上下翻转。Splay 中需要 push\_down 下传。
+\end{itemize}
+
+\textbf{核心操作}
+
+\textbf{1. access(p)} — 核心操作，均摊 $O(\log N)$
+将 $p$ 到原树根的路径变为一条实链（即把路径上所有边变为实边，$p$ 的实儿子断开）。
+\begin{verbatim}
+int access(int p) {
+    for (int q = 0; p; q = p, p = fa[p]) {
+        splay(p);
+        virt_siz[p] += siz[ch[p][1]];  // 旧实儿子 → 虚
+        ch[p][1] = q;
+        virt_siz[p] -= siz[q];         // 新实儿子 → 实
+        push_up(p);
+    }
+    return q;  // 最后处理的结点，用于 LCA
+}
+\end{verbatim}
+每次将 $p$ Splay 到辅助树根，把右儿子换成上一步的结点 $q$。旧的右儿子变为虚儿子，$q$ 变为实儿子。
+
+\textbf{2. make\_root(p)} — 换根}
+$\text{access}(p); \text{splay}(p); \text{apply\_rev}(p)$ —— 将 $p$ 到原根的路径反转，使 $p$ 成为新根。
+
+\textbf{3. find\_root(p)} — 找原树根}
+$\text{access}(p); \text{splay}(p)$，然后一路向左走到 Splay 的最左结点（中序遍历第一个，即原树根），最后 $\text{splay}$ 该结点以保证均摊。
+
+\textbf{4. split(x, y)} — 提取路径}
+$\text{make\_root}(x); \text{access}(y); \text{splay}(y)$ —— 此时 $y$ 的 Splay 子树包含路径 $x \to y$ 上的所有结点。
+
+\textbf{5. link(x, y)} — 连边}
+$\text{make\_root}(x)$；若不连通，则 $\text{access}(y); \text{splay}(y)$，设 $\text{fa}[x] = y$，并更新 $\text{virt\_siz}[y] \mathrel{+}= \text{siz}[x]$。
+
+\textbf{6. cut(x, y)} — 断边}
+$\text{split}(x, y)$；若 $\text{ch}[y][0] = x \land \text{ch}[x][1] = 0$（即 $x$ 与 $y$ 直接在路径上相邻），则断开。
+
+\textbf{虚子树信息维护（子树大小查询）}
+
+引入 $\text{virt\_siz}[p]$：$p$ 的所有虚儿子的子树大小之和。
+
+\begin{itemize}
+    \item \textbf{push\_up}：$\text{siz}[p] = \text{siz}[L] + \text{siz}[R] + \text{virt\_siz}[p] + 1$
+    \item \textbf{access 时更新}：换实儿子时，旧实儿子 $\to$ 虚（加 $\text{virt\_siz}$），新实儿子 $\to$ 实（减 $\text{virt\_siz}$）。
+    \item \textbf{link 时更新}：新连的子树作为虚儿子，需 $\text{virt\_siz}[y] \mathrel{+}= \text{siz}[x]$。
+\end{itemize}
+
+基于此可实现：
+\begin{itemize}
+    \item \textbf{连通块大小}：$\text{make\_root}(x)$ 后返回 $\text{siz}[x]$
+    \item \textbf{子树大小}：先固定树根 $\text{make\_root}(root)$，再 $\text{access}(x); \text{splay}(x)$，返回 $\text{virt\_siz}[x] + 1$
+\end{itemize}
+
+\textbf{LCA 查询}
+
+标准做法：$\text{access}(x); \text{return access}(y);$
+\begin{itemize}
+    \item 第一次 $\text{access}(x)$ 将 $\text{root} \to x$ 变为实链
+    \item 第二次 $\text{access}(y)$ 从 $y$ 向上走，当走到与 $x$ 路径的交点时（即 LCA），该结点 Splay 后 $\text{fa}$ 变为 $0$，循环结束，返回该结点
+\end{itemize}
+
+\textbf{复杂度分析（均摊）}
+
+LCT 的复杂度来自两部分：
+\begin{enumerate}
+    \item \textbf{Splay 均摊}：单次 $\text{access}$ 中每次 Splay 均摊 $O(\log N)$（Splay 的均摊界）
+    \item \textbf{实边切换次数}：每次 $\text{access}$ 中切换实儿子的次数等于路径上虚边数，而虚边数受 Heavy-Light 性质的约束——每条路径上最多 $O(\log N)$ 条虚边。这可以通过势能函数 $R = \sum \log \text{siz}$ 来证明。
+    \item \textbf{结论}：所有操作（link, cut, access, make\_root, query）均摊 $O(\log N)$。
+\end{enumerate}
+
+\textbf{常见扩展}
+
+\begin{itemize}
+    \item \textbf{维护边权}：把每条边拆成一个虚点，点权为边权，路径查询时经过虚点即经过边。
+    \item \textbf{维护子树最值/子树和}：在 $\text{virt\_siz}$ 的基础上，增加 $\text{virt\_max}$ / $\text{virt\_sum}$ 等字段，类似地维护虚子树信息。套路一致：access/link 时更新虚信息，push\_up 时合并实和虚的信息。
+    \item \textbf{动态维护直径/重心}：可通过维护虚子树信息 + Splay 树上二分实现。
+    \item \textbf{LCT 配合最小生成树}：动态维护 MST，删边时用 LCT 找环上最大边。
+\end{itemize}
+
+\textbf{快记}
+
+\begin{itemize}
+    \item $\text{\_is\_root}(p)$：$\text{ch}[\text{fa}[p]][0] \neq p \land \text{ch}[\text{fa}[p]][1] \neq p$
+    \item $\text{access}$：for 循环 splay + 换右儿子 + update virt\_siz
+    \item $\text{make\_root}$ = access + splay + rev
+    \item $\text{find\_root}$ = access + splay + 一路向左
+    \item $\text{split}(x, y)$ = make\_root(x) + access(y) + splay(y)
+    \item $\text{LCA}$ = access(x) + access(y)，第二次返回值即为 LCA
+    \item 虚子树信息：access 换实儿子时维护；link 时维护
+    \item 换根后的子树查询：先 make\_root(root)，再 access(x)+splay(x)，virt\_siz[x]+1 即子树大小
+\end{itemize}
