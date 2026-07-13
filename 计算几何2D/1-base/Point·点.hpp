@@ -35,9 +35,9 @@ struct Point {
 	}
 };
 
-// 极角排序
+// 极角排序（严格弱序谓词，可直接传入 std::sort / std::lower_bound）
 template<typename T>
-bool polar_cmp(const Point<T>& a, const Point<T>& b) {
+bool polar_less(const Point<T>& a, const Point<T>& b) {
 	int ha = a.half(), hb = b.half();
 	if (ha != hb) return ha < hb;
 	T c = a.cross(b);

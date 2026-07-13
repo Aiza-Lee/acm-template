@@ -52,11 +52,17 @@ struct FHQNullTag {
  * Note:
  * 		1. Time: 所有操作期望 O(log N)，build O(N)
  * 		2. Space: O(N)
- * 		3. `Info` 需要支持 `Info(T)` 与 `operator+`；`Tag` 需要默认构造、`has_value/merge/apply_to`
+ * 		3. Info 需要支持 Info(T) 与 operator+；Tag 需要默认构造、has_value/merge/apply_to
  * 		4. 用法/技巧:
- * 			4.1 不需要懒标记时可直接用 `FHQNullTag<Info, T>`。
- * 			4.2 文件末尾提供了 `FHQSumInfo<T>`、`FHQRevAddTag<T>` 与别名 `FHQSeqSum<T>`，可直接做区间和/区间加/翻转。
- * 			4.3 generic 基础层只提供 `modify(l, r, tag)`；像翻转这类具体语义由 Tag 自身表达。
+ * 			4.1 不需要懒标记时可直接用 FHQNullTag<Info, T>。
+ * 			4.2 文件末尾提供了 FHQSumInfo<T>、FHQRevAddTag<T> 与别名 FHQSeqSum<T>，可直接做区间和/区间加/翻转。
+ * 			4.3 generic 基础层只提供 modify(l, r, tag)；像翻转这类具体语义由 Tag 自身表达。
+ * 		5. 内部原语:
+ * 			5.1 _split_val(u, v, x, y): 按值分裂——x 是 val ≤ v 的部分，y 是 val > v 的部分
+ * 			5.2 _split_val_less(u, v, x, y): 按值分裂——x 是 val < v 的部分，y 是 val ≥ v 的部分
+ * 			5.3 _split_rk(u, k, x, y): 按排名分裂——x 是前 k 个结点（中序最靠前的 k 个），y 是其余；
+ * 				序列模式下同样用于按位置切片（rank == pos）
+ * 			5.4 _merge(u, v): 合并两棵 BST 序的 treap；要求 u 中所有 val 都 < v 中所有 val
  */
 template<class Info, class Tag, typename T>
 requires FHQInfoLike<Info, T> && FHQTagLike<Tag, Info, T>

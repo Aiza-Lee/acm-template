@@ -15,8 +15,13 @@
  * Note:
  * 		1. Time: 所有操作期望 O(log N)
  * 		2. Space: O(N)
- * 		3. 默认定位为 BST / multiset 模式；不再默认内置 `rev`，序列翻转等需求建议使用 `FHQtreap_Generic.cpp`
- * 		4. 用法/技巧: 支持重复值；`erase_val(v)` 仅删除一个值为 v 的结点
+ * 		3. 默认定位为 BST / multiset 模式；不再默认内置 rev，序列翻转等需求建议使用 FHQtreap_Generic.cpp
+ * 		4. 用法/技巧: 支持重复值；erase_val(v) 仅删除一个值为 v 的结点
+ * 		5. 内部原语:
+ * 			5.1 _split_val(u, v, x, y): 按值分裂——x 是 val ≤ v 的部分，y 是 val > v 的部分
+ * 			5.2 _split_val_less(u, v, x, y): 按值分裂——x 是 val < v 的部分，y 是 val ≥ v 的部分
+ * 			5.3 _split_rk(u, k, x, y): 按排名分裂——x 是前 k 个结点（中序最靠前的 k 个），y 是其余
+ * 			5.4 _merge(u, v): 合并两棵满足 BST 序的 treap；要求 u 中所有 val 都 < v 中所有 val
  */
 template<typename T>
 struct FHQ {
@@ -59,14 +64,14 @@ private:
 		}
 		_push_up(u);
 	}
-	void _split_less(int u, const T& v, int& x, int& y) {
+	void _split_val_less(int u, const T& v, int& x, int& y) {
 		if (!u) return x = y = 0, void();
 		if (tr[u].val < v) {
 			x = u;
-			_split_less(tr[u].r, v, tr[u].r, y);
+			_split_val_less(tr[u].r, v, tr[u].r, y);
 		} else {
 			y = u;
-			_split_less(tr[u].l, v, x, tr[u].l);
+			_split_val_less(tr[u].l, v, x, tr[u].l);
 		}
 		_push_up(u);
 	}
@@ -118,7 +123,7 @@ public:
 	void erase_val(const T& v) {
 		int x, y, z;
 		_split_val(root, v, x, z);
-		_split_less(x, v, x, y);
+		_split_val_less(x, v, x, y);
 		if (y) {
 			int keep, del;
 			_split_rk(y, tr[y].sz - 1, keep, del);
