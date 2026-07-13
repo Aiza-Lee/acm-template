@@ -1,5 +1,7 @@
 #pragma once
 #include "Segment·线段.hpp"
+#include "../1-base/Line·直线.hpp"
+#include "../algorithms/float-oriented/HalfPlane·半平面交.hpp"
 namespace Geo2D {
 
 template<typename T>
@@ -49,6 +51,22 @@ ld polygon_area(const Polygon<T>& poly) {
 }
 
 /**
+ * @brief 多边形周长
+ * @return ld 边长之和;空多边形 / 单点返回 0。整数坐标差可能溢出 T (与 cross/dot 同样需要 i128 防护的场景),此处统一 cast 到 ld。
+ */
+template<typename T>
+ld polygon_perimeter(const Polygon<T>& poly) {
+	int n = poly.size();
+	if (n < 2) return (ld)0;
+	ld s = 0;
+	for (int i = 0; i < n; i++) {
+		int j = (i + 1) % n;
+		s += std::hypot((ld)(poly[j].x - poly[i].x), (ld)(poly[j].y - poly[i].y));
+	}
+	return s;
+}
+
+/**
  * @brief 判断是否为凸多边形
  */
 template<typename T>
@@ -83,6 +101,33 @@ Point<ld> polygon_centroid(const Polygon<T>& poly) {
 	}
 	if (sgn(area) == 0) return Point<ld>(poly[0].x, poly[0].y); // 退化情况
 	return c / (3.0 * area);
+}
+
+/**
+ * @brief 多边形核 (kernel)
+ *
+ * 定义为所有顶点能"看到"的多边形内部点集 — 等价于多边形每条边 (CCW) 左侧
+ * 半平面的交。凸多边形的核就是它本身;凹多边形的核可能为空(此时多边形无星形
+ * 中心)或为更小的多边形。
+ *
+ * note:
+ *   1. 输入必须为逆时针;CW 输入会得到错误(反方向)半平面。
+ *   2. 退化为空 / 单点 / 两点 / 全共线多边形时核为空。
+ *   3. 时间 O(N log N),底层转调 half_plane_intersection。
+ */
+template<typename T>
+requires std::is_floating_point_v<T>
+Polygon<T> polygon_kernel(const Polygon<T>& poly) {
+	int n = poly.size();
+	if (n < 3) return {};
+	std::vector<Line<T>> lines;
+	lines.reserve(n);
+	for (int i = 0; i < n; i++) {
+		int j = (i + 1) % n;
+		// 边 poly[i] → poly[j] 在 CCW 多边形下,左侧为多边形内部
+		lines.push_back(Line<T>(poly[i], poly[j]));
+	}
+	return half_plane_intersection(lines);
 }
 
 /**

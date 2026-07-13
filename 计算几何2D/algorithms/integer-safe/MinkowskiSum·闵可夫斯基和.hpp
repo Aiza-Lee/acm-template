@@ -3,14 +3,16 @@
 
 /**
  * [MinkowskiSum (闵可夫斯基和)]
- * 算法介绍: 计算两个凸多边形 P 和 Q 的闵可夫斯基和 (位积)。
+ * 算法介绍: 计算两个凸多边形 P 和 Q 的闵可夫斯基和 (位积),以及差 P ⊖ Q = P ⊕ (-Q)。
  * 模板参数: T (坐标类型)
- * Interface: 
+ * Interface:
  *   - Polygon<T> minkowski_sum(const Polygon<T>& P, const Polygon<T>& Q)
+ *   - Polygon<T> minkowski_difference(const Polygon<T>& P, const Polygon<T>& Q)
  * Note:
  * 1. Time: O(N + M)
  * 2. Space: O(N + M)
  * 3. 输入的两个多边形必须是凸多边形并且点集按逆时针有序。
+ * 4. minkowski_difference 主要用于碰撞判定: 凸体 A 与 B 相交 ⟺ (A ⊕ -B) 包含原点。
  */
 
 namespace Geo2D {
@@ -71,6 +73,15 @@ Polygon<T> minkowski_sum(const Polygon<T>& P, const Polygon<T>& Q) {
 		if (i < n || j < m) res.emplace_back(cur);
 	}
 	return normalize(res);
+}
+
+// 闵可夫斯基差: P ⊖ Q = P ⊕ (-Q)。Q 取反仍保持 CCW,直接调用 minkowski_sum。
+template<typename T>
+Polygon<T> minkowski_difference(const Polygon<T>& P, const Polygon<T>& Q) {
+	Polygon<T> negQ;
+	negQ.reserve(Q.size());
+	for (const auto& v : Q) negQ.emplace_back(-v.x, -v.y);
+	return minkowski_sum(P, negQ);
 }
 
 } // namespace Geo2D

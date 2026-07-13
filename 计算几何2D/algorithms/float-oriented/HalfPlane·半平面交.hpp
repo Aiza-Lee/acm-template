@@ -31,6 +31,12 @@ std::vector<Point<T>> half_plane_intersection(std::vector<Line<T>> lines) {
 	auto outside = [&](const Line<T>& l, const Point<T>& p) {
 		return l.side(p) < 0;
 	};
+	// 安全求交:若两条直线平行,交集无定义(返回空集而不是 assert)。
+	// 处理两类情况 — (1) 同向平行但未被去重剔除;(2) 反向平行,半平面互相矛盾。
+	auto safe_intersect = [&](const Line<T>& l1, const Line<T>& l2) -> std::optional<Point<T>> {
+		if (parallel(l1, l2)) return std::nullopt;
+		return intersection(l1, l2);
+	};
 
 	// 排序键预缓存：dir = (b, −a) 是方向向量，避免比较器内重复构造。
 	struct _Item { Line<T> line; Point<T> dir; };
@@ -66,7 +72,11 @@ std::vector<Point<T>> half_plane_intersection(std::vector<Line<T>> lines) {
 			p.pop_front();
 			q.pop_front();
 		}
-		if (!q.empty()) p.push_back(intersection(q.back(), l));
+		if (!q.empty()) {
+			auto pt = safe_intersect(q.back(), l);
+			if (!pt) return {};
+			p.push_back(*pt);
+		}
 		q.push_back(l);
 	}
 	while (!p.empty() && outside(q.front(), p.back())) {
@@ -78,7 +88,9 @@ std::vector<Point<T>> half_plane_intersection(std::vector<Line<T>> lines) {
 		q.pop_front();
 	}
 	if (q.size() < 3) return {};
-	p.push_back(intersection(q.back(), q.front()));
+	auto last_pt = safe_intersect(q.back(), q.front());
+	if (!last_pt) return {};
+	p.push_back(*last_pt);
 	return {p.begin(), p.end()};
 }
 

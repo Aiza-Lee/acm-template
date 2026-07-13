@@ -13,7 +13,8 @@
  * Note:
  * 1. argmax_dot / argmin_dot: O(log N) 三分搜索。点积沿多边形顶点为单峰（循环）。
  *    当 dir 与某条边平行时取该边起点索引（约定）。
- * 2. tangent_from_point: O(N) 遍历，外部点 p 的左/右切线（CCW 侧/ CW 侧）。
+ * 2. tangent_from_point: O(N) 遍历 — 基于叉积判定 p 在顶点两侧有向边的位置;
+ *    p 在凸包内/上时给出包含 p 的对边。
  * 3. point_in_convex: O(log N) 二分。返回 1=严格内部, 0=边界, -1=外部。
  * 4. 输入必须是逆时针凸多边形；点退化（n < 3）调用行为见各函数实现。
  */
@@ -66,6 +67,8 @@ int argmin_dot(const Polygon<T>& poly, const Point<T>& dir) {
 // 从外部点 p 到凸多边形的左/右切线端点
 // first = 左切线（多边形在 p→poly[first] 右侧），second = 右切线（多边形在 p→poly[second] 左侧）
 // p 应为外部点；若是内部点则返回的切线退化为包含 p 的对边
+// note: O(N) 而非 O(log N) — 用 dot-product argmax/argmin 的 O(log N) 替代方案在某些
+//       退化情形(如 p 在凸包某轴的延长线上)下会出现 ties 导致选错顶点。
 template<typename T>
 std::pair<int, int> tangent_from_point(const Polygon<T>& poly, const Point<T>& p) {
 	int n = poly.size();
@@ -75,7 +78,7 @@ std::pair<int, int> tangent_from_point(const Polygon<T>& poly, const Point<T>& p
 	for (int i = 0; i < n; ++i) {
 		int j = (i + 1) % n;
 		int k = (i - 1 + n) % n;
-		// p 在两条有向边 (k, i) 和 (i, j) 形成的夹角的"外侧"时，i 是切点
+		// p 在两条有向边 (k, i) 和 (i, j) 形成的夹角的"外侧"时,i 是切点
 		// 边 (i, j) 方向: p 在其右侧（即 cross(poly[j]-poly[i], p-poly[i]) < 0）
 		// 边 (k, i) 方向: p 在其右侧（即 cross(poly[i]-poly[k], p-poly[k]) > 0，注意方向反转）
 		int c1 = sgn((poly[j] - poly[i]).cross(p - poly[i]));   // p 关于 (i, j) 的符号

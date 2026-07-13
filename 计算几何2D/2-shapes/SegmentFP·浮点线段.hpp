@@ -21,7 +21,7 @@ T distance_to_segment(Point<T> p, Segment<T> s) {
 
 /**
  * @brief 求两线段的交点
- * 
+ *
  * note:
  * 		1. 调用前必须确保两线段确实相交（可先调用 segment_intersect）。
  * 		2. 如果两线段重合（有无穷多交点），该函数行为未定义（通常返回其中一个端点或计算出的某点）。
@@ -32,6 +32,25 @@ Point<T> segment_intersection_point(Segment<T> s1, Segment<T> s2) {
 	Point<T> a = s1.a, b = s1.b, c = s2.a, d = s2.b;
 	T t = ((c - a).cross(d - c)) / ((b - a).cross(d - c));
 	return a + (b - a) * t;
+}
+
+/**
+ * @brief 两线段间的最短距离
+ *
+ * note: 先用 segment_intersect 排除相交(距离=0)的情形,否则取 4 个
+ * "端点到另一线段距离"的最小值 — 当两段不相交时,最近点对必包含至少
+ * 一个端点(否则内点投影会让两段相交),故 min 即可。
+ */
+template<typename T>
+requires std::is_floating_point_v<T>
+T segment_segment_distance(Segment<T> s1, Segment<T> s2) {
+	if (segment_intersect(s1, s2)) return (T)0;
+	return std::min({
+		distance_to_segment(s1.a, s2),
+		distance_to_segment(s1.b, s2),
+		distance_to_segment(s2.a, s1),
+		distance_to_segment(s2.b, s1)
+	});
 }
 
 using SegmentFP = Segment<ld>;
