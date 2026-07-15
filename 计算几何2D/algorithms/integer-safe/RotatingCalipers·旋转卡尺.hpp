@@ -12,12 +12,15 @@
  * 2. 输入必须是逆时针严格凸多边形。
  * 3. diameter 内部转调 Polygon::farthest_point_pair，返回距离最远的一对顶点。
  * 4. width 与 min_bounding_rect 因结果一般为实数，放在 float-oriented/RotatingCalipersFP.hpp 中。
+ * @see RotatingCalipersFP·旋转卡尺FP.hpp::width — 凸多边形最小宽度（浮点专用）
+ * @see RotatingCalipersFP·旋转卡尺FP.hpp::min_bounding_rect — 凸多边形最小面积包围矩形（浮点专用）
  */
 
 namespace Geo2D {
 
 template<typename T>
 std::pair<Point<T>, Point<T>> diameter(const Polygon<T>& poly) {
+	// 转: Polygon·多边形.hpp::farthest_point_pair
 	return farthest_point_pair(poly);
 }
 

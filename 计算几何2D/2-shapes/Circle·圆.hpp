@@ -2,21 +2,27 @@
 #include "../1-base/Line·直线.hpp"
 namespace Geo2D {
 
+/** @brief 圆;c 是圆心, r 是半径。浮点专用。
+ * @see MinEnclosingCircle·最小圆覆盖.hpp::smallest_enclosing_circle — 给定点集的最小覆盖圆 (Welzl)
+ * @see CirclePolygonArea·圆与多边形面积交.hpp::circle_polygon_area — 圆与多边形有向面积交
+ */
 template<typename T>
 requires std::is_floating_point_v<T>
 struct Circle {
 	Point<T> c; T r;
 	Circle() : c(Point<T>()), r(0) {}
 	Circle(Point<T> c, T r) : c(c), r(r) {}
+	/** @brief 点 p 是否在圆内 (含边界)。O(1)。 */
 	bool contains(Point<T> p) const { return cmp(c.dist2(p), r * r) <= 0; }
-	// 圆周上的点，angle为弧度
+	/** @brief 圆周上对应 angle (弧度) 的点。O(1)。 */
 	Point<T> point(T angle) const {
 		return Point<T>(c.x + r * std::cos(angle), c.y + r * std::sin(angle));
 	}
 };
 
 /**
- * @brief 圆与直线交点
+ * @brief 圆与直线的交点;返回 0/1/2 个点。
+ * @complexity O(1);浮点路径用 sgn 比较距离与半径。
  */
 template<typename T>
 requires std::is_floating_point_v<T>
@@ -44,9 +50,9 @@ std::vector<Point<T>> circle_line_intersection(Circle<T> c, Line<T> l) {
 }
 
 /**
- * @brief 圆与圆交点
- * note:
- * 		1.不处理两圆完全重合的情况（返回空）。
+ * @brief 圆与圆的交点;返回 0/1/2 个点。
+ * @complexity O(1)。
+ * note: 不处理两圆完全重合 (返回空,与无交无法区分)。
  */
 template<typename T>
 requires std::is_floating_point_v<T>
@@ -73,10 +79,9 @@ std::vector<Point<T>> circle_circle_intersection(Circle<T> c1, Circle<T> c2) {
 }
 
 /**
- * @brief 过点 p 做圆 c 的切线，返回切点。
- * 
- * note: 
- * 		1.点在圆内无切线；点在圆上有一个切点（即点本身）；点在圆外有两个切点。
+ * @brief 过点 p 做圆 c 的切线,返回切点。
+ * @complexity O(1)。
+ * note: 点在圆内无切线 (返回空);点在圆上 1 个切点 (即 p 本身);点在圆外 2 个切点。
  */
 template<typename T>
 requires std::is_floating_point_v<T>
@@ -98,7 +103,9 @@ std::vector<Point<T>> tangents_point_circle(Point<T> p, Circle<T> c) {
 }
 
 /**
- * @brief 计算两个圆的公切线，返回切点对。
+ * @brief 两圆的公切线,返回切点对 (在 c1 与 c2 上各一个)。
+ * @complexity O(1)。
+ * note: 内含 / 完全重合时返回空;外公切线与内公切线分别处理。
  */
 template<typename T>
 requires std::is_floating_point_v<T>

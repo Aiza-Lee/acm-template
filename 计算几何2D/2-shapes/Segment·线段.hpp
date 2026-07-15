@@ -3,6 +3,7 @@
 
 namespace Geo2D {
 
+/** @brief 线段 (有向/无向皆可,由调用方约定);T 为坐标类型。 */
 template<typename T>
 struct Segment {
 	Point<T> a, b;
@@ -11,7 +12,8 @@ struct Segment {
 };
 
 /**
- * @brief 判断点 p 是否位于线段 s 上（包含端点）。
+ * @brief 判断点 p 是否在线段 s 上 (含端点)。
+ * @complexity O(1);浮点路径经 sgn 含 EPS。
  */
 template<typename T>
 bool on_segment(Point<T> p, Segment<T> s) {
@@ -20,8 +22,8 @@ bool on_segment(Point<T> p, Segment<T> s) {
 }
 
 /**
- * @brief 判断线段 s1 和 s2 是否相交。
- * 支持规范相交（交点唯一且不在端点）和非规范相交（端点重合或部分重合）。
+ * @brief 判断两线段是否相交 (含端点接触与共线部分重叠)。
+ * @complexity O(1);浮点路径经 sgn 含 EPS。
  */
 template<typename T>
 bool segment_intersect(Segment<T> s1, Segment<T> s2) {

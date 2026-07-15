@@ -4,17 +4,19 @@
 /**
  * [HalfPlaneIntersection (半平面交)]
  * 算法介绍: 双端队列增量法求多个半平面的交集（凸多边形）。半平面定义为有向直线左侧区域。
- * 模板参数: T (浮点数类型，requires std::is_floating_point_v<T>)
+ * 模板参数: T (浮点数类型,requires std::is_floating_point_v<T>)
  * Interface:
  *   - std::vector<Point<T>> half_plane_intersection(std::vector<Line<T>> lines)
  * Note:
  * 1. Time: O(N log N)
  * 2. Space: O(N)
- * 3. 半平面等价于 `{p | a·p.x + b·p.y + c ≥ 0}`，即法向量 (a, b) 指向的一侧；
- *    这与沿方向 (b, −a) 的左手侧是同一件事（两种构造路径 `Line(p1, p2)` 与
- *    `Line::from_point_and_normal(p, n)` 的保留侧一致）。
- * 4. 排序键按方向 (b, −a) 的极角升序；方向相同的平行直线，仅保留法向量侧更"靠内"
- *    的那条（即 c 更小、保留区域更小者），以避免主循环冗余弹队。
+ * 3. 半平面等价于 `{p | a·p.x + b·p.y + c ≥ 0}`,即法向量 (a, b) 指向的一侧;
+ *    这与沿方向 (b, −a) 的左手侧是同一件事(两种构造路径 `Line(p1, p2)` 与
+ *    `Line::from_point_and_normal(p, n)` 的保留侧一致)。
+ * 4. 排序键按方向 (b, −a) 的极角升序;方向相同的平行直线,仅保留法向量侧更"靠内"
+ *    的那条(即 c 更小、保留区域更小者),以避免主循环冗余弹队。
+ * 5. 反向平行线对(两个方向相反的半平面)经 safe_intersect 兜底返回空集。
+ * @see Polygon·多边形.hpp::polygon_kernel — 多边形级封装(自动转换 CCW 边为半平面)
  */
 
 namespace Geo2D {

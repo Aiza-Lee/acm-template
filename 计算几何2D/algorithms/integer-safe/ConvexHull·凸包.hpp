@@ -3,14 +3,21 @@
 
 /**
  * [ConvexHull (凸包)]
- * 算法介绍: Andrew 算法求二维点集凸包
- * 模板参数: T (点集坐标类型)
- * Interface: 
+ * 算法介绍: Andrew 单调链算法求二维点集凸包,以及凸包的几何重心。
+ * 模板参数: T (点集/凸包顶点坐标类型)
+ * Interface:
  *   - Polygon<T> convex_hull(std::vector<Point<T>> pts)
+ *   - Point<ld>  convex_hull_centroid(const Polygon<T>& hull)
  * Note:
- * 1. Time: O(N log N)
- * 2. Space: O(N)
- * 3. 结果按逆时针顺序排列，自动去重且不包含多余共线点。若需保留共线点，应将 cross 判断改为 < 0 (而非 <= 0)。
+ * 1. convex_hull:
+ *    a. Time: O(N log N); Space: O(N).
+ *    b. 结果按逆时针顺序排列,自动去重且不包含多余共线点。若需保留共线点,应将 cross 判断改为 < 0 (而非 <= 0)。
+ * 2. convex_hull_centroid:
+ *    a. Time: O(N).
+ *    b. 输入必须是逆时针凸多边形 (顶点集为 convex_hull 的返回值);退化情形由 polygon_centroid 处理 (area=0 时返回首顶点)。
+ *    c. 返回 Point<ld>,无论输入 T 是整数还是浮点数 (公式含除法)。
+ *    d. 底层转调 Polygon·多边形.hpp::polygon_centroid,与多边形重心共享同一实现。
+ *    @see Polygon·多边形.hpp::polygon_centroid — 多边形层通用质心;此函数为空凸包兜底 (0,0)。
  */
 
 namespace Geo2D {
@@ -21,7 +28,7 @@ Polygon<T> convex_hull(std::vector<Point<T>> pts) {
 	pts.erase(std::unique(pts.begin(), pts.end()), pts.end());
 	int n = pts.size(), k = 0;
 	if (n <= 1) return pts;
-	
+
 	Polygon<T> hull(2 * n);
 	// 下凸包
 	rep(i, 0, n - 1) {
@@ -38,22 +45,10 @@ Polygon<T> convex_hull(std::vector<Point<T>> pts) {
 	return hull;
 }
 
-/**
- * [ConvexHullCentroid (凸包重心)]
- * 算法介绍: 凸多边形(凸包)的几何重心(面积加权质心 / 形心),由 shoelace 公式 O(N) 求得
- * 模板参数: T (凸包顶点坐标类型)
- * Interface:
- *   - Point<ld> convex_hull_centroid(const Polygon<T>& hull)
- * Note:
- * 1. Time: O(N)
- * 2. 输入必须是逆时针凸多边形 (顶点集为 convex_hull 的返回值);退化情形由 polygon_centroid 处理 (area=0 时返回首顶点)。
- * 3. 返回 Point<ld>,无论输入 T 是整数还是浮点数 (公式含除法)。
- * 4. 底层转调 Polygon::polygon_centroid,与多边形重心共享同一实现。
- */
-
 template<typename T>
 Point<ld> convex_hull_centroid(const Polygon<T>& hull) {
-	if (hull.empty()) return Point<ld>(0, 0);
+	if (hull.empty()) return Point<ld>(0, 0);   // 本地兜底:空凸包返回原点
+	// 转: Polygon·多边形.hpp::polygon_centroid
 	return polygon_centroid(hull);
 }
 
