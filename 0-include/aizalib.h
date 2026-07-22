@@ -28,7 +28,7 @@ void inc(int& x, int y) { (x += y) >= md ? x -= md : x; }
 void dec(int& x, int y) { (x -= y) < 0 ? x += md : x; }
 int add(int x, int y) { return (x += y) >= md ? x - md : x; }
 int sub(int x, int y) { return (x -= y) < 0 ? x + md : x; }
-int mul(i64 x, int y) { return (x *= y) >= md ? x % md : x; }
+int mul(i64 x, int y) { return x * y % md; }
 template<typename... T>
 int add(int x, T ... ys) {
 	((x = add(x, ys)), ...);
