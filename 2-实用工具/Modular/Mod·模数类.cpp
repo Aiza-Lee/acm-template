@@ -38,3 +38,5 @@ struct MInt {
 };
 
 using Mint = MInt<md>;
+
+constexpr Mint operator""_m(u64 v) { return Mint(static_cast<i64>(v)); }
