@@ -24,10 +24,9 @@ class PNSieve {
 
 	std::unordered_map<i64, int> G_save; // 杜教筛记忆化
 	int G(i64 n) {
-		if (n < N) return G_arr[n];
 		if (G_save.find(n) != G_save.end()) return G_save[n];
 		/* 计算G_save[n] */
-		int res;
+		int res = user_G(n);
 		return G_save[n] = res;
 	}
 
@@ -36,10 +35,11 @@ class PNSieve {
 	int h(int p_id, int e) {
 		if (h_vis[p_id][e]) return h_vl[p_id][e];
 		h_vis[p_id][e] = true;
-		
+
 		const int p = primes[p_id];
 		int& vl = h_vl[p_id][e];
 		/* 计算vl, 注意h(p_id,e)的第一位传递的是质数的标号 */
+		vl = user_h(p_id, e);
 		return vl;
 	}
 
@@ -57,11 +57,18 @@ class PNSieve {
 	}
 
 public:
+	// Injectable hooks: defaults return 0 (matches the original empty stubs).
+	// Override these to plug in the G prefix-sum and h primitive-powerful
+	// function for the specific multiplicative-function sum you want to
+	// compute. See the test under tests/acm-template/数学/亚线性筛法/ for an
+	// example (counting powerful numbers ≤ n).
+	std::function<int(i64)> user_G = [](i64) { return 0; };
+	std::function<int(int, int)> user_h = [](int, int) { return 0; };
 	PNSieve() {
 		sieve();
 		h_vl.resize(primes.size(), {});
 		h_vis.resize(primes.size(), {});
-		rep(i, 0, primes.size() - 1) 
+		rep(i, 0, primes.size() - 1)
 			h_vl[i][0] = 1, h_vl[i][1] = 0,
 			h_vis[i][0] = h_vis[i][1] = true;
 	}
