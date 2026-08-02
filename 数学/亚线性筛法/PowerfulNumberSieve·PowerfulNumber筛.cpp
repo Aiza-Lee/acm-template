@@ -57,11 +57,11 @@ class PNSieve {
 	}
 
 public:
-	// Injectable hooks: defaults return 0 (matches the original empty stubs).
-	// Override these to plug in the G prefix-sum and h primitive-powerful
-	// function for the specific multiplicative-function sum you want to
-	// compute. See the test under tests/acm-template/数学/亚线性筛法/ for an
-	// example (counting powerful numbers ≤ n).
+	// 可注入的钩子函数：默认返回 0（与原模板中的空桩函数行为一致）。
+	// 为具体的积性函数求和问题赋值 user_G（G 的前缀和）和 user_h（原始强数函数 h），
+	// 即可驱动本模板的 Powerful Number 筛 DFS。
+	// 示例见 tests/acm-template/数学/亚线性筛法/PowerfulNumberSieve·PowerfulNumber筛-test.cpp
+	// （其中实现的是 ≤ n 的强数计数）。
 	std::function<int(i64)> user_G = [](i64) { return 0; };
 	std::function<int(int, int)> user_h = [](int, int) { return 0; };
 	PNSieve() {
