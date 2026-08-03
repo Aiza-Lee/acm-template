@@ -2,16 +2,18 @@
 #include "../../2-shapes/Circle·圆.hpp"
 #include "../../2-shapes/Polygon·多边形.hpp"
 
-/**
- * [CirclePolygonArea (圆与多边形面积交)]
- * 算法介绍: 计算圆与简单多边形（不一定是凸多边形）的重叠面积。使用有向面积三角剖分和积分思想。
- * 模板参数: T (浮点数类型，requires std::is_floating_point_v<T>)
- * Interface: 
- *   - T circle_polygon_area(Circle<T> c, const Polygon<T>& poly)
- * Note:
- * 1. Time: O(N)
- * 2. Space: O(1)
- * 3. 多边形点需按逆时针顺序，如果顺时针求出来的结果需要取绝对值。
+/*
+ * 圆与多边形面积交
+ *
+ * Overview:
+ * 	计算圆与简单多边形（不要求凸）的有向面积交，使用有向面积三角剖分和积分思想。
+ *
+ * API:
+ * 	circle_polygon_area(c, poly) -> T: 圆与多边形的有向面积交。Time O(N), Space O(1)。
+ *
+ * Notes:
+ * 	模板参数 T: 浮点数类型，requires std::is_floating_point_v<T>。
+ * 	多边形点需按逆时针顺序；如果顺时针则需要对结果取绝对值。
  */
 
 namespace Geo2D {

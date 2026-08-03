@@ -2,18 +2,23 @@
 #include "../../2-shapes/Circle·圆.hpp"
 #include "../../2-shapes/Triangle·三角形.hpp"
 
-/**
- * [SmallestEnclosingCircle (最小圆覆盖)]
- * 算法介绍: Welzl's Algorithm 随机增量法求覆盖所有点的最小圆。
- * 模板参数: T (浮点数类型,requires std::is_floating_point_v<T>)
- * Interface:
- *   - Circle<T> smallest_enclosing_circle(std::vector<Point<T>> pts)
- * Note:
- * 1. Time: 期望 O(N)
- * 2. Space: O(N)
- * 3. 内置 std::mt19937 洗牌,需引入 random 头文件。因为三点定圆严重依赖圆心测算,必须为浮点类型。
- * 4. 底层转调 Triangle·三角形.hpp::circum_center 计算三点外接圆圆心。
- * @see Circle·圆.hpp — 返回类型所在;同目录下 Circle·圆.hpp 还有圆线/圆圆交/公切线等基础圆运算。
+/*
+ * 最小圆覆盖
+ *
+ * Overview:
+ * 	Welzl 随机增量法求覆盖所有给定点的最小圆。
+ *
+ * API:
+ * 	smallest_enclosing_circle(pts) -> Circle<T>: 包含 pts 的最小圆。Time 期望 O(N), Space O(N)。
+ *
+ * Notes:
+ * 	模板参数 T: 浮点数类型，requires std::is_floating_point_v<T>。三点定圆严重依赖圆心测算，必须为浮点类型。
+ * 	空输入返回 Circle((0, 0), 0)；单点输入返回 Circle(p, 0)。
+ * 	内部使用 std::mt19937 洗牌，需要 random 头文件。
+ *
+ * Related:
+ * 	Circle·圆.hpp: 返回类型所在，包含圆线 / 圆圆交 / 公切线等基础圆运算。
+ * 	Triangle·三角形.hpp::circum_center: 三点外接圆圆心的计算。
  */
 
 namespace Geo2D {

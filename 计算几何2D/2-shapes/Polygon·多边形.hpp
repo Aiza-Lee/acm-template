@@ -7,12 +7,33 @@ namespace Geo2D {
 template<typename T>
 using Polygon = std::vector<Point<T>>;
 
-/**
- * @brief 点在多边形内判定 (射线法 / winding number)。
- * @complexity O(N);浮点路径经 sgn 含 EPS。
- * @return 2 = 点在边上,1 = 严格内部,0 = 外部。
- * @note 多边形顶点不自交时结果可靠;自交多边形用 winding number,符号约定仍为 1。
+/*
+ * 多边形
+ *
+ * Overview:
+ * 	提供多边形基本度量、点包含判定、凸性、重心、多边形核和最远点对。
+ *
+ * API:
+ * 	Polygon<T>: 点序列别名，等价于 std::vector<Point<T>>。
+ * 	point_in_polygon(p, poly) -> int: 射线法 / winding number；边上 2，内部 1，外部 0。O(N)。
+ * 	polygon_area_2(poly) -> T: 两倍有向面积；逆时针为正，顺时针为负；空多边形返回 0。O(N)。
+ * 	polygon_area(poly) -> ld: 有向面积，逆时针为正，顺时针为负。O(N)。
+ * 	polygon_perimeter(poly) -> ld: 闭合路径周长；空 / 单点返回 0；两点返回 2×距离。O(N)。
+ * 	is_convex(poly) -> bool: 顶点数 < 3 或全共线返回 false；CCW 严格凸返回 true。O(N)。
+ * 	polygon_centroid(poly) -> Point<ld>: 面积加权质心；area=0 时返回首顶点。O(N)。
+ * 	polygon_kernel(poly) -> Polygon<T>: 多边形核（仅支持浮点坐标）。O(N log N)。
+ * 	farthest_point_pair(convex) -> pair<Point<T>, Point<T>>: 凸多边形直径；n<=1 返回 ({0,0}, {0,0})，n=2 返回两端点。O(N)。
+ *
+ * Notes:
+ * 	面积符号约定：逆时针为正、顺时针为负。
+ * 	polygon_kernel 要求输入为逆时针；CW 输入会得到错误方向的半平面。退化为空 / 单点 / 两点 / 全共线多边形时核为空。
+ *
+ * Related:
+ * 	HalfPlane·半平面交.hpp::half_plane_intersection: polygon_kernel 的底层实现。
+ * 	ConvexHull·凸包.hpp::convex_hull_centroid: 凸包质心入口，空凸包兜底 (0,0)。
+ * 	RotatingCalipers·旋转卡尺.hpp::diameter: farthest_point_pair 的算法层 wrapper。
  */
+
 template<typename T>
 int point_in_polygon(Point<T> p, const Polygon<T>& poly) {
 	int n = poly.size(), wn = 0;
@@ -31,11 +52,6 @@ int point_in_polygon(Point<T> p, const Polygon<T>& poly) {
 	return wn ? 1 : 0;
 }
 
-/**
- * @brief 多边形面积的两倍 (避免由除以 2 带来的精度丢失)。
- * @complexity O(N)。
- * @return T 面积的两倍。逆时针为正,顺时针为负;空多边形返回 0。
- */
 template<typename T>
 T polygon_area_2(const Polygon<T>& poly) {
 	T area = 0;
@@ -46,22 +62,11 @@ T polygon_area_2(const Polygon<T>& poly) {
 	return area;
 }
 
-/**
- * @brief 多边形面积 (ld,带符号)。
- * @complexity O(N)。
- * @return 面积;逆时针为正,顺时针为负;空多边形返回 0。
- */
 template<typename T>
 ld polygon_area(const Polygon<T>& poly) {
 	return static_cast<ld>(polygon_area_2(poly)) / 2.0;
 }
 
-/**
- * @brief 多边形周长 (闭合路径总和)。
- * @complexity O(N);走 std::hypot,内部用 ld 求和保证精度。
- * @return 周长;空多边形 / 单点返回 0;两点返回 2×距离(闭合)。
- * @note 整数坐标差可能溢出 T(与 cross/dot 同样需要 i128 防护的场景),此处统一 cast 到 ld。
- */
 template<typename T>
 ld polygon_perimeter(const Polygon<T>& poly) {
 	int n = poly.size();
@@ -74,11 +79,6 @@ ld polygon_perimeter(const Polygon<T>& poly) {
 	return s;
 }
 
-/**
- * @brief 判断多边形是否为凸多边形。
- * @complexity O(N)。
- * @return n<3 或全共线返回 false;CCW 严格凸返回 true。
- */
 template<typename T>
 bool is_convex(const Polygon<T>& poly) {
 	int n = poly.size();
@@ -95,12 +95,6 @@ bool is_convex(const Polygon<T>& poly) {
 	return true;
 }
 
-/**
- * @brief 多边形重心 (面积加权质心,shoelace 形式)。
- * @complexity O(N);返回 Point<ld>。
- * @return 重心;area = 0 (退化多边形) 时返回首顶点。
- * @see ConvexHull·凸包.hpp::convex_hull_centroid — 凸包专用入口,空凸包兜底 (0,0)。
- */
 template<typename T>
 Point<ld> polygon_centroid(const Polygon<T>& poly) {
 	Point<ld> c(0, 0);
@@ -116,18 +110,6 @@ Point<ld> polygon_centroid(const Polygon<T>& poly) {
 	return c / (3.0 * area);
 }
 
-/**
- * @brief 多边形核 (kernel)
- *
- * 定义为所有顶点能"看到"的多边形内部点集 — 等价于多边形每条边 (CCW) 左侧
- * 半平面的交。凸多边形的核就是它本身;凹多边形的核可能为空 (此时多边形无星形
- * 中心) 或为更小的多边形。
- *
- * @complexity O(N log N),底层转调 half_plane_intersection。
- * @note 输入必须为逆时针;CW 输入会得到错误(反方向)半平面。
- *       退化为空 / 单点 / 两点 / 全共线多边形时核为空。
- * @see HalfPlane·半平面交.hpp::half_plane_intersection — 底层实现
- */
 template<typename T>
 requires std::is_floating_point_v<T>
 Polygon<T> polygon_kernel(const Polygon<T>& poly) {
@@ -144,12 +126,6 @@ Polygon<T> polygon_kernel(const Polygon<T>& poly) {
 	return half_plane_intersection(lines);
 }
 
-/**
- * @brief 旋转卡壳求最远点对 (凸多边形直径)。
- * @complexity O(N)。
- * @note 输入必须是 CCW 严格凸多边形;n≤1 返回 ({0,0}, {0,0});n=2 返回两端点。
- * @see RotatingCalipers·旋转卡尺.hpp::diameter — 算法层的别名入口 (一行 wrapper)
- */
 template<typename T>
 std::pair<Point<T>, Point<T>> farthest_point_pair(const Polygon<T>& convex) {
 	int n = convex.size();
@@ -166,7 +142,7 @@ std::pair<Point<T>, Point<T>> farthest_point_pair(const Polygon<T>& convex) {
 	T maxDist2 = 0;
 	std::pair<Point<T>, Point<T>> res;
 
-	// 旋转卡壳
+	// 旋转卡尺
 	for (int i = 0; i < n; i++) {
 		int curr = left, next = (left + 1) % n;
 		while (sgn((convex[next] - convex[curr]).cross(convex[(right + 1) % n] - convex[right])) > 0) {

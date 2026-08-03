@@ -1,16 +1,18 @@
 #pragma once
 #include "../../1-base/Point·点.hpp"
 
-/**
- * [ClosestPair (平面最近点对)]
- * 算法介绍: 分治法求解点集中距离最近的两个点 (基于距离平方，纯整数安全)
- * 模板参数: T (坐标类型)
- * Interface: 
- *   - std::pair<Point<T>, Point<T>> closest_point_pair(std::vector<Point<T>>& pts)
- * Note:
- * 1. Time: O(N log N)
- * 2. Space: O(N)
- * 3. 内部使用 len2() 返回的欧氏距离平方比较，因此支持纯整型，防溢出需要注意坐标平方相加后不超上限。
+/*
+ * 平面最近点对
+ *
+ * Overview:
+ * 	分治法求点集中欧氏距离最近的两个点。
+ *
+ * API:
+ * 	closest_point_pair(pts) -> pair<Point<T>, Point<T>>: 距离最近的一对点（按距离平方比较，整数安全）。Time O(N log N), Space O(N)。
+ *
+ * Notes:
+ * 	模板参数 T: 坐标类型，支持纯整型。
+ * 	使用 len2() 返回的欧氏距离平方比较，整数坐标平方相加后需自行确保不超上限。
  */
 
 namespace Geo2D {

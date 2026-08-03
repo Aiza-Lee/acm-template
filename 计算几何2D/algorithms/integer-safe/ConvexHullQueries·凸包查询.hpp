@@ -1,22 +1,23 @@
 #pragma once
 #include "../../2-shapes/Polygon·多边形.hpp"
 
-/**
- * [ConvexHullQueries (凸包查询)]
- * 算法介绍: 凸多边形上的快速查询接口
- * 模板参数: T (坐标类型)
- * Interface:
- *   - int argmax_dot(const Polygon<T>& poly, const Point<T>& dir)
- *   - int argmin_dot(const Polygon<T>& poly, const Point<T>& dir)
- *   - std::pair<int, int> tangent_from_point(const Polygon<T>& poly, const Point<T>& p)
- *   - int point_in_convex(const Polygon<T>& poly, const Point<T>& p)
- * Note:
- * 1. argmax_dot / argmin_dot: O(log N) 三分搜索。点积沿多边形顶点为单峰（循环）。
- *    当 dir 与某条边平行时取该边起点索引（约定）。
- * 2. tangent_from_point: O(N) 遍历 — 基于叉积判定 p 在顶点两侧有向边的位置;
- *    p 在凸包内/上时给出包含 p 的对边。
- * 3. point_in_convex: O(log N) 二分。返回 1=严格内部, 0=边界, -1=外部。
- * 4. 输入必须是逆时针凸多边形；点退化（n < 3）调用行为见各函数实现。
+/*
+ * 凸包查询
+ *
+ * Overview:
+ * 	凸多边形上的快速查询接口：点积极值、切点和点包含判定。
+ *
+ * API:
+ * 	argmax_dot(poly, dir) -> int: 沿 dir 点积最大的顶点索引。O(log N)。
+ * 	argmin_dot(poly, dir) -> int: 沿 dir 点积最小的顶点索引。O(log N)。
+ * 	tangent_from_point(poly, p) -> pair<int, int>: 左 / 右切线端点索引。O(N)。
+ * 	point_in_convex(poly, p) -> int: 严格内部 1，边界 0，外部 -1。O(log N)。
+ *
+ * Notes:
+ * 	模板参数 T: 坐标类型。
+ * 	输入必须是逆时针凸多边形；n<3 时调用行为见各函数实现。
+ * 	argmax / argmin 把点积沿顶点视为循环单峰函数用三分搜索；dir 与某边平行时取该边起点索引。
+ * 	tangent_from_point 通过叉积判定切点，p 在凸包内或上时返回包含 p 的对边；该函数为 O(N)，替换为 argmax_dot / argmin_dot 的 O(log N) 方案在退化情形（如 p 在某轴延长线上）会出现 ties 导致选错顶点。
  */
 
 namespace Geo2D {

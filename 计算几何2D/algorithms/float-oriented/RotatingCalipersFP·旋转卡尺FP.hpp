@@ -1,18 +1,21 @@
 #pragma once
 #include "../../2-shapes/Polygon·多边形.hpp"
 
-/**
- * [RotatingCalipersFP (旋转卡尺FP)]
- * 算法介绍: 凸多边形上的旋转卡尺（浮点版）
- * 模板参数: T (浮点数类型，requires std::is_floating_point_v<T>)
- * Interface:
- *   - T width(const Polygon<T>& poly)
- *   - Polygon<T> min_bounding_rect(const Polygon<T>& poly)
- * Note:
- * 1. Time: width O(N), min_bounding_rect O(N)
- * 2. 输入必须是逆时针严格凸多边形（凸包算法结果已满足）。
- * 3. width: 最小宽度 = 平行支撑线最短距离；2*area / perimeter。无理数结果（如 45° 旋转方块的 sqrt(2)）需用 ld 才能保留精度。
- * 4. min_bounding_rect: 最小面积包围矩形，返回 4 个 CCW 顶点。最小面积矩形的某一边必与凸包某边平行，因此只需枚举各边方向。角点可能为非整数 / 非有理数，必须用浮点类型。
+/*
+ * 旋转卡尺（浮点版）
+ *
+ * Overview:
+ * 	凸多边形上的旋转卡尺（浮点版）：最小宽度与最小面积包围矩形。
+ *
+ * API:
+ * 	width(poly) -> T: 平行支撑线最短距离（最小宽度）。Time O(N)。
+ * 	min_bounding_rect(poly) -> Polygon<T>: 最小面积包围矩形，返回 4 个 CCW 顶点。Time O(N)。
+ *
+ * Notes:
+ * 	模板参数 T: 浮点数类型，requires std::is_floating_point_v<T>。
+ * 	输入必须是逆时针严格凸多边形（凸包算法结果已满足）。
+ * 	width: 2*area / perimeter；无理数结果（如 45° 旋转方块的 sqrt(2)）需用 ld 才能保留精度。
+ * 	min_bounding_rect: 最小面积矩形的某条边必与凸包某条边平行，只需枚举各边方向；角点可能为非整数 / 非有理数，必须用浮点类型。
  */
 
 namespace Geo2D {
