@@ -24,6 +24,8 @@
  *   1. Time: O(\sum |S|)
  *   2. Space: O(\sum |S| * ALPHABET)
  *   3. 状态数 max 2 * \sum |S|
+ *   4. 节点编号 1-base: 节点 0 是未使用的哨兵，节点 1 是 root
+ *      根的 link = 0 表示"无后缀链接"
  */
 
 struct GeneralSAM {
@@ -35,7 +37,7 @@ struct GeneralSAM {
 		int link;
 		std::array<int, ALPHABET> next;
 
-		Node() : len(0), link(-1) {
+		Node() : len(0), link(0) {
 			next.fill(0);
 		}
 	};
@@ -43,21 +45,22 @@ struct GeneralSAM {
 	std::vector<Node> nodes;
 
 	GeneralSAM(int n = 0) {
-		nodes.reserve(n * 2 + 1);
-		nodes.emplace_back(); // Root: 0
+		nodes.reserve(n * 2 + 2);
+		nodes.emplace_back(); // Node 0: sentinel (unused)
+		nodes.emplace_back(); // Node 1: root (len=0, link=0)
 	}
 
 	// 插入一个字符串
 	void insert(const std::string& s) {
-		int last = 0; // 每次从根开始
+		int last = 1; // 每次从根开始 (节点 1)
 		for (char c : s) {
 			int c_idx = c - MIN_CHAR;
-			
+
 			// 如果当前节点已经有该字符的转移
 			if (nodes[last].next[c_idx]) {
 				int p = last;
 				int q = nodes[p].next[c_idx];
-				
+
 				// 如果满足 len 连续条件，直接复用该节点
 				if (nodes[p].len + 1 == nodes[q].len) {
 					last = q;
@@ -68,8 +71,8 @@ struct GeneralSAM {
 					nodes[clone].len = nodes[p].len + 1;
 					nodes[clone].next = nodes[q].next; // 复制转移
 					nodes[clone].link = nodes[q].link;
-					
-					while (p != -1 && nodes[p].next[c_idx] == q) {
+
+					while (p != 0 && nodes[p].next[c_idx] == q) {
 						nodes[p].next[c_idx] = clone;
 						p = nodes[p].link;
 					}
@@ -81,15 +84,15 @@ struct GeneralSAM {
 				int cur = nodes.size();
 				nodes.emplace_back();
 				nodes[cur].len = nodes[last].len + 1;
-				
+
 				int p = last;
-				while (p != -1 && !nodes[p].next[c_idx]) {
+				while (p != 0 && !nodes[p].next[c_idx]) {
 					nodes[p].next[c_idx] = cur;
 					p = nodes[p].link;
 				}
-				
-				if (p == -1) {
-					nodes[cur].link = 0;
+
+				if (p == 0) {
+					nodes[cur].link = 1; // 无 link 时指向 root (节点 1)
 				} else {
 					int q = nodes[p].next[c_idx];
 					if (nodes[p].len + 1 == nodes[q].len) {
@@ -100,8 +103,8 @@ struct GeneralSAM {
 						nodes[clone].len = nodes[p].len + 1;
 						nodes[clone].next = nodes[q].next;
 						nodes[clone].link = nodes[q].link;
-						
-						while (p != -1 && nodes[p].next[c_idx] == q) {
+
+						while (p != 0 && nodes[p].next[c_idx] == q) {
 							nodes[p].next[c_idx] = clone;
 							p = nodes[p].link;
 						}

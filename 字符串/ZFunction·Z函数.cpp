@@ -19,12 +19,13 @@
  * Note:
  * 		1. Time: init O(M), extend / match O(N)
  * 		2. Space: O(M)（extend 返回值额外 O(N)）
- * 		3. 内部统一 1-based，模式串记为 s[1...m]，且 z[1] = m
+ * 		3. 字符串存储 0-base（以 string_view 引用输入，不拷贝），算法内部 1-based
  * 		4. 用法/技巧: `extend` 常用于跨串 LCP、循环同构判定、前后缀拼接判定
  * 		5. 枚举 i | m 时，若 i + z[i] - 1 == m，则 i - 1 是一个 border 长度
+ * 		6. 模式串以 string_view 保存，需保证底层串在 ZFunc 生命周期内有效
  */
 struct ZFunc {
-	std::string s;
+	std::string_view s; // 0-base 视图，引用输入串
 	int m = 0;
 	std::vector<int> z; // z[i]: s[i...m] 与 s[1...m] 的 LCP 长度
 
@@ -32,15 +33,15 @@ struct ZFunc {
 	ZFunc(std::string_view s) { init(s); }
 
 	void init(std::string_view str) {
+		s = str;
 		m = (int)str.size();
-		s = " " + std::string(str);
 		z.assign(m + 1, 0);
 		if (m == 0) return;
 
 		z[1] = m;
 		for (int i = 2, l = 1, r = 1; i <= m; ++i) {
 			if (i <= r) z[i] = std::min(r - i + 1, z[i - l + 1]);
-			while (i + z[i] <= m && s[z[i] + 1] == s[i + z[i]]) ++z[i];
+			while (i + z[i] <= m && s[z[i]] == s[i + z[i] - 1]) ++z[i];
 			if (i + z[i] - 1 > r) {
 				l = i;
 				r = i + z[i] - 1;
@@ -58,7 +59,7 @@ struct ZFunc {
 				int k = i - l + 1;
 				ex[i] = std::min(r - i + 1, k <= m ? z[k] : 0);
 			}
-			while (ex[i] < m && i + ex[i] <= n && t[i + ex[i] - 1] == s[ex[i] + 1]) ++ex[i];
+			while (ex[i] < m && i + ex[i] <= n && t[i + ex[i] - 1] == s[ex[i]]) ++ex[i];
 			if (i + ex[i] - 1 > r) {
 				l = i;
 				r = i + ex[i] - 1;
