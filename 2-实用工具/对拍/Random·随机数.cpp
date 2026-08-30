@@ -17,7 +17,7 @@ struct Random {
 		std::uniform_int_distribution<size_t> dist(0, chars.size() - 1);
 		return chars[dist(rng)];
 	}
-};
+} R;
 
 template<typename... Args>
 void output(bool newLine, Args... args) {
