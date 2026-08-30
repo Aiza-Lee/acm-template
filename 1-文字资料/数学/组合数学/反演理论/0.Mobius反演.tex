@@ -1,26 +1,22 @@
-\textbf{定义}
+\textbf{[偏序集 Möbius 反演]}
 
-设\((P,\preceq)\)是有限偏序集，对任意在\(P\)上的函数\(f,g\)，如果：
+\textbf{定义}：设 $(P,\preceq)$ 是有限偏序集，$f,g$ 为 $P$ 上的函数，若
+\[
+g(y) = \sum_{x\preceq y} f(x) \quad(\forall y \in P),
+\]
+视 $\zeta(x,y)=[x\preceq y]$ 为矩阵作用，即 $\vec g = \zeta \vec f$。
 
-\[g(y) = \sum_{x\preceq y}f(x) \quad{(\forall y \in P)},\]
+若 $\zeta$ 可逆，其逆矩阵称为 Möbius 矩阵 $\mu$，满足
+\[
+f(y) = \sum_{x\preceq y} \mu(x,y)\, g(x) \quad(\forall y \in P).
+\]
 
-设\(\zeta(x,y)\)函数：
+\textbf{反演思想}：$g=\zeta f$ 的反演即 $f=\mu g$；找出反演等价于求出对应偏序的 Möbius 矩阵闭式。
 
-\[\zeta(x,y) = \begin{cases}
- 1 & x\preceq y \\
- 0 & \text{otherwise}
-\end{cases}.\]
-
-则可将第一个式子拓展到整个\(P\)上，并视\(\zeta\)为矩阵的作用，\(\vec g = \zeta \vec f\).
-
-如果矩阵\(\zeta\)可逆，那么其逆矩阵称为Mobius矩阵\(\mu\)，满足：
-
-\[f(y) = \sum_{x\preceq y}\mu(x,y)g(x) \quad (\forall y \in P).\]
-
-对于很多特殊的反演\(\mu\)存在特殊的闭式。比如：
-
-整数除约偏序\((d\mid n)\)：\(\mu(d,n)=\mu(n/d)\)，右侧\(\mu\)为数论Mobius函数。
-
-子集偏序：\(\mu(T,S)=(-1)^{|S|-|T|}\)，当\(T\subseteq S\)。
-
-……
+\textbf{常用特例}（本目录各文件均是它的特殊化）：
+\begin{itemize}
+\item \textbf{整除偏序} $(d\mid n)$：$\mu(d,n)=\mu(n/d)$（右侧为数论 Möbius 函数）$\to$ \texttt{数论Mobius反演.tex}（整除型 / 倍数型）。
+\item \textbf{子集偏序} $T\subseteq S$：$\mu(T,S)=(-1)^{|S|-|T|}$ $\to$ \texttt{子集反演.tex}。
+\item 子集偏序上 $\max$ 由 $-\mu$ 组合得到 $\to$ \texttt{minmax反演.tex}。
+\item 序列层面（只依赖下标大小）的三角反演 $\to$ \texttt{二项式反演.tex}。
+\end{itemize}

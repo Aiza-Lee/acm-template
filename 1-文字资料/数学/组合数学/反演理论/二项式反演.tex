@@ -1,10 +1,32 @@
-定义
+\textbf{[二项式反演]}
 
-序列之间常见的三角变换。若对\(n \ge 0\)：
+序列之间常见的三角反演，作用于 $\{f_n\}$ 与 $\{g_n\}$。
 
-\[g_n = \sum_{k=0}^n{n \choose k} f_k.\]
+\textbf{标准形式（形式 1，下三角）}：对 $n\ge 0$，
+\[
+g_n = \sum_{k=0}^{n} \binom{n}{k} f_k
+\quad\Longleftrightarrow\quad
+f_n = \sum_{k=0}^{n} (-1)^{n-k} \binom{n}{k} g_k.
+\]
 
-反演为：
+\textbf{反向形式（形式 2，上三角 / 容斥）}：有限和时上界取 $N$，
+\[
+g_n = \sum_{k\ge n} \binom{k}{n} f_k
+\quad\Longleftrightarrow\quad
+f_n = \sum_{k\ge n} (-1)^{k-n} \binom{k}{n} g_k.
+\]
 
-\[f_n = \sum_{k=0}^n(-1)^{n - k}{n \choose k}g_k.\]
+\textbf{生成函数视角}：
+\begin{itemize}
+\item 设 EGF $F(x)=\sum f_n x^n/n!$，$G(x)=\sum g_n x^n/n!$，则形式 1 等价于 $G(x)=e^x F(x)$，反演即 $F(x)=e^{-x}G(x)$。
+\item 设 OGF $G(x)=\sum g_n x^n$，则形式 2 等价于 $G(x)=F(x+1)$，反演即 $F(x)=G(x-1)$。
+\end{itemize}
 
+\textbf{常用应用}：
+\begin{itemize}
+\item \textbf{错排}：$D_n=\sum_{k=0}^{n}(-1)^k\binom{n}{k}(n-k)!=n!\sum_{k=0}^{n}(-1)^k/k!$，即"恰好 0 个固定点"的容斥。
+\item \textbf{至少 / 恰好计数}：设 $f(k)$ 为恰好满足 $k$ 个性质的方案数，$g(k)=\sum_{n\ge k}\binom{n}{k}f(n)$ 为钦定 $k$ 个性质全满足的方案数，二者用形式 2 互逆（$g\to f$ 即容斥）。
+\item 子集反演中 $f,g$ 只依赖 $|S|$ 时退化为形式 1（见 \texttt{子集反演.tex}）。
+\end{itemize}
+
+\textbf{条件与复杂度}：模质数下组合数预处理；直接按和式展开计算为 $O(N^2)$。

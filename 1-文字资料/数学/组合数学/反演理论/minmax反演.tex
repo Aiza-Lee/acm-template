@@ -1,0 +1,39 @@
+\textbf{[Min-Max 反演]}
+
+\textbf{记号}：$S$ 为有限集合；$\max(S)$、$\min(S)$ 分别为 $S$ 中最大值、最小值；$\max_k(S)$、$\min_k(S)$ 分别为第 $k$ 大、第 $k$ 小（$1\le k\le |S|$）。
+
+\textbf{集合版}：
+\[
+\max(S) = \sum_{\emptyset \neq T \subseteq S} (-1)^{|T|-1} \min(T)
+\]
+\[
+\min(S) = \sum_{\emptyset \neq T \subseteq S} (-1)^{|T|-1} \max(T)
+\]
+\[
+\max\nolimits_k(S) = \sum_{\emptyset \neq T \subseteq S} (-1)^{|T|-k} \binom{|T|-1}{k-1} \min(T)
+\]
+\[
+\min\nolimits_k(S) = \sum_{\emptyset \neq T \subseteq S} (-1)^{|T|-k} \binom{|T|-1}{k-1} \max(T)
+\]
+
+\textbf{期望版}：若 $S$ 中元素为随机变量，把 $\min / \max$ 换成期望后公式仍成立：
+\[
+E[\max(S)] = \sum_{\emptyset \neq T \subseteq S} (-1)^{|T|-1} E[\min(T)]
+\]
+\[
+E[\max\nolimits_k(S)] = \sum_{\emptyset \neq T \subseteq S} (-1)^{|T|-k} \binom{|T|-1}{k-1} E[\min(T)]
+\]
+对 $\min$、$\min_k$ 同理。$E[\min(T)]$ 通常由独立性从 $E[X_i]$ 预计算得到。
+
+\textbf{条件}：$S$ 有限即可；元素值任意（允许相等，无需互异）；求和自 $\emptyset \neq T$ 开始。
+
+\textbf{常用结论}：
+\begin{itemize}
+\item \textbf{所有变量出现时间} $\to$ \textbf{至少一个变量出现时间}：
+  求若干独立随机变量 \textbf{全部出现} 的期望时间，可转化为求 \textbf{至少一个出现} 的期望时间（Markov 等待思想 + Min-Max 反演）；求第 $k$ 个出现的期望时间同理用 $\max_k$ 的期望形式。
+\item $\max_k(S)$ 在 $k=1$ 时退化为 $\max(S)$（此时 $\binom{|T|-1}{0}=1$）；$\min_k(S)$ 同理。
+\end{itemize}
+
+\textbf{算法复杂度}：朴素枚举所有非空子集，$O(n \cdot 2^n)$；实际适用 $n \le 20$（期望时间类题型最常见）。若 $n$ 极大且子集结构特殊（如 $[n]$ 上前缀/后缀），可改用前缀 / SOS 卷积把复杂度降到 $O(n \log n)$ 或 $O(2^n)$。
+
+\textbf{与其它反演的关系}：本反演本质是子集族上的容斥，公式与 \texttt{容斥原理.tex} 的 [Min-Max 容斥] 一节完全一致；偏序集视角下是子集偏序上 $\zeta$ 矩阵 $-\mu$ 的应用（见 $0.\text{Mobius 反演.tex}$）；$\max_k$ 中的组合数系数 $\binom{|T|-1}{k-1}$ 是与二项式反演的联系点；与子集反演（$F(S)=\sum_{T\subseteq S}f(T)$）同属一族。

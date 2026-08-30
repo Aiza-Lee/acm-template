@@ -1,9 +1,23 @@
-定义
+\textbf{[子集反演]}
 
-给定全集\(U\)，\(|U| = n\)。定义子集累加：
+给定全集 $U$，$|U|=n$，$f,g$ 为定义在 $2^U$ 上的函数。
 
-\[F(S) = \sum_{T\subseteq S} f(T).\]
+\textbf{子集形式（下）}：
+\[
+F(S) = \sum_{T\subseteq S} f(T)
+\quad\Longleftrightarrow\quad
+f(S) = \sum_{T\subseteq S} (-1)^{|S|-|T|} F(T).
+\]
 
-反演为：
+\textbf{超集形式（对偶）}：
+\[
+F(S) = \sum_{T\supseteq S} f(T)
+\quad\Longleftrightarrow\quad
+f(S) = \sum_{T\supseteq S} (-1)^{|T|-|S|} F(T).
+\]
 
-\[f(S) = \sum_{T\subseteq S}(-1)^{|S|-|T|}F(T).\]
+\textbf{与 Möbius 反演的联系}：子集偏序 $(2^U,\subseteq)$ 上 $\mu(T,S)=(-1)^{|S|-|T|}$（当 $T\subseteq S$），本反演即偏序集 Möbius 反演在子集偏序的特例（见 $0.\text{Mobius 反演.tex}$）。
+
+\textbf{实现与复杂度}：对所有 $2^n$ 个子集，可用 SOS DP（高维前缀和）$O(n2^n)$ 整体完成正、反变换。
+
+\textbf{退化}：当全集 $U=[n]$ 且 $f,g$ 只依赖 $|S|$ 时，退化为二项式反演（见 \texttt{二项式反演.tex}）。
