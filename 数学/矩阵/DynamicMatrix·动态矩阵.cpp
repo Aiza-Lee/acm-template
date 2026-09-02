@@ -15,7 +15,7 @@
  * Note:
  * 		1. 乘法采用 i-k-j 循环序
  * 		2. det()/inverse() 对浮点类型使用主元消元，非浮点类型使用非零判断
- * 		3. det()/inverse() 需 T 支持除法和 std::abs (浮点) / != T(0) (非浮点)
+ * 		3. det()/inverse() 要求 T 为域上的类型 (浮点 / 模数类)；整数类型因除法截断被 static_assert 拒绝
  */
 template<typename T>
 struct Matrix {
@@ -81,6 +81,7 @@ struct Matrix {
 
 	T det() const {
 		AST(r == c);
+		static_assert(std::is_floating_point_v<T> || !std::is_integral_v<T>, "det/inverse need a field (floating point or modular type)");
 		Matrix tmp = *this;
 		T res = 1;
 		rep(i, 0, r - 1) {
@@ -109,6 +110,7 @@ struct Matrix {
 
 	Matrix inverse() const {
 		AST(r == c);
+		static_assert(std::is_floating_point_v<T> || !std::is_integral_v<T>, "det/inverse need a field (floating point or modular type)");
 		int n = r;
 		Matrix tmp(n, 2 * n);
 		rep(i, 0, n - 1) {
@@ -120,6 +122,8 @@ struct Matrix {
 			rep(j, i + 1, n - 1) {
 				if constexpr (std::is_floating_point_v<T>) {
 					if (std::abs(tmp[j][i]) > std::abs(tmp[pivot][i])) pivot = j;
+				} else {
+					if (tmp[j][i] != T(0) && tmp[pivot][i] == T(0)) pivot = j;
 				}
 			}
 			if (tmp[pivot][i] == T(0)) return Matrix(0, 0);  // singular

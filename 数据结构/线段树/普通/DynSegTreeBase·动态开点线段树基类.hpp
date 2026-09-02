@@ -7,18 +7,19 @@
  * 算法介绍: 维护一类支持稀疏建点、区间修改、区间查询和线段树二分的懒标记线段树框架，具体维护内容由 Info / Tag 自定义。
  * 模板参数: Info (节点信息), Tag (懒标记)
  * Interface:
- * 		DynSegTree(int n, int reserve_nodes = 0): 初始化定义域 [1, n] 的空线段树
+ * 		DynSegTree(int n, int reserve_nodes = 0):    初始化定义域 [1, n] 的空线段树
  * 		DynSegTree(int l, int r, int reserve_nodes): 初始化定义域 [l, r] 的空线段树
- * 		void reserve(int reserve_nodes): 预留结点池空间
+ * 
+ * 		void reserve(int reserve_nodes):             预留结点池空间
  * 		void modify(int ql, int qr, const Tag& tag): 区间打标记
- * 		Info query(int ql, int qr): 查询区间信息
- * 		Info all_info(): 返回整棵树信息
- * 		void set(int pos, const Info& value): 单点赋值
- * 		int find_first(int ql, int qr, Pred pred): 在线段树上二分第一个满足条件的位置
- * 		int find_last(int ql, int qr, Pred pred): 在线段树上二分最后一个满足条件的位置
+ * 		Info query(int ql, int qr):                  查询区间信息
+ * 		Info all_info():                             返回整棵树信息
+ * 		void set(int pos, const Info& value):        单点赋值
+ * 		int find_first(int ql, int qr, Pred pred):   在线段树上二分第一个满足条件的位置
+ * 		int find_last(int ql, int qr, Pred pred):    在线段树上二分最后一个满足条件的位置
  * Note:
  * 		1. Time: 单次 modify / query / set / find O(log V)，V = r - l + 1
- * 		2. Space: O(实际访问结点数)
+ * 		2. Space: O(实际访问结点数)；结点池按需扩容，递归以返回值回写子树根下标，无需预估 reserve
  * 		3. `Info` 需要支持 `operator+` 和 `static Info from_range(int l, int r)`
  * 		4. `Tag` 需要支持 `merge(rhs)`、`has_value()`、`apply_to(Info&, int l, int r)`
  * 		5. 空结点默认表示其整段区间都处于初始状态，因此 `Info::from_range(l, r)` 必须返回该区间的默认信息
@@ -70,13 +71,13 @@ struct DynSegTree {
 
 	void reserve(int reserve_nodes) { if (reserve_nodes + 1 > (int)tr.capacity()) tr.reserve(reserve_nodes + 1); }
 
-	void modify(int ql, int qr, const Tag& v) { AST(lb <= ql && ql <= qr && qr <= rb); _modify(root, ql, qr, v, lb, rb); }
+	void modify(int ql, int qr, const Tag& v) { AST(lb <= ql && ql <= qr && qr <= rb); root = _modify(root, ql, qr, v, lb, rb); }
 
 	Info query(int ql, int qr) { AST(lb <= ql && ql <= qr && qr <= rb); return _query(root, ql, qr, lb, rb); }
 
 	Info all_info() const { AST(lb <= rb); return _get_info(root, lb, rb); }
 
-	void set(int pos, const Info& v) { AST(lb <= pos && pos <= rb); _set(root, pos, v, lb, rb); }
+	void set(int pos, const Info& v) { AST(lb <= pos && pos <= rb); root = _set(root, pos, v, lb, rb); }
 
 	template<class Pred>
 	int find_first(int ql, int qr, Pred pred) { AST(lb <= ql && ql <= qr && qr <= rb); return _find_first(root, ql, qr, pred, lb, rb); }
@@ -94,44 +95,46 @@ struct DynSegTree {
 		tr[p].info = _get_info(tr[p].ls, l, mid) + _get_info(tr[p].rs, mid + 1, r);
 	}
 
-	void _apply(int& p, const Tag& v, int l, int r) {
+	int _apply(int p, const Tag& v, int l, int r) {
 		if (!p) p = _new_node(l, r);
 		v.apply_to(tr[p].info, l, r), tr[p].tag.merge(v);
+		return p;
 	}
 
 	void _push(int p, int l, int r) {
 		if (l == r || !tr[p].tag.has_value()) return;
 		int mid = (l + r) >> 1;
-		_apply(tr[p].ls, tr[p].tag, l, mid);
-		_apply(tr[p].rs, tr[p].tag, mid + 1, r);
+		Tag t = tr[p].tag; // 拷贝后使用: _apply 可能扩容使 tr[p].tag 引用失效
+		tr[p].ls = _apply(tr[p].ls, t, l, mid);
+		tr[p].rs = _apply(tr[p].rs, t, mid + 1, r);
 		tr[p].tag = Tag();
 	}
 
-	void _modify(int& p, int ql, int qr, const Tag& v, int l, int r) {
-		if (ql <= l && r <= qr) {
-			_apply(p, v, l, r);
-			return;
-		}
+	// 递归返回子树根下标、由父结点回写: _new_node 扩容会使持有 tr 内部的引用失效
+	int _modify(int p, int ql, int qr, const Tag& v, int l, int r) {
+		if (ql <= l && r <= qr) return _apply(p, v, l, r);
 		if (!p) p = _new_node(l, r);
 		_push(p, l, r);
 		int mid = (l + r) >> 1;
-		if (ql <= mid) _modify(tr[p].ls, ql, qr, v, l, mid);
-		if (qr > mid) _modify(tr[p].rs, ql, qr, v, mid + 1, r);
+		if (ql <= mid) tr[p].ls = _modify(tr[p].ls, ql, qr, v, l, mid);
+		if (qr > mid) tr[p].rs = _modify(tr[p].rs, ql, qr, v, mid + 1, r);
 		_pull(p, l, r);
+		return p;
 	}
 
-	void _set(int& p, int pos, const Info& v, int l, int r) {
+	int _set(int p, int pos, const Info& v, int l, int r) {
 		if (!p) p = _new_node(l, r);
 		if (l == r) {
 			tr[p].info = v;
 			tr[p].tag = Tag();
-			return;
+			return p;
 		}
 		_push(p, l, r);
 		int mid = (l + r) >> 1;
-		if (pos <= mid) _set(tr[p].ls, pos, v, l, mid);
-		else _set(tr[p].rs, pos, v, mid + 1, r);
+		if (pos <= mid) tr[p].ls = _set(tr[p].ls, pos, v, l, mid);
+		else tr[p].rs = _set(tr[p].rs, pos, v, mid + 1, r);
 		_pull(p, l, r);
+		return p;
 	}
 
 	Info _query(int p, int ql, int qr, int l, int r) {
