@@ -10,8 +10,8 @@ namespace poly_ext {
  *  - bostan_mori(n, P, Q): 求 [x^n] P(x)/Q(x)
  *  - linear_recurrence(n, c, a): 求常系数线性递推数列第 n 项
  * Note:
- * 		1. Time: O(d log d log n), d = deg(Q)
- * 		2. Space: O(d)
+ *      1. Time: O(d log d log n), d = deg(Q)
+ *      2. Space: O(d)
  */
 
 /**
@@ -22,25 +22,25 @@ namespace poly_ext {
  * @return [x^n] P(x)/Q(x) 取模后的值
  */
 int bostan_mori(i64 n, Poly P, Poly Q) {
-	while (n > 0) {
-		auto Q_neg = Q;
-		for (int i = 1; i < (int)Q_neg.size(); i += 2)
-			Q_neg[i] = sub(0, Q_neg[i]);
+    while (n > 0) {
+        auto Q_neg = Q;
+        for (int i = 1; i < (int)Q_neg.size(); i += 2)
+            Q_neg[i] = sub(0, Q_neg[i]);
 
-		auto U = P * Q_neg, V = Q * Q_neg;
-		
-		P.clear();
-		for (int i = (n & 1); i < (int)U.size(); i += 2)
-			P.push_back(U[i]);
+        auto U = P * Q_neg, V = Q * Q_neg;
+        
+        P.clear();
+        for (int i = (n & 1); i < (int)U.size(); i += 2)
+            P.push_back(U[i]);
 
-		Q.clear();
-		for (int i = 0; i < (int)V.size(); i += 2)
-			Q.push_back(V[i]);
+        Q.clear();
+        for (int i = 0; i < (int)V.size(); i += 2)
+            Q.push_back(V[i]);
 
-		n >>= 1;
-	}
-	if (Q.empty() || Q[0] == 0) return 0;
-	return mul(P.empty() ? 0 : P[0], inv(Q[0]));
+        n >>= 1;
+    }
+    if (Q.empty() || Q[0] == 0) return 0;
+    return mul(P.empty() ? 0 : P[0], inv(Q[0]));
 }
 
 /**
@@ -52,19 +52,19 @@ int bostan_mori(i64 n, Poly P, Poly Q) {
  * @return a_n 取模后的值
  */
 int linear_recurrence(long long n, const std::vector<int>& c, const std::vector<int>& a) {
-	int d = c.size();
-	if (n < d) return a[n];
+    int d = c.size();
+    if (n < d) return a[n];
 
-	Poly Q(d + 1);
-	Q[0] = 1;
-	rep(i, 0, d - 1)
-		Q[i + 1] = sub(0, c[i]);
+    Poly Q(d + 1);
+    Q[0] = 1;
+    rep(i, 0, d - 1)
+        Q[i + 1] = sub(0, c[i]);
 
-	Poly A(a);
-	auto P = A * Q;
-	P.resize(d);
+    Poly A(a);
+    auto P = A * Q;
+    P.resize(d);
 
-	return bostan_mori(n, P, Q);
+    return bostan_mori(n, P, Q);
 }
 
 } // namespace poly_ext

@@ -18,18 +18,18 @@ namespace Lagrange {
  * @complexity O(N \log N)
  */
 int coeff(Poly F, int n) {
-	if (n == 0) return 0;
-	if (F.empty()) return 0;
-	// F(x) / x
-	F.erase(F.begin()); 
-		
-	// (F(x)/x)^(-n)
-	// k = -n (mod md)
-	int k = mod(-n);
-	F = F.pow(k, n);
-		
-	if (n - 1 >= (int)F.size()) return 0;
-	return mul(F[n - 1], inv(n));
+    if (n == 0) return 0;
+    if (F.empty()) return 0;
+    // F(x) / x
+    F.erase(F.begin()); 
+        
+    // (F(x)/x)^(-n)
+    // k = -n (mod md)
+    int k = mod(-n);
+    F = F.pow(k, n);
+        
+    if (n - 1 >= (int)F.size()) return 0;
+    return mul(F[n - 1], inv(n));
 }
 
 /**
@@ -46,19 +46,19 @@ int coeff(Poly F, int n) {
  * @complexity O(N \log N)
  */
 int generalized_coeff(Poly F, Poly H, int n) {
-	if (n == 0) return H.empty() ? 0 : H[0];
-	if (F.empty()) return 0;
-		
-	F.erase(F.begin());
-		
-	int k = mod(-n);
-	F = F.pow(k, n);
-		
-	H = H.deriv();
-	F = F * H;
-		
-	if (n - 1 >= (int)F.size()) return 0;
-	return mul(F[n - 1], inv(n));
+    if (n == 0) return H.empty() ? 0 : H[0];
+    if (F.empty()) return 0;
+        
+    F.erase(F.begin());
+        
+    int k = mod(-n);
+    F = F.pow(k, n);
+        
+    H = H.deriv();
+    F = F * H;
+        
+    if (n - 1 >= (int)F.size()) return 0;
+    return mul(F[n - 1], inv(n));
 }
 
 } // namespace Lagrange

@@ -43,53 +43,53 @@
  *         整个搜索区间内见过的最优值，不依赖切点的精确命中
  */
 struct WQS {
-	/**
-	 * 整数惩罚版本
-	 * f(λ) 返回 {新凸包最低点的 y 值, x 坐标 cnt}
-	 */
-	template<typename F>
-	static i64 solve(int k, F&& f, i64 lo = -1e12, i64 hi = 1e12) {
-		AST(k >= 0);
-		i64 ans = std::numeric_limits<i64>::min();
-		while (lo <= hi) {
-			i64 mid = lo + ((hi - lo) >> 1);
-			auto [val, cnt] = f(mid);
-			// cand = val - λ·k：把新凸包最低点 y 值减去倾斜分量，恢复 dp[k]
-			i64 cand = val - mid * k;
-			ans = std::max(ans, cand);
-			if (cnt >= k) {
-				// 最低点 x ≥ k：λ 偏小，抬高 λ 把它往左推
-				lo = mid + 1;
-			} else {
-				// 最低点 x < k：λ 偏大，降低 λ 把它往右推
-				hi = mid - 1;
-			}
-		}
-		return ans;
-	}
+    /**
+     * 整数惩罚版本
+     * f(λ) 返回 {新凸包最低点的 y 值, x 坐标 cnt}
+     */
+    template<typename F>
+    static i64 solve(int k, F&& f, i64 lo = -1e12, i64 hi = 1e12) {
+        AST(k >= 0);
+        i64 ans = std::numeric_limits<i64>::min();
+        while (lo <= hi) {
+            i64 mid = lo + ((hi - lo) >> 1);
+            auto [val, cnt] = f(mid);
+            // cand = val - λ·k：把新凸包最低点 y 值减去倾斜分量，恢复 dp[k]
+            i64 cand = val - mid * k;
+            ans = std::max(ans, cand);
+            if (cnt >= k) {
+                // 最低点 x ≥ k：λ 偏小，抬高 λ 把它往左推
+                lo = mid + 1;
+            } else {
+                // 最低点 x < k：λ 偏大，降低 λ 把它往右推
+                hi = mid - 1;
+            }
+        }
+        return ans;
+    }
 
-	/**
-	 * 浮点惩罚版本，用于非整数 λ 的场景（如分数规划、实数权值）
-	 * f(λ) 返回 {新凸包最低点的 y 值, x 坐标 cnt}
-	 */
-	template<typename F>
-	static double solve_float(int k, F&& f, double lo = -1e12, double hi = 1e12, double eps = 1e-9) {
-		AST(k >= 0);
-		double ans = -1e18;
-		while (hi - lo > eps) {
-			double mid = (lo + hi) * 0.5;
-			auto [val, cnt] = f(mid);
-			// cand = val - λ·k：把新凸包最低点 y 值减去倾斜分量，恢复 dp[k]
-			double cand = val - mid * k;
-			ans = std::max(ans, cand);
-			if (cnt >= k) {
-				// 最低点 x ≥ k：λ 偏小，抬高 λ 把它往左推
-				lo = mid;
-			} else {
-				// 最低点 x < k：λ 偏大，降低 λ 把它往右推
-				hi = mid;
-			}
-		}
-		return ans;
-	}
+    /**
+     * 浮点惩罚版本，用于非整数 λ 的场景（如分数规划、实数权值）
+     * f(λ) 返回 {新凸包最低点的 y 值, x 坐标 cnt}
+     */
+    template<typename F>
+    static double solve_float(int k, F&& f, double lo = -1e12, double hi = 1e12, double eps = 1e-9) {
+        AST(k >= 0);
+        double ans = -1e18;
+        while (hi - lo > eps) {
+            double mid = (lo + hi) * 0.5;
+            auto [val, cnt] = f(mid);
+            // cand = val - λ·k：把新凸包最低点 y 值减去倾斜分量，恢复 dp[k]
+            double cand = val - mid * k;
+            ans = std::max(ans, cand);
+            if (cnt >= k) {
+                // 最低点 x ≥ k：λ 偏小，抬高 λ 把它往左推
+                lo = mid;
+            } else {
+                // 最低点 x < k：λ 偏大，降低 λ 把它往右推
+                hi = mid;
+            }
+        }
+        return ans;
+    }
 };

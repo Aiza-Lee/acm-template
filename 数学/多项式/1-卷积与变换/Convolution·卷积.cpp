@@ -5,7 +5,7 @@ namespace poly_ext {
 // 普通卷积 (普通多项式乘法)
 // res[k] = sum_{i+j = k} a[i] * b[j]
 Poly convolution(const Poly& a, const Poly& b) {
-	return a * b;
+    return a * b;
 }
 
 /**
@@ -28,9 +28,9 @@ Poly convolution(const Poly& a, const Poly& b) {
  * - res[b.size() - 1 - d] 对应 k = -d (i = j - d) 的项
  */
 Poly difference_convolution(const Poly& a, const Poly& b) {
-	Poly b_rev = b;
-	std::reverse(b_rev.begin(), b_rev.end());
-	return a * b_rev;
+    Poly b_rev = b;
+    std::reverse(b_rev.begin(), b_rev.end());
+    return a * b_rev;
 }
 
 } // namespace poly_ext

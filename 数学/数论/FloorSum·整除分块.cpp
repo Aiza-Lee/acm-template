@@ -15,42 +15,42 @@
  *      4. 原理: floor_sum_w 需要 f 的前缀和数组 (1-indexed), pref[0] = 0
  */
 struct FloorSum {
-	static i64 sum(i64 n) {
-		i64 ans = 0;
-		for (i64 l = 1, r; l <= n; l = r + 1) {
-			r = n / (n / l);
-			ans += (n / l) * (r - l + 1);
-		}
-		return ans;
-	}
+    static i64 sum(i64 n) {
+        i64 ans = 0;
+        for (i64 l = 1, r; l <= n; l = r + 1) {
+            r = n / (n / l);
+            ans += (n / l) * (r - l + 1);
+        }
+        return ans;
+    }
 
-	static i64 sum(i64 n, i64 k) {
-		i64 ans = 0;
-		for (i64 l = 1, r; l <= n; l = r + 1) {
-			if (k / l == 0) break;
-			r = std::min(k / (k / l), n);
-			ans += (k / l) * (r - l + 1);
-		}
-		return ans;
-	}
+    static i64 sum(i64 n, i64 k) {
+        i64 ans = 0;
+        for (i64 l = 1, r; l <= n; l = r + 1) {
+            if (k / l == 0) break;
+            r = std::min(k / (k / l), n);
+            ans += (k / l) * (r - l + 1);
+        }
+        return ans;
+    }
 
-	static i64 sum_w(i64 n, i64 k, const std::vector<i64>& pref) {
-		i64 ans = 0;
-		for (i64 l = 1, r; l <= n; l = r + 1) {
-			if (k / l == 0) break;
-			r = std::min(k / (k / l), n);
-			ans += (pref[r] - pref[l - 1]) * (k / l);
-		}
-		return ans;
-	}
+    static i64 sum_w(i64 n, i64 k, const std::vector<i64>& pref) {
+        i64 ans = 0;
+        for (i64 l = 1, r; l <= n; l = r + 1) {
+            if (k / l == 0) break;
+            r = std::min(k / (k / l), n);
+            ans += (pref[r] - pref[l - 1]) * (k / l);
+        }
+        return ans;
+    }
 
-	static i64 sum2(i64 n, i64 m) {
-		i64 ans = 0;
-		i64 lim = std::min(n, m);
-		for (i64 l = 1, r; l <= lim; l = r + 1) {
-			r = std::min(n / (n / l), m / (m / l));
-			ans += (n / l) * (m / l) * (r - l + 1);
-		}
-		return ans;
-	}
+    static i64 sum2(i64 n, i64 m) {
+        i64 ans = 0;
+        i64 lim = std::min(n, m);
+        for (i64 l = 1, r; l <= lim; l = r + 1) {
+            r = std::min(n / (n / l), m / (m / l));
+            ans += (n / l) * (m / l) * (r - l + 1);
+        }
+        return ans;
+    }
 };

@@ -16,20 +16,20 @@ std::vector<int> son[N];
  * @param is_max 是否为最大化者的回合
  */
 int alpha_beta(int u, int alph, int beta, bool is_max) {
-	if (!son_cnt[u]) return val[u];
-	if (is_max) {
-		for (int i = 0; i < son_cnt[u]; ++i) {
-			int d = son[u][i];
-			alph = std::max(alph, alpha_beta(d, alph, beta, !is_max));
-			if (alph >= beta) break;
-		}
-		return alph;
-	} else {
-		for (int i = 0; i < son_cnt[u]; ++i) {
-			int d = son[u][i];
-			beta = std::min(beta, alpha_beta(d, alph, beta, !is_max));
-			if (alph >= beta) break;
-		}
-		return beta;
-	}
+    if (!son_cnt[u]) return val[u];
+    if (is_max) {
+        for (int i = 0; i < son_cnt[u]; ++i) {
+            int d = son[u][i];
+            alph = std::max(alph, alpha_beta(d, alph, beta, !is_max));
+            if (alph >= beta) break;
+        }
+        return alph;
+    } else {
+        for (int i = 0; i < son_cnt[u]; ++i) {
+            int d = son[u][i];
+            beta = std::min(beta, alpha_beta(d, alph, beta, !is_max));
+            if (alph >= beta) break;
+        }
+        return beta;
+    }
 }

@@ -24,43 +24,43 @@
  * Poly power_sums(const std::vector<int>& a, int m);
  * 
  * Note:
- * 		1. Time: O(n log^2 n + m log m)
- * 		2. Space: O(n + m)
- * 		3. O(n log^2 n) 部分对应分治乘法，O(m log m) 对应多项式求导积分及求逆。
+ *      1. Time: O(n log^2 n + m log m)
+ *      2. Space: O(n + m)
+ *      3. O(n log^2 n) 部分对应分治乘法，O(m log m) 对应多项式求导积分及求逆。
  */
 
 namespace poly_ext {
 
 Poly power_sums(const std::vector<int>& a, int m) {
-	if (a.empty()) {
-		return Poly(m, 0);
-	}
-	
-	auto solve = [&](auto self, int l, int r) -> Poly {
-		if (l == r) {
-			// 构造 1 - a[l]*x
-			Poly res(2);
-			res[0] = 1;
-			res[1] = sub(0, a[l]); 
-			return res;
-		}
-		int mid = l + (r - l) / 2;
-		return self(self, l, mid) * self(self, mid + 1, r);
-	};
-	
-	Poly P = solve(solve, 0, (int)a.size() - 1);
-	
-	P.resize(m);
-	
-	Poly lnP = P.ln(m);
-	
-	Poly res(m);
-	res[0] = a.size();
-	rep(i, 1, m - 1) {
-		res[i] = mul(lnP[i], sub(0, i)); 
-	}
-	
-	return res;
+    if (a.empty()) {
+        return Poly(m, 0);
+    }
+    
+    auto solve = [&](auto self, int l, int r) -> Poly {
+        if (l == r) {
+            // 构造 1 - a[l]*x
+            Poly res(2);
+            res[0] = 1;
+            res[1] = sub(0, a[l]); 
+            return res;
+        }
+        int mid = l + (r - l) / 2;
+        return self(self, l, mid) * self(self, mid + 1, r);
+    };
+    
+    Poly P = solve(solve, 0, (int)a.size() - 1);
+    
+    P.resize(m);
+    
+    Poly lnP = P.ln(m);
+    
+    Poly res(m);
+    res[0] = a.size();
+    rep(i, 1, m - 1) {
+        res[i] = mul(lnP[i], sub(0, i)); 
+    }
+    
+    return res;
 }
 
 } // namespace poly_ext
