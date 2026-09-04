@@ -7,8 +7,8 @@ namespace poly_ext {
  * 算法介绍: 用于求解有理分式 [x^n] P(x)/Q(x) 和常系数线性递推数列第 n 项。数学原理见文字部分。
  * 模板参数: 无
  * Interface: 
- *  - bostan_mori(n, P, Q): 求 [x^n] P(x)/Q(x)
- *  - linear_recurrence(n, c, a): 求常系数线性递推数列第 n 项
+ *  - bostan_mori(n, P, Q)       求 [x^n] P(x)/Q(x)
+ *  - linear_recurrence(n, c, a) 求常系数线性递推数列第 n 项
  * Note:
  *      1. Time: O(d log d log n), d = deg(Q)
  *      2. Space: O(d)

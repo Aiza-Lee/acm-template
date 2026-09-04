@@ -3,8 +3,8 @@
 /**
  * Minimal Representation 最小表示法
  * 
- * interface:
- *      get_min_representation(string s)    // 获取字符串s的最小表示法的起始位置 (0-based)
+ * Interface:
+ *      get_min_representation(string s)    获取字符串s的最小表示法的起始位置 (0-based)
  * 
  * note:
  *      1. 最小表示法：字符串S的循环同构串中字典序最小的串。

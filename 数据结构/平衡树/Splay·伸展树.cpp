@@ -5,18 +5,18 @@
  * 算法介绍: 维护序列的文艺平衡树版 splay，使用双哨兵配合按排名定位区间。
  * 模板参数: T
  * Interface:
- *      Splay(n), init(n): 初始化，可选预留 n 个结点
- *      size(), empty(), clear(): 常用辅助接口
- *      insert(pos, v), erase(pos): 按位置插入 / 删除
- *      reverse(l, r): 区间翻转
- *      kth(k): 查询第 k 个元素
- *      build(a): 按给定顺序 O(N) 建树
- *      traverse(func): 中序遍历全部实际元素
+ *      Splay(n), init(n)          初始化，可选预留 n 个结点
+ *      size(), empty(), clear()   常用辅助接口
+ *      insert(pos, v), erase(pos) 按位置插入 / 删除
+ *      reverse(l, r)              区间翻转
+ *      kth(k)                     查询第 k 个元素
+ *      build(a)                   按给定顺序 O(N) 建树
+ *      traverse(func)             中序遍历全部实际元素
  * Note:
  *      1. Time: 所有操作均摊 O(log N)，build O(N)
  *      2. Space: O(N)
- *      3. 外部位置统一为 1-based；插入位置 `pos` 表示插到前 `pos` 个元素之后
- *      4. 用法/技巧: 用双哨兵隔离区间，`_range(l, r)` 返回目标区间子树根
+ *      3. 外部位置统一为 1-based；插入位置 pos 表示插到前 pos 个元素之后
+ *      4. 用法/技巧: 用双哨兵隔离区间，_range(l, r) 返回目标区间子树根
  */
 template<typename T>
 struct Splay {

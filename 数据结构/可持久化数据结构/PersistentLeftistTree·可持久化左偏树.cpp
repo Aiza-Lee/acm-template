@@ -4,12 +4,12 @@
  * 算法介绍: merge 时沿递归链复制结点，保留旧版本结构；默认维护小根堆。
  * 模板参数: VT
  * Interface:
- *      PLT(cap), init(cap): 初始化，可选预留 cap 个结点
- *      merge(x, y): 合并两棵堆，返回新根；原根保持不变
- *      push(rt, v): 在 rt 版本基础上插入 v，返回新根
- *      pop(rt): 删除 rt 版本堆顶，返回新根
- *      top(rt): 返回 rt 版本堆顶元素
- *      empty(rt): 判断 rt 是否为空堆
+ *      PLT(cap), init(cap) 初始化，可选预留 cap 个结点
+ *      merge(x, y)         合并两棵堆，返回新根；原根保持不变
+ *      push(rt, v)         在 rt 版本基础上插入 v，返回新根
+ *      pop(rt)             删除 rt 版本堆顶，返回新根
+ *      top(rt)             返回 rt 版本堆顶元素
+ *      empty(rt)           判断 rt 是否为空堆
  * Note:
  *      1. Time: 所有操作均摊 O(log N)
  *      2. Space: 每次操作新建 O(log N) 个结点

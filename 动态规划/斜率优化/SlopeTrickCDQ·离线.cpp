@@ -1,12 +1,12 @@
 #include "aizalib.h"
 /**
  * 斜率优化 - CDQ分治
- * 算法介绍: 离线求解标准式 `dp[i] = c[i] + min_{0<=j<i}(dp[j] + a[i] * b[j])`。
+ * 算法介绍: 离线求解标准式 dp[i] = c[i] + min_{0<=j<i}(dp[j] + a[i] * b[j])。
  * 模板参数: T
  * Interface:
- *      CDQSlopeDP<T>(a, b, c, dp0, inf): 传入 1-based 的 a / c，与含 b[0] 的 b
- *      solve(): 求出 dp[1..n]
- *      value(i): 查询 dp[i]
+ *      CDQSlopeDP<T>(a, b, c, dp0, inf) 传入 1-based 的 a / c，与含 b[0] 的 b
+ *      solve()                          求出 dp[1..n]
+ *      value(i)                         查询 dp[i]
  * Note:
  *      1. Time: O(N log^2 N)
  *      2. Space: O(N)

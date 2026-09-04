@@ -12,8 +12,8 @@
  *     2. cost(b,c) ≤ cost(a,d),  a≤b≤c≤d (区间包含单调性)
  * 模板参数: None
  * Interface:
- *     solve(n, cost):  返回dp[1][n], cost(i,j)为合并区间[i,j]的代价
- *     solve_full(n, cost):  返回(dp表, opt表), opt[i][j]存最优分割点
+ *     solve(n, cost)      返回dp[1][n], cost(i,j)为合并区间[i,j]的代价
+ *     solve_full(n, cost) 返回(dp表, opt表), opt[i][j]存最优分割点
  * Note:
  *     1. Time: O(n^2)
  *     2. Space: O(n^2)

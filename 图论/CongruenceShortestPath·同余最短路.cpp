@@ -10,13 +10,13 @@
  *      给定正整数的非负整数线性组合。
  *
  * Interface:
- *      solve(base, values): 以 base 为模数，values 为其余系数。
+ *      solve(base, values)      以 base 为模数，values 为其余系数。
  *          返回 std::vector<i64> dist, 其中 dist[r] 为
  *          模 base 余 r 的最小可达值。dist[0] = 0。
  *          不可达的余数设为 INF。
- *      reachable(dist, target): 判断 target 是否可表示为
+ *      reachable(dist, target)  判断 target 是否可表示为
  *          给定系数的非负整数组合。
- *      max_not_achievable(dist): 返回最大不可表示数。
+ *      max_not_achievable(dist) 返回最大不可表示数。
  *          要求所有余数均可达（即 gcd = 1），否则返回 -1。
  *
  * Note:

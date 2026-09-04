@@ -12,8 +12,8 @@
  *      无
  * 
  * Interface:
- *      void add_edge(int u, int v): 添加有向边 u -> v
- *      void build(int s): 以 s 为源点构建支配树
+ *      void add_edge(int u, int v) 添加有向边 u -> v
+ *      void build(int s)           以 s 为源点构建支配树
  * 
  * Note:
  *      1. 时间复杂度: O(M \alpha(N)) 或 O(M \log N)

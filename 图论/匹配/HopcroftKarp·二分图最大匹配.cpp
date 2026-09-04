@@ -4,9 +4,9 @@
  * 算法介绍: 对显式二分图分层后批量寻找最短增广路，求最大匹配。
  * 模板参数: 无
  * Interface:
- *      HopcroftKarp(int n, int m)      初始化左部 1~n、右部 1~m 的二分图
- *      void add_edge(int u, int v)     添加左部点 u 到右部点 v 的边
- *      int solve()     返回最大匹配数，并在 match_l / match_r 中恢复匹配
+ *      HopcroftKarp(int n, int m)  初始化左部 1~n、右部 1~m 的二分图
+ *      void add_edge(int u, int v) 添加左部点 u 到右部点 v 的边
+ *      int solve()                 返回最大匹配数，并在 match_l / match_r 中恢复匹配
  *      std::pair<std::vector<int>, std::vector<int>> min_vertex_cover() const:
  *          在 solve() 后返回一组最小点覆盖的左右部点集
  * Note:
@@ -14,8 +14,8 @@
  *      2. Space: O(n + m + E)
  *      3. 1-based indexing. 左部点编号 1~n，右部点编号 1~m。
  *      4. 用法/技巧:
- *          4.1 `match_l[u]` / `match_r[v]` 为匹配对象，0 表示未匹配。
- *          4.2 `min_vertex_cover()` 需在 `solve()` 后调用，返回值满足 Konig 定理，大小等于最大匹配数。
+ *          4.1 match_l[u] / match_r[v] 为匹配对象，0 表示未匹配。
+ *          4.2 min_vertex_cover() 需在 solve() 后调用，返回值满足 Konig 定理，大小等于最大匹配数。
  */
 struct HopcroftKarp {
     int n;                              // 左部点数

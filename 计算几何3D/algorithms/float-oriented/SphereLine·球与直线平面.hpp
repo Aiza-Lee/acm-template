@@ -12,9 +12,9 @@
  *  Sphere-Plane / Sphere-Sphere 在 Sphere·球.hpp;Line-Plane 在 Line·空间直线.hpp。
  *
  * API:
- *  sphere_line_intersection(line, sphere) -> vector<Point<ld>>: 球与直线交点;按 t 升序返回 0/1/2 个交点。O(1)。
- *  two_planes_intersection(p1, p2) -> optional<Line<ld>>: 两平面的交线;法向量平行或重合时返回 nullopt。O(1)。
- *  three_planes_intersection(p1, p2, p3) -> optional<Point<ld>>: 三平面唯一点;Crammer 行列式为 0 返回 nullopt。O(1)。
+ *  sphere_line_intersection(line, sphere) -> vector<Point<ld>>  球与直线交点;按 t 升序返回 0/1/2 个交点。O(1)。
+ *  two_planes_intersection(p1, p2) -> optional<Line<ld>>        两平面的交线;法向量平行或重合时返回 nullopt。O(1)。
+ *  three_planes_intersection(p1, p2, p3) -> optional<Point<ld>> 三平面唯一点;Crammer 行列式为 0 返回 nullopt。O(1)。
  *
  * Notes:
  *  球-直线的求交:代入 line.p0 + t·dir,展开 |P-c|²=r² 为 |d|²·t² + 2 d·(p0-c) t + |p0-c|²-r² = 0。

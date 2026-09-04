@@ -5,8 +5,8 @@
  * 算法介绍: 当 ord(a) 的质因子较小（smooth）时，将 a^x = b (mod p) 的离散对数分解到各质数幂子群中分别求解，再通过 CRT 合并。
  * 模板参数: None
  * Interface:
- *      PohligHellman::solve(a, b, p)                   // 求最小非负整数解，Time: O(sum e_i * q_i)
- *      PohligHellman::solve(a, b, p, factors_of_pm1)    // 带 p-1 预分解因子，格式 vector<pair<质数, 指数>>
+ *      PohligHellman::solve(a, b, p)                 求最小非负整数解，Time: O(sum e_i * q_i)
+ *      PohligHellman::solve(a, b, p, factors_of_pm1) 带 p-1 预分解因子，格式 vector<pair<质数, 指数>>
  * Note:
  *      1. p 需为质数（群阶 = p-1），gcd(a, p) = 1；否则需 ExBSGS
  *      2. Time: O(sum e_i * q_i)，ord(a) = prod q_i^{e_i}

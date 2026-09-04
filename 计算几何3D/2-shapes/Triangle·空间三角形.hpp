@@ -9,14 +9,14 @@
  *  提供三维空间三角形的面积、法向、重心坐标与四面体有向体积。
  *
  * API:
- *  triangle_squared_area_2(a, b, c) -> T: 4 倍面积平方 = |(b - a) × (c - a)|²;整数安全(T 范围内)。O(1)。
- *  triangle_area(a, b, c) -> T: 三角形面积。浮点。O(1)。
- *  triangle_normal(a, b, c) -> Point<T>: 单位法向量;退化时 (叉积零) 返回零向量。浮点。O(1)。
- *  signed_solid_angle_2(a, b, c) -> T: 两倍"有向"立体角 (|(b-a)·(c-a)| 等投影量) 不存在;保留占位。
- *  barycentric(p, a, b, c, &alpha, &beta, &gamma): 重心坐标,三参数 α,β,γ 满足 α + β + γ = 1。浮点。
- *  point_in_triangle(p, a, b, c) -> int: +1 (内) / -1 (外) / 0 (边上或退化)。浮点。O(1)。
- *  signed_volume_tetrahedron(a, b, c, d) -> T: 四面体 6 倍有向体积 = ((b - a) × (c - a)) · (d - a);整数坐标受限时整数安全。O(1)。
- *  tetrahedron_volume(a, b, c, d) -> T: 浮点无符号体积。O(1)。
+ *  triangle_squared_area_2(a, b, c) -> T           4 倍面积平方 = |(b - a) × (c - a)|²;整数安全(T 范围内)。O(1)。
+ *  triangle_area(a, b, c) -> T                     三角形面积。浮点。O(1)。
+ *  triangle_normal(a, b, c) -> Point<T>            单位法向量;退化时 (叉积零) 返回零向量。浮点。O(1)。
+ *  signed_solid_angle_2(a, b, c) -> T              两倍"有向"立体角 (|(b-a)·(c-a)| 等投影量) 不存在;保留占位。
+ *  barycentric(p, a, b, c, &alpha, &beta, &gamma)  重心坐标,三参数 α,β,γ 满足 α + β + γ = 1。浮点。
+ *  point_in_triangle(p, a, b, c) -> int            +1 (内) / -1 (外) / 0 (边上或退化)。浮点。O(1)。
+ *  signed_volume_tetrahedron(a, b, c, d) -> T      四面体 6 倍有向体积 = ((b - a) × (c - a)) · (d - a);整数坐标受限时整数安全。O(1)。
+ *  tetrahedron_volume(a, b, c, d) -> T             浮点无符号体积。O(1)。
  *
  * Notes:
  *  面积 / 体积函数面对共线 / 共面退化返回 0,几何意义由调用方把握。

@@ -3,23 +3,23 @@
 /**
  * 高维决策单调性分治优化
  * 算法介绍:
- *      多层形式: `dp[t][i] = min_{j < i}(dp[t - 1][j] + cost(t, j, i))`。
- *      若每层最优决策单调，即 `opt[t][i] <= opt[t][i + 1]`，可逐层分治优化。
+ *      多层形式: dp[t][i] = min_{j < i}(dp[t - 1][j] + cost(t, j, i))。
+ *      若每层最优决策单调，即 opt[t][i] <= opt[t][i + 1]，可逐层分治优化。
  * 适用条件:
  *      1. 每一层都需要最优决策单调。
  *      2. 四边形不等式是常见充分条件，见文字资料。
  * 模板参数:
  *      T: DP 值类型；F: 代价函数类型
  * Interface:
- *      DCDP2D(m, n, inf, cost): 多层优化，`cost(t, j, i)` 返回第 t 层从 j 转移到 i 的附加代价
- *      DCDP2D::set_base(base): 设置 `dp[0]`
+ *      DCDP2D(m, n, inf, cost) 多层优化，cost(t, j, i) 返回第 t 层从 j 转移到 i 的附加代价
+ *      DCDP2D::set_base(base)  设置 dp[0]
  *      DCDP2D::solve_layer(t, l = 1, r = n, ql = 0, qr = n - 1)
  *      DCDP2D::solve_all(l = 1, r = n, ql = 0, qr = n - 1)
  * Note:
  *      1. Time: O(m (r - l + 1) log (qr - ql + 2))
  *      2. Space: O(mn)
- *      3. 默认使用 1-based 状态下标，决策点通常为 `j in [0, i - 1]`
- *      4. `cost(...)` 应能较快计算
+ *      3. 默认使用 1-based 状态下标，决策点通常为 j in [0, i - 1]
+ *      4. cost(...) 应能较快计算
  */
 template<class T, class F>
 struct DCDP2D {

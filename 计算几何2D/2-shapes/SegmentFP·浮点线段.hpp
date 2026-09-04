@@ -9,10 +9,10 @@
  *  提供点与线段、线段与线段之间的距离及线段交点运算。
  *
  * API:
- *  distance_to_segment(p, s) -> T: 点到线段的有符号最短距离。O(1)。
- *  segment_intersection_point(s1, s2) -> Point<T>: 两线段交点，要求二者确实相交。O(1)。
- *  segment_segment_distance(s1, s2) -> T: 两线段间的最短距离。O(1)。
- *  SegmentFP: Segment<ld> 的常用别名。
+ *  distance_to_segment(p, s) -> T                             点到线段的有符号最短距离。O(1)。
+ *  segment_intersection_point(s1, s2) -> Point<T>             两线段交点，要求二者确实相交。O(1)。
+ *  segment_segment_distance(s1, s2) -> T                      两线段间的最短距离。O(1)。
+ *  SegmentFP                                      Segment<ld> 的常用别名。
  *
  * Notes:
  *  仅支持浮点坐标；调用 segment_intersection_point 前应先用 segment_intersect 确认相交。

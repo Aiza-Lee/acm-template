@@ -11,8 +11,8 @@
  *      T: 值类型，需支持 operator< 及默认构造
  *
  * Interface:
- *      SparseTable2D(grid): 传入 1-based 二维网格 (n 行 m 列) 构建
- *      query(r1, c1, r2, c2): 查询矩形 [r1, r2] × [c1, c2] 内的最小值，O(1)
+ *      SparseTable2D(grid)   传入 1-based 二维网格 (n 行 m 列) 构建
+ *      query(r1, c1, r2, c2) 查询矩形 [r1, r2] × [c1, c2] 内的最小值，O(1)
  *
  * Note:
  *      1. Time: Build O(N M log N log M), Query O(1)

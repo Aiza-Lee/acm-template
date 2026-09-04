@@ -41,14 +41,14 @@ struct FHQNullTag {
  * 算法介绍: 基于 split / merge 维护序列或有序 multiset；聚合信息与懒标记均由用户自定义。
  * 模板参数: Info, Tag, T
  * Interface:
- *      FHQ<Info, Tag, T>(n), init(n): 初始化，可选预留 n 个结点
- *      size(), empty(), clear(): 常用辅助接口
- *      insert(pos, v), erase(pos): 按排名插入 / 删除（序列模式）
- *      modify(l, r, tag), query(l, r): 序列区间修改 / 查询
- *      build(a): 按给定顺序 O(N) 建树（序列模式）
- *      insert_val(v), erase_val(v): 按值插入 / 删除（BST / multiset 模式）
- *      modify_val(lv, rv, tag): 值域区间修改（需保证 Tag 不破坏 BST 有序性）
- *      rank(v), kth(k), prev(v), next(v): BST 常用查询
+ *      FHQ<Info, Tag, T>(n), init(n)         初始化，可选预留 n 个结点
+ *      size(), empty(), clear()              常用辅助接口
+ *      insert(pos, v), erase(pos)            按排名插入 / 删除（序列模式）
+ *      modify(l, r, tag), query(l, r)        序列区间修改 / 查询
+ *      build(a)                              按给定顺序 O(N) 建树（序列模式）
+ *      insert_val(v), erase_val(v)           按值插入 / 删除（BST / multiset 模式）
+ *      modify_val(lv, rv, tag)               值域区间修改（需保证 Tag 不破坏 BST 有序性）
+ *      rank(v), kth(k), prev(v), next(v)     BST 常用查询
  * Note:
  *      1. Time: 所有操作期望 O(log N)，build O(N)
  *      2. Space: O(N)

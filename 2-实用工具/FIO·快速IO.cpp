@@ -4,15 +4,15 @@
  * FastIO 卡常工具
  * 通过大缓冲区读写加速，适用于大数据量场景。
  * Interface:
- *      FIO::read(T &x)                     // 读入整数
- *      FIO::readFloat(T &x)                // 读入浮点数
- *      FIO::write(T x)                     // 写出整数
- *      FIO::writeFloat(T x, int p)         // 写出浮点数，p 为小数位数，默认 6
- *      FIO::readWord()                     // 读入单词，返回 std::string
- *      FIO::writeStr(const std::string &s) // 写出字符串
- *      FIO::writeStr(const char *s)        // 写出字符串
- *      FIO::nl()                           // 写出换行符
- *      FIO::flush()                        // 主动刷新输出缓冲区
+ *      FIO::read(T &x)                     读入整数
+ *      FIO::readFloat(T &x)                读入浮点数
+ *      FIO::write(T x)                     写出整数
+ *      FIO::writeFloat(T x, int p)         写出浮点数，p 为小数位数，默认 6
+ *      FIO::readWord()                     读入单词，返回 std::string
+ *      FIO::writeStr(const std::string &s) 写出字符串
+ *      FIO::writeStr(const char *s)        写出字符串
+ *      FIO::nl()                           写出换行符
+ *      FIO::flush()                        主动刷新输出缓冲区
  * Notes:
  *      1. 交互题尽量不使用该工具卡常。
  *      2. 读入函数返回 bool，表示是否成功读入（遇到 EOF 则返回 false）。

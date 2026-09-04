@@ -9,17 +9,17 @@
  *      set_val(x, v), modify_add(x, y, v): 路径 x -> y 上所有点 +v
  *      make_root(x), find_root(x), split(x, y)
  *      link(x, y), cut(x, y), connected(x, y)
- *      query_sum(x, y): 查询路径 x -> y 上的点权和
- *      query_size(x, y): 查询路径 x -> y 上的点数
+ *      query_sum(x, y)  查询路径 x -> y 上的点权和
+ *      query_size(x, y) 查询路径 x -> y 上的点数
  *      query_component_size(x), query_subtree_size(root, x)
  *      lca(x, y)
  * Internal Methods:
  *      字段访问器、内部分析同 LCT·动态树.cpp。额外:
- *      add_tag(p): 访问路径加懒标记
- *      _apply_add(p, v): 对节点 p 应用加法标记 v
+ *      add_tag(p)       访问路径加懒标记
+ *      _apply_add(p, v) 对节点 p 应用加法标记 v
  *          更新 val(p) += v, sum(p) += v * cnt(p)（精确累加需乘以路径大小）
  *          add_tag(p) += v，rev 不变
- *      _push_down 先下传 rev，再下传 add_tag（因为 add 不依赖左右方向）
+ *      _push_down       先下传 rev，再下传 add_tag（因为 add 不依赖左右方向）
  * Note:
  *      1. Time: 单次均摊 O(log N)
  *      2. Space: O(N)

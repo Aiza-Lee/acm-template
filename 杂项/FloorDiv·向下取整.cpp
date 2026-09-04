@@ -8,9 +8,9 @@
  *      可与 1-文字资料/数学/具体数学/取整操作.tex 的恒等式相互印证。
  *
  * API:
- *      floor_div(a, b): 返回 ⌊a/b⌋；满足 a = floor_div(a,b) * b + floor_mod(a,b)。
- *      floor_mod(a, b): 返回与 floor_div 配对的余数；b > 0 时结果 ∈ [0, b)，b < 0 时结果 ∈ (b, 0]。
- *      ceil_div(a, b):  返回 ⌈a/b⌉。
+ *      floor_div(a, b) 返回 ⌊a/b⌋；满足 a = floor_div(a,b) * b + floor_mod(a,b)。
+ *      floor_mod(a, b) 返回与 floor_div 配对的余数；b > 0 时结果 ∈ [0, b)，b < 0 时结果 ∈ (b, 0]。
+ *      ceil_div(a, b)  返回 ⌈a/b⌉。
  *
  * Notes:
  *      1. 全部函数要求 b != 0；AST(b != 0) 仅在 LOCAL 下生效。

@@ -5,10 +5,10 @@
  * 模板参数:
  *      T: 值类型，默认为 i64
  * interface:
- *      SegTreeMerge(int max_nodes):     // 构造函数，指定最大节点数
- *      update(int &u, int l, int r, int pos, T val):  // 单点修改
- *      query(int u, int ql, int qr):    // 区间查询
- *      merge(int x, int y):             // 合并两棵线段树，返回合并后的根节点
+ *      SegTreeMerge(int max_nodes)                  构造函数，指定最大节点数
+ *      update(int &u, int l, int r, int pos, T val) 单点修改
+ *      query(int u, int ql, int qr)                 区间查询
+ *      merge(int x, int y)                          合并两棵线段树，返回合并后的根节点
  * note:
  *      1. 空间复杂度 O(N log N)，通常需要开 32*N ~ 64*N 的空间
  *      2. 默认 merge 会破坏原树结构（复用节点），如需可持久化请参考 merge_new 注释部分

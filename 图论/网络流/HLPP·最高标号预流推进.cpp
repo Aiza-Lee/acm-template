@@ -5,9 +5,9 @@
  * 算法介绍: 最高标号预流推进算法，维护预流与高度标号，始终优先处理最高标号活跃点并执行 push / relabel。
  * 模板参数: Cap (容量类型)
  * Interface:
- *      HLPP(int n, int m = 0): 初始化 n 个点、预估 m 条原图边的网络
- *      void add_edge(int u, int v, Cap w): 添加一条容量为 w 的有向边
- *      Cap solve(int s, int t, Cap limit = INF): 返回至多增广 limit 流量后的最大流
+ *      HLPP(int n, int m = 0)                   初始化 n 个点、预估 m 条原图边的网络
+ *      void add_edge(int u, int v, Cap w)       添加一条容量为 w 的有向边
+ *      Cap solve(int s, int t, Cap limit = INF) 返回至多增广 limit 流量后的最大流
  * Note:
  *      1. Time: 理论最坏 O(V^2\sqrt{E}) 量级，实现中通常在大规模最大流上表现稳定
  *      2. Space: O(V + E)

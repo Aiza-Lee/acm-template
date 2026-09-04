@@ -2,12 +2,12 @@
 
 /**
  * 区间乘加线段树 (Range Affine Transformation)
- * 算法介绍: 基于通用懒标记线段树维护区间仿射变换 `x -> x * mul + add` 与区间和。
+ * 算法介绍: 基于通用懒标记线段树维护区间仿射变换 x -> x * mul + add 与区间和。
  * 模板参数: 无
  * Interface:
  *      using SegAffine = SegTree<Info, Tag>
- *      modify(l, r, {mul, add}): 对区间应用仿射变换
- *      query(l, r).sum: 查询区间和
+ *      modify(l, r, {mul, add}) 对区间应用仿射变换
+ *      query(l, r).sum          查询区间和
  * Note:
  *      1. Time: 单次修改/查询 O(log N)
  *      2. Space: O(N)

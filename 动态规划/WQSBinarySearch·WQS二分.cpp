@@ -28,11 +28,11 @@
  *      最终答案 = val - λ·k
  *      最小化问题直接使用；最大化问题请将价值取负转化为最小化。
  * Interface:
- *      solve(k, f, lo, hi): 整数惩罚二分，返回恰为 k 时的最优值
- *          k:   目标 k
- *          f:   f(λ) 返回 {val, cnt}，见"惩罚约定"
+ *      solve(k, f, lo, hi)            整数惩罚二分，返回恰为 k 时的最优值
+ *          k:      目标 k
+ *          f:      f(λ) 返回 {val, cnt}，见"惩罚约定"
  *          lo, hi: λ 的搜索范围，足够大以覆盖所有可能的边际斜率
- *      solve_float(k, f, lo, hi, eps): 浮点惩罚版本
+ *      solve_float(k, f, lo, hi, eps) 浮点惩罚版本
  * Note:
  *      1. Time: O(log(hi - lo) · T(f))，T(f) 为 f 的单次调用代价
  *      2. Space: O(1) 额外空间

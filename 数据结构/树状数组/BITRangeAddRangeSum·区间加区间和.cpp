@@ -4,18 +4,18 @@
  * 算法介绍: 用两棵 1-based 树状数组维护差分，支持区间加、前缀和与区间和。
  * 模板参数: T
  * Interface:
- *      RangeBitTree<T>(n), init(n): 初始化长度为 n 的结构
- *      RangeBitTree<T>(a), init(a): 用 1-based 数组 a 建树
- *      add(l, r, v)    令 a[l..r] += v
- *      sum_prefix(p)   查询前缀 [1, p] 的和
- *      sum(l, r)       查询区间 [l, r] 的和
- *      all_sum()       查询整体 [1, n] 的和
+ *      RangeBitTree<T>(n), init(n) 初始化长度为 n 的结构
+ *      RangeBitTree<T>(a), init(a) 用 1-based 数组 a 建树
+ *      add(l, r, v)                令 a[l..r] += v
+ *      sum_prefix(p)               查询前缀 [1, p] 的和
+ *      sum(l, r)                   查询区间 [l, r] 的和
+ *      all_sum()                   查询整体 [1, n] 的和
  * Note:
  *      1. Time: 单次 add / sum_prefix / sum O(log N)，建树 O(N)
  *      2. Space: O(N)
- *      3. 下标从 1 开始；若传入数组建树，则要求 `a[1..n]` 有效、`a[0]` 留空
+ *      3. 下标从 1 开始；若传入数组建树，则要求 a[1..n] 有效、a[0] 留空
  *      4. 用法/技巧:
- *          4.1 维护差分 d[i] = a[i] - a[i - 1]，前缀和可写成 `(p + 1) * sum(d) - sum(i * d[i])`。
+ *          4.1 维护差分 d[i] = a[i] - a[i - 1]，前缀和可写成 (p + 1) * sum(d) - sum(i * d[i])。
  */
 template<typename T = i64>
 struct RangeBitTree {

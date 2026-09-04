@@ -5,16 +5,16 @@
  * 算法介绍: 使用 Tarjan 算法在线求有向图的强连通分量。
  * 模板参数: 无
  * Interface:
- *      SCC(Graph& g)           构造时完成求解
- *      int scc_cnt             强连通分量个数
+ *      SCC(Graph& g)                      构造时完成求解
+ *      int scc_cnt                        强连通分量个数
  *      std::vector<int> scc        scc[u] 为点 u 所属的强连通分量编号
  * Note:
  *      1. Time: O(V + E)
  *      2. Space: O(V)
  *      3. 1-based indexing. 对不连通图会自动逐块处理。
  *      4. 用法/技巧:
- *          4.1 若后续要做缩点 DAG，直接按 `scc[u] != scc[v]` 收集跨分量边即可。
- *          4.2 若更偏好两遍 DFS 写法，可改用同目录下的 `SCC_kosaraju(强连通分量).cpp`。
+ *          4.1 若后续要做缩点 DAG，直接按 scc[u] != scc[v] 收集跨分量边即可。
+ *          4.2 若更偏好两遍 DFS 写法，可改用同目录下的 SCC_kosaraju(强连通分量).cpp。
  *          4.3 per(i, scc_cnt, 1) 遍历顺序即为缩点图的拓扑顺序。
  */
 

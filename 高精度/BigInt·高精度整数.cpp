@@ -11,20 +11,20 @@
  * API:
  *      BigInt<Conv>::BigInt() / BigInt(i64) / BigInt(const string&):
  *          构造。空为 0；i64 与十进制字符串均支持前导 '-' 与前导零。
- *      BigInt<Conv>::read(const string&): 从十进制字符串解析，覆盖旧值。
- *      BigInt<Conv>::toString(): 十进制字符串，0 返回 "0"。
- *      BigInt<Conv>::trim(): 去高位零；归零时符号置 +1。
- *      BigInt<Conv>::isZero(): 是否为零。
- *      BigInt<Conv>::sgn: 符号 ±1（值为 0 时恒为 +1）。
- *      BigInt<Conv>::operator== / != / < / > / <= / >=: 带符号比较。
- *      BigInt<Conv>::operator+ / - / *: 加减乘；乘用 Conv::conv + 进位。
- *      BigInt<Conv>::operator+= / -= / *=: 就地运算。
- *      BigInt<Conv>::operator- (一元) / abs(): 取负 / 取绝对值。
- *      BigInt<Conv>::cmp(b): 带符号三态比较，返回 < -1，= 0，> 1。
- *      BigInt<Conv>::BASE / BASE_DIGITS: 进制及其十进制宽度，由引擎决定。
- *      BigInt<Conv>::operator>> / <<: 流读写，输出同 toString。
- *      NttConv / FftConv: 卷积引擎，O(L log L)，L 为数字个数。
- *      BigIntNTT = BigInt<NttConv> / BigIntFFT = BigInt<FftConv>: 预置别名。
+ *      BigInt<Conv>::read(const string&)                         从十进制字符串解析，覆盖旧值。
+ *      BigInt<Conv>::toString()                                  十进制字符串，0 返回 "0"。
+ *      BigInt<Conv>::trim()                                      去高位零；归零时符号置 +1。
+ *      BigInt<Conv>::isZero()                                    是否为零。
+ *      BigInt<Conv>::sgn                                         符号 ±1（值为 0 时恒为 +1）。
+ *      BigInt<Conv>::operator== / != / < / > / <= / >=           带符号比较。
+ *      BigInt<Conv>::operator+ / - / *                           加减乘；乘用 Conv::conv + 进位。
+ *      BigInt<Conv>::operator+= / -= / *=                        就地运算。
+ *      BigInt<Conv>::operator-                                   (一元) / abs(): 取负 / 取绝对值。
+ *      BigInt<Conv>::cmp(b)                                      带符号三态比较，返回 < -1，= 0，> 1。
+ *      BigInt<Conv>::BASE / BASE_DIGITS                          进制及其十进制宽度，由引擎决定。
+ *      BigInt<Conv>::operator>> / <<                             流读写，输出同 toString。
+ *      NttConv / FftConv                                         卷积引擎，O(L log L)，L 为数字个数。
+ *      BigIntNTT = BigInt<NttConv> / BigIntFFT = BigInt<FftConv> 预置别名。
  *
  * Notes:
  *      1. 数字数组低位在前，每位 ∈ [0, BASE)，BASE 由引擎决定；所有

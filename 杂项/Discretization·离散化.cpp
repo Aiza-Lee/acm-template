@@ -4,15 +4,15 @@
  * 算法介绍: 将数值映射到连续整数 [1, sz]
  * 模板参数: T
  * Interface:
- *      add(x): 加入元素
- *      build(): 排序并去重
- *      get(x): 获取离散化后的值 (1-based)
- *      operator[](i): 获取第 i 个值 (1-based)
+ *      add(x)        加入元素
+ *      build()       排序并去重
+ *      get(x)        获取离散化后的值 (1-based)
+ *      operator[](i) 获取第 i 个值 (1-based)
  * Note:
  *      1. Time: Build O(N log N), Query O(log N)
  *      2. Space: O(N)
- *      3. 1-based indexing；`operator[](i)` 返回第 i 小的原值。
- *      4. 用法: `get(x)` 返回 `lower_bound` 位置，通常要求 x 已经加入并经过 `build()`。
+ *      3. 1-based indexing；operator[](i) 返回第 i 小的原值。
+ *      4. 用法: get(x) 返回 lower_bound 位置，通常要求 x 已经加入并经过 build()。
  */
 
 template<typename T>

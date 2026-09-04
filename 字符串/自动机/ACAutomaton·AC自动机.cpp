@@ -6,9 +6,9 @@
  * 多模式串匹配算法模板，包含Trie图优化和Fail图(DAG)拓扑排序优化。
  *
  * interface:
- *      void insert(const std::string& s, int id) // 插入模式串，s为字符串，id为模式串的唯一编号(通常从1开始)
- *      void build() // 构建Fail指针与Trie图，必须在所有insert完成后调用
- *      void query(const std::string& s) // 查询文本串，在Trie图上运行并对经过的节点打标记(count++)
+ *      void insert(const std::string& s, int id) 插入模式串，s为字符串，id为模式串的唯一编号(通常从1开始)
+ *      void build()                              构建Fail指针与Trie图，必须在所有insert完成后调用
+ *      void query(const std::string& s)          查询文本串，在Trie图上运行并对经过的节点打标记(count++)
  *      std::vector<int> get_results(int max_id)
  *          /// 获取所有模式串的匹配次数，利用Fail图拓扑排序汇总答案
  *          /// 返回vector下标对应模式串ID，max_id为最大的模式串编号

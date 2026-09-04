@@ -4,18 +4,18 @@
  * 算法介绍: 用四棵 1-based 二维树状数组维护二维差分，支持矩形加、矩形前缀和与子矩形求和。
  * 模板参数: T
  * Interface:
- *      RectBitTree2D<T>(n, m), init(n, m): 初始化 n * m 的结构
- *      RectBitTree2D<T>(a), init(a): 用 1-based 矩阵 a 建树
- *      add(x1, y1, x2, y2, v)  令 a[x1..x2][y1..y2] += v
- *      sum_prefix(x, y)        查询子矩形 [1, x] * [1, y] 的和
- *      sum(x1, y1, x2, y2)     查询子矩形 [x1, x2] * [y1, y2] 的和
- *      all_sum()           查询整体 [1, n] * [1, m] 的和
+ *      RectBitTree2D<T>(n, m), init(n, m) 初始化 n * m 的结构
+ *      RectBitTree2D<T>(a), init(a)       用 1-based 矩阵 a 建树
+ *      add(x1, y1, x2, y2, v)             令 a[x1..x2][y1..y2] += v
+ *      sum_prefix(x, y)                   查询子矩形 [1, x] * [1, y] 的和
+ *      sum(x1, y1, x2, y2)                查询子矩形 [x1, x2] * [y1, y2] 的和
+ *      all_sum()                          查询整体 [1, n] * [1, m] 的和
  * Note:
  *      1. Time: 单次 add / sum_prefix / sum O(log N log M)，建树 O(NM)
  *      2. Space: O(NM)
- *      3. 下标从 1 开始；若传入矩阵建树，则要求 `a[1..n][1..m]` 有效，0 行/列留空
+ *      3. 下标从 1 开始；若传入矩阵建树，则要求 a[1..n][1..m] 有效，0 行/列留空
  *      4. 用法/技巧:
- *          4.1 维护二维差分 d，则前缀和可写成 `(x+1)(y+1)sum(d)-(y+1)sum(i*d)-(x+1)sum(j*d)+sum(i*j*d)`。
+ *          4.1 维护二维差分 d，则前缀和可写成 (x+1)(y+1)sum(d)-(y+1)sum(i*d)-(x+1)sum(j*d)+sum(i*j*d)。
  */
 template<typename T = i64>
 struct RectBitTree2D {

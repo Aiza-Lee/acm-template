@@ -13,11 +13,11 @@
  *   MIN_CHAR: 起始字符 (默认'a')
  *
  * Interface:
- *   SAM(n)             : 预分配空间
- *   extend(char/string): 插入字符/字符串
- *   calc_size()        : 计算每个等价类中子串在原串中的出现次数
- *   calc_sub_cnt()     : 计算每个状态出发能构成的本质不同子串数
- *   kth_substring(k)   : 求字典序第k小的子串
+ *   SAM(n)              预分配空间
+ *   extend(char/string) 插入字符/字符串
+ *   calc_size()         计算每个等价类中子串在原串中的出现次数
+ *   calc_sub_cnt()      计算每个状态出发能构成的本质不同子串数
+ *   kth_substring(k)    求字典序第k小的子串
  *
  * Note:
  *   1. Time: O(|S|) 构建, O(|S|) 统计

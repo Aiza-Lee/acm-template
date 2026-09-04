@@ -5,10 +5,10 @@
  * 算法介绍: 维护直线集合，支持在线插入直线、在线查询某个 x 处的最小值。
  * 模板参数: T
  * Interface:
- *      LiChaoTree<T>(l, r), init(l, r): 初始化定义域 [l, r]
- *      add_line(k, b): 插入直线 y = kx + b
- *      query(x): 查询最小值
- *      clear(): 清空已插入直线
+ *      LiChaoTree<T>(l, r), init(l, r) 初始化定义域 [l, r]
+ *      add_line(k, b)                  插入直线 y = kx + b
+ *      query(x)                        查询最小值
+ *      clear()                         清空已插入直线
  * Note:
  *      1. Time: 单次 add_line / query O(log V)
  *      2. Space: O(Q log V)

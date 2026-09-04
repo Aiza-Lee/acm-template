@@ -4,20 +4,20 @@
  * 算法介绍: 整理竞赛里常用的位运算库函数速查，并提供少量可直接复用的轻量包装
  * 模板参数: None
  * Interface:
- *      popcount_u32/u64(x)                     : 统计二进制 1 的个数
- *      countr_zero_u32/u64(x)                  : 统计尾零个数，x = 0 时返回位宽
- *      countl_zero_u32/u64(x)                  : 统计前导零个数，x = 0 时返回位宽
- *      lowbit(x) / clear_lowbit(x) / is_pow2(x)    : 常见位运算封装
- *      highest_bit_index_u64(x)                : 最高位下标(0-based)，要求 x != 0
+ *      popcount_u32/u64(x)                      统计二进制 1 的个数
+ *      countr_zero_u32/u64(x)                   统计尾零个数，x = 0 时返回位宽
+ *      countl_zero_u32/u64(x)                   统计前导零个数，x = 0 时返回位宽
+ *      lowbit(x) / clear_lowbit(x) / is_pow2(x) 常见位运算封装
+ *      highest_bit_index_u64(x)                 最高位下标(0-based)，要求 x != 0
  *      bit_width_u64(x) / bit_floor_u64(x)
- *      / bit_ceil_u64(x)                       : C++20 <bit> 常用包装
- *      rotl64(x, k) / rotr64(x, k)         : 64 位循环移位
- *      foreach_subset(mask, f)             : 枚举 mask 的全部子集(包含 0)
+ *      / bit_ceil_u64(x)                       C++20 <bit> 常用包装
+ *      rotl64(x, k) / rotr64(x, k)             64位循环移位
+ *      foreach_subset(mask, f)                 枚举 mask 的全部子集(包含 0)
  * Note:
  *      1. Time: 各包装均为 O(1)；foreach_subset 为 O(子集数)
  *      2. Space: O(1)
  *      3. clz/ctz 对 0 的原生 builtin 未定义，本文件包装已统一处理
- *      4. 若环境支持 C++20 <bit>，bit_width / bit_floor / bit_ceil / rotl / rotr 可直接联想使用
+ *      4. 若环境支持 C++20 <bit>，bit_width / bit_floor / bit_ceil / rotl / rotr 可直接使用
  */
 
 inline int popcount_u32(u32 x) { return std::popcount(x); }

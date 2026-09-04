@@ -12,9 +12,9 @@
  *      INF: 无穷大值 (默认为 numeric_limits<T>::max() / 2)
  * 
  * Interface:
- *      add_edge(u, v, w): 添加有向边
- *      solve(s): 计算源点 s 到所有点的最短路，返回 false 若存在负环
- *      has_negative_cycle: 求解后标记是否存在负环
+ *      add_edge(u, v, w)  添加有向边
+ *      solve(s)           计算源点 s 到所有点的最短路，返回 false 若存在负环
+ *      has_negative_cycle 求解后标记是否存在负环
  * 
  * Note:
  *      1. 时间复杂度: 平均 O(kE), k 为常数 (~2). 最坏 O(VE).

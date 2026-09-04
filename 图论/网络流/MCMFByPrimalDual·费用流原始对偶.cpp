@@ -5,9 +5,9 @@
  * 算法介绍: 原始对偶算法，先用 SPFA 求初始势能，再用 Dijkstra 在非负化边权上反复寻找最短增广路。
  * 模板参数: Cap (容量类型), Cost (费用类型)
  * Interface:
- *      MCMF_PrimalDual(int n, int m = 0): 初始化 n 个点、预估 m 条原图边的网络
- *      void add_edge(int u, int v, Cap w, Cost c): 添加一条容量为 w、费用为 c 的有向边
- *      std::pair<Cap, Cost> solve(int s, int t, Cap limit = INF_CAP): 返回至多增广 limit 流量后的 {flow, cost}
+ *      MCMF_PrimalDual(int n, int m = 0)                             初始化 n 个点、预估 m 条原图边的网络
+ *      void add_edge(int u, int v, Cap w, Cost c)                    添加一条容量为 w、费用为 c 的有向边
+ *      std::pair<Cap, Cost> solve(int s, int t, Cap limit = INF_CAP) 返回至多增广 limit 流量后的 {flow, cost}
  * Note:
  *      1. Time: O(FE log V)，通常比纯 SPFA 版更稳
  *      2. Space: O(V + E)

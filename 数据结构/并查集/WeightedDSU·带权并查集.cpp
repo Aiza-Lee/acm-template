@@ -6,18 +6,18 @@
  * 模板参数:
  *      V: 权值类型 (默认为 i64)
  * Interface:
- *      WeightedDSU(n): 初始化 1..n
- *      find(x): 返回根并压缩路径，同时维护 val[x]
- *      merge(x, y, w): 合并 x, y，使得 weight[x] - weight[y] = w
- *      dist(x, y): 返回 weight[x] - weight[y]，要求 x, y 已连通
- *      same(x, y): 判断是否同集合
+ *      WeightedDSU(n) 初始化 1..n
+ *      find(x)        返回根并压缩路径，同时维护 val[x]
+ *      merge(x, y, w) 合并 x, y，使得 weight[x] - weight[y] = w
+ *      dist(x, y)     返回 weight[x] - weight[y]，要求 x, y 已连通
+ *      same(x, y)     判断是否同集合
  * Note:
  *      1. Time: 单次 find / merge / dist / same 均摊 O(alpha(n))
  *      2. Space: O(n)
- *      3. 1-based indexing；`val[x]` 表示 x 到当前父亲的权值，路径压缩后表示 x 到根的权值
+ *      3. 1-based indexing；val[x] 表示 x 到当前父亲的权值，路径压缩后表示 x 到根的权值
  *      4. 用法/技巧:
  *          4.1 默认维护加法群关系，适合差分约束、相对距离等。
- *          4.2 若要维护模关系，可将 `+=` / `-` 改成对应模运算并归一化。
+ *          4.2 若要维护模关系，可将 += / - 改成对应模运算并归一化。
  */
 template<typename V = i64>
 struct WeightedDSU {

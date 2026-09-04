@@ -5,9 +5,9 @@
  * 算法介绍: 基于分层图的最大流算法，每轮先 BFS 建立分层图，再在分层图上 DFS 多路增广。
  * 模板参数: Cap (容量类型)
  * Interface:
- *      Dinic(int n, int m = 0): 初始化 n 个点、预估 m 条原图边的网络
- *      void add_edge(int u, int v, Cap w): 添加一条容量为 w 的有向边
- *      Cap solve(int s, int t, Cap limit = INF): 返回至多增广 limit 流量后的最大流
+ *      Dinic(int n, int m = 0)                  初始化 n 个点、预估 m 条原图边的网络
+ *      void add_edge(int u, int v, Cap w)       添加一条容量为 w 的有向边
+ *      Cap solve(int s, int t, Cap limit = INF) 返回至多增广 limit 流量后的最大流
  * Note:
  *      1. Time: 一般图 O(V^2E)；单位容量网络 O(min(V^(2/3), E^(1/2))E)；二分图匹配 O(E\sqrt{V})
  *      2. Space: O(V + E)
@@ -15,7 +15,7 @@
  *      4. 用法/技巧:
  *          4.1 二分图最大匹配可直接按网络流建模，用 Dinic 求最大流。
  *          4.2 若只需发送部分流量，可直接传入 solve(s, t, limit)。
- *          4.3 `dep[u] = 0` 的剪枝能减少本轮分层图中的无效搜索。
+ *          4.3 dep[u] = 0 的剪枝能减少本轮分层图中的无效搜索。
  */
 
 template<typename Cap>

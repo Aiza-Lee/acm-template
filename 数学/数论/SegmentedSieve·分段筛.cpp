@@ -5,10 +5,10 @@
  * 算法介绍: 求区间 [L, R] 内的质数，先筛出 [2, sqrt(R)] 的质数，再标记区间内合数。
  * 模板参数: None
  * Interface:
- *      SegmentedSieve(L, R) // 筛区间 [L, R] 内的质数，Time: O(sqrt(R) log log R + (R - L + 1) log log R)
- *      sieve.is_prime[i]    // 偏移 i 对应的数 L + i 是否为质数
- *      sieve.primes         // [L, R] 内所有质数
- *      sieve.check(x)       // 判定区间内单点 x 是否为质数，Time: O(1)
+ *      SegmentedSieve(L, R)        筛区间 [L, R] 内的质数，Time: O(sqrt(R) log log R + (R - L + 1) log log R)
+ *      sieve.is_prime[i]           偏移 i 对应的数 L + i 是否为质数
+ *      sieve.primes                [L, R] 内所有质数
+ *      sieve.check(x)              判定区间内单点 x 是否为质数，Time: O(1)
  * Note:
  *      1. Time: O(sqrt(R) log log R + (R - L + 1) log log R)
  *      2. Space: O(sqrt(R) + (R - L + 1))

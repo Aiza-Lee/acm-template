@@ -4,20 +4,20 @@
  * 算法介绍: 将每条边的下界拆入结点需求，配合超级源汇与 Dinic 处理可行环流、可行流、最小流、最大流。
  * 模板参数: Cap (容量类型)
  * Interface:
- *      LowerUpperBoundFlow(int n)      初始化 1~n 点的网络
- *      int add_edge(int u, int v, Cap low, Cap high)       添加一条上下界边 [low, high]
- *      bool feasible_circulation()                         判断是否存在满足所有上下界的一组环流
- *      std::pair<bool, Cap> feasible_flow(int s, int t)    返回一组可行 s->t 流及其流量
- *      std::pair<bool, Cap> min_flow(int s, int t)     返回最小可行 s->t 流
- *      std::pair<bool, Cap> max_flow(int s, int t)     返回最大可行 s->t 流
- *      Cap edge_flow(int id) const     读取最近一次成功求解后原图第 id 条边的流量
+ *      LowerUpperBoundFlow(int n)                       初始化 1~n 点的网络
+ *      int add_edge(int u, int v, Cap low, Cap high)    添加一条上下界边 [low, high]
+ *      bool feasible_circulation()                      判断是否存在满足所有上下界的一组环流
+ *      std::pair<bool, Cap> feasible_flow(int s, int t) 返回一组可行 s->t 流及其流量
+ *      std::pair<bool, Cap> min_flow(int s, int t)      返回最小可行 s->t 流
+ *      std::pair<bool, Cap> max_flow(int s, int t)      返回最大可行 s->t 流
+ *      Cap edge_flow(int id) const                      读取最近一次成功求解后原图第 id 条边的流量
  * Note:
  *      1. Time: 单次求解约为一次或两次 Dinic，O(V^2E) 量级
  *      2. Space: O(V + E)
- *      3. 1-based indexing. 所有边默认容量非负，要求 `0 <= low <= high`。
+ *      3. 1-based indexing. 所有边默认容量非负，要求 0 <= low <= high。
  *      4. 用法/技巧:
- *          4.1 `feasible_flow / min_flow / max_flow` 均会覆盖 `flow`，可随后用 `edge_flow(id)` 取原边流量。
- *          4.2 无源汇时直接调用 `feasible_circulation()`。
+ *          4.1 feasible_flow / min_flow / max_flow 均会覆盖 flow，可随后用 edge_flow(id) 取原边流量。
+ *          4.2 无源汇时直接调用 feasible_circulation()。
  *          4.3 最小流 / 最大流都基于同一组上下界约束；若题目还带费用，再另行建模到费用流。
  */
 template<typename Cap = i64>

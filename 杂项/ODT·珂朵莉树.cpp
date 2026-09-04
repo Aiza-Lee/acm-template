@@ -4,13 +4,13 @@
  * 算法介绍: 用 std::set 维护值相同的极长连续段，借助 _split 将区间切开，适合随机数据下的区间赋值/区间加/顺序统计。
  * 模板参数: T，要求支持比较、加法、数乘到和里
  * Interface:
- *      ODT()                           空结构
- *      ODT(const std::vector<T>& a)    由 1-based 数组 a[1..n] 建树
- *      build(a)                        重建为数组 a[1..n]
- *      assign(l, r, v)                 区间赋值为 v
- *      add(l, r, d)                    区间每个元素加 d
- *      kth(l, r, k)                    查询区间第 k 小 (k 为 1-based)
- *      sum(l, r)                       查询区间元素和
+ *      ODT()                        空结构
+ *      ODT(const std::vector<T>& a) 由 1-based 数组 a[1..n] 建树
+ *      build(a)                     重建为数组 a[1..n]
+ *      assign(l, r, v)              区间赋值为 v
+ *      add(l, r, d)                 区间每个元素加 d
+ *      kth(l, r, k)                 查询区间第 k 小 (k 为 1-based)
+ *      sum(l, r)                    查询区间元素和
  * Note:
  *      1. Time: 单次操作通常 O((被切到的段数 + 1) log n)，但最坏可退化到 O(n)
  *      2. Space: O(当前段数)

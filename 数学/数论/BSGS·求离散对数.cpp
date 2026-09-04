@@ -5,8 +5,8 @@
  * 算法介绍: 求离散对数 a^x = b (mod p)，并支持 ExBSGS 处理 gcd(a, p) != 1。
  * 模板参数: None
  * Interface:
- *      BSGS::solve(a, b, p)    // 在 gcd(a, p) = 1 时求最小非负解，Time: O(sqrt(p))
- *      BSGS::ex_solve(a, b, p) // 一般情形求最小非负解，Time: O(sqrt(p))
+ *      BSGS::solve(a, b, p)    在 gcd(a, p) = 1 时求最小非负解，Time: O(sqrt(p))
+ *      BSGS::ex_solve(a, b, p) 一般情形求最小非负解，Time: O(sqrt(p))
  * Note:
  *      1. Time: O(sqrt(p))
  *      2. Space: O(sqrt(p))

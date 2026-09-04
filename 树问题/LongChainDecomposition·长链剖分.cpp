@@ -4,11 +4,11 @@
  * 算法介绍: 按子树最大高度选择长儿子，将树拆成若干长链，配合倍增支持 O(1) 级祖先查询
  * 模板参数: 无
  * Interface:
- *      LongChainDecomposition(G, root = 1)     以 root 为根预处理长链信息
- *      kth_ancestor(u, k)  查询 u 的第 k 级祖先，不存在返回 0
- *      lca(u, v)           查询 u 和 v 的最近公共祖先
- *      dist(u, v)          查询树上距离（边数）
- *      jump(u, v, k)       返回路径 u -> v 上从 u 出发第 k 条边到达的点，越界返回 0
+ *      LongChainDecomposition(G, root = 1) 以 root 为根预处理长链信息
+ *      kth_ancestor(u, k)                  查询 u 的第 k 级祖先，不存在返回 0
+ *      lca(u, v)                           查询 u 和 v 的最近公共祖先
+ *      dist(u, v)                          查询树上距离（边数）
+ *      jump(u, v, k)                       返回路径 u -> v 上从 u 出发第 k 条边到达的点，越界返回 0
  * Note:
  *      1. Time: 预处理 O(N log N)，kth_ancestor O(1)，lca / jump / dist O(log N)
  *      2. Space: O(N log N)

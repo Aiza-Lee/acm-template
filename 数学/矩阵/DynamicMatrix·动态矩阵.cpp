@@ -5,13 +5,13 @@
  * 模板参数:
  *      [T]: 元素类型
  * Interface:
- *      Matrix(r, c)        // r 行 c 列零矩阵
- *      Matrix(r, c, val)   // 填充矩阵
- *      Matrix(r, c, data)  // 从 C 数组构造
- *      static Identity(n)  // n*n 单位矩阵
- *      transpose()         // 转置
- *      det()               // 行列式 (需方阵)
- *      inverse()           // 逆矩阵 (需方阵)
+ *      Matrix(r, c)           r 行 c 列零矩阵
+ *      Matrix(r, c, val)      填充矩阵
+ *      Matrix(r, c, data)     从 C 数组构造
+ *      static Identity(n)     n*n 单位矩阵
+ *      transpose()            转置
+ *      det()                  行列式 (需方阵)
+ *      inverse()              逆矩阵 (需方阵)
  * Note:
  *      1. 乘法采用 i-k-j 循环序
  *      2. det()/inverse() 对浮点类型使用主元消元，非浮点类型使用非零判断

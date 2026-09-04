@@ -4,26 +4,26 @@
  * 算法介绍: 维护满足堆序性质与左偏性质的可并堆，合并时递归拼接右链。
  * 模板参数: VT
  * Interface:
- *      VT: 节点值类型, 需支持<运算符
- *      reserve(cap)                            // 可选预留 cap 个结点容量
- *      reset_pool()                            // 清空共享结点池, 旧节点编号全部失效
- *      LT()                                    // 构造一个空堆
- *      LT(std::initializer_list<VT> init)      // 用初始化列表构造堆
- *      int push(VT vl)                         // 插入元素, 返回节点id
- *      bool empty()                            // 判空
- *      VT top()                                // 获取最小值
- *      int size()                              // 获取堆大小
- *      void pop()                              // 删除最小值
- *      void join(LT& R)                        // 合并另一个堆, R将被清空
- *      void clear()                            // 清空堆
+ *      VT                                 节点值类型, 需支持<运算符
+ *      reserve(cap)                       可选预留 cap 个结点容量
+ *      reset_pool()                       清空共享结点池, 旧节点编号全部失效
+ *      LT()                               构造一个空堆
+ *      LT(std::initializer_list<VT> init) 用初始化列表构造堆
+ *      int push(VT vl)                    插入元素, 返回节点id
+ *      bool empty()                       判空
+ *      VT top()                           获取最小值
+ *      int size()                         获取堆大小
+ *      void pop()                         删除最小值
+ *      void join(LT& R)                   合并另一个堆, R将被清空
+ *      void clear()                       清空堆
  * Note:
  *      1. 插入(push)、查询最小值(top)、合并(join)、删除最小值(pop)的复杂度均为O(log n)
- *      2. 使用共享 `vector` 结点池，节点编号从1开始; 0号节点作为空节点
- *      3. `join` 会清空右侧堆对象；共享池中的旧节点仍存在但不再由右侧堆持有
+ *      2. 使用共享 vector 结点池，节点编号从1开始; 0号节点作为空节点
+ *      3. join 会清空右侧堆对象；共享池中的旧节点仍存在但不再由右侧堆持有
  *      4. 用法/技巧:
- *          4.1 若已知总插入次数，可先 `reserve(cap)` 减少扩容次数；不写也会自动扩容。
- *          4.2 多组数据若需复用共享池，在旧根全部作废后调用 `reset_pool()`。
- *          4.3 默认是小根堆；若要大根堆，可让 VT 的 `<` 表示更高优先级。
+ *          4.1 若已知总插入次数，可先 reserve(cap) 减少扩容次数；不写也会自动扩容。
+ *          4.2 多组数据若需复用共享池，在旧根全部作废后调用 reset_pool()。
+ *          4.3 默认是小根堆；若要大根堆，可让 VT 的 < 表示更高优先级。
  */
 template<typename VT>
 struct LT {

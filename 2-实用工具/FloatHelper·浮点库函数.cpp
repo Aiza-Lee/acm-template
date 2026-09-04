@@ -4,10 +4,10 @@
  * 算法介绍: 整理竞赛里常用的浮点库函数速查，并提供少量可直接复用的轻量包装
  * 模板参数: None
  * Interface:
- *      sgn(x, eps = EPS)           : 浮点符号函数，返回 -1 / 0 / 1
- *      feq(a, b, eps = EPS)        : 浮点近似相等判断
- *      clamp_unit(x)               : 将浮点数截到 [-1, 1]
- *      float_examples()            : 常见 <cmath> 用法示例
+ *      sgn(x, eps = EPS)    浮点符号函数，返回 -1 / 0 / 1
+ *      feq(a, b, eps = EPS) 浮点近似相等判断
+ *      clamp_unit(x)        将浮点数截到 [-1, 1]
+ *      float_examples()     常见 <cmath> 用法示例
  * Note:
  *      1. Time: 各包装均为 O(1)
  *      2. Space: O(1)

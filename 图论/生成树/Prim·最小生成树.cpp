@@ -17,8 +17,8 @@
  *      2. Space: O(V + E)
  *      3. 1-based indexing，边按无向边加入。
  *      4. 用法/技巧:
- *          4.1 使用 `std::priority_queue` 懒删除，适合显式稀疏图；稠密图可改邻接矩阵 O(V^2)。
- *          4.2 `solve(s)` 每次会重置 `dis/vis`，同一对象可从任意起点重复求当前图 MST。
+ *          4.1 使用 std::priority_queue 懒删除，适合显式稀疏图；稠密图可改邻接矩阵 O(V^2)。
+ *          4.2 solve(s) 每次会重置 dis/vis，同一对象可从任意起点重复求当前图 MST。
  */
 
 template<typename T>

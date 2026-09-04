@@ -5,10 +5,10 @@
  * 算法介绍: 对无序有根树递归混合子树哈希，无根树取重心根的最小哈希代表。
  * 模板参数: None
  * Interface:
- *      TreeHash(n): 初始化 n 个点
- *      add_edge(u, v): 加无向边
- *      get_rooted_hash(root): 计算以 root 为根的哈希
- *      get_unrooted_hash(): 计算无根树哈希，自动处理单/双重心
+ *      TreeHash(n)           初始化 n 个点
+ *      add_edge(u, v)        加无向边
+ *      get_rooted_hash(root) 计算以 root 为根的哈希
+ *      get_unrooted_hash()   计算无根树哈希，自动处理单/双重心
  * Note:
  *      1. Time: 单次 rooted / unrooted hash O(N)
  *      2. Space: O(N)

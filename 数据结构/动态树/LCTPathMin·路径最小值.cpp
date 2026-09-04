@@ -5,11 +5,11 @@
  * 模板参数: None
  * Interface:
  *      LCTPathMin(n), init(n)
- *      set_val(x, v): 把点 x 的值改为 v
+ *      set_val(x, v)    把点 x 的值改为 v
  *      make_root(x), find_root(x), split(x, y)
  *      link(x, y), cut(x, y), connected(x, y)
- *      query_min(x, y): 查询路径 x -> y 上的最小值
- *      query_size(x, y): 查询路径 x -> y 上的点数
+ *      query_min(x, y)  查询路径 x -> y 上的最小值
+ *      query_size(x, y) 查询路径 x -> y 上的点数
  *      query_component_size(x), query_subtree_size(root, x)
  *      lca(x, y)
  * Internal Methods:

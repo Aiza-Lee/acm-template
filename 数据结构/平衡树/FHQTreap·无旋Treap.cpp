@@ -5,13 +5,13 @@
  * 算法介绍: 维护有序 multiset，基于 split / merge 支持插入、删除、排名与第 k 小查询。
  * 模板参数: T
  * Interface:
- *      FHQ(n), init(n): 初始化，可选预留 n 个结点
- *      insert_val(v): 插入一个值 v
- *      erase_val(v): 删除一个值 v
- *      rank(v): 查询 v 的排名（比它小的数个数 + 1）
- *      kth(k): 查询第 k 小
- *      prev(v), next(v): 查询前驱 / 后继
- *      size(), empty(), clear(): 常用辅助接口
+ *      FHQ(n), init(n)          初始化，可选预留 n 个结点
+ *      insert_val(v)            插入一个值 v
+ *      erase_val(v)             删除一个值 v
+ *      rank(v)                  查询 v 的排名（比它小的数个数 + 1）
+ *      kth(k)                   查询第 k 小
+ *      prev(v), next(v)         查询前驱 / 后继
+ *      size(), empty(), clear() 常用辅助接口
  * Note:
  *      1. Time: 所有操作期望 O(log N)
  *      2. Space: O(N)

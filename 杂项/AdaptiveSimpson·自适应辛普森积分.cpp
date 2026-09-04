@@ -6,9 +6,9 @@ using func = std::function<double(double)>;
  * 算法介绍: 递归细分区间，直到左右 Simpson 估计与整段估计足够接近。
  * 模板参数: 无
  * Interface:
- *      simpson(f, a, b): 单段 Simpson 估计
- *      adaptive_simpson(f, a, b, eps, S): 已知整段估计 S 时递归积分
- *      intergrate(f, a, b, eps): 计算定积分
+ *      simpson(f, a, b)                  单段 Simpson 估计
+ *      adaptive_simpson(f, a, b, eps, S) 已知整段估计 S 时递归积分
+ *      intergrate(f, a, b, eps)          计算定积分
  * Note:
  *      1. Time: 取决于函数光滑程度与 eps
  *      2. Space: O(recursion depth)

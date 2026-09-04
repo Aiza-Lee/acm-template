@@ -4,16 +4,16 @@
  * 算法介绍: 从序列前若干项求最短线性递推，并可在已知递推后快速求第 n 项。
  * 模板参数: 无
  * Interface:
- *      std::vector<int> solve(const std::vector<int>& s)       返回最短递推系数 c
- *      int kth(i64 n, const std::vector<int>& init, const std::vector<int>& c)     求第 n 项
- *      int guess_nth(const std::vector<int>& s, i64 n)     由前缀直接推断第 n 项
+ *      std::vector<int> solve(const std::vector<int>& s)                       返回最短递推系数 c
+ *      int kth(i64 n, const std::vector<int>& init, const std::vector<int>& c) 求第 n 项
+ *      int guess_nth(const std::vector<int>& s, i64 n)                         由前缀直接推断第 n 项
  * Note:
- *      1. Time: `solve` 为 O(m^2)，`kth` 为 O(d^2 log n)
+ *      1. Time: solve 为 O(m^2)，kth 为 O(d^2 log n)
  *      2. Space: O(m)
- *      3. 若返回 `c = {c1, ..., cd}`，则满足 `a_n = c1 a_{n-1} + ... + cd a_{n-d}`。
+ *      3. 若返回 c = {c1, ..., cd}，则满足 a_n = c1 a_{n-1} + ... + cd a_{n-d}。
  *      4. 用法/技巧:
- *          4.1 计数与线性递推默认都在模 `md = 998244353` 下进行。
- *          4.2 `guess_nth()` 适合已有足够长前缀时直接求远项；若前缀不足，BM 可能过拟合。
+ *          4.1 计数与线性递推默认都在模 md = 998244353 下进行。
+ *          4.2 guess_nth() 适合已有足够长前缀时直接求远项；若前缀不足，BM 可能过拟合。
  */
 struct BerlekampMassey {
     static std::vector<int> solve(const std::vector<int>& s) {

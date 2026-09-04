@@ -8,14 +8,14 @@
  *  提供整数、浮点通用的二维点 / 向量类型及基础向量运算。
  *
  * API:
- *  Point<T>(x, y): 构造二维点 / 向量。
- *  operator + / - / * / /: 向量加减、数乘和数除。O(1)。
- *  operator < / ==: 按 x、y 字典序比较 / 判等。O(1)。
- *  len2() / dist2(p): 模长平方 / 两点距离平方。O(1)。
- *  dot(p) / cross(p): 点积 / 叉积。O(1)。
- *  half(): 极角所在半平面，[0, PI) 返回 0，[PI, 2PI) 返回 1。O(1)。
- *  polar_less(a, b): 极角严格弱序比较，可用于 std::sort / std::lower_bound。O(1)。
- *  ccw(p0, p1, p2): 逆时针 / 顺时针 / 共线分别返回 1 / -1 / 0。O(1)。
+ *  Point<T>(x, y)         构造二维点 / 向量。
+ *  operator + / - / * / / 向量加减、数乘和数除。O(1)。
+ *  operator < / ==        按 x、y 字典序比较 / 判等。O(1)。
+ *  len2() / dist2(p)      模长平方 / 两点距离平方。O(1)。
+ *  dot(p) / cross(p)      点积 / 叉积。O(1)。
+ *  half()                 极角所在半平面，[0, PI) 返回 0，[PI, 2PI) 返回 1。O(1)。
+ *  polar_less(a, b)       极角严格弱序比较，可用于 std::sort / std::lower_bound。O(1)。
+ *  ccw(p0, p1, p2)        逆时针 / 顺时针 / 共线分别返回 1 / -1 / 0。O(1)。
  *
  * Notes:
  *  浮点比较经 cmp / sgn 使用 EPS；整数坐标的乘法和叉积需自行防止 T 溢出。

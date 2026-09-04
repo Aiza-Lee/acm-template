@@ -8,9 +8,9 @@
  *     在多数竞赛问题中（如平面网格DAG），将源汇按适当顺序排列后仅有恒等排列对应不相交路径，
  *     此时det(M)直接给出顶点不相交路径系统的方案数。
  * Interface:
- *     LGV(int n)                                   初始化1..n点的DAG
- *     void add_edge(int u, int v)                  添加有向边u->v
- *     int count_paths(int u, int v)                计算从u到v的路径条数
+ *     LGV(int n)                                                初始化1..n点的DAG
+ *     void add_edge(int u, int v)                               添加有向边u->v
+ *     int count_paths(int u, int v)                             计算从u到v的路径条数
  *     int solve(const vector<int>& src, const vector<int>& snk) 计算k对源汇的不相交路径系统行列式值
  * Note:
  *     1. 复杂度: solve为O(k(n+m) + k^3)，count_paths为O(n+m)

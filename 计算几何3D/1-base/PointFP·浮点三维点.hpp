@@ -8,12 +8,12 @@
  *  提供浮点三维点的长度、距离、单位化与角度运算。
  *
  * API:
- *  len(p) -> T: 向量长度,使用 std::hypot 避免中间溢出。O(1)。
- *  dist_to(a, b) -> T: 两点距离。O(1)。
- *  normalize(p) -> Point<T>: 单位化;零向量触发 AST。O(1)。
- *  angle_xy(p) -> T: 向量 XY 平面投影的极角,范围 (-PI, PI]。O(1)。
- *  angle_between(a, b) -> T: 两向量夹角（无符号, [0, PI]）。O(1)。
- *  PointFP: Point<ld> 的常用别名。
+ *  len(p) -> T               向量长度,使用 std::hypot 避免中间溢出。O(1)。
+ *  dist_to(a, b) -> T        两点距离。O(1)。
+ *  normalize(p) -> Point<T>  单位化;零向量触发 AST。O(1)。
+ *  angle_xy(p) -> T          向量 XY 平面投影的极角,范围 (-PI, PI]。O(1)。
+ *  angle_between(a, b) -> T  两向量夹角（无符号, [0, PI]）。O(1)。
+ *  PointFP                   Point<ld> 的常用别名。
  *
  * Notes:
  *  本文件 API 仅支持浮点类型。

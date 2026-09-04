@@ -8,14 +8,14 @@
  *  提供整数 / 浮点通用的三维点（向量）类型及基础运算。
  *
  * API:
- *  Point<T>(x, y, z): 构造三维点 / 向量。
- *  operator + / -: 向量加减。O(1)。
- *  operator * k / / k: 数乘和数除（数除仅在浮点下数值稳定）。O(1)。
- *  operator < / ==: 按 x、y、z 字典序比较 / 判等。O(1)。
- *  len2() / dist2(p): 模长平方 / 两点距离平方。O(1)。
- *  dot(p): 点积,返回 T。O(1)。
- *  cross(p): 叉积,返回 Point<T>。O(1)。
- *  triple(p, q): 三重标量积 (this × p) · q; 用于共面判定 / 有向体积。O(1)。
+ *  Point<T>(x, y, z)  构造三维点 / 向量。
+ *  operator + / -     向量加减。O(1)。
+ *  operator * k / / k 数乘和数除（数除仅在浮点下数值稳定）。O(1)。
+ *  operator < / ==    按 x、y、z 字典序比较 / 判等。O(1)。
+ *  len2() / dist2(p)  模长平方 / 两点距离平方。O(1)。
+ *  dot(p)             点积,返回 T。O(1)。
+ *  cross(p)           叉积,返回 Point<T>。O(1)。
+ *  triple(p, q)       三重标量积 (this × p) · q; 用于共面判定 / 有向体积。O(1)。
  *
  * Notes:
  *  浮点比较经 cmp / sgn 使用 EPS。

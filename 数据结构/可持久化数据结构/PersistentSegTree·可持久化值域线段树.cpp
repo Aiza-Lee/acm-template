@@ -4,19 +4,19 @@
  * 算法介绍: 每个版本维护序列前缀在值域上的计数与权值和，查询时用两棵前缀树做差。
  * 模板参数: None
  * Interface:
- *      PersistentSeg(n, M), init(n, M): 初始化，值域为 [1, M]，预留 n 个前缀版本
- *      append(v): 在最新版本末尾追加一个值 v，生成新版本
- *      query_kth(l, r, k): 查询区间 [l, r] 的第 k 小
- *      query_min_cnt(l, r, H): 在区间 [l, r] 内选若干数，使和至少为 H，返回所需最少数量
+ *      PersistentSeg(n, M), init(n, M) 初始化，值域为 [1, M]，预留 n 个前缀版本
+ *      append(v)                       在最新版本末尾追加一个值 v，生成新版本
+ *      query_kth(l, r, k)              查询区间 [l, r] 的第 k 小
+ *      query_min_cnt(l, r, H)          在区间 [l, r] 内选若干数，使和至少为 H，返回所需最少数量
  * Note:
  *      1. Time: 单次追加 / 查询 O(log M)
  *      2. Space: O(版本数 log M)
  *      3. 第 i 个版本表示原序列前 i 个元素；0 号版本为空前缀
  *      4. 用法/技巧:
- *          4.1 主席树最常见用法之一是区间第 k 小，即 `query_kth(l, r, k)`。
+ *          4.1 主席树最常见用法之一是区间第 k 小，即 query_kth(l, r, k)。
  *          4.2 若原值过大或不连续，先离散化到 [1, M]；此时第 k 小返回离散后下标，需自行映射回原值。
- *          4.3 当前 `query_min_cnt` 按“尽量取大值”贪心；若做过离散化且想按原值求和，需把叶子权值改成原值。
- *      5. 用法/技巧: 结点池采用 `reserve + push_back`，超出预留后交给 `vector` 自动扩容
+ *          4.3 当前 query_min_cnt 按“尽量取大值”贪心；若做过离散化且想按原值求和，需把叶子权值改成原值。
+ *      5. 用法/技巧: 结点池采用 reserve + push_back，超出预留后交给 vector 自动扩容
  */
 struct PersistentSeg {
     struct Node {

@@ -7,12 +7,12 @@
  *           两者本质上等价——连分数系数对应树上的移动步数。
  *           如上述展开形式等价与 R^a0 L^a1 R^a2 L^a3 ...
  * Interface:
- *     ContinuedFraction::to_continued_fraction(p, q)          — 展开 p/q 为连分数，返回系数向量
- *     ContinuedFraction::from_continued_fraction(cf)          — 由系数向量还原为有理数 (num, den)
- *     ContinuedFraction::convergents(p, q)                    — 返回 p/q 的所有渐近分数 (h_i, k_i)
- *     ContinuedFraction::best_approximation(p, q, max_den)    — p/q 的有界分母最佳逼近，b ≤ max_den
- *     SternBrocot::find(p, q, max_den)                        — 在树中寻 x = p/q，返回最接近且分母 ≤ max_den 的分数
- *     SternBrocot::enclose(p, q)                              — 返回树中紧包围 x=p/q 的两个既约分数，满足 L < x < R
+ *     ContinuedFraction::to_continued_fraction(p, q)              展开 p/q 为连分数，返回系数向量
+ *     ContinuedFraction::from_continued_fraction(cf)              由系数向量还原为有理数 (num, den)
+ *     ContinuedFraction::convergents(p, q)                        返回 p/q 的所有渐近分数 (h_i, k_i)
+ *     ContinuedFraction::best_approximation(p, q, max_den)        p/q 的有界分母最佳逼近，b ≤ max_den
+ *     SternBrocot::find(p, q, max_den)                            在树中寻 x = p/q，返回最接近且分母 ≤ max_den 的分数
+ *     SternBrocot::enclose(p, q)                                  返回树中紧包围 x=p/q 的两个既约分数，满足 L < x < R
  * Note:
  *     1. p, q 须为正整数且 gcd(p, q) = 1（调用方负责约分）
  *     2. best_approximation / find 返回的分数已约分

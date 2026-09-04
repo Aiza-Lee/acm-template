@@ -22,9 +22,9 @@
  *      2. Space: O(2N)，N 为向上取整到 2 的幂的值
  *      3. 1-based indexing; 内部将 n 向上取整到 2 的幂得到 N，叶子存放在 [N, N+n)。
  *      4. 用法/技巧:
- *          4.1 `Info` 需要支持 `operator+`，用于合并左右儿子信息。
- *          4.2 `Tag` 需要支持 `merge(rhs)`、`has_value()`、`apply_to(Info&, int l, int r)`；其中 l, r 为该节点覆盖的原始 1-based 区间。
- *          4.3 `find_first / find_last` 中的 `pred(info)` 应满足单调性，否则二分结果没有意义。
+ *          4.1 Info 需要支持 operator+，用于合并左右儿子信息。
+ *          4.2 Tag 需要支持 merge(rhs)、has_value()、apply_to(Info&, int l, int r)；其中 l, r 为该节点覆盖的原始 1-based 区间。
+ *          4.3 find_first / find_last 中的 pred(info) 应满足单调性，否则二分结果没有意义。
  *          4.4 不支持自定义定义域 —— zkw 树必须以闭区间 [1, n] 为定义域。
  *          4.5 当 n 不是 2 的幂时，多余的 padding 叶子位置 [n+1, N] 不存储有效数据，初始为 Info()；要求 Info() 是 operator+ 的幺元，使得 padding 贡献在合并时被消去。
  */

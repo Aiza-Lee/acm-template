@@ -4,10 +4,10 @@
  * 算法介绍: 维护按 x 单调插入的下凸壳，支持查询 min(y-kx)。
  * 模板参数: None
  * Interface:
- *      add(x, y): 插入点 (x, y)
- *      query_inc_k(k): 查询 min(y-kx)，要求 k 单调递增
- *      query(k): 查询 min(y-kx)
- *      clear(): 清空
+ *      add(x, y)      插入点 (x, y)
+ *      query_inc_k(k) 查询 min(y-kx)，要求 k 单调递增
+ *      query(k)       查询 min(y-kx)
+ *      clear()        清空
  * Note:
  *      1. Time: 单次 add O(1) 均摊，query_inc_k O(1) 均摊，query O(log N)
  *      2. Space: O(N)

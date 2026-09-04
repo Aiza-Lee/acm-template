@@ -5,9 +5,9 @@
  * 算法介绍: 给定左部和右部点集，使用 DFS 寻找增广路，求无权二分图最大匹配。
  * 模板参数: None
  * Interface:
- *      ExplicitHungarian(int n, int m): 初始化左部大小为 n，右部大小为 m 的二分图
- *      void add_edge(int u, int v): 添加左部点 u 到右部点 v 的边
- *      int solve(): 求最大匹配，返回匹配边数
+ *      ExplicitHungarian(int n, int m) 初始化左部大小为 n，右部大小为 m 的二分图
+ *      void add_edge(int u, int v)     添加左部点 u 到右部点 v 的边
+ *      int solve()                     求最大匹配，返回匹配边数
  * Note:
  *      1. Time: O(nE)
  *      2. Space: O(n + m + E)

@@ -9,18 +9,18 @@
  *      无
  *
  * Interface:
- *      ZFunc(s) / init(s): 初始化模式串
- *      extend(t): 返回 1-based 的 ex 数组，ex[i] = lcp(t[i...], s[1...])
- *      match(t): 在文本串中查找所有匹配位置，返回 1-based 起点
- *      border_len(): 整个模式串的最长 border 长度
- *      min_period(): 返回最小循环节长度
- *      z: Z 数组，z[i] 表示 s[i...m] 与 s[1...m] 的 LCP 长度
+ *      ZFunc(s) / init(s)   初始化模式串
+ *      extend(t)            返回 1-based 的 ex 数组，ex[i] = lcp(t[i...], s[1...])
+ *      match(t)             在文本串中查找所有匹配位置，返回 1-based 起点
+ *      border_len()         整个模式串的最长 border 长度
+ *      min_period()         返回最小循环节长度
+ *      z                  Z 数组，z[i] 表示 s[i...m] 与 s[1...m] 的 LCP 长度
  *
  * Note:
  *      1. Time: init O(M), extend / match O(N)
  *      2. Space: O(M)（extend 返回值额外 O(N)）
  *      3. 字符串存储 0-base（以 string_view 引用输入，不拷贝），算法内部 1-based
- *      4. 用法/技巧: `extend` 常用于跨串 LCP、循环同构判定、前后缀拼接判定
+ *      4. 用法/技巧: extend 常用于跨串 LCP、循环同构判定、前后缀拼接判定
  *      5. 枚举 i | m 时，若 i + z[i] - 1 == m，则 i - 1 是一个 border 长度
  *      6. 模式串以 string_view 保存，需保证底层串在 ZFunc 生命周期内有效
  */

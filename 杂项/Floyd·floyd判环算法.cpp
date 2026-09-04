@@ -5,8 +5,8 @@
  * 算法介绍: 在函数图中用快慢指针寻找从起点可达环的入口。
  * 模板参数: 无
  * Interface:
- *      FloydCycleFinding(f): 传入后继函数 f(x)
- *      find_enter_point(x0): 返回从 x0 出发的环入口
+ *      FloydCycleFinding(f) 传入后继函数 f(x)
+ *      find_enter_point(x0) 返回从 x0 出发的环入口
  * Note:
  *      1. Time: O(mu + lambda)，mu 为入环前长度，lambda 为环长
  *      2. Space: O(1)

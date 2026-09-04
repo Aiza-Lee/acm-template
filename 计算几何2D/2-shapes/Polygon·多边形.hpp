@@ -14,15 +14,15 @@ using Polygon = std::vector<Point<T>>;
  *  提供多边形基本度量、点包含判定、凸性、重心、多边形核和最远点对。
  *
  * API:
- *  Polygon<T>: 点序列别名，等价于 std::vector<Point<T>>。
- *  point_in_polygon(p, poly) -> int: 射线法 / winding number；边上 2，内部 1，外部 0。O(N)。
- *  polygon_area_2(poly) -> T: 两倍有向面积；逆时针为正，顺时针为负；空多边形返回 0。O(N)。
- *  polygon_area(poly) -> ld: 有向面积，逆时针为正，顺时针为负。O(N)。
- *  polygon_perimeter(poly) -> ld: 闭合路径周长；空 / 单点返回 0；两点返回 2×距离。O(N)。
- *  is_convex(poly) -> bool: 顶点数 < 3 或全共线返回 false；CCW 严格凸返回 true。O(N)。
- *  polygon_centroid(poly) -> Point<ld>: 面积加权质心；area=0 时返回首顶点。O(N)。
- *  polygon_kernel(poly) -> Polygon<T>: 多边形核（仅支持浮点坐标）。O(N log N)。
- *  farthest_point_pair(convex) -> pair<Point<T>, Point<T>>: 凸多边形直径；n<=1 返回 ({0,0}, {0,0})，n=2 返回两端点。O(N)。
+ *  Polygon<T>                                              点序列别名，等价于 std::vector<Point<T>>。
+ *  point_in_polygon(p, poly) -> int                        射线法 / winding number；边上 2，内部 1，外部 0。O(N)。
+ *  polygon_area_2(poly) -> T                               两倍有向面积；逆时针为正，顺时针为负；空多边形返回 0。O(N)。
+ *  polygon_area(poly) -> ld                                有向面积，逆时针为正，顺时针为负。O(N)。
+ *  polygon_perimeter(poly) -> ld                           闭合路径周长；空 / 单点返回 0；两点返回 2×距离。O(N)。
+ *  is_convex(poly) -> bool                                 顶点数 < 3 或全共线返回 false；CCW 严格凸返回 true。O(N)。
+ *  polygon_centroid(poly) -> Point<ld>                     面积加权质心；area=0 时返回首顶点。O(N)。
+ *  polygon_kernel(poly) -> Polygon<T>                      多边形核（仅支持浮点坐标）。O(N log N)。
+ *  farthest_point_pair(convex) -> pair<Point<T>, Point<T>> 凸多边形直径；n<=1 返回 ({0,0}, {0,0})，n=2 返回两端点。O(N)。
  *
  * Notes:
  *  面积符号约定：逆时针为正、顺时针为负。

@@ -5,9 +5,9 @@
  * 算法介绍: 求解字符串中最长回文子串及所有回文子串的相关信息
  * 模板参数: 无
  * Interface: 
- *     - longest_palindromic_substring(): 返回最长回文子串
- *     - count_palindromic_substrings(): 计算所有回文子串总数量
- *     - count_palindromes_by_left_endpoints(): 统计以每个位置为左端点的回文串数量
+ *     - longest_palindromic_substring()       返回最长回文子串
+ *     - count_palindromic_substrings()        计算所有回文子串总数量
+ *     - count_palindromes_by_left_endpoints() 统计以每个位置为左端点的回文串数量
  * Note:
  *      1. Time: O(N)
  *      2. Space: O(N)

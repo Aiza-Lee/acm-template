@@ -5,8 +5,8 @@
  * 算法介绍: 逐个合并同余方程，处理模数不一定互质的情形。
  * 模板参数: None
  * Interface:
- *      ExtendedCRT::merge(r0, m0, r1, m1) // 合并两个同余方程，Time: O(log max(m0, m1))
- *      ExtendedCRT::solve(r, m)           // 合并整个方程组，Time: O(n log lcm)
+ *      ExtendedCRT::merge(r0, m0, r1, m1) 合并两个同余方程，Time: O(log max(m0, m1))
+ *      ExtendedCRT::solve(r, m)           合并整个方程组，Time: O(n log lcm)
  * Note:
  *      1. Time: O(n log lcm)
  *      2. Space: O(1)

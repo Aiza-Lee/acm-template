@@ -8,9 +8,9 @@
  *      使用替罪羊树(Scapegoat Tree)思想，通过维护每个节点的实数值(tag)来实现O(1)比较后缀大小。
  * 
  * Interface:
- *      push_front(char c)  // 在前端添加字符c
- *      query_rank(int k)   // 查询第k个添加的后缀的排名(1-based)
- *      get_sa(vector<int>& sa) // 获取当前的后缀数组到sa中
+ *      push_front(char c)      在前端添加字符c
+ *      query_rank(int k)       查询第k个添加的后缀的排名(1-based)
+ *      get_sa(vector<int>& sa) 获取当前的后缀数组到sa中
  * 
  * Note:
  *      1. Time: push_front O(log N), 均摊。

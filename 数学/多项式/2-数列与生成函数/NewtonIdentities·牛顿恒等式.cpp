@@ -10,10 +10,10 @@ namespace poly_ext {
  *      公式和应用见文字资料「数学/多项式/牛顿恒等式」。
  *
  * Interface:
- *      Poly p_to_e(p, n)   // p_1..p_n -> e_0..e_n
- *      Poly e_to_p(e, m)   // e -> p_0..p_m
- *      Poly p_to_f(p, n)   // p -> f(x)=prod(x-a_i)
- *      Poly f_to_p(f, m)   // f -> p_0..p_m
+ *      Poly p_to_e(p, n) p_1..p_n -> e_0..e_n
+ *      Poly e_to_p(e, m) e -> p_0..p_m
+ *      Poly p_to_f(p, n) p -> f(x)=prod(x-a_i)
+ *      Poly f_to_p(f, m) f -> p_0..p_m
  *
  * Note:
  *      1. p[0] 表示 p_0，输入时可忽略；返回时 p[0] = 根数。

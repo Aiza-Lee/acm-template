@@ -4,14 +4,14 @@
  * 算法介绍: 不做路径压缩，仅按大小合并，并将修改记录入栈，支持回滚到历史版本。
  * 模板参数: 无
  * Interface:
- *      RollbackDSU(int n): 初始化 1~n
- *      int find(int x) const: 查询所在连通块代表元
- *      bool same(int x, int y) const: 判断是否连通
- *      bool merge(int x, int y): 合并两个集合，返回是否真的合并
- *      int size(int x) const: 查询所在连通块大小
- *      int snapshot() const: 返回当前历史栈位置
- *      void rollback(int snap): 回滚到给定快照
- *      int components() const: 当前连通块个数
+ *      RollbackDSU(int n)            初始化 1~n
+ *      int find(int x) const         查询所在连通块代表元
+ *      bool same(int x, int y) const 判断是否连通
+ *      bool merge(int x, int y)      合并两个集合，返回是否真的合并
+ *      int size(int x) const         查询所在连通块大小
+ *      int snapshot() const          返回当前历史栈位置
+ *      void rollback(int snap)       回滚到给定快照
+ *      int components() const        当前连通块个数
  * Note:
  *      1. Time: 单次 find / merge / rollback 均摊 O(log n)
  *      2. Space: O(n + 操作数)

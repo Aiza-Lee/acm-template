@@ -4,8 +4,8 @@
  * 算法介绍: 使用并查集离线求LCA，时间复杂度优秀( nearly linear )
  * 模板参数: 无
  * Interface:
- *      add_query(u, v): 添加查询
- *      solve(root): 解决所有查询，返回结果 vector<int>
+ *      add_query(u, v) 添加查询
+ *      solve(root)     解决所有查询，返回结果 vector<int>
  * Note:
  *      1. Time: O(N alpha(N) + Q alpha(N))
  *      2. Space: O(N + Q)
