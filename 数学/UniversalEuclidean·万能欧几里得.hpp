@@ -12,58 +12,45 @@
  *     UniversalEuclidean::qpow(a, p)                    — 任意 Monoid 节点的快速幂,复杂度 O(log p * T_mul)
  *     UniversalEuclidean::solve(n, a, b, c, u, r)       — 求解 x \in [1, n] 核心操作序列积,复杂度 O(log(min(a, c)) * T_mul)
  *     UniversalEuclidean::solve_full(n, a, b, c, u, r)  — 求解包含 x=0 处 U^(b/c) 前缀的完整路径积,复杂度 O(log(min(a, c)) * T_mul)
- *     UniversalEuclidean::query_like_euclid(n, a, b, c) — 便捷计算 P5170 类欧三和 (f, g, h),支持可选取模或 64 位整数
- *     struct LikeEuclidNode                             — 内置类欧三和状态节点,维护 count、一次和、平方和及乘积交叉项
- *     struct LikeEuclidResult                           — 类欧三和返回值聚合 (f=\sum y, g=\sum i*y, h=\sum y^2)
+ *     UniversalEuclidean::query_like_euclid(n, a, b, c) — 便捷计算 P5170 类欧三和 (f, g, h),支持整型或模数类 T
+ *     struct LikeEuclidNode                             — 泛型类欧三和状态节点,维护 count、一次和、平方和及乘积交叉项
+ *     struct LikeEuclidResult                           — 泛型类欧三和返回值聚合 (f=\sum y, g=\sum i*y, h=\sum y^2)
  *
  * Notes:
  *     1. 要求 a >= 0, b >= 0, c > 0, n >= 0。内部坐标运算使用 i128 防御溢出。
  *     2. 自定义 Node 需支持默认构造(返回单位元 I)与乘法结合律 operator*(const Node&, const Node&) const。
  *     3. solve() 统计 x \in [1, n] 区间内每步 R 处的贡献;若需包含 i=0 处,使用 solve_full() 或 query_like_euclid()。
- *     4. query_like_euclid<Mod>(n, a, b, c) 默认 Mod=998244353,传入 Mod=0 时使用原生 64 位整型加乘。
+ *     4. LikeEuclidNode<T> 与 query_like_euclid<T> 默认 T=i64;传入模数类(如 Mint)时自动按模运算合并。
  *
  * Related:
  *     EuclideanLike·类欧几里得算法.cpp: 特化的一维基础类欧几里得求和实现
  */
 
-// 内置 P5170 类欧三和状态节点 (Mod > 0 时取模, Mod == 0 时使用原生 64 位整型)
-template<i64 Mod = 998244353>
+// P5170 类欧三和状态节点:支持任意整型或模数类 T (支持 +, *)
+template<typename T = i64>
 struct LikeEuclidNode {
-    i64 cu = 0, cr = 0, su = 0, su2 = 0, sru = 0, sr = 0;
-
-    static constexpr i64 norm(i64 x) {
-        if constexpr (Mod > 0) return (x % Mod + Mod) % Mod;
-        else return x;
-    }
-    static constexpr i64 add(i64 x, i64 y) {
-        if constexpr (Mod > 0) {
-            i64 res = x + y;
-            return res >= Mod ? res - Mod : res;
-        } else {
-            return x + y;
-        }
-    }
-    static constexpr i64 mul(i64 x, i64 y) {
-        if constexpr (Mod > 0) return i64(i128(x) * y % Mod);
-        else return x * y;
-    }
+    T cu = 0, cr = 0, su = 0, su2 = 0, sr = 0, sru = 0;
 
     LikeEuclidNode operator*(const LikeEuclidNode& b) const {
         LikeEuclidNode res;
-        res.cu = add(cu, b.cu);
-        res.cr = add(cr, b.cr);
-        res.su = add(add(su, b.su), mul(cu, b.cr));
-        res.su2 = add(add(su2, b.su2), add(mul(mul(cu, cu), b.cr), mul(mul(2, cu), b.su)));
-        res.sr = add(add(sr, b.sr), mul(cr, b.cr));
-        res.sru = add(add(sru, b.sru), add(add(mul(mul(cr, cu), b.cr), mul(cr, b.su)), mul(cu, b.sr)));
+        res.cu = cu + b.cu;
+        res.cr = cr + b.cr;
+        res.su = su + b.su + cu * b.cr;
+        res.su2 = su2 + b.su2 + cu * cu * b.cr + T(2) * cu * b.su;
+        res.sr = sr + b.sr + cr * b.cr;
+        res.sru = sru + b.sru 
+                    + cr * cu * b.cr 
+                    + cr * b.su 
+                    + cu * b.sr;
         return res;
     }
 };
 
+template<typename T = i64>
 struct LikeEuclidResult {
-    i64 f = 0; // \sum_{i=0}^n \floor{(ai+b)/c}
-    i64 g = 0; // \sum_{i=0}^n i * \floor{(ai+b)/c}
-    i64 h = 0; // \sum_{i=0}^n \floor{(ai+b)/c}^2
+    T f = 0; // \sum_{i=0}^n \floor{(ai+b)/c}
+    T g = 0; // \sum_{i=0}^n i * \floor{(ai+b)/c}
+    T h = 0; // \sum_{i=0}^n \floor{(ai+b)/c}^2
 };
 
 struct UniversalEuclidean {
@@ -103,18 +90,18 @@ struct UniversalEuclidean {
     }
 
     // 便捷计算类欧三和: f = \sum y, g = \sum i*y, h = \sum y^2 (i \in [0, n])
-    template<i64 Mod = 998244353>
-    static LikeEuclidResult query_like_euclid(i64 n, i64 a, i64 b, i64 c) {
+    template<typename T = i64>
+    static LikeEuclidResult<T> query_like_euclid(i64 n, i64 a, i64 b, i64 c) {
         if (n < 0) return {};
-        using Node = LikeEuclidNode<Mod>;
+        using Node = LikeEuclidNode<T>;
         Node u{ .cu = 1 };
         Node r{ .cr = 1, .sr = 1 };
         Node path = solve_full(n, a, b, c, u, r);
-        i64 y0 = Node::norm(b / c);
+        T y0 = b / c;
         return {
-            .f = Node::add(path.su, y0),
+            .f = path.su + y0,
             .g = path.sru,
-            .h = Node::add(path.su2, Node::mul(y0, y0))
+            .h = path.su2 + y0 * y0
         };
     }
 };
