@@ -1,14 +1,17 @@
 #include "aizalib.h"
-
-/**
- * 第一类斯特林数 (Stirling Number of First Kind)
- * 算法介绍: S1[n][k] 表示将 n 个不同元素排成 k 个轮换(Cycles)的方案数。
- * 模板参数: N (预处理最大范围)
- * Interface: 
- *      int get(int n, int k); — 获取值 [n over k]
- * Note:
- *      1. Time: Build O(N^2)
- *      2. See specific math formulas in text material (斯特林数.tex)
+/*
+ * StirlingNumber·第一类斯特林数
+ *
+ * Overview:
+ *     无符号第一类斯特林数 [n over k]，表示将 n 个不同元素排成 k 个互不相交非空轮换 (Cycles) 的方案数。
+ *
+ * API:
+ *     StirlingS1<N>() — 编译期/构造时 O(N^2) 递推预处理第一类斯特林数表
+ *     int get(n, k)   — 获取 [n over k] mod 998244353，复杂度 O(1)
+ *
+ * Notes:
+ *     1. 递推式: S1(i, j) = S1(i-1, j-1) + (i-1) * S1(i-1, j)。
+ *     2. 边界条件: S1(0, 0) = 1，其余 S1(i, 0) = S1(0, j) = 0。
  */
 
 template<int N>

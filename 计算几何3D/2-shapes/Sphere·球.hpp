@@ -69,10 +69,8 @@ Circle<T> sphere_plane_intersection(const Sphere<T>& s, const Plane<T>& pl) {
     T d = distance_to_point(pl, s.c);
     T rd = s.r * s.r - d * d;
     if (rd < 0) return Circle<T>(s.c, -1);                       // 无交(r < 0)
-    Point<T> n(pl.a, pl.b, pl.c);
-    T nlen = std::hypot(n.x, n.y, n.z);
-    Point<T> c = s.c - n * (d / nlen);                            // 球心在平面的投影
-    T r = safe_sqrt(rd) / nlen;
+    Point<T> c = projection(pl, s.c);                            // 球心在平面的投影
+    T r = safe_sqrt(rd);
     return Circle<T>(c, r);
 }
 
@@ -94,15 +92,22 @@ Circle<T> sphere_sphere_intersection(const Sphere<T>& s1, const Sphere<T>& s2) {
     return Circle<T>(mid, h);
 }
 
-// 从外部点 p 到球的外切点（较近 p 的那个）;点位于球内或球面上时返回 nullopt
+// 外部点 p 到球面上最近点（点位于球内或球面上时返回 nullopt）
 template<typename T>
 requires std::is_floating_point_v<T>
-std::optional<Point<T>> tangent_points_to_sphere(Point<T> p, const Sphere<T>& s) {
+std::optional<Point<T>> closest_point_on_sphere(Point<T> p, const Sphere<T>& s) {
     Point<T> v = s.c - p;
     T v2 = v.len2();
     if (cmp(v2, s.r * s.r) <= 0) return std::nullopt;            // 球内或球上
     T len_v = std::sqrt(v2);
     return s.c - v * (s.r / len_v);                              // 沿 PC 方向投影到球面
+}
+
+// 兼容别名: 沿 PC 方向投影到球面的最近表面点
+template<typename T>
+requires std::is_floating_point_v<T>
+std::optional<Point<T>> tangent_points_to_sphere(Point<T> p, const Sphere<T>& s) {
+    return closest_point_on_sphere(p, s);
 }
 
 using SphereFP = Sphere<ld>;

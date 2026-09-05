@@ -1,26 +1,27 @@
 #include "aizalib.h"
 
-/**
- * SPFA 算法模板 (Shortest Path Faster Algorithm)
- * 算法介绍:
- *      SPFA 是 Bellman-Ford 算法的队列优化版本。
- *      用于求解带负权边图的单源最短路，并可用于检测负环。
- *      最坏时间复杂度为指数级，但在随机图上表现良好。
- * 
- * 模板参数:
- *      T: 边权类型 (默认为 i64)
- *      INF: 无穷大值 (默认为 numeric_limits<T>::max() / 2)
- * 
- * Interface:
- *      add_edge(u, v, w)  — 添加有向边
- *      solve(s)           — 计算源点 s 到所有点的最短路，返回 false 若存在负环
- *      has_negative_cycle — 求解后标记是否存在负环
- * 
- * Note:
- *      1. 时间复杂度: 平均 O(kE), k 为常数 (~2). 最坏 O(VE).
- *      2. 空间复杂度: O(V + E)
- *      3. 1-based indexing
- *      4. 适用场景: 带负权图的最短路，负环检测。正权图请优先使用 Dijkstra。
+/*
+ * SPFA·队列优化BellmanFord
+ *
+ * Overview:
+ *     SPFA 算法模板 (Shortest Path Faster Algorithm)
+ *     SPFA 是 Bellman-Ford 算法的队列优化版本。
+ *     用于求解带负权边图的单源最短路，并可用于检测负环。
+ *     最坏时间复杂度为指数级，但在随机图上表现良好。
+ *
+ * API:
+ *     add_edge(u, v, w)  — 添加有向边
+ *     solve(s)           — 计算源点 s 到所有点的最短路，返回 false 若存在负环
+ *     has_negative_cycle — 求解后标记是否存在负环
+ *
+ * Notes:
+ *     模板参数:
+ *     T: 边权类型 (默认为 i64)
+ *     INF: 无穷大值 (默认为 numeric_limits<T>::max() / 2)
+ *     1. 时间复杂度: 平均 O(kE), k 为常数 (~2). 最坏 O(VE).
+ *     2. 空间复杂度: O(V + E)
+ *     3. 1-based indexing
+ *     4. 适用场景: 带负权图的最短路，负环检测。正权图请优先使用 Dijkstra。
  */
 
 template<typename T>

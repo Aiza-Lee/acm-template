@@ -1,30 +1,31 @@
 #include "aizalib.h"
 
-/**
- * 欧拉回路 / 欧拉通路
- * 算法介绍:
- *      用 Hierholzer 算法在线性时间内求解欧拉回路或欧拉通路。
- *      支持有向图与无向图，支持重边与自环，返回经过所有边恰好一次的点序列。
+/*
+ * EulerianCircuit·欧拉回路
  *
- * 模板参数:
- *      无
+ * Overview:
+ *     欧拉回路 / 欧拉通路
+ *     用 Hierholzer 算法在线性时间内求解欧拉回路或欧拉通路。
+ *     支持有向图与无向图，支持重边与自环，返回经过所有边恰好一次的点序列。
  *
- * Interface:
- *      EulerTrail(n, directed = false)
- *          构造 n 个点的图，directed = false/true 表示无向/有向图
- *      add_edge(u, v)
- *          加入一条边；无向图会自动加入双向邻接，但只算一条原图边
- *      get_circuit(start = 0)
- *          求欧拉回路，不存在返回空数组；start = 0 表示自动选择起点
- *      get_path(start = 0)
- *          求欧拉通路，不存在返回空数组；start = 0 表示自动选择起点
+ * API:
+ *     EulerTrail(n, directed = false)
+ *     构造 n 个点的图，directed = false/true 表示无向/有向图
+ *     add_edge(u, v)
+ *     加入一条边；无向图会自动加入双向邻接，但只算一条原图边
+ *     get_circuit(start = 0)
+ *     求欧拉回路，不存在返回空数组；start = 0 表示自动选择起点
+ *     get_path(start = 0)
+ *     求欧拉通路，不存在返回空数组；start = 0 表示自动选择起点
  *
- * Note:
- *      1. Time: O(V + E)
- *      2. Space: O(V + E)
- *      3. 1-based indexing.
- *      4. 返回值为点序列，长度为边数 + 1；若图无边，则返回 {start} 或 {1}。
- *      5. 若手动指定 start，则需与合法欧拉回路/通路的起点一致，否则返回空数组。
+ * Notes:
+ *     模板参数:
+ *     无
+ *     1. Time: O(V + E)
+ *     2. Space: O(V + E)
+ *     3. 1-based indexing.
+ *     4. 返回值为点序列，长度为边数 + 1；若图无边，则返回 {start} 或 {1}。
+ *     5. 若手动指定 start，则需与合法欧拉回路/通路的起点一致，否则返回空数组。
  */
 
 struct EulerTrail {

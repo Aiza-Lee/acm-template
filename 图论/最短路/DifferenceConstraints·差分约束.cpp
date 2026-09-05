@@ -1,27 +1,27 @@
 #include "aizalib.h"
 
-/**
- * 差分约束系统 (Difference Constraints)
- * 算法介绍:
- *      解决形如 x_i - x_j <= w 的不等式组问题。
- *      将其转化为最短路问题。x_i <= x_j + w 对应边 j -> i，权值为 w。
- *      若求 x_i - x_j >= w，则变形为 x_j - x_i <= -w，对应边 i -> j，权值为 -w。
- *      若图中存在负环，则该不等式组无解。
- *      通常利用 SPFA 算法判负环。
- *      若不连通，一般建立超级源点 (0号点) 指向所有点 (边权0)。
- * 
- * 模板参数: T (权值类型，如 i64)
- * Interface: 
- *      add_le(u, v, w) — 添加约束 x_u - x_v <= w
- *      add_ge(u, v, w) — 添加约束 x_u - x_v >= w
- *      add_eq(u, v, w) — 添加约束 x_u - x_v = w
- *      solve()         — 求解是否存在可行解。
- * 
- * Note:
- *      1. Time: O(kE) (SPFA average), O(VE) worst case.
- *      2. Space: O(V + E)
- *      3. 采用 1-based 索引，内部处理超级源点逻辑 (等价于初始全入队)。
- *      4. solve() 返回 true 表示有解，解保存在 dist 中；返回 false 表示无解 (负环)。
+/*
+ * DifferenceConstraints·差分约束
+ *
+ * Overview:
+ *     解决形如 x_i - x_j <= w 的不等式组问题。
+ *     将其转化为最短路问题。x_i <= x_j + w 对应边 j -> i，权值为 w。
+ *     若求 x_i - x_j >= w，则变形为 x_j - x_i <= -w，对应边 i -> j，权值为 -w。
+ *     若图中存在负环，则该不等式组无解。
+ *     通常利用 SPFA 算法判负环。
+ *
+ * API:
+ *     add_le(u, v, w) — 添加约束 x_u - x_v <= w
+ *     add_ge(u, v, w) — 添加约束 x_u - x_v >= w
+ *     add_eq(u, v, w) — 添加约束 x_u - x_v = w
+ *     solve()         — 求解是否存在可行解。
+ *
+ * Notes:
+ *     模板参数: T (权值类型，如 i64)
+ *     1. Time: O(kE) (SPFA average), O(VE) worst case.
+ *     2. Space: O(V + E)
+ *     3. 采用 1-based 索引，内部处理超级源点逻辑 (等价于初始全入队)。
+ *     4. solve() 返回 true 表示有解，解保存在 dist 中；返回 false 表示无解 (负环)。
  */
 
 template <typename T>

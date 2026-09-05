@@ -1,16 +1,17 @@
 #include "aizalib.h"
-
-/**
- * 牛顿级数插值 (Newton Series Interpolation)
- * 算法介绍: 利用差分代替导数还原函数，类似于离散的泰勒展开。
- * 模板参数: 
- * Interface: 
- *      NewtonInterpolation(vector<int> y) — 输入 f(0)...f(n-1)
- *      int query(i64 x)                   — 计算 f(x)
- * Note:
- *      1. Time: Build O(n^2), Query O(n)
- *      2. Space: O(n)
- *      3. 公式: f(x) = sum_{k=0}^{n} binom(x, k) * Delta^k f(0)
+/*
+ * NewtonInterpolation·牛顿级数插值
+ *
+ * Overview:
+ *     利用高阶前向差分还原多项式函数，相当于离散形式的泰勒展开：f(x) = ∑_{k=0}^n binom(x, k) Δ^k f(0)。
+ *
+ * API:
+ *     NewtonInterpolation(y) — 输入连续整数点值 f(0)...f(n-1) 预处理高阶差分，复杂度 O(n^2)
+ *     int query(i64 x)       — 计算目标点 f(x) mod 998244353，复杂度 O(n)
+ *
+ * Notes:
+ *     1. 要求已知点为连续整数 0, 1, ..., n-1。
+ *     2. 空间复杂度 O(n)，适合插值点数较少但需多次大坐标查询的场景。
  */
 
 struct NewtonInterpolation {

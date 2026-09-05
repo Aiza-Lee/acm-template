@@ -1,14 +1,18 @@
 #include "aizalib.h"
-
-/**
- * 第二类斯特林数 (Stirling Number of Second Kind)
- * 算法介绍: S2[n][k] 表示将 n 个不同元素划分为 k 个非空集合的方案数。
- * 模板参数: N (预处理最大范围)
- * Interface: 
- *      int sum_powers(i64 n, int k); — 计算 sum_{i=0}^n i^k
- * Note:
- *      1. Time: Build O(N^2)
- *      2. See specific math formulas in text material (斯特林数.tex)
+/*
+ * StirlingNumber·第二类斯特林数
+ *
+ * Overview:
+ *     第二类斯特林数 {n over k}，表示将 n 个不同元素划分为 k 个互不相交非空子集的方案数，并支持离散幂和计算。
+ *
+ * API:
+ *     StirlingS2<N>()          — 编译期/构造时 O(N^2) 递推预处理第二类斯特林数表
+ *     int get(n, k)            — 获取 {n over k} mod 998244353，复杂度 O(1)
+ *     int sum_powers(i64 n, k) — 利用斯特林数展开计算 ∑_{i=0}^n i^k mod 998244353，复杂度 O(k)
+ *
+ * Notes:
+ *     1. 递推式: S2(i, j) = S2(i-1, j-1) + j * S2(i-1, j)。
+ *     2. 幂和展开公式: i^k = ∑_{j=0}^k S2(k, j) * j! * binom(i, j)。
  */
 
 template<int N>

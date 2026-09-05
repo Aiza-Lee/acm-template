@@ -1,19 +1,22 @@
 #include "aizalib.h"
-/**
- * 双次出现 Euler 序
- * 算法介绍: 进入 u 和离开 u 时各记录一次。
- * 模板参数: 无
- * Interface:
- *      DoubleEulerDFS(g, root = 1)
- * Note:
- *      1. Time: O(N)
- *      2. Space: O(N)
- *      3. 1-based indexing；Euler 序有效位置为 1..2n
- *      4. 性质: subtree(u) 的 DFS 过程对应 [st[u], ed[u]]
- *      5. 维护: 扫到区间位置 pos 时，对点 euler[pos] 做一次 toggle；点 u 当前在集合中 <=> 它在区间内出现奇数次
- *      6. 路径转区间: 设 p = lca(u, v)，且 st[u] <= st[v]
- *      7. 若 p = u，则路径 (u, v) 对应区间 [st[u], st[v]]，toggle 后留下的恰为路径上全部点
- *      8. 若 p != u，则路径 (u, v) 对应区间 [ed[u], st[v]]，toggle 后留下的是路径点集去掉 p，因此需额外补一次 p
+/*
+ * Double Occurrence Euler Tour (双次出现 Euler 序)
+ *
+ * Overview:
+ *     进入 u 和离开 u 时各记录一次节点编号，序列总长度为 2n。
+ *     通过按区间出现次数奇偶性翻转（Toggle），支持树上莫队将树上路径查询转化为序列区间查询。
+ *
+ * API:
+ *     DoubleEulerDFS(g, root = 1) — 构造双次出现 Euler 序，以 root 为根预处理
+ *     dfs(u, p)                   — 内部 DFS 遍历函数
+ *
+ * Notes:
+ *     1. 1-based indexing；Euler 序有效位置为 1..2n。
+ *     2. Time: O(N)；Space: O(N)。
+ *     3. 性质: subtree(u) 对应区间 [st[u], ed[u]]。
+ *     4. 路径转区间 (设 p = lca(u, v) 且 st[u] <= st[v]):
+ *        - 若 p = u，路径 (u, v) 对应 [st[u], st[v]]，出现奇数次的节点恰为路径点集。
+ *        - 若 p != u，路径 (u, v) 对应 [ed[u], st[v]]，出现奇数次的节点集加上 p 恰为路径点集。
  */
 struct DoubleEulerDFS {
     const std::vector<std::vector<int>>& g;

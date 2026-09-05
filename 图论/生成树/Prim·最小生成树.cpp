@@ -1,24 +1,25 @@
 #include "aizalib.h"
 
-/**
- * Prim
- * 算法介绍:
- *      一种求解加权无向图最小生成树的算法。
- *      从任意一个顶点开始，每次选择距离当前生成树最近的节点加入生成树，直到所有节点都被加入。
- * 
- * 模板参数:
- *      T: 边权类型, 默认为 i64
- * 
- * Interface:
- *      T solve(int start_node = 1) — 返回最小生成树的边权之和。如果不连通返回 -1。
- * 
- * Note:
- *      1. Time: O(E log E)
- *      2. Space: O(V + E)
- *      3. 1-based indexing，边按无向边加入。
- *      4. 用法/技巧:
- *          4.1 使用 std::priority_queue 懒删除，适合显式稀疏图；稠密图可改邻接矩阵 O(V^2)。
- *          4.2 solve(s) 每次会重置 dis/vis，同一对象可从任意起点重复求当前图 MST。
+/*
+ * Prim·最小生成树
+ *
+ * Overview:
+ *     Prim
+ *     一种求解加权无向图最小生成树的算法。
+ *     从任意一个顶点开始，每次选择距离当前生成树最近的节点加入生成树，直到所有节点都被加入。
+ *
+ * API:
+ *     T solve(int start_node = 1) — 返回最小生成树的边权之和。如果不连通返回 -1。
+ *
+ * Notes:
+ *     模板参数:
+ *     T: 边权类型, 默认为 i64
+ *     1. Time: O(E log E)
+ *     2. Space: O(V + E)
+ *     3. 1-based indexing，边按无向边加入。
+ *     4. 用法/技巧:
+ *     4.1 使用 std::priority_queue 懒删除，适合显式稀疏图；稠密图可改邻接矩阵 O(V^2)。
+ *     4.2 solve(s) 每次会重置 dis/vis，同一对象可从任意起点重复求当前图 MST。
  */
 
 template<typename T>

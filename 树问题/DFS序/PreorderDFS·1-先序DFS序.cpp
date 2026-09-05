@@ -1,17 +1,20 @@
 #include "aizalib.h"
-/**
- * 先序 DFS 序
- * 算法介绍: 首次进入点 u 时记录 pre[u]，并维护 sz[u]。
- * 模板参数: 无
- * Interface:
- *      PreorderDFS(g, root = 1)
- * Note:
- *      1. Time: O(N)
- *      2. Space: O(N)
- *      3. 1-based indexing；输入 g 为树的邻接表，默认根为 1
- *      4. 性质: subtree(u) <=> [pre[u], pre[u] + sz[u] - 1]
- *      5. 性质: v 在 u 子树内 <=> pre[u] <= pre[v] < pre[u] + sz[u]
- *      6. 用法/技巧: id[pre[u]] = u，可把子树点权映射到连续数组区间。
+/*
+ * Preorder DFS Order (先序 DFS 序)
+ *
+ * Overview:
+ *     首次进入点 u 时记录时间戳 pre[u]，并维护子树大小 sz[u]，将子树点集映射为连续区间。
+ *
+ * API:
+ *     PreorderDFS(g, root = 1) — 构造先序 DFS 序，以 root 为根预处理
+ *     dfs(u, p)                — 内部 DFS 遍历函数
+ *
+ * Notes:
+ *     1. 1-based indexing；输入 g 为树的邻接表，默认根为 1。
+ *     2. Time: O(N)；Space: O(N)。
+ *     3. 性质: subtree(u) 对应区间 [pre[u], pre[u] + sz[u] - 1]。
+ *     4. 性质: v 在 u 子树内 <=> pre[u] <= pre[v] < pre[u] + sz[u]。
+ *     5. 用法: id[pre[u]] = u，可将子树上的点权直接映射到树状数组或线段树等连续结构上。
  */
 struct PreorderDFS {
     const std::vector<std::vector<int>>& g;

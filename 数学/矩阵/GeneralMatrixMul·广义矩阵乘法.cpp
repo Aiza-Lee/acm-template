@@ -1,4 +1,22 @@
 #include "aizalib.h"
+/*
+ * GeneralMatrixMul·广义矩阵乘法
+ *
+ * Overview:
+ *     基于半环 (Semiring) 抽象的广义矩阵类，支持标准乘法、Max-Plus (最长路)、Min-Plus (最短路)、AND-OR、OR-AND 等代数结构。
+ *
+ * API:
+ *     GeneralMatrix<Semiring>(r, c) — 构造基于指定半环的 r 行 c 列矩阵
+ *     StandardSemiring<T>           — (+, *) 普通加乘代数
+ *     MaxPlusSemiring<T>            — (max, +) 最长路 / 动态规划转移
+ *     MinPlusSemiring<T>            — (min, +) 最短路 (Floyd / Bellman-Ford)
+ *     AndOrSemiring                 — (&, |) 位与或半环
+ *     OrAndSemiring                 — (|, &) 位或与半环
+ *
+ * Notes:
+ *     1. 半环要求加法满足交换律、结合律且有单位元 zero()，乘法满足结合律且分配于加法。
+ *     2. 复杂度: 矩阵乘法 O(n^3)，广义矩阵快速幂 O(n^3 log k)。
+ */
 
 // --- Semiring Policies ---
 // 每个策略需提供: value_type, add, mul, zero, one

@@ -1,15 +1,20 @@
 #include "aizalib.h"
-/**
- * LCA (重链剖分)
- * 算法介绍: 基于重链剖分的LCA算法，常数小
- * 模板参数: 无
- * Interface:
- *      HLDLCA(G, root) — O(N) Initialize
- *      lca(u, v)       — O(log N) Query
- * Note:
- *      1. Time: O(N) pre, O(log N) query
- *      2. Space: O(N)
- *      3. Constant factor is usually better than Doubling
+/*
+ * HLD LCA (重链剖分 LCA)
+ *
+ * Overview:
+ *     基于重链剖分的树上 LCA 在线算法。常数极小，预处理为线性时间。
+ *
+ * API:
+ *     struct Graph(n)       — 树的邻接表表示，1-based
+ *     Graph::add_edge(u, v) — 添加无向边 (u, v)
+ *     HLDLCA(G, root = 1)   — 预处理重链剖分信息，时间复杂度 O(N)
+ *     lca(u, v)             — 查询 u 和 v 的最近公共祖先，复杂度 O(log N)
+ *     dist(u, v)            — 查询 u 和 v 的树上距离（边数），复杂度 O(log N)
+ *
+ * Notes:
+ *     1. 1-based indexing，root 深度为 0。
+ *     2. Time: 预处理 O(N)，单次查询最坏 O(log N) 且常数显著优于倍增；Space: O(N)。
  */
 
 struct Graph {

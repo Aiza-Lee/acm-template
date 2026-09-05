@@ -1,15 +1,19 @@
 #include "aizalib.h"
 
-/**
- * Edge Biconnected Component (边双连通分量)
- * 算法介绍: 使用 Tarjan 算法求解无向图的边双连通分量与桥。
- * 模板参数: 无
- * Interface:
- *      EDCC(GraphFS& g) — 构造函数，计算桥和 E-DCC
- * Note:
- *      1. Time: O(V + E)
- *      2. Space: O(V + E)
- *      3. 1-based indexing. 图中可能存在重边，使用成对变换的边表存储。
+/*
+ * EDCC·边双连通分量
+ *
+ * Overview:
+ *     使用 Tarjan 算法求解无向图的边双连通分量与桥。
+ *
+ * API:
+ *     EDCC(GraphFS& g) — 构造函数，计算桥和 E-DCC
+ *
+ * Notes:
+ *     模板参数: 无
+ *     1. Time: O(V + E)
+ *     2. Space: O(V + E)
+ *     3. 1-based indexing. 图中可能存在重边，使用成对变换的边表存储。
  */
 #include "../0-base[ignore]/GraphForwardStar·前向星.cpp"
 

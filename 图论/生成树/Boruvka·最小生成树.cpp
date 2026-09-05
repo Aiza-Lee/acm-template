@@ -1,22 +1,27 @@
 #include "aizalib.h"
 
-/**
- * Boruvka
- * 算法介绍: 每轮为每个连通分量选出一条最小出边并同时合并，直到只剩一个分量或无法继续合并。
- * 模板参数: T (边权类型)
- * Interface:
- *      Boruvka(int n)                   — 初始化 n 个点的无向图
- *      void add_edge(int u, int v, T w) — 添加一条无向边
- *      T solve()                        — 返回最小生成树边权和，不连通时返回 -1
- * Note:
- *      1. Time: O(E log V)
- *      2. Space: O(V + E)
- *      3. 1-based indexing.
- *      4. 用法/技巧:
- *          4.1 对普通显式图，Kruskal 通常更短更常用；Boruvka 更适合作为补充模板。
- *          4.2 若边权可能相同，需加入次关键字避免同轮选择不稳定，本模板以边下标打破平局。
- *          4.3 若题目天然按“每个连通块找最优外连边”建模，Boruvka 会比 Kruskal 更贴近题意。
- *          4.4 solve() 每次会重置并查集，因此同一对象可重复求解当前边集。
+/*
+ * Boruvka·最小生成树
+ *
+ * Overview:
+ *     Boruvka
+ *     每轮为每个连通分量选出一条最小出边并同时合并，直到只剩一个分量或无法继续合并。
+ *
+ * API:
+ *     Boruvka(int n)                   — 初始化 n 个点的无向图
+ *     void add_edge(int u, int v, T w) — 添加一条无向边
+ *     T solve()                        — 返回最小生成树边权和，不连通时返回 -1
+ *
+ * Notes:
+ *     模板参数: T (边权类型)
+ *     1. Time: O(E log V)
+ *     2. Space: O(V + E)
+ *     3. 1-based indexing.
+ *     4. 用法/技巧:
+ *     4.1 对普通显式图，Kruskal 通常更短更常用；Boruvka 更适合作为补充模板。
+ *     4.2 若边权可能相同，需加入次关键字避免同轮选择不稳定，本模板以边下标打破平局。
+ *     4.3 若题目天然按“每个连通块找最优外连边”建模，Boruvka 会比 Kruskal 更贴近题意。
+ *     4.4 solve() 每次会重置并查集，因此同一对象可重复求解当前边集。
  */
 
 template<typename T>

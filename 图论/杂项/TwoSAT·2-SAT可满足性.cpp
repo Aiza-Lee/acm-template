@@ -1,26 +1,30 @@
 #include "aizalib.h"
-/**
- * TwoSAT (2-SAT)
- * 算法介绍: 建立蕴含图并用 Kosaraju 求强连通分量，判断 2-SAT 可满足性并恢复一组解。
- * 模板参数: 无
- * Interface:
- *      TwoSAT(int n)                                        — 初始化 n 个布尔变量 x1...xn
- *      void add_implication(int u, bool fu, int v, bool fv) — 加入 (xu = fu) => (xv = fv)
- *      void add_or(int u, bool fu, int v, bool fv)          — 加入 (xu = fu) or (xv = fv)
- *      void add_true(int u, bool fu = true)                 — 强制 (xu = fu)
- *      void add_false(int u)                                — 强制 xu = false
- *      void add_equal(int u, bool fu, int v, bool fv)       — 强制 (xu = fu) == (xv = fv)
- *      void add_xor(int u, bool fu, int v, bool fv)         — 强制 (xu = fu) xor (xv = fv)
- *      bool solve()                                         — 判断是否可满足，并在 assignment 中恢复一组解
- *      bool value(int u) const                              — 读取 solve() 后变量 u 的取值
- * Note:
- *      1. Time: O(n + m)
- *      2. Space: O(n + m)
- *      3. 1-based indexing. 变量编号为 1~n。
- *      4. 用法/技巧:
- *          4.1 add_or(u, fu, v, fv) 即加入子句 (xu = fu) or (xv = fv)。
- *          4.2 互斥可写作 add_xor(u, true, v, true)；等价可写作 add_equal(...)。
- *          4.3 solve() 成功后，assignment[u] 与 value(u) 均可直接读取答案。
+/*
+ * TwoSAT·2-SAT可满足性
+ *
+ * Overview:
+ *     建立蕴含图并用 Kosaraju 求强连通分量，判断 2-SAT 可满足性并恢复一组解。
+ *
+ * API:
+ *     TwoSAT(int n)                                        — 初始化 n 个布尔变量 x1...xn
+ *     void add_implication(int u, bool fu, int v, bool fv) — 加入 (xu = fu) => (xv = fv)
+ *     void add_or(int u, bool fu, int v, bool fv)          — 加入 (xu = fu) or (xv = fv)
+ *     void add_true(int u, bool fu = true)                 — 强制 (xu = fu)
+ *     void add_false(int u)                                — 强制 xu = false
+ *     void add_equal(int u, bool fu, int v, bool fv)       — 强制 (xu = fu) == (xv = fv)
+ *     void add_xor(int u, bool fu, int v, bool fv)         — 强制 (xu = fu) xor (xv = fv)
+ *     bool solve()                                         — 判断是否可满足，并在 assignment 中恢复一组解
+ *     bool value(int u) const                              — 读取 solve() 后变量 u 的取值
+ *
+ * Notes:
+ *     模板参数: 无
+ *     1. Time: O(n + m)
+ *     2. Space: O(n + m)
+ *     3. 1-based indexing. 变量编号为 1~n。
+ *     4. 用法/技巧:
+ *     4.1 add_or(u, fu, v, fv) 即加入子句 (xu = fu) or (xv = fv)。
+ *     4.2 互斥可写作 add_xor(u, true, v, true)；等价可写作 add_equal(...)。
+ *     4.3 solve() 成功后，assignment[u] 与 value(u) 均可直接读取答案。
  */
 struct TwoSAT {
     int n;                              // 变量个数

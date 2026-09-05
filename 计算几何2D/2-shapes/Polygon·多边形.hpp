@@ -92,11 +92,12 @@ bool is_convex(const Polygon<T>& poly) {
         if (cross < 0) has_neg = true;
         if (has_pos && has_neg) return false;
     }
-    return true;
+    return has_pos ^ has_neg;
 }
 
 template<typename T>
 Point<ld> polygon_centroid(const Polygon<T>& poly) {
+    if (poly.empty()) return Point<ld>(0, 0);
     Point<ld> c(0, 0);
     ld area = 0;
     int n = poly.size();

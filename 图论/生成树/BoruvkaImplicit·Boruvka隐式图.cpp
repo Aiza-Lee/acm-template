@@ -1,23 +1,28 @@
 #include "aizalib.h"
 
-/**
- * BoruvkaImplicit
- * 算法介绍: Boruvka 的隐式图框架。模板只负责维护并查集、分量枚举与批量合并，真正的最优跨分量边查询由外部 selector 对象提供。
- * 模板参数: T (边权类型), INF (无穷大)
- * Interface:
- *      BoruvkaImplicit(int n)      — 初始化 n 个点
- *      T solve(Selector& selector) — 返回最小生成树边权和，不连通时返回 -1
- * Note:
- *      1. Time: O(N log V + \sum select_cost)，复杂度主要取决于外部回调
- *      2. Space: O(N)
- *      3. 1-based indexing.
- *      4. 用法/技巧:
- *          4.1 selector 需提供:
- *              - void on_round_begin(BoruvkaImplicit& solver)
- *              - EdgeInfo select(int root, const std::vector<int>& nodes, BoruvkaImplicit& solver)
- *          4.2 其中 nodes 是当前连通块点集，可通过 solver.find(x) / solver.same(u, v) 查询当前并查集状态。
- *          4.3 本模板更适合完全图 / 隐式边图 / 最近点结构类题目；真正难点通常不在 Boruvka，而在如何高效实现 select。
- *          4.4 若回调返回的边两端不跨分量，本模板会自动忽略；若某一轮所有分量都找不到合法出边，则说明图不连通。
+/*
+ * BoruvkaImplicit·Boruvka隐式图
+ *
+ * Overview:
+ *     BoruvkaImplicit
+ *     Boruvka 的隐式图框架。模板只负责维护并查集、分量枚举与批量合并，真正的最优跨分量边查询由外部 selector 对象提供。
+ *
+ * API:
+ *     BoruvkaImplicit(int n)      — 初始化 n 个点
+ *     T solve(Selector& selector) — 返回最小生成树边权和，不连通时返回 -1
+ *
+ * Notes:
+ *     模板参数: T (边权类型), INF (无穷大)
+ *     1. Time: O(N log V + \sum select_cost)，复杂度主要取决于外部回调
+ *     2. Space: O(N)
+ *     3. 1-based indexing.
+ *     4. 用法/技巧:
+ *     4.1 selector 需提供:
+ *     - void on_round_begin(BoruvkaImplicit& solver)
+ *     - EdgeInfo select(int root, const std::vector<int>& nodes, BoruvkaImplicit& solver)
+ *     4.2 其中 nodes 是当前连通块点集，可通过 solver.find(x) / solver.same(u, v) 查询当前并查集状态。
+ *     4.3 本模板更适合完全图 / 隐式边图 / 最近点结构类题目；真正难点通常不在 Boruvka，而在如何高效实现 select。
+ *     4.4 若回调返回的边两端不跨分量，本模板会自动忽略；若某一轮所有分量都找不到合法出边，则说明图不连通。
  */
 
 template<typename T = i64, T INF = std::numeric_limits<T>::max()>

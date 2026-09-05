@@ -1,20 +1,24 @@
 #include "aizalib.h"
-/**
- * Edmonds Blossom (一般图最大匹配)
- * 算法介绍: 在无向一般图中通过 blossom 收缩寻找增广路，求最大匹配。
- * 模板参数: 无
- * Interface:
- *      Blossom(int n)                                          — 初始化 1~n 点的无向图
- *      void add_edge(int u, int v)                             — 添加一条无向边
- *      int solve()                                             — 返回最大匹配数，并在 mate 中恢复匹配
- *      std::vector<std::pair<int, int>> matching_edges() const — 返回一组匹配边
- * Note:
- *      1. Time: solve() 最坏 O(n^3)，更精确地说总计 O(nm + n^3)，单次 _find_path() 为 O(m + n^2)
- *      2. Space: O(n^2)
- *      3. 1-based indexing. 自环会被自动忽略，重边允许存在。
- *      4. 用法/技巧:
- *          4.1 mate[u] = v 表示点 u 当前匹配到 v，0 表示未匹配。
- *          4.2 solve() 会从当前图重新计算最大匹配，可重复调用。
+/*
+ * Blossom·一般图最大匹配
+ *
+ * Overview:
+ *     在无向一般图中通过 blossom 收缩寻找增广路，求最大匹配。
+ *
+ * API:
+ *     Blossom(int n)                                          — 初始化 1~n 点的无向图
+ *     void add_edge(int u, int v)                             — 添加一条无向边
+ *     int solve()                                             — 返回最大匹配数，并在 mate 中恢复匹配
+ *     std::vector<std::pair<int, int>> matching_edges() const — 返回一组匹配边
+ *
+ * Notes:
+ *     模板参数: 无
+ *     1. Time: solve() 最坏 O(n^3)，更精确地说总计 O(nm + n^3)，单次 _find_path() 为 O(m + n^2)
+ *     2. Space: O(n^2)
+ *     3. 1-based indexing. 自环会被自动忽略，重边允许存在。
+ *     4. 用法/技巧:
+ *     4.1 mate[u] = v 表示点 u 当前匹配到 v，0 表示未匹配。
+ *     4.2 solve() 会从当前图重新计算最大匹配，可重复调用。
  */
 struct Blossom {
     int n;                              // 点数

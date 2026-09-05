@@ -1,20 +1,21 @@
 #include "aizalib.h"
 
-/**
- * 树的直径（树形 DP）
- * 算法介绍: 以 root 定根，在每个点合并两条最长向下链更新直径。
+/*
+ * Tree Diameter (树直径，树形 DP)
  *
- * 模板参数:
- *      T: 边权类型，默认 i64
+ * Overview:
+ *     以 root 定根，在每个点合并两条最长向下链更新直径。
+ *     支持包含任意正负权边的带权树。
  *
- * Interface:
- *      Graph<T>(n), add_edge(u, v, w = 1)   — 建无向树，边权需非负
- *      TreeDiameterDP<T>(G).solve(root = 1) — 求直径，返回 {len, u, v, edges}
+ * API:
+ *     struct Graph<T>(n)              — 建无向树，1-based
+ *     Graph::add_edge(u, v, w = 1)    — 添加无向边 (u, v, w)
+ *     struct TreeDiameterDP<T>(G)     — 树形 DP 直径求解器
+ *     TreeDiameterDP::solve(root = 1) — 求直径，返回 Result {len, u, v, edges}
  *
- * Note:
- *      1. Time: O(N)
- *      2. Space: O(N)
- *      3. 1-based indexing
+ * Notes:
+ *     1. 1-based indexing。
+ *     2. Time: O(N)；Space: O(N)。
  */
 
 template<typename T>

@@ -90,12 +90,12 @@ std::tuple<T, T, T> matrix_to_euler_zyx(const std::array<std::array<T, 3>, 3>& R
     T pitch = std::asin(clamp_unit(sp));
     if (std::abs(sp - (T)1) < (T)1e-12) {
         // gimbal lock:pitch = π/2,yaw = 0 仅 roll 由矩阵前两行定
-        T roll = std::atan2(-R[0][1], R[0][2]);
+        T roll = std::atan2(R[0][1], R[0][2]);
         return {(T)0, (T)PI / 2, roll};
     }
     if (std::abs(sp + (T)1) < (T)1e-12) {
         // pitch = -π/2,yaw = 0 仅 roll 由矩阵前两行定
-        T roll = std::atan2(R[0][1], -R[0][2]);
+        T roll = std::atan2(-R[0][1], -R[0][2]);
         return {(T)0, -(T)PI / 2, roll};
     }
     T yaw  = std::atan2(R[1][0], R[0][0]);

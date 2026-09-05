@@ -119,11 +119,8 @@ int point_in_convex(const Polygon<T>& poly, const Point<T>& p) {
         return cmp(p.x, std::min(a.x, b.x)) >= 0 && cmp(p.x, std::max(a.x, b.x)) <= 0
             && cmp(p.y, std::min(a.y, b.y)) >= 0 && cmp(p.y, std::max(a.y, b.y)) <= 0;
     };
-    if (c1 == 0 || c2 == 0) {
-        if (on_segment(p0, poly[1])) return 0;
-        if (on_segment(p0, poly[n - 1])) return 0;
-        return -1;
-    }
+    if (c1 == 0) return on_segment(p0, poly[1]) ? 0 : -1;
+    if (c2 == 0) return on_segment(p0, poly[n - 1]) ? 0 : -1;
     if (c1 < 0 || c2 > 0) return -1;
 
     // c1 > 0 && c2 < 0：p 在 poly[0] 张开的扇形内
@@ -143,8 +140,9 @@ int point_in_convex(const Polygon<T>& poly, const Point<T>& p) {
     int t2 = sgn((poly[lo + 1] - poly[lo]).cross(p - poly[lo]));
     int t3 = sgn((p0 - poly[lo + 1]).cross(p - poly[lo + 1]));
     if (t1 < 0 || t2 < 0 || t3 < 0) return -1;
-    // 在三条边上或内部
-    if (t1 == 0 || t2 == 0 || t3 == 0) return 0;
+    // 仅在外边界上时返回 0（内部对角线上属于严格内部，返回 1）
+    bool on_boundary = (t2 == 0) || (t1 == 0 && lo == 1) || (t3 == 0 && lo + 1 == n - 1);
+    if (on_boundary) return 0;
     return 1;
 }
 

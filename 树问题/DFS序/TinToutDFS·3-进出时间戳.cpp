@@ -1,17 +1,20 @@
 #include "aizalib.h"
-/**
- * 进出时间戳
- * 算法介绍: 进入 u 时记录 tin[u]，离开 u 时记录 tout[u]。
- * 模板参数: 无
- * Interface:
- *      TinToutDFS(g, root = 1)
- * Note:
- *      1. Time: O(N)
- *      2. Space: O(N)
- *      3. 1-based indexing；输入 g 为树的邻接表，默认根为 1
- *      4. 性质: u 是 v 的祖先 <=> tin[u] <= tin[v] <= tout[u]
- *      5. 性质: subtree(u) <=> [tin[u], tout[u]]
- *      6. 用法/技巧: tout[u] 是子树内最大进入时间，不是离开时再加一的时间戳。
+/*
+ * In-Out Timestamp DFS (进出时间戳)
+ *
+ * Overview:
+ *     进入 u 时记录进入时间 tin[u]，遍历完子树后记录子树内最大进入时间 tout[u]。
+ *     提供 O(1) 的祖先关系判定与子树区间表达。
+ *
+ * API:
+ *     TinToutDFS(g, root = 1) — 构造进出时间戳，以 root 为根预处理
+ *     dfs(u, p)               — 内部 DFS 遍历函数
+ *
+ * Notes:
+ *     1. 1-based indexing；输入 g 为树的邻接表，默认根为 1。
+ *     2. Time: O(N)；Space: O(N)。
+ *     3. 性质: u 是 v 的祖先 <=> tin[u] <= tin[v] 且 tout[v] <= tout[u]（等价于 tin[v] <= tout[u]）。
+ *     4. 性质: subtree(u) 对应时间戳闭区间 [tin[u], tout[u]]，区间长度恰好等于 siz[u]。
  */
 struct TinToutDFS {
     const std::vector<std::vector<int>>& g;

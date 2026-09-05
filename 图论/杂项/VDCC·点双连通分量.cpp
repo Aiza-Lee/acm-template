@@ -1,15 +1,19 @@
 #include "aizalib.h"
 
-/**
- * Vertex Biconnected Component (点双连通分量)
- * 算法介绍: 使用 Tarjan 算法求解无向图的割点与点双连通分量。
- * 模板参数: 无
- * Interface:
- *      VDCC(GraphFS& g) — 构造函数，计算 V-DCC
- * Note:
- *      1. Time: O(V + E)
- *      2. Space: O(V + E)
- *      3. 1-based indexing. 对于孤立点也会包含在一个单点的V-DCC中。
+/*
+ * VDCC·点双连通分量
+ *
+ * Overview:
+ *     使用 Tarjan 算法求解无向图的割点与点双连通分量。
+ *
+ * API:
+ *     VDCC(GraphFS& g) — 构造函数，计算 V-DCC
+ *
+ * Notes:
+ *     模板参数: 无
+ *     1. Time: O(V + E)
+ *     2. Space: O(V + E)
+ *     3. 1-based indexing. 对于孤立点也会包含在一个单点的V-DCC中。
  */
 #include "../0-base[ignore]/GraphForwardStar·前向星.cpp"
 

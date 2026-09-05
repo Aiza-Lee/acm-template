@@ -1,20 +1,24 @@
 #include "aizalib.h"
-/**
- * Stoer-Wagner (全局最小割)
- * 算法介绍: 对无向带权图不断做最大邻接搜索与点收缩，求全局最小割。
- * 模板参数: T (边权类型)
- * Interface:
- *      StoerWagner(int n)               — 初始化 1~n 点无向图
- *      void add_edge(int u, int v, T w) — 添加一条无向边
- *      T solve() const                  — 返回全局最小割权值
- *      Result solve_with_cut() const    — 返回最小割权值及一侧点集
- * Note:
- *      1. Time: O(n^3)
- *      2. Space: O(n^2)
- *      3. 1-based indexing. 适用于无向图、非负边权；重边会自动合并。
- *      4. 用法/技巧:
- *          4.1 若图不连通，则全局最小割为 0。
- *          4.2 solve_with_cut().side 返回最优割的一侧点集，另一侧为补集。
+/*
+ * StoerWagner·全局最小割
+ *
+ * Overview:
+ *     对无向带权图不断做最大邻接搜索与点收缩，求全局最小割。
+ *
+ * API:
+ *     StoerWagner(int n)               — 初始化 1~n 点无向图
+ *     void add_edge(int u, int v, T w) — 添加一条无向边
+ *     T solve() const                  — 返回全局最小割权值
+ *     Result solve_with_cut() const    — 返回最小割权值及一侧点集
+ *
+ * Notes:
+ *     模板参数: T (边权类型)
+ *     1. Time: O(n^3)
+ *     2. Space: O(n^2)
+ *     3. 1-based indexing. 适用于无向图、非负边权；重边会自动合并。
+ *     4. 用法/技巧:
+ *     4.1 若图不连通，则全局最小割为 0。
+ *     4.2 solve_with_cut().side 返回最优割的一侧点集，另一侧为补集。
  */
 template<typename T = i64>
 struct StoerWagner {

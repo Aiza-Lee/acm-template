@@ -10,33 +10,33 @@ struct Graph {
     }
 };
 
-/**
- * 图着色 (Graph Coloring)
- * 算法介绍:
+/*
+ * GraphColoring·图着色
+ *
+ * Overview:
  *     图着色是指给图的每个顶点分配一个颜色，使得相邻顶点颜色不同。
  *     本模板实现了贪心着色、二分图检测与着色、以及精确色数求解。
- *
  *     贪心着色 (Welsh-Powell): 按度数降序贪心着色，使用颜色数不超过 max degree + 1。
  *     二分图检测: BFS 判定图是否可二着色，若可则返回一组合法的二着色方案。
  *     精确色数: 对于小图 (n ≤ 20)，使用 DP 枚举独立集精确求解色数和最优着色。
- *         状态 dp[mask] = 诱导子图 mask 的最小着色数。
- *         转移: dp[mask] = 1 + min_{I ⊆ mask, I 是独立集, LSB(mask) ∈ I} dp[mask \ I]。
+ *     状态 dp[mask] = 诱导子图 mask 的最小着色数。
+ *     转移: dp[mask] = 1 + min_{I ⊆ mask, I 是独立集, LSB(mask) ∈ I} dp[mask \ I]。
  *
- * Interface:
+ * API:
  *     static std::vector<int> greedy_coloring(const Graph& graph, const std::vector<int>& order)
- *         按指定顺序贪心着色，返回 1-based 颜色编号 (1 到 n)。
+ *     按指定顺序贪心着色，返回 1-based 颜色编号 (1 到 n)。
  *     static std::vector<int> greedy_coloring(const Graph& graph)
- *         按度数降序贪心着色 (Welsh-Powell 启发式)。
+ *     按度数降序贪心着色 (Welsh-Powell 启发式)。
  *     static bool is_bipartite(const Graph& graph)
- *         判断图是否可二着色。
+ *     判断图是否可二着色。
  *     static std::vector<int> bipartite_coloring(const Graph& graph)
- *         返回 1-based 二着色方案 (颜色 1 或 2)，不可二着色返回空 vector。
+ *     返回 1-based 二着色方案 (颜色 1 或 2)，不可二着色返回空 vector。
  *     static int chromatic_number(const Graph& graph)
- *         精确色数 (要求 n ≤ 20)，使用独立集 DP 求解。
+ *     精确色数 (要求 n ≤ 20)，使用独立集 DP 求解。
  *     static std::vector<int> minimum_coloring(const Graph& graph)
- *         返回最优着色方案 (要求 n ≤ 20)。
+ *     返回最优着色方案 (要求 n ≤ 20)。
  *
- * Note:
+ * Notes:
  *     1. 贪心着色: Time O(V + E), Space O(V).
  *     2. 二分图: Time O(V + E), Space O(V).
  *     3. 精确色数: Time O(3^n) worst-case, n ≤ 20, Space O(2^n).

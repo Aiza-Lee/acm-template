@@ -1,21 +1,25 @@
 #include "aizalib.h"
-/**
- * Zhu-Liu / Edmonds (最小树形图)
- * 算法介绍: 迭代收缩有向环，求以 root 为根、覆盖所有点的最小有向生成树。
- * 模板参数: T (边权类型)
- * Interface:
- *      ZhuLiu(int n)                      — 初始化 1~n 点的有向图
- *      void add_edge(int u, int v, T w)   — 添加一条 u -> v 的有向边
- *      std::pair<bool, T> solve(int root) — 返回是否存在最小树形图及其最小权值
- *      Result solve_with_plan(int root)   — 返回可行性、最小权值与一组父边方案
- * Note:
- *      1. Time: O(VE)
- *      2. Space: solve 为 O(V + E)，solve_with_plan 额外记录收缩历史，空间 O(VE)
- *      3. 1-based indexing. root 不需要入边；其余每个点都必须可由 root 到达。
- *      4. 用法/技巧:
- *          4.1 自环会被自动忽略。
- *          4.2 若返回 false，说明不存在以 root 为根、覆盖所有点的树形图。
- *          4.3 solve_with_plan() 返回的 parent[v] 为父亲，in_eid[v] 为原图入边编号；root 位置分别为 0 / -1。
+/*
+ * ZhuLiu·最小树形图
+ *
+ * Overview:
+ *     迭代收缩有向环，求以 root 为根、覆盖所有点的最小有向生成树。
+ *
+ * API:
+ *     ZhuLiu(int n)                      — 初始化 1~n 点的有向图
+ *     void add_edge(int u, int v, T w)   — 添加一条 u -> v 的有向边
+ *     std::pair<bool, T> solve(int root) — 返回是否存在最小树形图及其最小权值
+ *     Result solve_with_plan(int root)   — 返回可行性、最小权值与一组父边方案
+ *
+ * Notes:
+ *     模板参数: T (边权类型)
+ *     1. Time: O(VE)
+ *     2. Space: solve 为 O(V + E)，solve_with_plan 额外记录收缩历史，空间 O(VE)
+ *     3. 1-based indexing. root 不需要入边；其余每个点都必须可由 root 到达。
+ *     4. 用法/技巧:
+ *     4.1 自环会被自动忽略。
+ *     4.2 若返回 false，说明不存在以 root 为根、覆盖所有点的树形图。
+ *     4.3 solve_with_plan() 返回的 parent[v] 为父亲，in_eid[v] 为原图入边编号；root 位置分别为 0 / -1。
  */
 template<typename T = i64>
 struct ZhuLiu {

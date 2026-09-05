@@ -1,21 +1,21 @@
 #include "aizalib.h"
-
-/**
- * Matrix (动态矩阵)
- * 模板参数:
- *      [T]: 元素类型
- * Interface:
- *      Matrix(r, c)       — r 行 c 列零矩阵
- *      Matrix(r, c, val)  — 填充矩阵
- *      Matrix(r, c, data) — 从 C 数组构造
- *      static Identity(n) — n*n 单位矩阵
- *      transpose()        — 转置
- *      det()              — 行列式 (需方阵)
- *      inverse()          — 逆矩阵 (需方阵)
- * Note:
- *      1. 乘法采用 i-k-j 循环序
- *      2. det()/inverse() 对浮点类型使用主元消元，非浮点类型使用非零判断
- *      3. det()/inverse() 要求 T 为域上的类型 (浮点 / 模数类)；整数类型因除法截断被 static_assert 拒绝
+/*
+ * DynamicMatrix·动态矩阵
+ *
+ * Overview:
+ *     动态大小矩阵类，支持任意域类型 T（浮点数、模数类等）的基础矩阵代数运算、转置、行列式与逆矩阵。
+ *
+ * API:
+ *     Matrix(r, c, val = 0) — 构造 r 行 c 列的矩阵
+ *     Matrix(r, c, data)    — 从数组构造矩阵
+ *     Matrix::Identity(n)   — 返回 n*n 单位矩阵
+ *     transpose()           — 矩阵转置
+ *     det()                 — 计算方阵行列式，复杂度 O(n^3)
+ *     inverse()             — 计算方阵逆矩阵，复杂度 O(n^3)
+ *
+ * Notes:
+ *     1. 乘法采用 i-k-j 循环序优化缓存局部性。
+ *     2. det() 与 inverse() 要求元素类型 T 为域类型（浮点数或带逆元模数类）。
  */
 template<typename T>
 struct Matrix {

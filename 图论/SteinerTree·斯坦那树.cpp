@@ -1,29 +1,21 @@
 #include "aizalib.h"
 
-/**
- * 最小斯坦纳树 (Steiner Tree)
- * 算法介绍:
- *      求连接图中指定的 k 个关键点的最小代价树。
- *      这是一个 NP-hard 问题，当 k 较小时可以使用状压 DP 求解。
- * 
- *      DP 状态:
- *      dp[mask][u]: 以 u 为根，连接了关键点集合 mask (二进制掩码) 的最小代价。
- * 
- *      转移方程:
- *      1. 子集扩展 (Splitting):
- *         dp[mask][u] = min(dp[mask][u], dp[sub][u] + dp[mask ^ sub][u])
- *         其中 sub 是 mask 的子集。
- *      2. 边松弛 (Extending):
- *         dp[mask][v] = min(dp[mask][v], dp[mask][u] + w(u, v))
- *         这就相当于对固定的状态 mask，在图上跑最短路 (Dijkstra)。
- * 
- * 模板参数:
- *      T: 权值类型，默认为 i64 (long long)
- *      INF: 无穷大值
- * 
- * 复杂度:
- *      时间: O(n * 3^k + m * log m * 2^k)
- *      空间: O(n * 2^k)
+/*
+ * SteinerTree·斯坦那树
+ *
+ * Overview:
+ *     求连接图中指定的 k 个关键点的最小代价树 (NP-hard，k 较小时使用状压 DP 求解)。
+ *
+ * API:
+ *     SteinerTree(int n)                               — 初始化 1..n 个点的图
+ *     void add_edge(int u, int v, T w)                 — 添加一条无向带权边 (u, v)
+ *     void set_key_nodes(const std::vector<int>& keys) — 设置关键点集合
+ *     T solve()                                        — 求解连接所有关键点的最小代价
+ *
+ * Notes:
+ *     1. 状态定义: dp[mask][u] 为以 u 为根连接关键点集合 mask 的最小代价。
+ *     2. 转移由子集枚举合并与 Dijkstra 最短路松弛两阶段交替进行。
+ *     3. 复杂度: 时间 O(n * 3^k + m log m * 2^k)，空间 O(n * 2^k)。
  */
 template<typename T>
 struct Graph {

@@ -1,21 +1,17 @@
 #include "aizalib.h"
-
-/**
- * 高斯消元 (Gauss Elimination)
- * 算法介绍:
- *      用于求解线性方程组 Ax = B。
- *      使用列主元消元法以提高数值稳定性。
- * 
- * 模板参数:
- *      T: 被处理的类型 (默认为 double)
- * 
- * Interface:
- *      int solve(std::vector<std::vector<T>>& a, std::vector<T>& ans)
- * 
- * Note:
- *      1. 时间复杂度: O(N^3)
- *      2. 空间复杂度: O(N^2)
- *      3. 返回值: 0-无解, 1-唯一解, 2-无穷多解
+/*
+ * GaussElimination·高斯消元
+ *
+ * Overview:
+ *     高斯消元法，用于求解实数域上的线性方程组 Ax = B，采用列主元消元法保证数值稳定性。
+ *
+ * API:
+ *     Gauss::solve(a, ans) — 求解线性方程组，返回值: 0-无解, 1-唯一解, 2-无穷多解，复杂度 O(n^3)
+ *
+ * Notes:
+ *     1. 输入增广矩阵 a 大小为 n * (m + 1)，每行最后一个元素为常数项 b_i。
+ *     2. 若有唯一解，解向量存入 ans 中（大小为 m）。
+ *     3. 复杂度: 时间 O(n * m * min(n, m))，空间 O(n * m)。
  */
 
 struct Gauss {

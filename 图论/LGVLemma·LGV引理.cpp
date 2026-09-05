@@ -1,18 +1,20 @@
 #include "aizalib.h"
-/**
- * LGV引理 (Lindström-Gessel-Viennot Lemma)
- * 算法介绍:
+/*
+ * LGVLemma·LGV引理
+ *
+ * Overview:
  *     在DAG中，给定k个源点{a_i}和k个汇点{b_i}，定义矩阵M[i][j]为从源点a_i到汇点b_j的路径条数。
  *     LGV引理指出：det(M) = Σ_{σ∈S_k} sign(σ) · ∏_{j=1}^k (a_j→b_{σ(j)}的路径条数)
  *     其中右式正是顶点不相交路径系统按置换符号的带权和。
  *     在多数竞赛问题中（如平面网格DAG），将源汇按适当顺序排列后仅有恒等排列对应不相交路径，
- *     此时det(M)直接给出顶点不相交路径系统的方案数。
- * Interface:
+ *
+ * API:
  *     LGV(int n)                                                — 初始化1..n点的DAG
  *     void add_edge(int u, int v)                               — 添加有向边u->v
  *     int count_paths(int u, int v)                             — 计算从u到v的路径条数
  *     int solve(const vector<int>& src, const vector<int>& snk) — 计算k对源汇的不相交路径系统行列式值
- * Note:
+ *
+ * Notes:
  *     1. 复杂度: solve为O(k(n+m) + k^3)，count_paths为O(n+m)
  *     2. 空间: O(n + m + k^2)
  *     3. 1-based indexing. 结果对md=998244353取模

@@ -1,31 +1,27 @@
 #include "aizalib.h"
-/**
- * 重链剖分
- * 算法介绍: 维护树链信息，支持 LCA、距离、祖先跳跃、路径/子树转区间，以及 DSU on Tree
- * 模板参数: 无
- * Interface:
- *      HeavyPathDecomposition(G, root = 1)
- *          以 root 为根完成重链剖分与 dfn 编号
- *      lca(u, v)
- *          查询 u 和 v 的最近公共祖先
- *      kth_ancestor(u, k)
- *          查询 u 的第 k 级祖先，若不存在返回 0
- *      jump(u, v, k)
- *          返回路径 u -> v 上从 u 出发第 k 条边到达的点，越界返回 0
- *      deal_path_vertex(u, v, f) / deal_path_edge(u, v, f)
- *          将点路径/边路径拆成若干 dfn 连续区间，对每段调用 f(l, r)
- *      deal_subtree(u, f)
- *          对 u 子树对应区间调用一次 f(l, r)
- *      heuristic_dfs(u, insert, erase, query)
- *          DSU on Tree — 模板，维护以 u 为根子树的信息并在每个点处触发 query
- * Note:
- *      1. Time: O(N) 预处理，单次链剖相关查询/拆链 O(log N)
- *      2. Space: O(N)
- *      3. 全部下标均为 1-based，点权通常映射到 dfn[u]，边权通常映射到更深端点的 dfn
- *      4. 用法/技巧:
- *          4.1 deal_path_edge 会自动跳过 LCA。
- *          4.2 jump(u, v, k) 中 k 是边数，k=0 返回 u，k=dist(u,v) 返回 v。
- *          4.3 heuristic_dfs 默认从传入 u 开始，keep=false，执行完会清空当前子树贡献。
+/*
+ * Heavy-Light Decomposition (重链剖分)
+ *
+ * Overview:
+ *     树上重链剖分框架。维护树链信息，支持 LCA、距离、祖先跳跃、路径/子树转连续区间，以及 DSU on Tree。
+ *
+ * API:
+ *     struct Graph(n)                        — 树的邻接表表示，1-based
+ *     Graph::add_edge(u, v)                  — 添加无向边 (u, v)
+ *     HeavyPathDecomposition(G, root = 1)    — 以 root 为根完成重链剖分与 dfn 编号
+ *     lca(u, v)                              — 查询 u 和 v 的最近公共祖先，复杂度 O(log N)
+ *     kth_ancestor(u, k)                     — 查询 u 的第 k 级祖先，越界返回 0，复杂度 O(log N)
+ *     jump(u, v, k)                          — 返回路径 u -> v 上从 u 出发第 k 条边到达的点，越界返回 0
+ *     deal_path_vertex(u, v, f)              — 将点路径拆成若干 dfn 连续区间，对每段调用 f(l, r)
+ *     deal_path_edge(u, v, f)                — 将边路径拆成若干 dfn 连续区间，自动跳过 LCA
+ *     deal_subtree(u, f)                     — 对 u 子树对应连续区间调用一次 f(l, r)
+ *     heuristic_dfs(u, insert, erase, query) — DSU on Tree 树上启发式合并模板
+ *
+ * Notes:
+ *     1. 全部下标均为 1-based，dep[root] = 0。点权映射到 dfn[u]，边权映射到较深端点的 dfn。
+ *     2. Time: 预处理 O(N)，单次链剖相关查询/拆链 O(log N)；Space: O(N)。
+ *     3. jump(u, v, k) 中 k 是边数，k=0 返回 u，k=dist(u, v) 返回 v。
+ *     4. heuristic_dfs 默认从传入 u 开始，执行完会清空当前子树贡献。
  */
 struct Graph {
     int n;

@@ -1,15 +1,20 @@
 #include "aizalib.h"
-/**
- * LCA (RMQ - ST表)
- * 算法介绍: 将LCA问题转化为RMQ问题，预处理O(N log N)，查询O(1)
- * 模板参数: 无
- * Interface:
- *      RMQLCA(G, root) — O(N log N) Initialize
- *      lca(u, v)       — O(1) Query
- * Note:
- *      1. Time: O(N log N) pre, O(1) query
- *      2. Space: O(N log N)
- *      3. Uses Euler Tour (First occurrence)
+/*
+ * RMQ LCA (RMQ 转化 LCA)
+ *
+ * Overview:
+ *     将 LCA 问题转化为欧拉序上的区间深度 RMQ 问题，通过 ST 表实现 O(1) 在线查询。
+ *
+ * API:
+ *     struct Graph(n)       — 树的邻接表表示，1-based
+ *     Graph::add_edge(u, v) — 添加无向边 (u, v)
+ *     RMQLCA(G, root = 1)   — 预处理欧拉序与 ST 表，时间复杂度 O(N log N)
+ *     lca(u, v)             — 查询 u 和 v 的最近公共祖先，复杂度 O(1)
+ *     dist(u, v)            — 查询 u 和 v 的树上距离（边数），复杂度 O(1)
+ *
+ * Notes:
+ *     1. 1-based indexing，root 深度为 0。
+ *     2. Time: 预处理 O(N log N)，单次查询 O(1)；Space: O(N log N)。
  */
 
 struct Graph {

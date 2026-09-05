@@ -1,14 +1,20 @@
 #include "aizalib.h"
-/**
- * LCA (Tarjan离线算法)
- * 算法介绍: 使用并查集离线求LCA，时间复杂度优秀( nearly linear )
- * 模板参数: 无
- * Interface:
- *      add_query(u, v) — 添加查询
- *      solve(root)     — 解决所有查询，返回结果 vector<int>
- * Note:
- *      1. Time: O(N alpha(N) + Q alpha(N))
- *      2. Space: O(N + Q)
+/*
+ * Tarjan Offline LCA (Tarjan 离线 LCA)
+ *
+ * Overview:
+ *     使用带路径压缩的并查集在一次 DFS 过程中离线回答全部 LCA 查询。
+ *
+ * API:
+ *     struct Graph(n)       — 树的邻接表表示，1-based
+ *     Graph::add_edge(u, v) — 添加无向边 (u, v)
+ *     TarjanLCA(G)          — 构造离线 LCA 求解器
+ *     add_query(u, v)       — 添加查询对 (u, v)
+ *     solve(root = 1)       — 解决所有查询，按添加顺序返回结果 std::vector<int>
+ *
+ * Notes:
+ *     1. 1-based indexing。
+ *     2. Time: O(N \alpha(N) + Q \alpha(N))；Space: O(N + Q)。
  */
 
 struct Graph {

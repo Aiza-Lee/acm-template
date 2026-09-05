@@ -1,17 +1,21 @@
 #include "aizalib.h"
-/**
- * LCA (倍增法)
- * 算法介绍: 基于倍增的LCA在线算法
- * 模板参数: 无
- * Interface:
- *      DoublingLCA(G, root) — O(N log N) 预处理
- *      lca(u, v)            — O(log N)   查询
- *      dist(u, v)           — O(log N)   距离
- *      kth_ancestor(u, k)   — O(log N) K 级祖先
- * Note:
- *      1. Time: O(N log N) pre, O(log N) query
- *      2. Space: O(N log N)
- *      3. 1-based indexing
+/*
+ * Doubling LCA (倍增法 LCA)
+ *
+ * Overview:
+ *     基于二进制倍增的树上 LCA 在线算法。支持查询任意两点 LCA、树上距离及 k 级祖先。
+ *
+ * API:
+ *     struct Graph(n)          — 树的邻接表表示，1-based
+ *     Graph::add_edge(u, v)    — 添加无向边 (u, v)
+ *     DoublingLCA(G, root = 1) — 预处理倍增数组，时间复杂度 O(N log N)
+ *     lca(u, v)                — 查询 u 和 v 的最近公共祖先，复杂度 O(log N)
+ *     dist(u, v)               — 查询 u 和 v 的树上距离（边数），复杂度 O(log N)
+ *     kth_ancestor(u, k)       — 查询 u 的第 k 级祖先，越界返回 0，复杂度 O(log N)
+ *
+ * Notes:
+ *     1. 1-based indexing，root 深度为 0。
+ *     2. Time: 预处理 O(N log N)，单次查询 O(log N)；Space: O(N log N)。
  */
 
 struct Graph {
@@ -65,6 +69,7 @@ struct DoublingLCA {
     }
 
     int kth_ancestor(int u, int k) {
+        if (k < 0 || k > dep[u]) return 0;
         rep(i, 0, LOG - 1) {
             if ((k >> i) & 1) u = up[u][i];
         }

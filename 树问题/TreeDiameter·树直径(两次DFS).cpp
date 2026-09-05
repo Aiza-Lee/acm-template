@@ -1,20 +1,21 @@
 #include "aizalib.h"
 
-/**
- * 树的直径（两次 DFS）
- * 算法介绍: 任取起点找最远点 a，再从 a 找最远点 b，a-b 即一条直径。
+/*
+ * Tree Diameter (树直径，两次 DFS)
  *
- * 模板参数:
- *      T: 边权类型，默认 i64
+ * Overview:
+ *     在带权树上任取起点找最远点 a，再从 a 找最远点 b，a-b 即为一条直径。
+ *     适用于非负边权树。
  *
- * Interface:
- *      Graph<T>(n), add_edge(u, v, w = 1)    — 建无向树，边权需非负
- *      TreeDiameterTwoDFS<T>(G).solve(s = 1) — 求直径，返回 {len, u, v, edges}
+ * API:
+ *     struct Graph<T>(n)               — 建无向树，1-based，边权需非负
+ *     Graph::add_edge(u, v, w = 1)     — 添加无向边 (u, v, w)
+ *     struct TreeDiameterTwoDFS<T>(G)  — 树直径求解器
+ *     TreeDiameterTwoDFS::solve(s = 1) — 求直径，返回 Result {len, u, v, edges}
  *
- * Note:
- *      1. Time: O(N)
- *      2. Space: O(N)
- *      3. 1-based indexing
+ * Notes:
+ *     1. 1-based indexing，边权必须非负（若存在负权边需使用树形 DP）。
+ *     2. Time: O(N)；Space: O(N)。
  */
 
 template<typename T>

@@ -38,31 +38,44 @@ std::vector<Face3<T>> convex_hull_3d(std::vector<Point<T>> pts) {
     std::vector<Face3<T>> faces;
     int n = (int)pts.size();
     if (n <= 3) return faces;
-    // 极小扰动避免整列共面
+
+    // 转换为浮点坐标并加极小扰动避免四点共面/多点共线
+    std::vector<Point<ld>> p_ld(n);
     for (int i = 0; i < n; ++i) {
-        pts[i].x = pts[i].x + T(i) * (T)1e-9;
-        pts[i].y = pts[i].y + T(i) * (T)2e-9;
-        pts[i].z = pts[i].z + T(i) * (T)3e-9;
+        p_ld[i] = Point<ld>(
+            (ld)pts[i].x + (ld)i * (ld)1e-9,
+            (ld)pts[i].y + (ld)i * (ld)2e-9,
+            (ld)pts[i].z + (ld)i * (ld)3e-9
+        );
     }
+
     // 找初始四面体
     auto find_tetra = [&](int& a, int& b, int& c, int& d) {
         a = 0;
-        for (b = 1; b < n; ++b) if (!(pts[a] == pts[b])) break;
+        for (b = 1; b < n; ++b) {
+            if (!is_zero((p_ld[b] - p_ld[a]).len2())) break;
+        }
         if (b >= n) return false;
         for (c = b + 1; c < n; ++c) {
-            auto cr = (pts[b] - pts[a]).cross(pts[c] - pts[a]);
+            auto cr = (p_ld[b] - p_ld[a]).cross(p_ld[c] - p_ld[a]);
             if (!is_zero(cr.len2())) break;
         }
         if (c >= n) return false;
         for (d = c + 1; d < n; ++d) {
-            if (is_zero(signed_volume_x6_tetrahedron(pts[a], pts[b], pts[c], pts[d]))) continue;
-            break;
+            if (!is_zero(signed_volume_x6_tetrahedron(p_ld[a], p_ld[b], p_ld[c], p_ld[d]))) break;
         }
         if (d >= n) return false;
         return true;
     };
+
     int a, b, c, d;
     if (!find_tetra(a, b, c, d)) return faces;
+
+    // 保证初始面 (a, b, c) 法向量朝外 (即 d 在其反面)
+    if (signed_volume_x6_tetrahedron(p_ld[a], p_ld[b], p_ld[c], p_ld[d]) > 0) {
+        std::swap(b, c);
+    }
+
     // 初始 4 面 (朝外)
     auto mk_face = [&](int i, int j, int k) {
         faces.push_back(Face3<T>(i, j, k));
@@ -71,47 +84,54 @@ std::vector<Face3<T>> convex_hull_3d(std::vector<Point<T>> pts) {
     mk_face(a, c, d);
     mk_face(a, d, b);
     mk_face(b, d, c);
+
     // 增量加入
     for (int p = 0; p < n; ++p) {
         if (p == a || p == b || p == c || p == d) continue;
         std::vector<bool> vis(faces.size(), false);
         for (size_t f = 0; f < faces.size(); ++f) {
             Face3<T>& fc = faces[f];
-            auto vol = signed_volume_x6_tetrahedron(pts[fc.i], pts[fc.j], pts[fc.k], pts[p]);
+            auto vol = signed_volume_x6_tetrahedron(p_ld[fc.i], p_ld[fc.j], p_ld[fc.k], p_ld[p]);
             if (sgn(vol) > 0) vis[f] = true;
         }
         if (std::none_of(vis.begin(), vis.end(), [](bool b) { return b; })) continue;
-        // horizon:可见面的邻边
-        std::vector<std::tuple<int, int, int>> horizon;
+
+        // horizon: 可见面与不可见面的交界有向边
+        std::vector<std::pair<int, int>> horizon;
         for (size_t f = 0; f < faces.size(); ++f) {
             if (!vis[f]) continue;
             Face3<T>& fc = faces[f];
             int vs[3] = { fc.i, fc.j, fc.k };
             for (int e = 0; e < 3; ++e) {
                 int u = vs[e], v = vs[(e + 1) % 3];
-                // 检查 (u, v) 是否还是某邻面的邻边且邻面不可见
-                bool on_horizon = true;
+                // 检查 (u, v) 是否与某不可见面共享（在不可见面中为 (v, u)）
+                bool on_horizon = false;
                 for (size_t g = 0; g < faces.size(); ++g) {
-                    if (g == f || vis[g]) continue;
+                    if (vis[g]) continue;
                     Face3<T>& fc2 = faces[g];
                     int ws[3] = { fc2.i, fc2.j, fc2.k };
-                    bool has_uv = false;
                     for (int x = 0; x < 3; ++x) {
                         int xn = ws[x], yn = ws[(x + 1) % 3];
-                        if ((xn == u && yn == v) || (xn == v && yn == u)) { has_uv = true; break; }
+                        if (xn == v && yn == u) {
+                            on_horizon = true;
+                            break;
+                        }
                     }
-                    if (has_uv) { on_horizon = false; break; }
+                    if (on_horizon) break;
                 }
-                if (on_horizon) horizon.emplace_back(u, v, p);
+                if (on_horizon) horizon.emplace_back(u, v);
             }
         }
+
         // 移除可见面
         std::vector<Face3<T>> kept;
         kept.reserve(faces.size());
-        for (size_t f = 0; f < faces.size(); ++f) if (!vis[f]) kept.push_back(faces[f]);
-        // 新面 p + horizon 各条边
-        for (auto& [u, v, pp] : horizon) {
-            kept.emplace_back(u, v, pp);
+        for (size_t f = 0; f < faces.size(); ++f) {
+            if (!vis[f]) kept.push_back(faces[f]);
+        }
+        // 新面: horizon 有向边 (u, v) 与新顶点 p 围成 (u, v, p)
+        for (auto& [u, v] : horizon) {
+            kept.emplace_back(u, v, p);
         }
         faces.swap(kept);
     }

@@ -1,18 +1,23 @@
 #include "aizalib.h"
 
-/**
- * 匈牙利算法-显式二分图 (Hungarian Algorithm for Explicit Bipartite Graph)
- * 算法介绍: 给定左部和右部点集，使用 DFS 寻找增广路，求无权二分图最大匹配。
- * 模板参数: None
- * Interface:
- *      ExplicitHungarian(int n, int m) — 初始化左部大小为 n，右部大小为 m 的二分图
- *      void add_edge(int u, int v)     — 添加左部点 u 到右部点 v 的边
- *      int solve()                     — 求最大匹配，返回匹配边数
- * Note:
- *      1. Time: O(nE)
- *      2. Space: O(n + m + E)
- *      3. 1-based indexing. 左部点编号为 1~n，右部点编号为 1~m。
- *      4. 用法/技巧: 显式二分图写法适合题目天然给出左右部时直接建图；调用 solve() 后，可通过 match_l / match_r 读取匹配结果；若只关心是否完美匹配，可检查 solve() == n 或 solve() == min(n, m) 的目标值。
+/*
+ * Hungarian·匈牙利算法-显式二分图
+ *
+ * Overview:
+ *     匈牙利算法-显式二分图 (Hungarian Algorithm for Explicit Bipartite Graph)
+ *     给定左部和右部点集，使用 DFS 寻找增广路，求无权二分图最大匹配。
+ *
+ * API:
+ *     ExplicitHungarian(int n, int m) — 初始化左部大小为 n，右部大小为 m 的二分图
+ *     void add_edge(int u, int v)     — 添加左部点 u 到右部点 v 的边
+ *     int solve()                     — 求最大匹配，返回匹配边数
+ *
+ * Notes:
+ *     模板参数: None
+ *     1. Time: O(nE)
+ *     2. Space: O(n + m + E)
+ *     3. 1-based indexing. 左部点编号为 1~n，右部点编号为 1~m。
+ *     4. 用法/技巧: 显式二分图写法适合题目天然给出左右部时直接建图；调用 solve() 后，可通过 match_l / match_r 读取匹配结果；若只关心是否完美匹配，可检查 solve() == n 或 solve() == min(n, m) 的目标值。
  */
 struct ExplicitBipartiteGraph {
     int n; // 左部点数

@@ -1,12 +1,29 @@
 #include "aizalib.h"
+/*
+ * PowerfulNumberSieve·PowerfulNumber筛
+ *
+ * Overview:
+ *     亚线性强数筛 (Powerful Number 筛)，用于在 O(√n) 复杂度内计算满足特定积性条件的数论函数前缀和。
+ *
+ * API:
+ *     PNSieve(int limit = 4000005) — 构造函数，按需动态分配并预处理质数表
+ *     int solve(i64 n)             — 计算目标积性函数前缀和 ∑_{i=1}^n f(i)
+ *     user_G                       — 拟合积性函数 G 的前缀和回调
+ *     user_h                       — 强数质数幂卷积系数 h(p, e) 回调
+ *
+ * Notes:
+ *     1. 适用于 f = g * h，其中 g 在素数处取值与 f 相同，使得 h 在素数处取值为 0。
+ *     2. 内部数组均采用 std::vector 动态分配，避免大数组造成对象栈溢出 (Segfault)。
+ *     3. 复杂度主要取决于 G 的前缀和计算与 DFS 强数枚举量，通常在 O(√n) ~ O(n^(2/3))。
+ */
 
-const int N = 4e6 + 5; // 1e10^(2/3)
 class PNSieve {
+    int N;
     std::vector<int> primes;
-    int minp[N];
-    int g[N], G_arr[N];
+    std::vector<int> minp;
+    std::vector<int> g, G_arr;
+
     void sieve() {
-        /* 在这里预处理g和G_arr数组在小范围内的前缀和保证复杂度 */
         minp[1] = 1;
         for (int i = 2; i < N; ++i) {
             if (!minp[i]) {
@@ -14,10 +31,13 @@ class PNSieve {
                 minp[i] = i;
             }
             for (int p : primes) {
-                if (i * p >= N) break;
-                if (i % p == 0) minp[i * p] = minp[i] * p;
-                else minp[i * p] = p;
-                if (i % p == 0) break;
+                if ((i64)i * p >= N) break;
+                if (i % p == 0) {
+                    minp[i * p] = minp[i] * p;
+                    break;
+                } else {
+                    minp[i * p] = p;
+                }
             }
         }
     }
@@ -25,7 +45,6 @@ class PNSieve {
     std::unordered_map<i64, int> G_save; // 杜教筛记忆化
     int G(i64 n) {
         if (G_save.find(n) != G_save.end()) return G_save[n];
-        /* 计算G_save[n] */
         int res = user_G(n);
         return G_save[n] = res;
     }
@@ -38,15 +57,15 @@ class PNSieve {
 
         const int p = primes[p_id];
         int& vl = h_vl[p_id][e];
-        /* 计算vl, 注意h(p_id,e)的第一位传递的是质数的标号 */
         vl = user_h(p_id, e);
         return vl;
     }
 
-    i64 global_n; int ans;
-    void dfs(int p_id = 0, int hd = 1, i64 d = 1ll) {
+    i64 global_n;
+    int ans;
+    void dfs(int p_id = 0, int hd = 1, i64 d = 1) {
         ans = add(ans, mul(hd, G(global_n / d)));
-        rep(i, p_id, primes.size() - 1) {
+        rep(i, p_id, (int)primes.size() - 1) {
             const int p = primes[i];
             if ((__int128_t)d * p * p > global_n) break; // 剪枝
             int e = 2;
@@ -57,21 +76,21 @@ class PNSieve {
     }
 
 public:
-    // 可注入的钩子函数：默认返回 0（与原模板中的空桩函数行为一致）。
-    // 为具体的积性函数求和问题赋值 user_G（G 的前缀和）和 user_h（原始强数函数 h），
-    // 即可驱动本模板的 Powerful Number 筛 DFS。
-    // 示例见 tests/acm-template/数学/亚线性筛法/PowerfulNumberSieve·PowerfulNumber筛-test.cpp
-    // （其中实现的是 ≤ n 的强数计数）。
     std::function<int(i64)> user_G = [](i64) { return 0; };
     std::function<int(int, int)> user_h = [](int, int) { return 0; };
-    PNSieve() {
+
+    PNSieve(int limit = 4000005)
+        : N(limit), minp(limit, 0), g(limit, 0), G_arr(limit, 0) {
         sieve();
         h_vl.resize(primes.size(), {});
         h_vis.resize(primes.size(), {});
-        rep(i, 0, primes.size() - 1)
-            h_vl[i][0] = 1, h_vl[i][1] = 0,
+        rep(i, 0, (int)primes.size() - 1) {
+            h_vl[i][0] = 1;
+            h_vl[i][1] = 0;
             h_vis[i][0] = h_vis[i][1] = true;
+        }
     }
+
     int solve(i64 n) {
         global_n = n;
         ans = 0;

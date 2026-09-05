@@ -1,17 +1,22 @@
 #include "aizalib.h"
 
-/**
- * 匈牙利算法 (Hungarian Algorithm)
- * 算法介绍: 用于求解无权二分图的最大匹配。通过寻找增广路的方式不断增加匹配数。
- * Interface:
- *      void add_edge(int u, int v) — 添加无向边 u-v
- *      int solve()                 — 求解并返回最大匹配数（即匹配边的数量）
- * Note:
- *      1. Time: O(VE)
- *      2. Space: O(V + E)
- *      3. 1-based indexing. 节点编号 1~n。
- *      4. 无需显式区分左右部点，只要原图是二分图，直接加无向边即可。求解过程中会自动正确交替。
- *      5. 网络流求解: 建立超级源 S 连左点，右点连超级汇点 T，容量均为 1；原二分图边容量设为 1，跑最大流。
+/*
+ * Hungarian·匈牙利算法
+ *
+ * Overview:
+ *     匈牙利算法 (Hungarian Algorithm)
+ *     用于求解无权二分图的最大匹配。通过寻找增广路的方式不断增加匹配数。
+ *
+ * API:
+ *     void add_edge(int u, int v) — 添加无向边 u-v
+ *     int solve()                 — 求解并返回最大匹配数（即匹配边的数量）
+ *
+ * Notes:
+ *     1. Time: O(VE)
+ *     2. Space: O(V + E)
+ *     3. 1-based indexing. 节点编号 1~n。
+ *     4. 无需显式区分左右部点，只要原图是二分图，直接加无向边即可。求解过程中会自动正确交替。
+ *     5. 网络流求解: 建立超级源 S 连左点，右点连超级汇点 T，容量均为 1；原二分图边容量设为 1，跑最大流。
  */
 struct Hungarian {
     int n; // 总点数

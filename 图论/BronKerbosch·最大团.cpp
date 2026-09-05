@@ -1,24 +1,26 @@
 #include "aizalib.h"
 
-/**
- * Bron-Kerbosch 最大团
- * 算法介绍:
- *      使用带转轴优化的 Bron-Kerbosch 算法枚举极大团，配合贪心染色上界的分支定界法求解最大团。
- *      采用 i64 位掩码表示邻接关系，支持 n ≤ 60 的无向图。染色上界用于剪枝，显著加速搜索。
+/*
+ * BronKerbosch·最大团
  *
- * Interface:
- *      MaxClique(n)                — 构造 n 个点的无向图，1-based indexing，n ≤ 60
- *      add_edge(u, v)              — 加入一条无向边
- *      solve()                     — 返回最大团的大小
- *      get_clique()                — 返回一个最大团的顶点集合 (std::vector<int>)，顶点编号 1-indexed
- *      enumerate_maximal_cliques() — 返回所有极大团，每个极大团为 std::vector<int>
+ * Overview:
+ *     Bron-Kerbosch 最大团
+ *     使用带转轴优化的 Bron-Kerbosch 算法枚举极大团，配合贪心染色上界的分支定界法求解最大团。
+ *     采用 i64 位掩码表示邻接关系，支持 n ≤ 60 的无向图。染色上界用于剪枝，显著加速搜索。
  *
- * Note:
- *      1. Time: O(3^{n/3}) worst-case 枚举所有极大团；分支定界法实际远快于此
- *      2. Space: O(n^2 / 64)
- *      3. n ≤ 60（i64 位掩码限制）
- *      4. solve() 使用分支定界 + 贪心染色上界，在稀疏图上非常快
- *      5. enumerate_maximal_cliques() 枚举所有极大团，适合 n ≤ 40 的稠密图
+ * API:
+ *     MaxClique(n)                — 构造 n 个点的无向图，1-based indexing，n ≤ 60
+ *     add_edge(u, v)              — 加入一条无向边
+ *     solve()                     — 返回最大团的大小
+ *     get_clique()                — 返回一个最大团的顶点集合 (std::vector<int>)，顶点编号 1-indexed
+ *     enumerate_maximal_cliques() — 返回所有极大团，每个极大团为 std::vector<int>
+ *
+ * Notes:
+ *     1. Time: O(3^{n/3}) worst-case 枚举所有极大团；分支定界法实际远快于此
+ *     2. Space: O(n^2 / 64)
+ *     3. n ≤ 60（i64 位掩码限制）
+ *     4. solve() 使用分支定界 + 贪心染色上界，在稀疏图上非常快
+ *     5. enumerate_maximal_cliques() 枚举所有极大团，适合 n ≤ 40 的稠密图
  */
 
 struct MaxClique {

@@ -1,21 +1,25 @@
 #include "aizalib.h"
 
-/**
- * Min Cost Max Flow (SPFA)
- * 算法介绍: 基于 SPFA 的最短增广路算法，每轮在残量网络中求一条 s 到 t 的最短费用路并沿该路增广。
- * 模板参数: Cap (容量类型), Cost (费用类型)
- * Interface:
- *      MCMF(int n, int m = 0)                                        — 初始化 n 个点、预估 m 条原图边的网络
- *      void add_edge(int u, int v, Cap w, Cost c)                    — 添加一条容量为 w、费用为 c 的有向边
- *      std::pair<Cap, Cost> solve(int s, int t, Cap limit = INF_CAP) — 返回至多增广 limit 流量后的 {flow, cost}
- * Note:
- *      1. Time: O(FVE)，适合负边费用、稠密度不高或数据范围较小的最小费用最大流
- *      2. Space: O(V + E)
- *      3. 1-based indexing.
- *      4. 用法/技巧:
- *          4.1 若要求最大费用最大流，可将边权费用取反，答案费用再取反。
- *          4.2 若只需发送部分流量，可直接传入 solve(s, t, limit)。
- *          4.3 若图中不存在可增广路，solve() 会直接返回当前答案；若数据较大可改用 Primal-Dual 版本。
+/*
+ * MCMFBySPFA·费用流SPFA
+ *
+ * Overview:
+ *     基于 SPFA 的最短增广路算法，每轮在残量网络中求一条 s 到 t 的最短费用路并沿该路增广。
+ *
+ * API:
+ *     MCMF(int n, int m = 0)                                        — 初始化 n 个点、预估 m 条原图边的网络
+ *     void add_edge(int u, int v, Cap w, Cost c)                    — 添加一条容量为 w、费用为 c 的有向边
+ *     std::pair<Cap, Cost> solve(int s, int t, Cap limit = INF_CAP) — 返回至多增广 limit 流量后的 {flow, cost}
+ *
+ * Notes:
+ *     模板参数: Cap (容量类型), Cost (费用类型)
+ *     1. Time: O(FVE)，适合负边费用、稠密度不高或数据范围较小的最小费用最大流
+ *     2. Space: O(V + E)
+ *     3. 1-based indexing.
+ *     4. 用法/技巧:
+ *     4.1 若要求最大费用最大流，可将边权费用取反，答案费用再取反。
+ *     4.2 若只需发送部分流量，可直接传入 solve(s, t, limit)。
+ *     4.3 若图中不存在可增广路，solve() 会直接返回当前答案；若数据较大可改用 Primal-Dual 版本。
  */
 
 template<typename Cap, typename Cost>

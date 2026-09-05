@@ -11,11 +11,11 @@
  *
  * API:
  *  closest_pair_3d(pts) -> tuple<ld, int, int> — 最近点对距离平方 + 下标 (a, b)。
- *      N ≤ 1 返回 (+inf, -1, -1);多点重合返回 (0, a, a)。Time O(N²), Space O(1)。
+ *      N ≤ 1 返回 (+inf, -1, -1);多点重合返回 (0, a, b) (a < b)。Time O(N²), Space O(1)。
  *
  * Notes:
  *  返回值是距离平方 (T 整数时仍按 ld 输出,sqrt 在调用方按需);
- *  多点重合返回首个最小下标对 (a, a)。
+ *  多点重合返回首个最小相异下标对 (a, b) (a < b)。
  *
  * Related:
  *  Tetrahedron·四面体.hpp: 任两点的距离通过 dist2 复用 Point::dist2。

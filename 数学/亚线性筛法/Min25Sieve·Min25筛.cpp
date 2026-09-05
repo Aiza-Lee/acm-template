@@ -1,18 +1,19 @@
 #include "aizalib.h"
-
-/**
- * Min_25 筛
- * 算法介绍: 计算积性函数前缀和 F(n) = sum_{i=1}^{n} f(i)，要求 f(p) 可拆成若干项 p^k 的线性组合
- * 模板参数: None
- * Interface:
- *      Min25(n, factors, f_p_c) — 构造，factors 中 (k, s) 表示对 f(p) 累加 s * p^k
- *      solve()                  — 返回 sum_{i=1}^{n} f(i)
- *      solve_prime_sum()        — 返回 sum_{p<=n} f(p)
- * Note:
- *      1. Time: O(n^(3/4) / log n) 级别
- *      2. Space: O(sqrt(n))
- *      3. 当前支持的 f(p) 基项为 p^k, 0 <= k <= 4；f(p^c) 由回调 f_p_c(p, c) 给出
- *      4. 用法/技巧: 适合 phi / mu / sigma / 幂和类积性函数前缀和；对象按单组参数构造即可，solve 可重复调用
+/*
+ * Min25Sieve·Min25筛
+ *
+ * Overview:
+ *     Min_25 筛法，用于在亚线性时间内计算积性函数前缀和 F(n) = ∑_{i=1}^n f(i)，要求 f(p) 在质数处可表示为多项式 ∑ coeff[k] * p^k。
+ *
+ * API:
+ *     Min25(n, factors, f_p_c) — 构造函数，初始化并预处理质数前缀和
+ *     int solve()              — 计算积性函数前缀和 ∑_{i=1}^n f(i)，复杂度 O(n^(3/4) / log n)
+ *     int solve_prime_sum()    — 计算质数处函数和 ∑_{p <= n} f(p)
+ *
+ * Notes:
+ *     1. factors 中每一项 (k, s) 表示 f(p) 累加 s * p^k，支持 0 <= k <= 4。
+ *     2. f(p^c) 的取值通过回调函数 f_p_c(p, c) 传入。
+ *     3. 空间复杂度 O(√n)，支持对相同 n 重复查询不同积性函数。
  */
 class Min25 {
 private:

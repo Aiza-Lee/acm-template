@@ -150,6 +150,7 @@ struct PolyCore {
     static void exp(const int* a, int n, int* res) {
         if (n == 1) { res[0] = 1; return; }
         int len = (n + 1) >> 1; exp(a, len, res);
+        std::fill(res + len, res + n, 0);
         Arr ln_b(n); ln(res, n, ln_b);
 
         int limit = 1; while (limit < (n << 1)) limit <<= 1;
@@ -192,9 +193,34 @@ struct PolyCore {
     }
 
     // 多项式幂函数 A^k
+    // 支持常数项 a[0] != 1 以及首项为 0 的多项式
     static void pow(const int* a, int n, int k, int* res) {
-        Arr ln_a(n); ln(a, n, ln_a);
-        rep(i, 0, n - 1) ln_a[i] = mul(ln_a[i], k);
-        exp(ln_a, n, res);
+        if (n <= 0) return;
+        if (k == 0) {
+            res[0] = 1;
+            rep(i, 1, n - 1) res[i] = 0;
+            return;
+        }
+        int p = 0;
+        while (p < n && a[p] == 0) ++p;
+        if (p == n || (i64)p * k >= n) {
+            rep(i, 0, n - 1) res[i] = 0;
+            return;
+        }
+        int c = a[p];
+        int inv_c = inv(c);
+        int m = n - p;
+        Arr na(m);
+        rep(i, 0, m - 1) na[i] = mul(a[p + i], inv_c);
+        Arr ln_a(m);
+        ln(na, m, ln_a);
+        rep(i, 0, m - 1) ln_a[i] = mul(ln_a[i], k);
+        Arr exp_a(m);
+        exp_a.fill_zero(0, m);
+        exp(ln_a, m, exp_a);
+        int c_pow = fp(c, k);
+        int shift = p * k;
+        rep(i, 0, shift - 1) res[i] = 0;
+        rep(i, shift, n - 1) res[i] = mul(exp_a[i - shift], c_pow);
     }
 };

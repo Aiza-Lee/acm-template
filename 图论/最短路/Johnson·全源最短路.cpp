@@ -1,24 +1,27 @@
 #include "aizalib.h"
 
-/**
- * Johnson's Algorithm
- * 算法介绍: 全源最短路算法。
- *      1. 新建虚拟源点 0，向所有点连边权为 0 的边。
- *      2. 跑一遍 SPFA 求出 0 到各点的最短路 h[u]（势能）。
- *         若存在负环则返回 false。
- *      3. 利用 h[u] 对边权进行重赋权: w'(u, v) = w(u, v) + h[u] - h[v]。
- *         由三角不等式 h[v] <= h[u] + w(u, v) 可知 w'(u, v) >= 0。
- *         这一步保证了所有新边权非负，从而可以使用 Dijkstra。
- *      4. 对每个点跑一遍 Dijkstra 求出基于新边权的最短路 d'[v]。
- *      5. 还原真实距离: dist(u, v) = d'[v] - h[u] + h[v]。
- * 模板参数: T (权值类型)
- * Interface: 
- *      add_edge(u, v, w)
- *      solve() -> bool (false if negative cycle)
- * Note:
- *      1. Time: O(NM + N^2 log N) - 适合稀疏图。稠密图请用 Floyd O(N^3)。
- *      2. Space: O(N^2) 用于存储距离矩阵。
- *      3. 1-based indexing.
+/*
+ * Johnson·全源最短路
+ *
+ * Overview:
+ *     Johnson's Algorithm
+ *     全源最短路算法。
+ *     1. 新建虚拟源点 0，向所有点连边权为 0 的边。
+ *     2. 跑一遍 SPFA 求出 0 到各点的最短路 h[u]（势能）。
+ *     若存在负环则返回 false。
+ *     3. 利用 h[u] 对边权进行重赋权: w'(u, v) = w(u, v) + h[u] - h[v]。
+ *     这一步保证了所有新边权非负，从而可以使用 Dijkstra。
+ *     4. 对每个点跑一遍 Dijkstra 求出基于新边权的最短路 d'[v]。
+ *
+ * API:
+ *     add_edge(u, v, w)
+ *     solve() -> bool (false if negative cycle)
+ *
+ * Notes:
+ *     模板参数: T (权值类型)
+ *     1. Time: O(NM + N^2 log N) - 适合稀疏图。稠密图请用 Floyd O(N^3)。
+ *     2. Space: O(N^2) 用于存储距离矩阵。
+ *     3. 1-based indexing.
  */
 
 template<typename T>

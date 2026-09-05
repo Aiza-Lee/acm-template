@@ -1,31 +1,36 @@
 #include "aizalib.h"
-
-/**
+/*
  * Tree Hash (树哈希)
- * 算法介绍: 对无序有根树递归混合子树哈希，无根树取重心根的最小哈希代表。
- * 模板参数: None
- * Interface:
- *      TreeHash(n)           — 初始化 n 个点
- *      add_edge(u, v)        — 加无向边
- *      get_rooted_hash(root) — 计算以 root 为根的哈希
- *      get_unrooted_hash()   — 计算无根树哈希，自动处理单/双重心
- * Note:
- *      1. Time: 单次 rooted / unrooted hash O(N)
- *      2. Space: O(N)
- *      3. 1-based indexing；调用前需加入 n-1 条树边
- *      4. 用法/技巧:
- *          4.1 使用随机 mask 降低碰撞概率；若要跨对象比较，需手动设成同一个 mask。
- *          4.2 哈希只能概率判断同构；严谨证明场景需改用规范括号序等确定性表示。
+ *
+ * Overview:
+ *     对无序有根树递归混合子树哈希，无根树取重心根的最小哈希代表。
+ *     默认使用确定性伪随机掩码，支持跨实例直接判定无向树同构。
+ *
+ * API:
+ *     TreeHash(n, mask = DEFAULT_MASK) — 初始化 n 个点的树哈希结构体，支持指定掩码
+ *     add_edge(u, v)                   — 添加无向边 (1-based)
+ *     set_mask(new_mask)               — 设置防碰撞随机掩码
+ *     get_rooted_hash(root)            — 计算以 root 为根的有根树哈希值
+ *     get_unrooted_hash()              — 计算无根树哈希值，自动处理单/双重心归一化
+ *
+ * Notes:
+ *     1. 1-based indexing；计算前需加入 n-1 条树边。
+ *     2. Time: 单次 rooted / unrooted hash 复杂度均为 O(N)；Space: O(N)。
+ *     3. 默认 mask 为确定性常量，不同 TreeHash 实例可直接比对同构哈希值；若需防 Hack 可传入自定义随机数。
  */
+
 struct TreeHash {
+    static constexpr u64 DEFAULT_MASK = 0x9e3779b97f4a7c15ULL;
+
     int n;
     std::vector<std::vector<int>> adj;
     std::vector<u64> sub;
     u64 mask;
 
-    TreeHash(int _n) : n(_n), adj(_n + 1), sub(_n + 1) {
-        std::mt19937_64 rng(std::chrono::steady_clock::now().time_since_epoch().count());
-        mask = rng();
+    TreeHash(int _n, u64 mask = DEFAULT_MASK) : n(_n), adj(_n + 1), sub(_n + 1), mask(mask) {}
+
+    void set_mask(u64 new_mask) {
+        mask = new_mask;
     }
 
     void add_edge(int u, int v) {
@@ -64,7 +69,7 @@ struct TreeHash {
         // 1. 寻找重心
         std::vector<int> centroids;
         std::vector<int> siz(n + 1), max_part(n + 1);
-        
+
         auto get_centroid = [&](auto&& self, int u, int p) -> void {
             siz[u] = 1;
             max_part[u] = 0;
@@ -79,9 +84,9 @@ struct TreeHash {
                 centroids.push_back(u);
             }
         };
-        
+
         get_centroid(get_centroid, 1, 0);
-        
+
         // 2. 计算所有重心的哈希值，取最小作为代表
         u64 res = std::numeric_limits<u64>::max();
         for (int c : centroids) {

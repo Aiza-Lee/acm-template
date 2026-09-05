@@ -1,16 +1,20 @@
 #include "aizalib.h"
-/**
- * RMQ-LCA 用 Euler 序
- * 算法介绍: DFS 每到一个点就记录一次，回父时再记父亲。
- * 模板参数: 无
- * Interface:
- *      RMQLCAEulerDFS(g, root = 1)
- * Note:
- *      1. Time: O(N)
- *      2. Space: O(N)
- *      3. 1-based indexing；Euler 序有效位置为 1..2n-1
- *      4. 性质: 设 first[u] <= first[v]，则 lca(u, v) 为 euler[first[u]..first[v]] 中深度最小者
- *      5. 用法/技巧: 通常对 Euler 序按 dep 建 ST/RMQ，即可 O(1) 查询 LCA。
+/*
+ * Euler Tour for RMQ-LCA (RMQ-LCA 用 Euler 序)
+ *
+ * Overview:
+ *     DFS 每遍历到一个点就记录一次，从子树回溯时再记录一次父亲，序列总长度为 2n-1。
+ *     用于将 LCA 查询转化为序列区间的深度 RMQ 查询。
+ *
+ * API:
+ *     RMQLCAEulerDFS(g, root = 1) — 构造欧拉序，以 root 为根预处理
+ *     dfs(u, p)                   — 内部 DFS 遍历函数
+ *
+ * Notes:
+ *     1. 1-based indexing；Euler 序有效位置为 1..2n-1。
+ *     2. Time: O(N)；Space: O(N)。
+ *     3. 性质: 设 first[u] <= first[v]，则 lca(u, v) 为 euler[first[u]..first[v]] 中深度最小者。
+ *     4. 用法: 对 Euler 序按 dep 建立 ST 表，即可实现 O(N log N) 预处理、O(1) 查询 LCA。
  */
 struct RMQLCAEulerDFS {
     const std::vector<std::vector<int>>& g;

@@ -1,21 +1,25 @@
 #include "aizalib.h"
 
-/**
- * ISAP (Improved Shortest Augment Path)
- * 算法介绍: 改进的最短增广路算法，先通过反向 BFS 初始化距离标号，再结合当前弧与 GAP 优化持续增广。
- * 模板参数: Cap (容量类型)
- * Interface:
- *      ISAP(int n, int m = 0)                   — 初始化 n 个点、预估 m 条原图边的网络
- *      void add_edge(int u, int v, Cap w)       — 添加一条容量为 w 的有向边
- *      Cap solve(int s, int t, Cap limit = INF) — 返回至多增广 limit 流量后的最大流
- * Note:
- *      1. Time: O(V^2E)，实战中常数通常优于朴素 Dinic
- *      2. Space: O(V + E)
- *      3. 1-based indexing.
- *      4. 用法/技巧:
- *          4.1 GAP 优化可在某层节点数清零时直接判定源点后续不可达。
- *          4.2 若只需发送部分流量，可直接传入 solve(s, t, limit)。
- *          4.3 反向 BFS 依赖残量网络中的反向可达性，因此建图时仍按常规有向边添加即可。
+/*
+ * ISAP·改进最短增广路
+ *
+ * Overview:
+ *     改进的最短增广路算法，先通过反向 BFS 初始化距离标号，再结合当前弧与 GAP 优化持续增广。
+ *
+ * API:
+ *     ISAP(int n, int m = 0)                   — 初始化 n 个点、预估 m 条原图边的网络
+ *     void add_edge(int u, int v, Cap w)       — 添加一条容量为 w 的有向边
+ *     Cap solve(int s, int t, Cap limit = INF) — 返回至多增广 limit 流量后的最大流
+ *
+ * Notes:
+ *     模板参数: Cap (容量类型)
+ *     1. Time: O(V^2E)，实战中常数通常优于朴素 Dinic
+ *     2. Space: O(V + E)
+ *     3. 1-based indexing.
+ *     4. 用法/技巧:
+ *     4.1 GAP 优化可在某层节点数清零时直接判定源点后续不可达。
+ *     4.2 若只需发送部分流量，可直接传入 solve(s, t, limit)。
+ *     4.3 反向 BFS 依赖残量网络中的反向可达性，因此建图时仍按常规有向边添加即可。
  */
 
 template<typename Cap>

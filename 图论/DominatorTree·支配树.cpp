@@ -1,29 +1,30 @@
 #include "aizalib.h"
 
-/**
- * Lengauer-Tarjan 算法 (支配树)
- * 算法介绍:
- *      Lengauer-Tarjan 算法用于在有向图中求解支配树。
- *      对于有向图中的源点 S 和任意节点 U, V，如果从 S 到 V 的所有路径都必须经过 U，则称 U 支配 V。
- *      对于 V，所有支配它的节点中（不包含 V 自身），距离 V 最近的节点称为最近支配点 (Immediate Dominator, idom)。
- *      IDOM 关系构成了一棵树，称为支配树。
- * 
- * 模板参数:
- *      无
- * 
- * Interface:
- *      void add_edge(int u, int v) — 添加有向边 u -> v
- *      void build(int s)           — 以 s 为源点构建支配树
- * 
- * Note:
- *      1. 时间复杂度: O(M \alpha(N)) 或 O(M \log N)
- *      2. 空间复杂度: O(N + M)
- *      3. 1-based indexing
- *      4. 适用场景: 需要求有向图必经点、支配关系、必经边等问题。
- *      5. 使用方法:
- *          - 实例化 LengauerTarjan(n)。
- *          - 调用 add_edge(u, v) 加边。
- *          - 调用 build(s) 构建，结果存通过 query_idom(u) 或访问 dom_tree 获取。
+/*
+ * DominatorTree·支配树
+ *
+ * Overview:
+ *     Lengauer-Tarjan 算法 (支配树)
+ *     Lengauer-Tarjan 算法用于在有向图中求解支配树。
+ *     对于有向图中的源点 S 和任意节点 U, V，如果从 S 到 V 的所有路径都必须经过 U，则称 U 支配 V。
+ *     对于 V，所有支配它的节点中（不包含 V 自身），距离 V 最近的节点称为最近支配点 (Immediate Dominator, idom)。
+ *     IDOM 关系构成了一棵树，称为支配树。
+ *
+ * API:
+ *     void add_edge(int u, int v) — 添加有向边 u -> v
+ *     void build(int s)           — 以 s 为源点构建支配树
+ *
+ * Notes:
+ *     模板参数:
+ *     无
+ *     1. 时间复杂度: O(M \alpha(N)) 或 O(M \log N)
+ *     2. 空间复杂度: O(N + M)
+ *     3. 1-based indexing
+ *     4. 适用场景: 需要求有向图必经点、支配关系、必经边等问题。
+ *     5. 使用方法:
+ *     - 实例化 LengauerTarjan(n)。
+ *     - 调用 add_edge(u, v) 加边。
+ *     - 调用 build(s) 构建，结果存通过 query_idom(u) 或访问 dom_tree 获取。
  */
 
 struct Graph {

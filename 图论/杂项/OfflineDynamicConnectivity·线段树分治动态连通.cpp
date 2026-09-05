@@ -1,21 +1,25 @@
 #include "aizalib.h"
 #include "../../数据结构/并查集/RollbackDSU·可撤销并查集.cpp"
-/**
- * OfflineDynamicConnectivity (线段树分治动态连通)
- * 算法介绍: 将边的生存区间挂到时间线段树上，DFS 过程中配合可撤销并查集回答连通性查询。
- * 模板参数: 无
- * Interface:
- *      OfflineDynamicConnectivity(int n, int q)  — 初始化 n 个点、时间轴 1~q
- *      void add_edge(int l, int r, int u, int v) — 添加在 [l, r] 内存在的无向边
- *      int add_query(int t, int u, int v)        — 在时刻 t 询问 u,v 是否连通，返回询问编号
- *      std::vector<char> solve()                 — 按加入顺序返回每个询问的答案
- * Note:
- *      1. Time: O((m log q + q) log n)
- *      2. Space: O(m log q + q + n)
- *      3. 1-based indexing. 时间轴为 1~q，若 l > r 则该边会被自动忽略。
- *      4. 用法/技巧:
- *          4.1 若原题给出加边 / 删边序列，可先离线转成若干存在区间再调用本模板。
- *          4.2 本模板仅回答连通性；若还需维护连通块大小，可在叶子处额外读取 dsu.size(x)。
+/*
+ * OfflineDynamicConnectivity·线段树分治动态连通
+ *
+ * Overview:
+ *     将边的生存区间挂到时间线段树上，DFS 过程中配合可撤销并查集回答连通性查询。
+ *
+ * API:
+ *     OfflineDynamicConnectivity(int n, int q)  — 初始化 n 个点、时间轴 1~q
+ *     void add_edge(int l, int r, int u, int v) — 添加在 [l, r] 内存在的无向边
+ *     int add_query(int t, int u, int v)        — 在时刻 t 询问 u,v 是否连通，返回询问编号
+ *     std::vector<char> solve()                 — 按加入顺序返回每个询问的答案
+ *
+ * Notes:
+ *     模板参数: 无
+ *     1. Time: O((m log q + q) log n)
+ *     2. Space: O(m log q + q + n)
+ *     3. 1-based indexing. 时间轴为 1~q，若 l > r 则该边会被自动忽略。
+ *     4. 用法/技巧:
+ *     4.1 若原题给出加边 / 删边序列，可先离线转成若干存在区间再调用本模板。
+ *     4.2 本模板仅回答连通性；若还需维护连通块大小，可在叶子处额外读取 dsu.size(x)。
  */
 struct OfflineDynamicConnectivity {
     struct Edge {

@@ -1,19 +1,24 @@
 #include "aizalib.h"
-/**
- * 长链剖分
- * 算法介绍: 按子树最大高度选择长儿子，将树拆成若干长链，配合倍增支持 O(1) 级祖先查询
- * 模板参数: 无
- * Interface:
- *      LongChainDecomposition(G, root = 1) — 以 root 为根预处理长链信息
- *      kth_ancestor(u, k)                  — 查询 u 的第 k 级祖先，不存在返回 0
- *      lca(u, v)                           — 查询 u 和 v 的最近公共祖先
- *      dist(u, v)                          — 查询树上距离（边数）
- *      jump(u, v, k)                       — 返回路径 u -> v 上从 u 出发第 k 条边到达的点，越界返回 0
- * Note:
- *      1. Time: 预处理 O(N log N)，kth_ancestor O(1)，lca / jump / dist O(log N)
- *      2. Space: O(N log N)
- *      3. 全部下标均为 1-based，dep[root] = 0
- *      4. 用法/技巧: 长链剖分最常用场景是 level ancestor、路径第 k 个点、按深度做树上 DP
+/*
+ * Long Chain Decomposition (长链剖分)
+ *
+ * Overview:
+ *     按子树最大高度选择长儿子，将树剖分为若干长链。
+ *     结合倍增与链头上下预处理数组，支持 O(1) 查询任意点 k 级祖先（Level Ancestor）。
+ *
+ * API:
+ *     struct Graph(n)                     — 树的邻接表表示，1-based
+ *     Graph::add_edge(u, v)               — 添加无向边 (u, v)
+ *     LongChainDecomposition(G, root = 1) — 以 root 为根预处理长链信息，时间复杂度 O(N log N)
+ *     kth_ancestor(u, k)                  — 查询 u 的第 k 级祖先，越界返回 0，复杂度 O(1)
+ *     lca(u, v)                           — 查询 u 和 v 的最近公共祖先，复杂度 O(log N)
+ *     dist(u, v)                          — 查询树上距离（边数），复杂度 O(log N)
+ *     jump(u, v, k)                       — 返回路径 u -> v 上从 u 出发第 k 条边到达的点，越界返回 0
+ *
+ * Notes:
+ *     1. 全部下标均为 1-based，dep[root] = 0。
+ *     2. Time: 预处理 O(N log N)，kth_ancestor O(1)，lca / dist / jump O(log N)；Space: O(N log N)。
+ *     3. 典型应用: Level Ancestor 快速查询、树上路径任意步长跳跃、按深度进行树上背包/DP 空间优化。
  */
 
 struct Graph {
