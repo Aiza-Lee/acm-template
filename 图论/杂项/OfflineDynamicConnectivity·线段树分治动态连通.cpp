@@ -5,10 +5,10 @@
  * 算法介绍: 将边的生存区间挂到时间线段树上，DFS 过程中配合可撤销并查集回答连通性查询。
  * 模板参数: 无
  * Interface:
- *      OfflineDynamicConnectivity(int n, int q)  初始化 n 个点、时间轴 1~q
- *      void add_edge(int l, int r, int u, int v) 添加在 [l, r] 内存在的无向边
- *      int add_query(int t, int u, int v)        在时刻 t 询问 u,v 是否连通，返回询问编号
- *      std::vector<char> solve()                 按加入顺序返回每个询问的答案
+ *      OfflineDynamicConnectivity(int n, int q)  — 初始化 n 个点、时间轴 1~q
+ *      void add_edge(int l, int r, int u, int v) — 添加在 [l, r] 内存在的无向边
+ *      int add_query(int t, int u, int v)        — 在时刻 t 询问 u,v 是否连通，返回询问编号
+ *      std::vector<char> solve()                 — 按加入顺序返回每个询问的答案
  * Note:
  *      1. Time: O((m log q + q) log n)
  *      2. Space: O(m log q + q + n)

@@ -42,13 +42,13 @@ struct SplayNullTag {
  * 算法介绍: 维护序列的文艺平衡树；聚合信息与懒标记均由用户自定义。
  * 模板参数: Info, Tag, T
  * Interface:
- *      Splay<Info, Tag, T>(n), init(n), reserve(n) 初始化 / 预留空间
- *      size(), empty(), clear(), all_info()        常用辅助接口
- *      insert(pos, v), erase(pos)                  按位置插入 / 删除
- *      modify(l, r, tag), query(l, r)              区间修改 / 查询
- *      kth(k)                                      查询第 k 个元素
- *      build(a)                                    按给定顺序 O(N) 建树
- *      traverse(func)                              中序遍历全部实际元素
+ *      Splay<Info, Tag, T>(n), init(n), reserve(n) — 初始化 / 预留空间
+ *      size(), empty(), clear(), all_info()        — 常用辅助接口
+ *      insert(pos, v), erase(pos)                  — 按位置插入 / 删除
+ *      modify(l, r, tag), query(l, r)              — 区间修改 / 查询
+ *      kth(k)                                      — 查询第 k 个元素
+ *      build(a)                                    — 按给定顺序 O(N) 建树
+ *      traverse(func)                              — 中序遍历全部实际元素
  * Note:
  *      1. Time: 所有操作均摊 O(log N)，build O(N)
  *      2. Space: O(N)

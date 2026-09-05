@@ -4,8 +4,8 @@
  * 算法介绍: 基于重链剖分的LCA算法，常数小
  * 模板参数: 无
  * Interface:
- *      HLDLCA(G, root) O(N) Initialize
- *      lca(u, v)       O(log N) Query
+ *      HLDLCA(G, root) — O(N) Initialize
+ *      lca(u, v)       — O(log N) Query
  * Note:
  *      1. Time: O(N) pre, O(log N) query
  *      2. Space: O(N)

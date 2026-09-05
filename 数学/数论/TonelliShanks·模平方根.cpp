@@ -5,8 +5,8 @@
  * 算法介绍: 在奇素数模 p 下求 x^2 = a (mod p) 的解。
  * 模板参数: None
  * Interface:
- *      TonelliShanks::legendre(a, p) 求勒让德符号；返回 0 / 1 / -1，Time: O(log p)
- *      TonelliShanks::solve(a, p)    返回两个平方根 {x, y}，无解返回 {-1, -1}，Time: O(log^2 p)
+ *      TonelliShanks::legendre(a, p) — 求勒让德符号；返回 0 / 1 / -1，Time: O(log p)
+ *      TonelliShanks::solve(a, p)    — 返回两个平方根 {x, y}，无解返回 {-1, -1}，Time: O(log^2 p)
  * Note:
  *      1. Time: solve 为 O(log^2 p)
  *      2. Space: O(1)

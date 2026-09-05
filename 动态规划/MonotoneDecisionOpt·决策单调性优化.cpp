@@ -1,20 +1,21 @@
 #include "aizalib.h"
-
-/**
- * 决策单调性分治优化
- * 算法介绍:
- *      一层形式: f[i] = min_{j < i} cost(j, i)。
- *      若最优决策单调，即 opt[i] <= opt[i + 1]，可用分治优化。
- * 模板参数:
- *      T: DP 值类型；F: 代价函数类型
- * Interface:
- *      DCDP(n, inf, cost): 一层优化，cost(j, i) 返回从 j 转移到 i 的代价
- *      DCDP::solve(l = 1, r = n, ql = 0, qr = n - 1)
- * Note:
- *      1. Time: O((r - l + 1) log (qr - ql + 2))
- *      2. Space: O(N)
- *      3. 默认使用 1-based 状态下标，决策点通常为 j in [0, i - 1]
- *      4. cost(...) 应能较快计算
+/*
+ * 决策单调性分治优化 (1D Divide and Conquer DP Optimization)
+ *
+ * Overview:
+ *      单层 DP 形式：f[i] = min_{j < i} cost(j, i)。
+ *      若最优决策单调，即 opt[i] <= opt[i + 1]，可利用分治在 O(n log n) 内求解全部状态。
+ *
+ * API:
+ *      DCDP(n, inf, cost)  — 初始化优化器，cost(j, i) 返回从 j 转移到 i 的代价。
+ *      solve(l, r, ql, qr) — 执行分治求解。
+ *      value(i)            — 查询 f[i]。
+ *      decision(i)         — 查询 opt[i]。
+ *
+ * Notes:
+ *      1. Time: O(n log n)。
+ *      2. Space: O(n)。
+ *      3. 状态采用 1-based 下标，决策点通常为 j in [0, i - 1]。
  */
 template<class T, class F>
 struct DCDP {

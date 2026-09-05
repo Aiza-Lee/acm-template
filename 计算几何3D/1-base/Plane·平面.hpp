@@ -9,16 +9,16 @@
  *  半空间 {p | ax + by + cz + d ≥ 0} 与法向量 (a, b, c) 指向一致。
  *
  * API:
- *  Plane<T>(a, b, c, d)                     一般式构造。
- *  Plane<T>::from_point_and_normal(p, n)    由一点和法向量构造。
- *  Plane<T>::from_points(p1, p2, p3)        三点构造;(p2-p1)×(p3-p1) 作为法向量。
- *  eval(p) -> T                             代入 ax + by + cz + d。O(1)。
- *  side(p) -> int                           返回 +1 / 0 / -1（正 / 平面 / 负），使用 sgn。O(1)。
- *  normal() -> Point<T>                     法向量 (a, b, c)；浮点要求归一化请在外部用 normalize。
- *  distance_to_point(plane, p) -> T         有符号距离（正值在法向量一侧）。浮点。O(1)。
- *  projection(plane, p) -> Point<T>         点在平面上的正交投影。浮点。O(1)。
- *  reflection(plane, p) -> Point<T>         点关于平面的对称点。浮点。O(1)。
- *  PlaneFP                                  Plane<ld> 的常用别名。
+ *  Plane<T>(a, b, c, d)                  — 一般式构造。
+ *  Plane<T>::from_point_and_normal(p, n) — 由一点和法向量构造。
+ *  Plane<T>::from_points(p1, p2, p3)     — 三点构造;(p2-p1)×(p3-p1) 作为法向量。
+ *  eval(p) -> T                          — 代入 ax + by + cz + d。O(1)。
+ *  side(p) -> int                        — 返回 +1 / 0 / -1（正 / 平面 / 负），使用 sgn。O(1)。
+ *  normal() -> Point<T>                  — 法向量 (a, b, c)；浮点要求归一化请在外部用 normalize。
+ *  distance_to_point(plane, p) -> T      — 有符号距离（正值在法向量一侧）。浮点。O(1)。
+ *  projection(plane, p) -> Point<T>      — 点在平面上的正交投影。浮点。O(1)。
+ *  reflection(plane, p) -> Point<T>      — 点关于平面的对称点。浮点。O(1)。
+ *  PlaneFP                               — Plane<ld> 的常用别名。
  *
  * Notes:
  *  模板参数 T: eval / side 对整数保持严格;浮点路径走 sgn / EPS。

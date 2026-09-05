@@ -4,10 +4,10 @@
  * Floor Sum (整除分块)
  * 算法介绍: 利用 ⌊n/i⌋ 取值只有 O(√n) 种的性质，将求和按值分块计算。
  * Interface:
- *      FloorSum::sum(n)        — ∑_{i=1}^{n} ⌊n/i⌋
- *      FloorSum::sum(n, k)     — ∑_{i=1}^{n} ⌊k/i⌋
+ *      FloorSum::sum(n)            — ∑_{i=1}^{n} ⌊n/i⌋
+ *      FloorSum::sum(n, k)         — ∑_{i=1}^{n} ⌊k/i⌋
  *      FloorSum::sum_w(n, k, pref) — ∑_{i=1}^{n} f(i)⋅⌊k/i⌋ (pref 为 f 前缀和)
- *      FloorSum::sum2(n, m)    — ∑_{i=1}^{min(n,m)} ⌊n/i⌋⋅⌊m/i⌋
+ *      FloorSum::sum2(n, m)        — ∑_{i=1}^{min(n,m)} ⌊n/i⌋⋅⌊m/i⌋
  * Note:
  *      1. Time: O(√n) per call
  *      2. Space: O(1)

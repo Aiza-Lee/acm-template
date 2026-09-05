@@ -17,8 +17,8 @@
  *   MIN_CHAR: 起始字符 (默认 'a')
  *
  * Interface:
- *   insert(s)   插入字符串
- *   build()   ( 可选) 可以在所有串插入完后进行拓扑排序等预处理
+ *   insert(s) — 插入字符串
+ *   build()   — ( 可选) 可以在所有串插入完后进行拓扑排序等预处理
  *
  * Note:
  *   1. Time: O(\sum |S|)

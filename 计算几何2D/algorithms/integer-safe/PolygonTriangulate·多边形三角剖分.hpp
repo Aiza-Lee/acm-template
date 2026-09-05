@@ -10,7 +10,7 @@
  *  通过 EPS 容差;时间 O(N²),空间 O(N)。
  *
  * API:
- *  polygon_triangulate(poly) -> vector<array<int, 3>>: 简单不自交多边形的三角剖分;
+ *  polygon_triangulate(poly) -> vector<array<int, 3>> — 简单不自交多边形的三角剖分;
  *      CCW / CW 自动判向;返回 n-2 个三角形,顶点下标 (a, b, c) 与多边形同向;退化
  *      (空 / 单点 / 线段 / 共线) 返回空 vector。Time O(N²), Space O(N)。
  *

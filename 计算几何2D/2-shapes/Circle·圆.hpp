@@ -8,14 +8,14 @@
  *  提供圆类型、点与圆的位置判定，以及圆与直线、圆与圆和切线相关运算。
  *
  * API:
- *  Circle<T>(c, r) / Circle<T>()                                                 构造圆或默认圆。
- *  contains(p)                                                                   点 p 是否在圆内（含边界）。O(1)。
- *  point(angle)                                                                  圆周上对应弧度 angle 的点。O(1)。
- *  circle_line_intersection(c, l) -> vector<Point<T>>                            圆与直线的交点，可能返回 0/1/2 个。O(1)。
- *  circle_circle_intersection(c1, c2) -> vector<Point<T>>                        圆与圆的交点，可能返回 0/1/2 个。O(1)。
- *  tangents_point_circle(p, c) -> vector<Point<T>>                               过点 p 的圆切点列表。O(1)。
- *  tangents_circle_circle(c1, c2) -> vector<pair<Point<T>, Point<T>>>            两圆的公切线切点对列表。O(1)。
- *  CircleFP                                                                      Circle<ld> 的常用别名。
+ *  Circle<T>(c, r) / Circle<T>()                                      — 构造圆或默认圆。
+ *  contains(p)                                                        — 点 p 是否在圆内（含边界）。O(1)。
+ *  point(angle)                                                       — 圆周上对应弧度 angle 的点。O(1)。
+ *  circle_line_intersection(c, l) -> vector<Point<T>>                 — 圆与直线的交点，可能返回 0/1/2 个。O(1)。
+ *  circle_circle_intersection(c1, c2) -> vector<Point<T>>             — 圆与圆的交点，可能返回 0/1/2 个。O(1)。
+ *  tangents_point_circle(p, c) -> vector<Point<T>>                    — 过点 p 的圆切点列表。O(1)。
+ *  tangents_circle_circle(c1, c2) -> vector<pair<Point<T>, Point<T>>> — 两圆的公切线切点对列表。O(1)。
+ *  CircleFP                                                           — Circle<ld> 的常用别名。
  *
  * Notes:
  *  仅支持浮点类型；浮点比较通过 sgn / EPS 完成。

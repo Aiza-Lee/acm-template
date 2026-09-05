@@ -6,8 +6,8 @@
  * 模板参数: 无
  * Interface:
  *      using SegAffine = SegTree<Info, Tag>
- *      modify(l, r, {mul, add}) 对区间应用仿射变换
- *      query(l, r).sum          查询区间和
+ *      modify(l, r, {mul, add}) — 对区间应用仿射变换
+ *      query(l, r).sum          — 查询区间和
  * Note:
  *      1. Time: 单次修改/查询 O(log N)
  *      2. Space: O(N)

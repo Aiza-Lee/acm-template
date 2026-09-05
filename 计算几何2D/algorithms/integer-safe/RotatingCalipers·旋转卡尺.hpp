@@ -8,7 +8,7 @@
  *  凸多边形上的旋转卡尺技术：求直径（最远点对）。
  *
  * API:
- *  diameter(poly) -> pair<Point<T>, Point<T>>: 凸多边形直径，返回距离最远的一对顶点。Time O(N)。
+ *  diameter(poly) -> pair<Point<T>, Point<T>> — 凸多边形直径，返回距离最远的一对顶点。Time O(N)。
  *
  * Notes:
  *  模板参数 T: 坐标类型。

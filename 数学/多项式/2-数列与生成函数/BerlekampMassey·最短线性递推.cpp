@@ -4,9 +4,9 @@
  * 算法介绍: 从序列前若干项求最短线性递推，并可在已知递推后快速求第 n 项。
  * 模板参数: 无
  * Interface:
- *      std::vector<int> solve(const std::vector<int>& s)                       返回最短递推系数 c
- *      int kth(i64 n, const std::vector<int>& init, const std::vector<int>& c) 求第 n 项
- *      int guess_nth(const std::vector<int>& s, i64 n)                         由前缀直接推断第 n 项
+ *      std::vector<int> solve(const std::vector<int>& s)                       — 返回最短递推系数 c
+ *      int kth(i64 n, const std::vector<int>& init, const std::vector<int>& c) — 求第 n 项
+ *      int guess_nth(const std::vector<int>& s, i64 n)                         — 由前缀直接推断第 n 项
  * Note:
  *      1. Time: solve 为 O(m^2)，kth 为 O(d^2 log n)
  *      2. Space: O(m)

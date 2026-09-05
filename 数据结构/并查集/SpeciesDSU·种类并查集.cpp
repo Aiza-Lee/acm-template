@@ -5,11 +5,11 @@
  * 算法介绍: 将每个元素拆分成 K 个域，处理 "敌人的敌人是朋友" 或 "三类循环克制" 等问题。
  * 模板参数: None
  * Interface:
- *      SpeciesDSU(n, k) 初始化 n 个元素、每个元素 k 个域
- *      get_id(x, t)     获取元素 x 在第 t 个域的真实编号
- *      merge(u, v)      合并两个真实编号
- *      same(u, v)       判断两个真实编号是否同集合
- *      find(u)          返回真实编号 u 的代表元
+ *      SpeciesDSU(n, k) — 初始化 n 个元素、每个元素 k 个域
+ *      get_id(x, t)     — 获取元素 x 在第 t 个域的真实编号
+ *      merge(u, v)      — 合并两个真实编号
+ *      same(u, v)       — 判断两个真实编号是否同集合
+ *      find(u)          — 返回真实编号 u 的代表元
  * Note:
  *      1. Time: 单次 find / merge / same 均摊 O(alpha(nk))
  *      2. Space: O(nk)

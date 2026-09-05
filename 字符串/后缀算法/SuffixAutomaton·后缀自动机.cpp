@@ -1,33 +1,27 @@
 #include "aizalib.h"
-
-/**
- * Suffix Automaton (SAM) 后缀自动机
+/*
+ * Suffix Automaton (SAM, 后缀自动机)
  *
- * 算法介绍:
- *   构建一个DAG，使得从初始节点出发的每一条路径都对应原串的一个子串。
- *   节点代表一个“等价类”，即所有结束位置集合(endpos)相同的子串集合。
- *   Parent Tree (link树) 描述了这些等价类的包含关系。
+ * Overview:
+ *     线性时间内构建识别字符串所有子串的有向无环图 (DAG)，节点代表 endpos 等价类，
+ *     Parent Tree (link 树) 刻画了后缀等价类的包含关系。
  *
- * 模板参数:
- *   ALPHABET: 字符集大小 (默认26)
- *   MIN_CHAR: 起始字符 (默认'a')
+ * API:
+ *     SAM(n)                — 构造函数，预分配状态空间
+ *     extend(c) / extend(s) — 增量插入单个字符或整个字符串视图
+ *     calc_size()           — 沿 Parent Tree 自底向上统计各等价类子串在原串的出现次数
+ *     calc_sub_cnt()        — 沿 DAG 拓扑排序计算从各状态出发可形成的本质不同子串数
+ *     kth_substring(k)      — 返回字典序第 k 小的本质不同子串 (需先调用 calc_sub_cnt)
+ *     get_lcs(s)            — 求原串与文本串 s 的最长公共子串长度
+ *     calc_total_length()   — 计算原串所有本质不同子串的总长度
  *
- * Interface:
- *   SAM(n)              预分配空间
- *   extend(char/string) 插入字符/字符串
- *   calc_size()         计算每个等价类中子串在原串中的出现次数
- *   calc_sub_cnt()      计算每个状态出发能构成的本质不同子串数
- *   kth_substring(k)    求字典序第k小的子串
- *
- * Note:
- *   1. Time: O(|S|) 构建, O(|S|) 统计
- *   2. Space: O(|S| * ALPHABET)
- *   3. 状态数 max 2*|S|-1
- *   4. 节点编号 1-base: 节点 0 是未使用的哨兵，节点 1 是 root
- *      根的 link = 0（哨兵）表示"无后缀链接"
- *   5. first_pos 是 1-base 位置 (即该等价类中子串第一次出现的结束位置)
- *   6. pos_id[i] 是原串前 i 个字符 (s[0..i-1]) 对应的状态编号 (i ∈ [1, n])
+ * Notes:
+ *     1. Time: O(|S|) 构建与统计。
+ *     2. Space: O(|S| * |\Sigma|)，最多 2|S| - 1 个状态节点。
+ *     3. 节点编号 1-based: 节点 0 为未使用的哨兵，节点 1 为 root 根节点 (link = 0)。
+ *     4. kth_substring 返回 std::string，当 k <= 0 或 k 超限时安全返回空串。
  */
+
 struct SAM {
     static constexpr int ALPHABET = 26;
     static constexpr char MIN_CHAR = 'a';
@@ -48,8 +42,8 @@ struct SAM {
     };
 
     std::vector<Node> nodes;
-    int last; // 上一个插入字符对应的状态 (1-based 节点 ID)
-    std::vector<int> pos_id; // pos_id[i]: 原串前 i 个字符 (s[0..i-1]) 对应的状态编号 (i ∈ [1, n])
+    int last = 1; // 上一个插入字符对应的状态 (1-based 节点 ID)
+    std::vector<int> pos_id; // pos_id[i]: 原串前 i 个字符对应的状态编号 (i \in [1, n])
 
     SAM(int n = 0) {
         nodes.reserve(n * 2 + 2);
@@ -61,10 +55,9 @@ struct SAM {
 
     void extend(char c) {
         int c_idx = c - MIN_CHAR;
-        int cur = nodes.size();
-        // first_pos 为 1-based 位置: 第 i 次 extend 后新节点的 len = i, 即当前字符在原串中的 1-based 位置
+        int cur = (int)nodes.size();
         nodes.emplace_back(nodes[last].len + 1, 0, nodes[last].len + 1, false);
-        nodes[cur].size = 1; // 初始非克隆状态size为1
+        nodes[cur].size = 1;
 
         int p = last;
         while (p != 0 && !nodes[p].next[c_idx]) {
@@ -73,16 +66,16 @@ struct SAM {
         }
 
         if (p == 0) {
-            nodes[cur].link = 1; // 无 link 时指向 root (节点 1)
+            nodes[cur].link = 1;
         } else {
             int q = nodes[p].next[c_idx];
             if (nodes[p].len + 1 == nodes[q].len) {
                 nodes[cur].link = q;
             } else {
-                int clone = nodes.size();
-                Node clone_node = nodes[q]; // 复制q的所有信息(next, link, first_pos)
+                int clone = (int)nodes.size();
+                Node clone_node = nodes[q];
                 clone_node.len = nodes[p].len + 1;
-                clone_node.size = 0;     // 克隆状态初始size为0
+                clone_node.size = 0;
                 clone_node.is_clone = true;
                 nodes.push_back(clone_node);
 
@@ -94,19 +87,16 @@ struct SAM {
             }
         }
         last = cur;
-        // pos_id 为 1-base 索引: pos_id[len] = 第 len 次 extend 后对应的状态
         int cur_len = nodes[cur].len;
         if ((int)pos_id.size() <= cur_len) pos_id.resize(cur_len + 1);
         pos_id[cur_len] = last;
     }
 
-    void extend(const std::string& s) {
+    void extend(std::string_view s) {
         for (char c : s) extend(c);
     }
 
-    // 按len长度排序的状态索引 (拓扑序)
-    // 桶排序 O(N)。输出包含所有节点 (含节点 0 哨兵); 根 (节点 1) 排在最前
-    std::vector<int> get_sorted_nodes() {
+    std::vector<int> get_sorted_nodes() const {
         std::vector<int> cnt(nodes.size() + 1, 0), id(nodes.size());
         for (const auto& node : nodes) cnt[node.len]++;
         rep(i, 1, (int)cnt.size() - 1) cnt[i] += cnt[i - 1];
@@ -114,11 +104,9 @@ struct SAM {
         return id;
     }
 
-    // 计算每个等价类中子串在原串中的出现次数 (endpos size)
     void calc_size() {
         auto sorted = get_sorted_nodes();
-        // 自底向上 (len 从大到小, Parent Tree)
-        per(i, (int)sorted.size() - 1, 1) { // 跳过 sorted[0] (root, 节点 1)
+        per(i, (int)sorted.size() - 1, 1) {
             int u = sorted[i];
             if (nodes[u].link != 0) {
                 nodes[nodes[u].link].size += nodes[u].size;
@@ -126,14 +114,11 @@ struct SAM {
         }
     }
 
-    // 计算从每个状态出发能构成的本质不同子串数 (DAG路径数)
-    // 结果存储在 nodes[1].sub_cnt - 1 (减去空串)
     void calc_sub_cnt() {
         auto sorted = get_sorted_nodes();
-        // 自底向上 (len 从大到小, DAG反向拓扑序)
         per(i, (int)sorted.size() - 1, 0) {
             int u = sorted[i];
-            nodes[u].sub_cnt = 1; // 自身作为一个结束点
+            nodes[u].sub_cnt = 1;
             rep(c, 0, ALPHABET - 1) {
                 if (int v = nodes[u].next[c]) {
                     nodes[u].sub_cnt += nodes[v].sub_cnt;
@@ -142,17 +127,17 @@ struct SAM {
         }
     }
 
-    // 求第k小本质不同子串
-    // 需先调用 calc_sub_cnt()
-    void kth_substring(i64 k) {
-        int u = 1; // 从 root 开始
+    std::string kth_substring(i64 k) const {
+        if (k <= 0 || (nodes.size() > 1 && k > nodes[1].sub_cnt - 1)) return "";
+        std::string res;
+        int u = 1;
         while (k > 0) {
             rep(c, 0, ALPHABET - 1) {
                 int v = nodes[u].next[c];
                 if (!v) continue;
                 if (k <= nodes[v].sub_cnt) {
-                    putchar(c + MIN_CHAR);
-                    k -= 1; // 减去到达状态v本身的这个子串 (长度为1的路径)
+                    res.push_back(char(c + MIN_CHAR));
+                    k -= 1;
                     u = v;
                     break;
                 } else {
@@ -160,12 +145,11 @@ struct SAM {
                 }
             }
         }
-        putchar('\n');
+        return res;
     }
 
-    // 求与字符串s的最长公共子串
-    int get_lcs(const std::string& s) {
-        int u = 1, l = 0, max_len = 0; // 从 root 开始
+    int get_lcs(std::string_view s) const {
+        int u = 1, l = 0, max_len = 0;
         for (char c : s) {
             int c_idx = c - MIN_CHAR;
             while (u != 1 && !nodes[u].next[c_idx]) {
@@ -181,10 +165,8 @@ struct SAM {
         return max_len;
     }
 
-    // 计算所有本质不同子串的总长度
-    i64 calc_total_length() {
+    i64 calc_total_length() const {
         i64 ans = 0;
-        // 跳过节点 0 (sentinel) 和节点 1 (root, len=0, 贡献为 0)
         rep(i, 2, (int)nodes.size() - 1) {
             i64 l = nodes[nodes[i].link].len + 1, r = nodes[i].len;
             ans += (l + r) * (r - l + 1) / 2;

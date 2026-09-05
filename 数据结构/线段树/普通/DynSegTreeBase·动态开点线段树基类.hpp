@@ -7,16 +7,16 @@
  * 算法介绍: 维护一类支持稀疏建点、区间修改、区间查询和线段树二分的懒标记线段树框架，具体维护内容由 Info / Tag 自定义。
  * 模板参数: Info (节点信息), Tag (懒标记)
  * Interface:
- *      DynSegTree(int n, int reserve_nodes = 0)    初始化定义域 [1, n] 的空线段树
- *      DynSegTree(int l, int r, int reserve_nodes) 初始化定义域 [l, r] 的空线段树
+ *      DynSegTree(int n, int reserve_nodes = 0)    — 初始化定义域 [1, n] 的空线段树
+ *      DynSegTree(int l, int r, int reserve_nodes) — 初始化定义域 [l, r] 的空线段树
  * 
- *      void reserve(int reserve_nodes)             预留结点池空间
- *      void modify(int ql, int qr, const Tag& tag) 区间打标记
- *      Info query(int ql, int qr)                  查询区间信息
- *      Info all_info()                             返回整棵树信息
- *      void set(int pos, const Info& value)        单点赋值
- *      int find_first(int ql, int qr, Pred pred)   在线段树上二分第一个满足条件的位置
- *      int find_last(int ql, int qr, Pred pred)    在线段树上二分最后一个满足条件的位置
+ *      void reserve(int reserve_nodes)             — 预留结点池空间
+ *      void modify(int ql, int qr, const Tag& tag) — 区间打标记
+ *      Info query(int ql, int qr)                  — 查询区间信息
+ *      Info all_info()                             — 返回整棵树信息
+ *      void set(int pos, const Info& value)        — 单点赋值
+ *      int find_first(int ql, int qr, Pred pred)   — 在线段树上二分第一个满足条件的位置
+ *      int find_last(int ql, int qr, Pred pred)    — 在线段树上二分最后一个满足条件的位置
  * Note:
  *      1. Time: 单次 modify / query / set / find O(log V)，V = r - l + 1
  *      2. Space: O(实际访问结点数)；结点池按需扩容，递归以返回值回写子树根下标，无需预估 reserve

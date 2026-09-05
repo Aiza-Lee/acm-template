@@ -7,11 +7,11 @@
  *      采用 i64 位掩码表示邻接关系，支持 n ≤ 60 的无向图。染色上界用于剪枝，显著加速搜索。
  *
  * Interface:
- *      MaxClique(n)                构造 n 个点的无向图，1-based indexing，n ≤ 60
- *      add_edge(u, v)              加入一条无向边
- *      solve()                     返回最大团的大小
- *      get_clique()                返回一个最大团的顶点集合 (std::vector<int>)，顶点编号 1-indexed
- *      enumerate_maximal_cliques() 返回所有极大团，每个极大团为 std::vector<int>
+ *      MaxClique(n)                — 构造 n 个点的无向图，1-based indexing，n ≤ 60
+ *      add_edge(u, v)              — 加入一条无向边
+ *      solve()                     — 返回最大团的大小
+ *      get_clique()                — 返回一个最大团的顶点集合 (std::vector<int>)，顶点编号 1-indexed
+ *      enumerate_maximal_cliques() — 返回所有极大团，每个极大团为 std::vector<int>
  *
  * Note:
  *      1. Time: O(3^{n/3}) worst-case 枚举所有极大团；分支定界法实际远快于此

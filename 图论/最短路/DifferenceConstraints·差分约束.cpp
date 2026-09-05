@@ -12,10 +12,10 @@
  * 
  * 模板参数: T (权值类型，如 i64)
  * Interface: 
- *      add_le(u, v, w) 添加约束 x_u - x_v <= w
- *      add_ge(u, v, w) 添加约束 x_u - x_v >= w
- *      add_eq(u, v, w) 添加约束 x_u - x_v = w
- *      solve()         求解是否存在可行解。
+ *      add_le(u, v, w) — 添加约束 x_u - x_v <= w
+ *      add_ge(u, v, w) — 添加约束 x_u - x_v >= w
+ *      add_eq(u, v, w) — 添加约束 x_u - x_v = w
+ *      solve()         — 求解是否存在可行解。
  * 
  * Note:
  *      1. Time: O(kE) (SPFA average), O(VE) worst case.

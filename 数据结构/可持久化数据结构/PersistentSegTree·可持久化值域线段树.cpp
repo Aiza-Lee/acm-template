@@ -4,10 +4,10 @@
  * 算法介绍: 每个版本维护序列前缀在值域上的计数与权值和，查询时用两棵前缀树做差。
  * 模板参数: None
  * Interface:
- *      PersistentSeg(n, M), init(n, M) 初始化，值域为 [1, M]，预留 n 个前缀版本
- *      append(v)                       在最新版本末尾追加一个值 v，生成新版本
- *      query_kth(l, r, k)              查询区间 [l, r] 的第 k 小
- *      query_min_cnt(l, r, H)          在区间 [l, r] 内选若干数，使和至少为 H，返回所需最少数量
+ *      PersistentSeg(n, M), init(n, M) — 初始化，值域为 [1, M]，预留 n 个前缀版本
+ *      append(v)                       — 在最新版本末尾追加一个值 v，生成新版本
+ *      query_kth(l, r, k)              — 查询区间 [l, r] 的第 k 小
+ *      query_min_cnt(l, r, H)          — 在区间 [l, r] 内选若干数，使和至少为 H，返回所需最少数量
  * Note:
  *      1. Time: 单次追加 / 查询 O(log M)
  *      2. Space: O(版本数 log M)

@@ -9,12 +9,12 @@
  *      无
  *
  * Interface:
- *      KMP(sv) / init(sv)       初始化 0-based 模式串视图
- *      match(t)                 传入 0-based 文本串视图，返回所有匹配的 1-based 起点
- *      border_len()             整个模式串的最长 border 长度
- *      min_period()             返回最小循环节长度
- *      all_borders()            返回整个模式串的所有 border 长度(降序)
- *      for_each_border_ap(i, f) 枚举前缀 s[1...i] 的 O(log n) 级 border 等差段
+ *      KMP(sv) / init(sv)       — 初始化 0-based 模式串视图
+ *      match(t)                 — 传入 0-based 文本串视图，返回所有匹配的 1-based 起点
+ *      border_len()             — 整个模式串的最长 border 长度
+ *      min_period()             — 返回最小循环节长度
+ *      all_borders()            — 返回整个模式串的所有 border 长度(降序)
+ *      for_each_border_ap(i, f) — 枚举前缀 s[1...i] 的 O(log n) 级 border 等差段
  *
  * Note:
  *      1. Time: init O(M), match O(N)

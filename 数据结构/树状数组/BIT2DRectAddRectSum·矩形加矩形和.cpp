@@ -4,12 +4,12 @@
  * 算法介绍: 用四棵 1-based 二维树状数组维护二维差分，支持矩形加、矩形前缀和与子矩形求和。
  * 模板参数: T
  * Interface:
- *      RectBitTree2D<T>(n, m), init(n, m) 初始化 n * m 的结构
- *      RectBitTree2D<T>(a), init(a)       用 1-based 矩阵 a 建树
- *      add(x1, y1, x2, y2, v)             令 a[x1..x2][y1..y2] += v
- *      sum_prefix(x, y)                   查询子矩形 [1, x] * [1, y] 的和
- *      sum(x1, y1, x2, y2)                查询子矩形 [x1, x2] * [y1, y2] 的和
- *      all_sum()                          查询整体 [1, n] * [1, m] 的和
+ *      RectBitTree2D<T>(n, m), init(n, m) — 初始化 n * m 的结构
+ *      RectBitTree2D<T>(a), init(a)       — 用 1-based 矩阵 a 建树
+ *      add(x1, y1, x2, y2, v)             — 令 a[x1..x2][y1..y2] += v
+ *      sum_prefix(x, y)                   — 查询子矩形 [1, x] * [1, y] 的和
+ *      sum(x1, y1, x2, y2)                — 查询子矩形 [x1, x2] * [y1, y2] 的和
+ *      all_sum()                          — 查询整体 [1, n] * [1, m] 的和
  * Note:
  *      1. Time: 单次 add / sum_prefix / sum O(log N log M)，建树 O(NM)
  *      2. Space: O(NM)

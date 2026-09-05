@@ -5,7 +5,7 @@
  * 算法介绍: 对 int / i64 做 LSD 基数排序；每趟按 16 bit 计数，通过翻转符号位转成无符号序。
  * Interface:
  *      RadixSort rs;
- *      rs.sort(a);     // 将 vector<int> 或 vector<i64> 升序排序
+ *      rs.sort(a); — 将 vector<int> 或 vector<i64> 升序排序
  * Note:
  *      1. Time: O(P * (n + 2^16))，P 为有效趟数，32 位至多 2 趟，64 位至多 4 趟
  *      2. Space: O(n + 2^16)

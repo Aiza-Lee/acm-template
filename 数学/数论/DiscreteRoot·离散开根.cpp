@@ -5,7 +5,7 @@
  * 算法介绍: 在素数模 p 下求解 x^k = a (mod p)，做法是原根化后转成线性同余。
  * 模板参数: None
  * Interface:
- *      DiscreteRoot::solve(k, a, p) // 返回全部解并从小到大排序；要求 p 为素数且 k > 0
+ *      DiscreteRoot::solve(k, a, p) — 返回全部解并从小到大排序；要求 p 为素数且 k > 0
  * Note:
  *      1. Time: 试除版约 O(求原根 + sqrt(p) + ans log p)
  *      2. Space: O(sqrt(p))

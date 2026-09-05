@@ -8,9 +8,9 @@
  *  提供二维线段类型、点在线段上的判定以及两线段相交判定。
  *
  * API:
- *  Segment<T>(a, b)          由两端点构造。
- *  on_segment(p, s)          点 p 是否在线段 s 上（含端点）。O(1)。
- *  segment_intersect(s1, s2) 两线段是否相交（含端点接触与共线部分重叠）。O(1)。
+ *  Segment<T>(a, b)          — 由两端点构造。
+ *  on_segment(p, s)          — 点 p 是否在线段 s 上（含端点）。O(1)。
+ *  segment_intersect(s1, s2) — 两线段是否相交（含端点接触与共线部分重叠）。O(1)。
  *
  * Notes:
  *  浮点路径使用 sgn 和 EPS 进行容差比较。

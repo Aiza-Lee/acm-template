@@ -4,9 +4,9 @@
  * 算法介绍: 外层树状数组维护位置前缀，内层动态开点线段树维护值域上的频数分布。
  *           支持按位置插入值并查询任意区间内的第k小值（静态建树 + 动态增量插入）。
  * Interface:
- *   BITSegTree(int n, const std::vector<i64>& a) 传入1-based数组a建树并自动值域离散化
- *   add(pos, val)                                在位置pos处插入一个值为val的元素（val必须在建树时值集合中）
- *   query(l, r, k)                               查询区间[l, r]内第k小的原始值（1 <= k <= 区间元素总数）
+ *   BITSegTree(int n, const std::vector<i64>& a) — 传入1-based数组a建树并自动值域离散化
+ *   add(pos, val)                                — 在位置pos处插入一个值为val的元素（val必须在建树时值集合中）
+ *   query(l, r, k)                               — 查询区间[l, r]内第k小的原始值（1 <= k <= 区间元素总数）
  * Note:
  *   1. Time: add O(log n * log V), query O(log n * log V), 建树 O(n * log n * log V)
  *   2. Space: O(n * log n * log V)，其中V为离散化后的值域大小；n较大时空间开销显著

@@ -9,7 +9,7 @@
  *      Lyndon串：严格小于其所有真后缀的串。
  * 
  * interface:
- *      duval(string s) // 返回分解结果
+ *      duval(string s) — 返回分解结果
  * 
  * note:
  *      1. Time: O(n)

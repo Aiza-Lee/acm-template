@@ -10,15 +10,15 @@
  *  提供球类型、点包含判定、与平面 / 球的求交,以及点到球外切点。
  *
  * API:
- *  Sphere<T>(c, r)                                         由圆心 c 与半径 r 构造;要求浮点类型。
- *  contains(s, p) -> bool                                  点 p 是否在球内(含边界)。O(1)。
- *  on_sphere(s, p) -> bool                                 点 p 是否在球面上(浮点容差)。O(1)。
- *  Circle<T>(c, r)                                         球求交返回的圆类型;r < 0 表示无效/无交。
- *  sphere_plane_intersection(s, pl) -> Circle<T>           球与平面交圆;球心到平面 |d| > r 时 r < 0。O(1)。
- *  sphere_sphere_intersection(s1, s2) -> Circle<T>         球与球交圆;返回 Circle.r 的判定规则:
+ *  Sphere<T>(c, r)                                      — 由圆心 c 与半径 r 构造;要求浮点类型。
+ *  contains(s, p) -> bool                               — 点 p 是否在球内(含边界)。O(1)。
+ *  on_sphere(s, p) -> bool                              — 点 p 是否在球面上(浮点容差)。O(1)。
+ *  Circle<T>(c, r)                                      — 球求交返回的圆类型;r < 0 表示无效/无交。
+ *  sphere_plane_intersection(s, pl) -> Circle<T>        — 球与平面交圆;球心到平面 |d| > r 时 r < 0。O(1)。
+ *  sphere_sphere_intersection(s1, s2) -> Circle<T>      — 球与球交圆;返回 Circle.r 的判定规则:
  *      r = 0 外切, r > 0 相交, r < 0 包含 / 无意义(同心不等径 r=-1;同心等径 r=-1)。
- *  tangent_points_to_sphere(p, s) -> optional<Point<T>>    从点 p 到球的外切点（两点中较近的一个）;点位于球内或球面上返回 nullopt。O(1)。
- *  SphereFP                                                Sphere<ld> 的常用别名。
+ *  tangent_points_to_sphere(p, s) -> optional<Point<T>> — 从点 p 到球的外切点（两点中较近的一个）;点位于球内或球面上返回 nullopt。O(1)。
+ *  SphereFP                                             — Sphere<ld> 的常用别名。
  *
  * Notes:
  *  sphere_sphere_intersection 返回的圆心位于两球心连线上,半径 = sqrt(r1² - a²),a = (r1² - r2² + d²) / (2d)。

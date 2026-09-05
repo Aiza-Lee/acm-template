@@ -4,14 +4,14 @@
  * Suffix Array (SA) 后缀数组
  * 
  * interface:
- *      SuffixArray(string s)                  构造函数，O(N log N)
- *      lcp(i, j)                              求排名为i和j的后缀的最长公共前缀长度 O(1)
- *      lcp_pos(p1, p2)                        求原串位置p1和p2开始的后缀的LCP (p1, p2为1-based索引) O(1)
- *      count_distinct_substrings()            计算本质不同子串个数 O(N)
- *      find_substring(string sub)             查找子串sub在原串中的出现位置范围 [L, R] (在sa数组中的下标范围) O(|sub| * log N)
- *      find_substring(pos, len)               查找原串子串str[pos...pos+len-1]在后缀数组中的范围 [L, R] O(log N)
- *      compare_substrings(p1, len1, p2, len2) 比较两个子串的大小 O(1)
- *      kth_distinct_substring(k)              求第k小(字典序)的本质不同子串 O(N)
+ *      SuffixArray(string s)                  — 构造函数，O(N log N)
+ *      lcp(i, j)                              — 求排名为i和j的后缀的最长公共前缀长度 O(1)
+ *      lcp_pos(p1, p2)                        — 求原串位置p1和p2开始的后缀的LCP (p1, p2为1-based索引) O(1)
+ *      count_distinct_substrings()            — 计算本质不同子串个数 O(N)
+ *      find_substring(string sub)             — 查找子串sub在原串中的出现位置范围 [L, R] (在sa数组中的下标范围) O(|sub| * log N)
+ *      find_substring(pos, len)               — 查找原串子串str[pos...pos+len-1]在后缀数组中的范围 [L, R] O(log N)
+ *      compare_substrings(p1, len1, p2, len2) — 比较两个子串的大小 O(1)
+ *      kth_distinct_substring(k)              — 求第k小(字典序)的本质不同子串 O(N)
  * 
  * note:
  *      1. sa[i]: 排名为i的后缀的起始位置 (1-based, 值域 1~n)

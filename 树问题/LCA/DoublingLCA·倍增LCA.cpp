@@ -4,10 +4,10 @@
  * 算法介绍: 基于倍增的LCA在线算法
  * 模板参数: 无
  * Interface:
- *      DoublingLCA(G, root) O(N log N) 预处理
- *      lca(u, v)            O(log N)   查询
- *      dist(u, v)           O(log N)   距离
- *      kth_ancestor(u, k)   O(log N) K 级祖先
+ *      DoublingLCA(G, root) — O(N log N) 预处理
+ *      lca(u, v)            — O(log N)   查询
+ *      dist(u, v)           — O(log N)   距离
+ *      kth_ancestor(u, k)   — O(log N) K 级祖先
  * Note:
  *      1. Time: O(N log N) pre, O(log N) query
  *      2. Space: O(N log N)

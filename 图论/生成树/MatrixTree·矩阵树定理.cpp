@@ -4,12 +4,12 @@
  * 算法介绍: 通过拉普拉斯矩阵的代数余子式计数无向生成树和有向树形图。
  * 模板参数: 无
  * Interface:
- *      MatrixTree(int n)                                 初始化 1~n 点图
- *      void add_undirected_edge(int u, int v, int w = 1) 添加 w 条无向边
- *      void add_directed_edge(int u, int v, int w = 1)   添加 w 条有向边
- *      int count_undirected(int root = 1) const          返回无向生成树个数
- *      int count_in_arborescence(int root) const         返回根为 root、边指向根的树形图个数
- *      int count_out_arborescence(int root) const        返回根为 root、边从根向外的树形图个数
+ *      MatrixTree(int n)                                 — 初始化 1~n 点图
+ *      void add_undirected_edge(int u, int v, int w = 1) — 添加 w 条无向边
+ *      void add_directed_edge(int u, int v, int w = 1)   — 添加 w 条有向边
+ *      int count_undirected(int root = 1) const          — 返回无向生成树个数
+ *      int count_in_arborescence(int root) const         — 返回根为 root、边指向根的树形图个数
+ *      int count_out_arborescence(int root) const        — 返回根为 root、边从根向外的树形图个数
  * Note:
  *      1. Time: 每次计数 O(n^3)
  *      2. Space: O(n^2)

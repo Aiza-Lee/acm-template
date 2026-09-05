@@ -4,11 +4,11 @@
  * 算法介绍: 用可持久化线段树维护 fa / siz 数组；每次合并仅改动并查集根对应的两个位置。
  * 模板参数: None
  * Interface:
- *      PersistentDSU(n, m), init(n, m) 初始化 n 个点、预留 m 个线性版本
- *      unite(ver, x, y)                在 ver 版本基础上合并 x, y，生成新版本
- *      query_same(ver, x, y)           查询 ver 版本中 x, y 是否连通
- *      append_version(ver)             复制 ver 版本作为最新版本
- *      find_root(ver, x)               查询 ver 版本中 x 所在集合代表元
+ *      PersistentDSU(n, m), init(n, m) — 初始化 n 个点、预留 m 个线性版本
+ *      unite(ver, x, y)                — 在 ver 版本基础上合并 x, y，生成新版本
+ *      query_same(ver, x, y)           — 查询 ver 版本中 x, y 是否连通
+ *      append_version(ver)             — 复制 ver 版本作为最新版本
+ *      find_root(ver, x)               — 查询 ver 版本中 x 所在集合代表元
  * Note:
  *      1. Time: 单次操作 O(log N log N)，其中 find_root 需要沿并查集父链查询
  *      2. Space: O(N + 修改次数 log N)

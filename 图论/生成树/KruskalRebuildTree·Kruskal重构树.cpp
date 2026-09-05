@@ -14,7 +14,7 @@
  *
  * Interface:
  *      struct Result { int n; std::vector<int> root; std::vector<int> parent; std::vector<T> weight; };
- *      Result solve(): 构建重构树，返回结果结构体。
+ *      Result solve() — 构建重构树，返回结果结构体。
  *
  * Note:
  *      1. Time: O(E log E)

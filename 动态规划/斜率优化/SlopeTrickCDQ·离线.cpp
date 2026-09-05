@@ -1,17 +1,23 @@
 #include "aizalib.h"
-/**
- * 斜率优化 - CDQ分治
- * 算法介绍: 离线求解标准式 dp[i] = c[i] + min_{0<=j<i}(dp[j] + a[i] * b[j])。
- * 模板参数: T
- * Interface:
- *      CDQSlopeDP<T>(a, b, c, dp0, inf) 传入 1-based 的 a / c，与含 b[0] 的 b
- *      solve()                          求出 dp[1..n]
- *      value(i)                         查询 dp[i]
- * Note:
- *      1. Time: O(N log^2 N)
- *      2. Space: O(N)
- *      3. 下标从 1 开始，转移仅允许更小下标转移到更大下标
+/*
+ * 斜率优化 - CDQ分治 (Slope Trick with CDQ Divide and Conquer)
+ *
+ * Overview:
+ *      离线求解标准斜率优化转移方程：
+ *      dp[i] = c[i] + min_{0 <= j < i}(dp[j] + a[i] * b[j])。
+ *      不要求 a[i] 或 b[j] 具有单调性。
+ *
+ * API:
+ *      CDQSlopeDP<T>(a, b, c, dp0, inf) — 传入 1-based 的 a/c 数组与包含 b[0] 的 b 数组。
+ *      solve()                          — 离线计算 dp[1..n]，支持重复调用（幂等）。
+ *      value(i)                         — 查询 dp[i] 的值。
+ *
+ * Notes:
+ *      1. Time: O(N log^2 N)。
+ *      2. Space: O(N)。
+ *      3. 状态从 0 开始，仅允许下标从更小的点转移至更大的点。
  */
+
 template<typename T = i64>
 struct CDQSlopeDP {
     struct Point {
@@ -113,6 +119,7 @@ struct CDQSlopeDP {
 
     void solve() {
         AST((int)q.size() == n + 1);
+        rep(i, 0, n) q[i].id = i;
         _solve(0, n);
     }
 

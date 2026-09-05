@@ -75,11 +75,11 @@ struct MaxMulSemiring {
  * 模板参数:
  *      [Semiring]: 半环类型，需提供 value_type, add, mul, zero, one
  * Interface:
- *      GMatrix(n)         n*n 零矩阵
- *      static Identity(n) n*n 单位矩阵
+ *      GMatrix(n)             — n*n 零矩阵
+ *      static Identity(n) n*n — 单位矩阵
  *      +, *, +=, *=, ^
- *      apply(col)  M * col (列向量), O(n^2)
- *      rapply(row) row * M (行向量), O(n^2)
+ *      apply(col)            — M * col (列向量), O(n^2)
+ *      rapply(row) row * M ( — 行向量), O(n^2)
  * Note:
  *      1. OrAndSemiring<bool> 使用 u64 位集优化，乘法 O(n^3 / 64)
  *      2. 其他半环为通用 O(n^3) 实现

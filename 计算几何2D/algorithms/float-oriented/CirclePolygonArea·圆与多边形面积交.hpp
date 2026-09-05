@@ -9,7 +9,7 @@
  *  计算圆与简单多边形（不要求凸）的有向面积交，使用有向面积三角剖分和积分思想。
  *
  * API:
- *  circle_polygon_area(c, poly) -> T: 圆与多边形的有向面积交。Time O(N), Space O(1)。
+ *  circle_polygon_area(c, poly) -> T — 圆与多边形的有向面积交。Time O(N), Space O(1)。
  *
  * Notes:
  *  模板参数 T: 浮点数类型，requires std::is_floating_point_v<T>。

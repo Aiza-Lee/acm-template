@@ -5,10 +5,10 @@
  * 算法介绍: 用父指针集合维护不交集合，路径压缩配合按大小合并。
  * 模板参数: None
  * Interface:
- *      DSU(n)      初始化 1..n
- *      find(x)     返回所在集合代表元
- *      same(x, y)  判断是否同集合
- *      merge(x, y) 合并两集合，成功合并返回 true
+ *      DSU(n)      — 初始化 1..n
+ *      find(x)     — 返回所在集合代表元
+ *      same(x, y)  — 判断是否同集合
+ *      merge(x, y) — 合并两集合，成功合并返回 true
  * Note:
  *      1. Time: 单次 find / same / merge 均摊 O(alpha(n))
  *      2. Space: O(n)

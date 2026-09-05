@@ -10,13 +10,13 @@
  *      BASE_CHAR: 字符集起点，默认 'a'
  *
  * Interface:
- *      ExtPAM(n) / init(n)  初始化，n 用于 reserve
- *      extend(c)            末尾插入字符 c，返回当前最长回文后缀节点
- *      build(s)             插入整个字符串
- *      count_occurrences()  汇总每个本质回文串出现次数
- *      distinct()           本质不同回文串个数
- *      longest_suffix_len() 当前最长回文后缀长度
- *      for_each_series(f)   沿当前最长回文后缀的 series link 链枚举，段数 O(log n)
+ *      ExtPAM(n) / init(n)  — 初始化，n 用于 reserve
+ *      extend(c)            — 末尾插入字符 c，返回当前最长回文后缀节点
+ *      build(s)             — 插入整个字符串
+ *      count_occurrences()  — 汇总每个本质回文串出现次数
+ *      distinct()           — 本质不同回文串个数
+ *      longest_suffix_len() — 当前最长回文后缀长度
+ *      for_each_series(f)   — 沿当前最长回文后缀的 series link 链枚举，段数 O(log n)
  *
  * Note:
  *      1. Time: Build O(N), count_occurrences O(N)

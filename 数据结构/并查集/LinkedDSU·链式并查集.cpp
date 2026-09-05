@@ -5,10 +5,10 @@
  * 算法介绍: 用于维护序列中元素的删除操作，支持快速查找下一个未被删除的元素。
  * 模板参数: None
  * Interface:
- *      LinkedDSU(n) 初始化位置 1..n，并保留 n+1 作为哨兵
- *      find(x)      返回 x 之后(包含 x)第一个未被删除的位置
- *      remove(x)    删除位置 x
- *      removed(x)   判断 x 是否已删除
+ *      LinkedDSU(n) — 初始化位置 1..n，并保留 n+1 作为哨兵
+ *      find(x)      — 返回 x 之后(包含 x)第一个未被删除的位置
+ *      remove(x)    — 删除位置 x
+ *      removed(x)   — 判断 x 是否已删除
  * Note:
  *      1. Time: 单次 find / remove / removed 均摊 O(alpha(n))
  *      2. Space: O(n)

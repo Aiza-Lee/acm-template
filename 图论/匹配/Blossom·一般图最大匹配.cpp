@@ -4,10 +4,10 @@
  * 算法介绍: 在无向一般图中通过 blossom 收缩寻找增广路，求最大匹配。
  * 模板参数: 无
  * Interface:
- *      Blossom(int n)                                          初始化 1~n 点的无向图
- *      void add_edge(int u, int v)                             添加一条无向边
- *      int solve()                                             返回最大匹配数，并在 mate 中恢复匹配
- *      std::vector<std::pair<int, int>> matching_edges() const 返回一组匹配边
+ *      Blossom(int n)                                          — 初始化 1~n 点的无向图
+ *      void add_edge(int u, int v)                             — 添加一条无向边
+ *      int solve()                                             — 返回最大匹配数，并在 mate 中恢复匹配
+ *      std::vector<std::pair<int, int>> matching_edges() const — 返回一组匹配边
  * Note:
  *      1. Time: solve() 最坏 O(n^3)，更精确地说总计 O(nm + n^3)，单次 _find_path() 为 O(m + n^2)
  *      2. Space: O(n^2)

@@ -5,9 +5,9 @@
  * 算法介绍: 每轮为每个连通分量选出一条最小出边并同时合并，直到只剩一个分量或无法继续合并。
  * 模板参数: T (边权类型)
  * Interface:
- *      Boruvka(int n)                   初始化 n 个点的无向图
- *      void add_edge(int u, int v, T w) 添加一条无向边
- *      T solve()                        返回最小生成树边权和，不连通时返回 -1
+ *      Boruvka(int n)                   — 初始化 n 个点的无向图
+ *      void add_edge(int u, int v, T w) — 添加一条无向边
+ *      T solve()                        — 返回最小生成树边权和，不连通时返回 -1
  * Note:
  *      1. Time: O(E log V)
  *      2. Space: O(V + E)

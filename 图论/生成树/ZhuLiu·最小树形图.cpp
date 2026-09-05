@@ -4,10 +4,10 @@
  * 算法介绍: 迭代收缩有向环，求以 root 为根、覆盖所有点的最小有向生成树。
  * 模板参数: T (边权类型)
  * Interface:
- *      ZhuLiu(int n)                      初始化 1~n 点的有向图
- *      void add_edge(int u, int v, T w)   添加一条 u -> v 的有向边
- *      std::pair<bool, T> solve(int root) 返回是否存在最小树形图及其最小权值
- *      Result solve_with_plan(int root)   返回可行性、最小权值与一组父边方案
+ *      ZhuLiu(int n)                      — 初始化 1~n 点的有向图
+ *      void add_edge(int u, int v, T w)   — 添加一条 u -> v 的有向边
+ *      std::pair<bool, T> solve(int root) — 返回是否存在最小树形图及其最小权值
+ *      Result solve_with_plan(int root)   — 返回可行性、最小权值与一组父边方案
  * Note:
  *      1. Time: O(VE)
  *      2. Space: solve 为 O(V + E)，solve_with_plan 额外记录收缩历史，空间 O(VE)

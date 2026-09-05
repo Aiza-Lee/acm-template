@@ -5,9 +5,9 @@
  * 算法介绍: 判定模数是否存在原根，并求一个最小原根。
  * 模板参数: None
  * Interface:
- *      PrimitiveRoot::has_primitive_root(mod)   判断 mod 是否存在原根，Time: 试除版约 O(sqrt(mod))
- *      PrimitiveRoot::is_primitive_root(g, mod) 判断 g 是否为 mod 的原根，Time: 试除版约 O(sqrt(mod))
- *      PrimitiveRoot::find(mod)                 求最小原根，无原根返回 -1；时间取决于试除分解 + 枚举
+ *      PrimitiveRoot::has_primitive_root(mod)   — 判断 mod 是否存在原根，Time: 试除版约 O(sqrt(mod))
+ *      PrimitiveRoot::is_primitive_root(g, mod) — 判断 g 是否为 mod 的原根，Time: 试除版约 O(sqrt(mod))
+ *      PrimitiveRoot::find(mod)                 — 求最小原根，无原根返回 -1；时间取决于试除分解 + 枚举
  * Note:
  *      1. Time: 试除分解版本约为 O(sqrt(mod))
  *      2. Space: O(因子个数(phi(mod)))

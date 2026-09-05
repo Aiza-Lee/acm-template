@@ -10,10 +10,10 @@
  *      INF: 无穷大，默认 numeric_limits<T>::max() / 2
  *
  * Interface:
- *      add_edge(u, v, w) 添加有向边
- *      solve(s)          计算源点 s 到所有点的最短路
- *      reachable(u)      判断是否可达
- *      path_to(t)        还原 s -> t 的一条最短路点集
+ *      add_edge(u, v, w) — 添加有向边
+ *      solve(s)          — 计算源点 s 到所有点的最短路
+ *      reachable(u)      — 判断是否可达
+ *      path_to(t)        — 还原 s -> t 的一条最短路点集
  *
  * Note:
  *      1. Time: O(E log V)

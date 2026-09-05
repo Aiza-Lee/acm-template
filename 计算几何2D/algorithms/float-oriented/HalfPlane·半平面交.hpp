@@ -8,7 +8,7 @@
  *  双端队列增量法求多个半平面的交集，结果为凸多边形。半平面定义为有向直线左侧区域。
  *
  * API:
- *  half_plane_intersection(lines) -> vector<Point<T>>: 半平面交点集（按出现顺序）。Time O(N log N), Space O(N)。
+ *  half_plane_intersection(lines) -> vector<Point<T>> — 半平面交点集（按出现顺序）。Time O(N log N), Space O(N)。
  *      空集返回 {}；无界交集自动追加包围盒裁剪为有限多边形后返回（见 Notes）。
  *
  * Notes:

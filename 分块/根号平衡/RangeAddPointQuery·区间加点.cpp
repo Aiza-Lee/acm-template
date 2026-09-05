@@ -1,25 +1,26 @@
 #include "aizalib.h"
-
-/**
- * [区间加, 单点查询] 根号平衡模板
- * 算法介绍: 提供两种平衡复杂度的实现方案
- *      1. modify O(sqrt N), query O(1): Standard Block Decomposition (Lazy Tags)
- *      2. modify O(1), query O(sqrt N): Differential Array + Block Prefix Sum
- * 模板参数: T (数据类型, e.g. i64)
- * Interface:
- *      - Sqrt_ModSqrt_Query1(n)
- *      - Sqrt_Mod1_QuerySqrt(n)
- * Note:
- *      1. 均采用 1-based indexing
- *      2. 方案1适合 查询密集型 (query intensive)
- *      3. 方案2适合 修改密集型 (Update intensive)
- *      4. 空间均为 O(N)
+/*
+ * 根号平衡 - 区间加单点查 (Range Add Point Query)
+ *
+ * Overview:
+ *      提供两种平衡复杂度的分块方案求解区间加与单点查询：
+ *      1. Sqrt_ModSqrt_Query1: 修改 O(sqrt N)，查询 O(1)，适合查询密集型。
+ *      2. Sqrt_Mod1_QuerySqrt: 修改 O(1)，查询 O(sqrt N)，适合修改密集型。
+ *
+ * API:
+ *      Sqrt_ModSqrt_Query1<T>(n) — 初始化大小为 n 的分块结构。
+ *          modify(l, r, v): 区间 [l, r] 增加 v，复杂度 O(sqrt N)。
+ *          query(x): 查询单点 x 的当前值，复杂度 O(1)。
+ *      Sqrt_Mod1_QuerySqrt<T>(n) — 初始化大小为 n 的分块结构。
+ *          modify(l, r, v): 区间 [l, r] 增加 v，复杂度 O(1)。
+ *          query(x): 查询单点 x 的当前值，复杂度 O(sqrt N)。
+ *
+ * Notes:
+ *      1. 均采用 1-based 下标，要求 1 <= l <= r <= n, 1 <= x <= n。
+ *      2. 空间复杂度均为 O(N)。
  */
 
 // 方案1: modify O(sqrt N), query O(1)
-// 维护原数组 val 和块标记 lazy (lazy tags for full blocks).
-// modify: 散块直接加 val, 整块加 lazy.
-// query: val[x] + lazy[bl[x]].
 template<typename T>
 struct Sqrt_ModSqrt_Query1 {
     int n, B;
@@ -41,6 +42,7 @@ struct Sqrt_ModSqrt_Query1 {
     }
 
     void modify(int l, int r, T v) {
+        AST(1 <= l && l <= r && r <= n);
         int bl_l = bl[l], bl_r = bl[r];
         if (bl_l == bl_r) {
             rep(i, l, r) val[i] += v;
@@ -52,14 +54,12 @@ struct Sqrt_ModSqrt_Query1 {
     }
 
     T query(int x) {
+        AST(1 <= x && x <= n);
         return val[x] + lazy[bl[x]];
     }
 };
 
 // 方案2: modify O(1), query O(sqrt N)
-// 维护差分数组 diff 和 块的差分和 sum (sum of diff in block).
-// modify: 区间加 -> 差分数组单点修改 (l, r+1). O(1).
-// query: 单点值 -> 差分数组前缀和 (Prefix sum). O(sqrt N).
 template<typename T>
 struct Sqrt_Mod1_QuerySqrt {
     int n, B;
@@ -68,7 +68,7 @@ struct Sqrt_Mod1_QuerySqrt {
 
     Sqrt_Mod1_QuerySqrt(int n) : n(n), diff(n + 2), bl(n + 2) {
         B = std::max(1, (int)std::sqrt(n));
-        int num_blocks = (n + 1 + B - 1) / B; // n+1 needs to be covered
+        int num_blocks = (n + 1 + B - 1) / B;
         sum.assign(num_blocks + 2, 0);
         L.assign(num_blocks + 2, 0);
 
@@ -78,7 +78,6 @@ struct Sqrt_Mod1_QuerySqrt {
         }
     }
 
-    // Internal helper: update diff array at p with v
     void _add(int p, T v) {
         if (p > n + 1) return;
         diff[p] += v;
@@ -86,16 +85,16 @@ struct Sqrt_Mod1_QuerySqrt {
     }
 
     void modify(int l, int r, T v) {
+        AST(1 <= l && l <= r && r <= n);
         _add(l, v);
         _add(r + 1, -v);
     }
 
     T query(int x) {
+        AST(1 <= x && x <= n);
         T res = 0;
         int bl_x = bl[x];
-        // Sum of full blocks before current block
         rep(b, 1, bl_x - 1) res += sum[b];
-        // Sum of elements in current block within range
         rep(i, L[bl_x], x) res += diff[i];
         return res;
     }

@@ -5,9 +5,9 @@
  * 算法介绍: 求 ax + by = gcd(a, b) 的一组特解，并可解模逆元与线性不定方程。
  * 模板参数: None
  * Interface:
- *      ExtendedGCD::exgcd(a, b, x, y)                   求 ax + by = gcd(a, b) 的一组特解，Time: O(log min(|a|, |b|))
- *      ExtendedGCD::inv_mod(a, mod, inv)                求 a 在 mod 下的逆元，不存在则返回 false，Time: O(log min(|a|, |mod|))
- *      ExtendedGCD::solve_linear(a, b, c, x, y, dx, dy) 解 ax + by = c 并给出通解步长，Time: O(log min(|a|, |b|))
+ *      ExtendedGCD::exgcd(a, b, x, y)                   — 求 ax + by = gcd(a, b) 的一组特解，Time: O(log min(|a|, |b|))
+ *      ExtendedGCD::inv_mod(a, mod, inv)                — 求 a 在 mod 下的逆元，不存在则返回 false，Time: O(log min(|a|, |mod|))
+ *      ExtendedGCD::solve_linear(a, b, c, x, y, dx, dy) — 解 ax + by = c 并给出通解步长，Time: O(log min(|a|, |b|))
  * Note:
  *      1. Time: O(log min(|a|, |b|))
  *      2. Space: O(log min(|a|, |b|))

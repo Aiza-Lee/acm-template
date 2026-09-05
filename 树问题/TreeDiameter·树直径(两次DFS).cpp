@@ -8,8 +8,8 @@
  *      T: 边权类型，默认 i64
  *
  * Interface:
- *      Graph<T>(n), add_edge(u, v, w = 1)    建无向树，边权需非负
- *      TreeDiameterTwoDFS<T>(G).solve(s = 1) 求直径，返回 {len, u, v, edges}
+ *      Graph<T>(n), add_edge(u, v, w = 1)    — 建无向树，边权需非负
+ *      TreeDiameterTwoDFS<T>(G).solve(s = 1) — 求直径，返回 {len, u, v, edges}
  *
  * Note:
  *      1. Time: O(N)

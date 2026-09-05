@@ -5,8 +5,8 @@
  * 算法介绍: 基于快速排序划分思想维护静态数组，支持区间第 k 小查询。每层按当前值域中位数把元素稳定划分到左右两侧，并记录前缀中进入左侧的元素个数。
  * 模板参数: T (值类型)
  * Interface:
- *      PartitionTree(const std::vector<T>& a) 用 1-based 数组 a 建树
- *      T query(int l, int r, int k)           查询区间 [l, r] 的第 k 小值
+ *      PartitionTree(const std::vector<T>& a) — 用 1-based 数组 a 建树
+ *      T query(int l, int r, int k)           — 查询区间 [l, r] 的第 k 小值
  * Note:
  *      1. Time: build O(n log n), query O(log n)
  *      2. Space: O(n log n)

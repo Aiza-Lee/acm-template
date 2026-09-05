@@ -5,8 +5,8 @@
  * 计数有向欧拉图的欧拉回路个数（模 998244353）。
  * Interface:
  *  BEST::count(n, edges)
- *      n     点数（1-indexed）
- *      edges 有向边列表 std::vector<pii>，元素为 (u, v)
+ *      n     — 点数（1-indexed）
+ *      edges — 有向边列表 std::vector<pii>，元素为 (u, v)
  *      返回:   有向图欧拉回路个数（模 md = 998244353）
  *              - 非欧拉图（存在 indeg != outdeg）返回 0
  *              - 无边图返回 1（空回路）

@@ -10,7 +10,7 @@
  *      T: 边权类型, 默认为 i64
  * 
  * Interface:
- *      T solve(int start_node = 1): 返回最小生成树的边权之和。如果不连通返回 -1。
+ *      T solve(int start_node = 1) — 返回最小生成树的边权之和。如果不连通返回 -1。
  * 
  * Note:
  *      1. Time: O(E log E)

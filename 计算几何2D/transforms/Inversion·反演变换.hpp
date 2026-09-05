@@ -8,12 +8,12 @@
  *  基于反演中心的几何变换，保持切点、角度大小等重要特征。将过反演中心的圆映射为不过中心的直线，不过中心的圆仍映射为圆。
  *
  * API:
- *  Inversion(O, r2)                    构造反演变换，O 为反演中心，r2 = R²。Time O(1)。
- *  transform(p) -> Point<T>            点 p 的反演；p = O 时返回 (NaN, NaN)。Time O(1)。
- *  transform_to_circle(c) -> Circle<T> 圆 c 不过 O 时，返回其反演后的圆。Time O(1)。
- *  transform_to_line(c) -> Line<T>     圆 c 过 O 时，返回其反演后的直线。Time O(1)。
- *  transform_to_circle(l) -> Circle<T> 直线 l 不过 O 时，返回其反演后的圆。Time O(1)。
- *  transform_to_line(l) -> Line<T>     直线 l 过 O 时，反演后仍为自身。Time O(1)。
+ *  Inversion(O, r2)                    — 构造反演变换，O 为反演中心，r2 = R²。Time O(1)。
+ *  transform(p) -> Point<T>            — 点 p 的反演；p = O 时返回 (NaN, NaN)。Time O(1)。
+ *  transform_to_circle(c) -> Circle<T> — 圆 c 不过 O 时，返回其反演后的圆。Time O(1)。
+ *  transform_to_line(c) -> Line<T>     — 圆 c 过 O 时，返回其反演后的直线。Time O(1)。
+ *  transform_to_circle(l) -> Circle<T> — 直线 l 不过 O 时，返回其反演后的圆。Time O(1)。
+ *  transform_to_line(l) -> Line<T>     — 直线 l 过 O 时，反演后仍为自身。Time O(1)。
  *
  * Notes:
  *  模板参数 T: 仅支持浮点类型，requires std::is_floating_point_v<T>。

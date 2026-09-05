@@ -4,12 +4,12 @@
  * 算法介绍: 用两棵 1-based 树状数组维护差分，支持区间加、前缀和与区间和。
  * 模板参数: T
  * Interface:
- *      RangeBitTree<T>(n), init(n) 初始化长度为 n 的结构
- *      RangeBitTree<T>(a), init(a) 用 1-based 数组 a 建树
- *      add(l, r, v)                令 a[l..r] += v
- *      sum_prefix(p)               查询前缀 [1, p] 的和
- *      sum(l, r)                   查询区间 [l, r] 的和
- *      all_sum()                   查询整体 [1, n] 的和
+ *      RangeBitTree<T>(n), init(n) — 初始化长度为 n 的结构
+ *      RangeBitTree<T>(a), init(a) — 用 1-based 数组 a 建树
+ *      add(l, r, v)                — 令 a[l..r] += v
+ *      sum_prefix(p)               — 查询前缀 [1, p] 的和
+ *      sum(l, r)                   — 查询区间 [l, r] 的和
+ *      all_sum()                   — 查询整体 [1, n] 的和
  * Note:
  *      1. Time: 单次 add / sum_prefix / sum O(log N)，建树 O(N)
  *      2. Space: O(N)

@@ -8,10 +8,10 @@
  *      本模板支持：区间加、区间取 Min、区间求和、区间求 Max。
  * 
  * Interface:
- *      range_add(l, r, v)   区间 A[i] += v
- *      range_chmin(l, r, v) 区间 A[i] = min(A[i], v)
- *      query_sum(l, r)      区间和
- *      query_max(l, r)      区间最大值
+ *      range_add(l, r, v)   — 区间 A[i] += v
+ *      range_chmin(l, r, v) — 区间 A[i] = min(A[i], v)
+ *      query_sum(l, r)      — 区间和
+ *      query_max(l, r)      — 区间最大值
  * 
  * Note:
  *      1. Time: O(M log N)，最坏情况下通常也很优秀。

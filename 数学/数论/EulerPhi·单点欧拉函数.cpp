@@ -5,7 +5,7 @@
  * 算法介绍: 通过试除分解求单个 n 的 phi(n)。
  * 模板参数: None
  * Interface:
- *      EulerPhi::phi(n) // 求 phi(n)，Time: O(sqrt(n))
+ *      EulerPhi::phi(n) — 求 phi(n)，Time: O(sqrt(n))
  * Note:
  *      1. Time: O(sqrt(n))
  *      2. Space: O(1)

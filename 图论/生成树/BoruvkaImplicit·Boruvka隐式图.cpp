@@ -5,8 +5,8 @@
  * 算法介绍: Boruvka 的隐式图框架。模板只负责维护并查集、分量枚举与批量合并，真正的最优跨分量边查询由外部 selector 对象提供。
  * 模板参数: T (边权类型), INF (无穷大)
  * Interface:
- *      BoruvkaImplicit(int n)      初始化 n 个点
- *      T solve(Selector& selector) 返回最小生成树边权和，不连通时返回 -1
+ *      BoruvkaImplicit(int n)      — 初始化 n 个点
+ *      T solve(Selector& selector) — 返回最小生成树边权和，不连通时返回 -1
  * Note:
  *      1. Time: O(N log V + \sum select_cost)，复杂度主要取决于外部回调
  *      2. Space: O(N)

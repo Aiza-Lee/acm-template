@@ -4,10 +4,10 @@
  * 算法介绍: 对无向带权图不断做最大邻接搜索与点收缩，求全局最小割。
  * 模板参数: T (边权类型)
  * Interface:
- *      StoerWagner(int n)               初始化 1~n 点无向图
- *      void add_edge(int u, int v, T w) 添加一条无向边
- *      T solve() const                  返回全局最小割权值
- *      Result solve_with_cut() const    返回最小割权值及一侧点集
+ *      StoerWagner(int n)               — 初始化 1~n 点无向图
+ *      void add_edge(int u, int v, T w) — 添加一条无向边
+ *      T solve() const                  — 返回全局最小割权值
+ *      Result solve_with_cut() const    — 返回最小割权值及一侧点集
  * Note:
  *      1. Time: O(n^3)
  *      2. Space: O(n^2)

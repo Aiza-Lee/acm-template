@@ -5,8 +5,8 @@
  * 算法介绍: 利用差分代替导数还原函数，类似于离散的泰勒展开。
  * 模板参数: 
  * Interface: 
- *      NewtonInterpolation(vector<int> y) 输入 f(0)...f(n-1)
- *      int query(i64 x)                   计算 f(x)
+ *      NewtonInterpolation(vector<int> y) — 输入 f(0)...f(n-1)
+ *      int query(i64 x)                   — 计算 f(x)
  * Note:
  *      1. Time: Build O(n^2), Query O(n)
  *      2. Space: O(n)

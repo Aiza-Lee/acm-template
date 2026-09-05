@@ -12,9 +12,9 @@
  *      Merge: 合并函数对象，需满足 Merge(const T&, const T&) -> T
  *
  * Interface:
- *      CatTree(a, merge, id) 传入 1-based 数组构建
- *      build(a)              重建
- *      query(l, r)           查询闭区间 [l, r]
+ *      CatTree(a, merge, id) — 传入 1-based 数组构建
+ *      build(a)              — 重建
+ *      query(l, r)           — 查询闭区间 [l, r]
  *
  * Note:
  *      1. Time: Build O(N log N), Query O(1)

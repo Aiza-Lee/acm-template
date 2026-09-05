@@ -4,12 +4,12 @@
  * 算法介绍: 维护 1-based 二维前缀和，支持单点加、矩形前缀和与子矩形求和。
  * 模板参数: T
  * Interface:
- *      BitTree2D<T>(n, m), init(n, m) 初始化 n * m 的二维树状数组
- *      BitTree2D<T>(a), init(a)       用 1-based 矩阵 a 线性建树
- *      add(x, y, v)                   令 a[x][y] += v
- *      sum_prefix(x, y)               查询子矩形 [1, x] * [1, y] 的和
- *      sum(x1, y1, x2, y2)            查询子矩形 [x1, x2] * [y1, y2] 的和
- *      all_sum()                      查询整体 [1, n] * [1, m] 的和
+ *      BitTree2D<T>(n, m), init(n, m) — 初始化 n * m 的二维树状数组
+ *      BitTree2D<T>(a), init(a)       — 用 1-based 矩阵 a 线性建树
+ *      add(x, y, v)                   — 令 a[x][y] += v
+ *      sum_prefix(x, y)               — 查询子矩形 [1, x] * [1, y] 的和
+ *      sum(x1, y1, x2, y2)            — 查询子矩形 [x1, x2] * [y1, y2] 的和
+ *      all_sum()                      — 查询整体 [1, n] * [1, m] 的和
  * Note:
  *      1. Time: 单次 add / sum_prefix / sum O(log N log M)，线性建树 O(NM)
  *      2. Space: O(NM)

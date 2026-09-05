@@ -8,11 +8,11 @@
  *  提供计算几何通用常量、带容差比较和安全的浮点初等函数。
  *
  * API:
- *  EPS / PI                        全局浮点容差 / long double 圆周率。
- *  sgn(x) / cmp(x, y) / is_zero(x) 符号、三路比较和判零。O(1)。
- *  clamp_unit(x)                   将浮点数钳到 [-1, 1]。O(1)。
- *  safe_sqrt(x)                    负输入按 0 处理后开方。O(1)。
- *  safe_acos(x) / safe_asin(x)     钳制输入后计算反三角函数。O(1)。
+ *  EPS / PI                        — 全局浮点容差 / long double 圆周率。
+ *  sgn(x) / cmp(x, y) / is_zero(x) — 符号、三路比较和判零。O(1)。
+ *  clamp_unit(x)                   — 将浮点数钳到 [-1, 1]。O(1)。
+ *  safe_sqrt(x)                    — 负输入按 0 处理后开方。O(1)。
+ *  safe_acos(x) / safe_asin(x)     — 钳制输入后计算反三角函数。O(1)。
  *
  * Notes:
  *  浮点比较使用绝对误差 EPS；整数比较保持严格。

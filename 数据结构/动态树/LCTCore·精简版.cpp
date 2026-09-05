@@ -5,13 +5,13 @@
  *          适合只需动态连通性 / LCA 的题目。
  * 模板参数: None
  * Interface:
- *      LCTCore(n), init(n)     初始化
- *      make_root(x)            换根
- *      find_root(x)            查根
- *      link(x, y)              连边（不连通则连边返回 1，否则返回 0）
- *      cut(x, y)               断边（存在则断边返回 1，否则返回 0）
- *      connected(x, y)         判断连通
- *      lca(x, y)               LCA ，不连通时返回 0
+ *      LCTCore(n), init(n) — 初始化
+ *      make_root(x)        — 换根
+ *      find_root(x)        — 查根
+ *      link(x, y)          — 连边（不连通则连边返回 1，否则返回 0）
+ *      cut(x, y)           — 断边（存在则断边返回 1，否则返回 0）
+ *      connected(x, y)     — 判断连通
+ *      lca(x, y)           — LCA ，不连通时返回 0
  * Internal Methods:
  *      fa(p) / ch(p) / rev(p): 内联访问器，返回对应字段的引用，
  *          使用访问器而非直接 t[p].field，使外部代码看起来仍是

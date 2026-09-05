@@ -17,18 +17,18 @@ namespace poly_ext {
  *
  * Interface:
  *     // 低层变换 (原位, type = 1 正变换, type = -1 逆变换)
- *     fwt_or(a, type)   OR   FWT     O(n log n)
- *     fwt_and(a, type)  AND  FWT     O(n log n)
- *     fwt_xor(a, type)  XOR  FWT     O(n log n)
- *     fwt_xnor(a, type) XNOR FWT     O(n log n)
+ *     fwt_or(a, type)            — OR   FWT     O(n log n)
+ *     fwt_and(a, type)           — AND  FWT     O(n log n)
+ *     fwt_xor(a, type)           — XOR  FWT     O(n log n)
+ *     fwt_xnor(a, type) XNOR FWT — O(n log n)
  *
  *     // 高层卷积闭包 (返回新 vector, 不修改输入)
- *     or_convolution(a, b)    OR  卷积     O(n log n)
- *     and_convolution(a, b)   AND 卷积     O(n log n)
- *     xor_convolution(a, b)   XOR 卷积     O(n log n)
- *     subset_convolution(a,b)     子集卷积 (disjoint union) O(K^2 * 2^K)
+ *     or_convolution(a, b)    — OR  卷积     O(n log n)
+ *     and_convolution(a, b)   — AND 卷积     O(n log n)
+ *     xor_convolution(a, b)   — XOR 卷积     O(n log n)
+ *     subset_convolution(a,b) — 子集卷积 (disjoint union) O(K^2 * 2^K)
  *
- * Usage (低层):
+ * Usage ( — 低层):
  *     fwt_xxx(a, 1); fwt_xxx(b, 1);
  *     rep(i, 0, n - 1) a[i] = mul(a[i], b[i]);
  *     fwt_xxx(a, -1);

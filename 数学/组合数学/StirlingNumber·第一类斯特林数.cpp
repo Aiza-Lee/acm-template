@@ -5,7 +5,7 @@
  * 算法介绍: S1[n][k] 表示将 n 个不同元素排成 k 个轮换(Cycles)的方案数。
  * 模板参数: N (预处理最大范围)
  * Interface: 
- *      int get(int n, int k); // 获取值 [n over k]
+ *      int get(int n, int k); — 获取值 [n over k]
  * Note:
  *      1. Time: Build O(N^2)
  *      2. See specific math formulas in text material (斯特林数.tex)

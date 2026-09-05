@@ -8,8 +8,8 @@
  *  凸多边形上的旋转卡尺（浮点版）：最小宽度与最小面积包围矩形。
  *
  * API:
- *  width(poly) -> T                      平行支撑线最短距离（最小宽度）。Time O(N)。
- *  min_bounding_rect(poly) -> Polygon<T> 最小面积包围矩形，返回 4 个 CCW 顶点。Time O(N)。
+ *  width(poly) -> T                      — 平行支撑线最短距离（最小宽度）。Time O(N)。
+ *  min_bounding_rect(poly) -> Polygon<T> — 最小面积包围矩形，返回 4 个 CCW 顶点。Time O(N)。
  *
  * Notes:
  *  模板参数 T: 浮点数类型，requires std::is_floating_point_v<T>。

@@ -4,19 +4,19 @@
  * 算法介绍: 通过多叉树表示可并堆，merge 时把较大根挂到较小根的最左儿子链上。
  * 模板参数: T
  * Interface:
- *      T                                    节点值类型, 需支持<运算符
- *      reserve(cap)                         可选预留 cap 个结点容量
- *      reset_pool()                         清空共享结点池, 旧节点编号全部失效
- *      PH()                                 构造一个空堆
- *      PH(std::initializer_list<T> init)    用初始化列表构造堆
- *      int push(T vl)                       插入元素, 返回节点id, 用于 decrease_key
- *      bool empty()                         判空
- *      T top()                              获取最小值
- *      int size()                           获取堆大小
- *      void pop()                           删除最小值
- *      void join(PH& R)                     合并另一个堆, R将被清空
- *      void clear()                         清空堆
- *      void decrease_key(int id, T new_val) 减小某个节点的值, id为插入时返回的节点编号
+ *      T                                    — 节点值类型, 需支持<运算符
+ *      reserve(cap)                         — 可选预留 cap 个结点容量
+ *      reset_pool()                         — 清空共享结点池, 旧节点编号全部失效
+ *      PH()                                 — 构造一个空堆
+ *      PH(std::initializer_list<T> init)    — 用初始化列表构造堆
+ *      int push(T vl)                       — 插入元素, 返回节点id, 用于 decrease_key
+ *      bool empty()                         — 判空
+ *      T top()                              — 获取最小值
+ *      int size()                           — 获取堆大小
+ *      void pop()                           — 删除最小值
+ *      void join(PH& R)                     — 合并另一个堆, R将被清空
+ *      void clear()                         — 清空堆
+ *      void decrease_key(int id, T new_val) — 减小某个节点的值, id为插入时返回的节点编号
  * Note:
  *      1. 插入、查询最小值、合并、减小键值的均摊复杂度通常视作 O(1)
  *      2. 删除最小值等其他操作可视作均摊 O(log n)

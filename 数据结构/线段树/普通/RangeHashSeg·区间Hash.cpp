@@ -5,10 +5,10 @@
  * 算法介绍: 维护序列多项式哈希，支持区间整体加值和区间哈希查询。
  * 模板参数: 无
  * Interface:
- *      H_init(n, base = 13331): 初始化幂与前缀幂和
+ *      H_init(n, base = 13331) — 初始化幂与前缀幂和
  *      using SegHash = SegTree<Info, Tag>
- *      modify(l, r, {add}) 对区间每个位置值加 add
- *      query(l, r).hash    查询 [l,r] 哈希，低位对应区间左端
+ *      modify(l, r, {add}) — 对区间每个位置值加 add
+ *      query(l, r).hash    — 查询 [l,r] 哈希，低位对应区间左端
  * Note:
  *      1. Time: 初始化 O(N)，单次修改/查询 O(log N)
  *      2. Space: O(N)

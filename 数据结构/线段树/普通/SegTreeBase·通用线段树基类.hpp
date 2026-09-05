@@ -7,15 +7,15 @@
  * 算法介绍: 维护一类支持区间修改、区间查询和线段树二分的懒标记线段树框架，具体维护内容由 Info / Tag 自定义。
  * 模板参数: Info (节点信息), Tag (懒标记)
  * Interface:
- *      SegTree(int n)                         初始化长度为 n 的空线段树
- *      SegTree(const std::vector<Info>& init) 用 1-based 的 Info 数组建树
+ *      SegTree(int n)                         — 初始化长度为 n 的空线段树
+ *      SegTree(const std::vector<Info>& init) — 用 1-based 的 Info 数组建树
  * 
- *      void modify(int ql, int qr, const Tag& tag) 区间打标记
- *      Info query(int ql, int qr)                  查询区间信息
- *      Info all_info()                             返回整棵树信息
- *      void set(int pos, const Info& value)        单点赋值
- *      int find_first(int ql, int qr, Pred pred)   在线段树上二分第一个满足条件的位置
- *      int find_last(int ql, int qr, Pred pred)    在线段树上二分最后一个满足条件的位置
+ *      void modify(int ql, int qr, const Tag& tag) — 区间打标记
+ *      Info query(int ql, int qr)                  — 查询区间信息
+ *      Info all_info()                             — 返回整棵树信息
+ *      void set(int pos, const Info& value)        — 单点赋值
+ *      int find_first(int ql, int qr, Pred pred)   — 在线段树上二分第一个满足条件的位置
+ *      int find_last(int ql, int qr, Pred pred)    — 在线段树上二分最后一个满足条件的位置
  * Note:
  *      1. Time: build O(n)，modify / query / set / find O(log n)
  *      2. Space: O(n)

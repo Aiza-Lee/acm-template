@@ -5,7 +5,7 @@
  * 算法介绍: S2[n][k] 表示将 n 个不同元素划分为 k 个非空集合的方案数。
  * 模板参数: N (预处理最大范围)
  * Interface: 
- *      int sum_powers(i64 n, int k); // 计算 sum_{i=0}^n i^k
+ *      int sum_powers(i64 n, int k); — 计算 sum_{i=0}^n i^k
  * Note:
  *      1. Time: Build O(N^2)
  *      2. See specific math formulas in text material (斯特林数.tex)

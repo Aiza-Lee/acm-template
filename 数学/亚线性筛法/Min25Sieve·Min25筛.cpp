@@ -5,9 +5,9 @@
  * 算法介绍: 计算积性函数前缀和 F(n) = sum_{i=1}^{n} f(i)，要求 f(p) 可拆成若干项 p^k 的线性组合
  * 模板参数: None
  * Interface:
- *      Min25(n, factors, f_p_c) 构造，factors 中 (k, s) 表示对 f(p) 累加 s * p^k
- *      solve()                  返回 sum_{i=1}^{n} f(i)
- *      solve_prime_sum()        返回 sum_{p<=n} f(p)
+ *      Min25(n, factors, f_p_c) — 构造，factors 中 (k, s) 表示对 f(p) 累加 s * p^k
+ *      solve()                  — 返回 sum_{i=1}^{n} f(i)
+ *      solve_prime_sum()        — 返回 sum_{p<=n} f(p)
  * Note:
  *      1. Time: O(n^(3/4) / log n) 级别
  *      2. Space: O(sqrt(n))

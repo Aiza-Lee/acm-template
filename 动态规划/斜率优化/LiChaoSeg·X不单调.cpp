@@ -1,19 +1,24 @@
 #include "aizalib.h"
 #include <numeric>
-/**
- * 斜率优化 - 李超线段树
- * 算法介绍: 维护直线集合，支持在线插入直线、在线查询某个 x 处的最小值。
- * 模板参数: T
- * Interface:
- *      LiChaoTree<T>(l, r), init(l, r) 初始化定义域 [l, r]
- *      add_line(k, b)                  插入直线 y = kx + b
- *      query(x)                        查询最小值
- *      clear()                         清空已插入直线
- * Note:
- *      1. Time: 单次 add_line / query O(log V)
- *      2. Space: O(Q log V)
- *      3. 适用于整数 x；若要求最大值，可整体取反
+/*
+ * 斜率优化 - 李超线段树 (Li Chao Segment Tree)
+ *
+ * Overview:
+ *      动态开点李超线段树，维护二维平面直线集合，支持在线插入直线 y = kx + b 并在线查询 x 处的全局最小值。
+ *
+ * API:
+ *      LiChaoTree<T>(l, r) — 构造并初始化横坐标定义域 [l, r]。
+ *      init(l, r)          — 重新初始化横坐标定义域。
+ *      add_line(k, b)      — 插入直线 y = kx + b。
+ *      query(x)            — 查询已插入直线在横坐标 x 处的最小值。
+ *      clear()             — 清空已插入直线。
+ *
+ * Notes:
+ *      1. Time: 单次 add_line / query 为 O(log(xr - xl))。
+ *      2. Space: O(Q log(xr - xl))，动态开点。
+ *      3. 若要求最大值，可将斜率和截距取反转化为最小值。
  */
+
 template<typename T = i64>
 struct LiChaoTree {
     static constexpr T INF = std::numeric_limits<T>::max() / 4;

@@ -10,7 +10,7 @@
  *      N 更大时可换 kd-tree + 跨子树缓冲 (本文件保留扩展位)。
  *
  * API:
- *  closest_pair_3d(pts) -> tuple<ld, int, int>: 最近点对距离平方 + 下标 (a, b)。
+ *  closest_pair_3d(pts) -> tuple<ld, int, int> — 最近点对距离平方 + 下标 (a, b)。
  *      N ≤ 1 返回 (+inf, -1, -1);多点重合返回 (0, a, a)。Time O(N²), Space O(1)。
  *
  * Notes:

@@ -5,7 +5,7 @@
  * 算法介绍: 在 gcd(a, mod) = 1 时求 a 在模 mod 意义下的最小正阶。
  * 模板参数: None
  * Interface:
- *      MultiplicativeOrder::order(a, mod) // 求最小正整数 k 使 a^k = 1 (mod mod)；若不存在返回 -1
+ *      MultiplicativeOrder::order(a, mod) — 求最小正整数 k 使 a^k = 1 (mod mod)；若不存在返回 -1
  * Note:
  *      1. Time: 试除版约 O(sqrt(mod) + sqrt(phi(mod)) log mod)
  *      2. Space: O(质因子个数)

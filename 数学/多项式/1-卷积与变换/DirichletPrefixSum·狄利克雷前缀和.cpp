@@ -7,13 +7,13 @@
  * 		时间复杂度 O(n log log n)。
  *
  * API:
- * 		get_primes(n)                     线性筛预处理 <= n 的质数表, O(n)
- * 		dirichlet_prefix(a, type, primes) 约数变换 (type = 1 约数和, type = -1 逆变换/莫比乌斯反演), O(n log log n)
- * 		dirichlet_suffix(a, type, primes) 倍数变换 (type = 1 倍数和, type = -1 逆变换/超集反演), O(n log log n)
- * 		dirichlet_prefix_sum(a, primes)   约数前缀和 b[k] = sum_{d | k} a[d], O(n log log n)
- * 		dirichlet_prefix_inv(a, primes)   约数逆变换 a[k] = sum_{d | k} mu(k/d) b[d], O(n log log n)
- * 		dirichlet_suffix_sum(a, primes)   倍数后缀和 b[k] = sum_{k | d} a[d], O(n log log n)
- * 		dirichlet_suffix_inv(a, primes)   倍数逆变换 a[k] = sum_{k | d} mu(d/k) b[d], O(n log log n)
+ * 		get_primes(n)                     — 线性筛预处理 <= n 的质数表, O(n)
+ * 		dirichlet_prefix(a, type, primes) — 约数变换 (type = 1 约数和, type = -1 逆变换/莫比乌斯反演), O(n log log n)
+ * 		dirichlet_suffix(a, type, primes) — 倍数变换 (type = 1 倍数和, type = -1 逆变换/超集反演), O(n log log n)
+ * 		dirichlet_prefix_sum(a, primes)   — 约数前缀和 b[k] = sum_{d | k} a[d], O(n log log n)
+ * 		dirichlet_prefix_inv(a, primes)   — 约数逆变换 a[k] = sum_{d | k} mu(k/d) b[d], O(n log log n)
+ * 		dirichlet_suffix_sum(a, primes)   — 倍数后缀和 b[k] = sum_{k | d} a[d], O(n log log n)
+ * 		dirichlet_suffix_inv(a, primes)   — 倍数逆变换 a[k] = sum_{k | d} mu(d/k) b[d], O(n log log n)
  *
  * Notes:
  * 		1. 数组采用 1-based 索引，有效元素下标范围为 [1, n]，数组大小为 n + 1，a[0] 不参与运算。

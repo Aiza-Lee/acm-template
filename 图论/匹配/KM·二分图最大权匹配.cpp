@@ -4,9 +4,9 @@
  * 算法介绍: Kuhn-Munkres 算法，求显式二分图左部全部匹配时的最大权完备匹配。
  * 模板参数: T (边权类型)
  * Interface:
- *      KM(int n, int m)                 初始化左部 1~n、右部 1~m 的二分图，要求 n <= m
- *      void add_edge(int u, int v, T w) 加入一条左 u 到右 v 的边，重边自动取最大权
- *      std::pair<bool, T> solve()       返回是否存在覆盖全部左部的匹配及其最大权值
+ *      KM(int n, int m)                 — 初始化左部 1~n、右部 1~m 的二分图，要求 n <= m
+ *      void add_edge(int u, int v, T w) — 加入一条左 u 到右 v 的边，重边自动取最大权
+ *      std::pair<bool, T> solve()       — 返回是否存在覆盖全部左部的匹配及其最大权值
  * Note:
  *      1. Time: O(n^2 m)
  *      2. Space: O(nm)

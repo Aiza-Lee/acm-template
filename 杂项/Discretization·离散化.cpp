@@ -4,10 +4,10 @@
  * 算法介绍: 将数值映射到连续整数 [1, sz]
  * 模板参数: T
  * Interface:
- *      add(x)        加入元素
- *      build()       排序并去重
- *      get(x)        获取离散化后的值 (1-based)
- *      operator[](i) 获取第 i 个值 (1-based)
+ *      add(x)        — 加入元素
+ *      build()       — 排序并去重
+ *      get(x)        — 获取离散化后的值 (1-based)
+ *      operator[](i) — 获取第 i 个值 (1-based)
  * Note:
  *      1. Time: Build O(N log N), Query O(log N)
  *      2. Space: O(N)

@@ -5,8 +5,8 @@
  * 算法介绍: 对树上关键点集合构建虚树，保留关键点及LCA，维持原树祖先关系。
  * 模板参数: 无
  * Interface: 
- *      VirtualTree(n) / init(n) 初始化容器大小
- *      build(h, get_lca, dfn)   构建虚树，h 会被排序去重
+ *      VirtualTree(n) / init(n) — 初始化容器大小
+ *      build(h, get_lca, dfn)   — 构建虚树，h 会被排序去重
  * Note:
  *      1. Time: O(K log K)
  *      2. Space: O(N)

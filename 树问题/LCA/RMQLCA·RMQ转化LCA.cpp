@@ -4,8 +4,8 @@
  * 算法介绍: 将LCA问题转化为RMQ问题，预处理O(N log N)，查询O(1)
  * 模板参数: 无
  * Interface:
- *      RMQLCA(G, root) O(N log N) Initialize
- *      lca(u, v)       O(1) Query
+ *      RMQLCA(G, root) — O(N log N) Initialize
+ *      lca(u, v)       — O(1) Query
  * Note:
  *      1. Time: O(N log N) pre, O(1) query
  *      2. Space: O(N log N)

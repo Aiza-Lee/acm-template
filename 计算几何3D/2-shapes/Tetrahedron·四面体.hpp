@@ -9,11 +9,11 @@
  *  提供四面体体积、质心与点内 / 外判定。
  *
  * API:
- *  tet_centroid(a, b, c, d) -> Point<T>      四面体几何质心(顶点均值)。任意 T。O(1)。
- *  point_in_tet(p, a, b, c, d) -> int        +1 ( 严格内部) / -1 (严格外部) / 0 (在面上、共面退化)。
+ *  tet_centroid(a, b, c, d) -> Point<T>     — 四面体几何质心(顶点均值)。任意 T。O(1)。
+ *  point_in_tet(p, a, b, c, d) -> int       — +1 ( 严格内部) / -1 (严格外部) / 0 (在面上、共面退化)。
  *      借助四个朝向面的 signed_volume_x6_tetrahedron 符号比较。浮点。O(1)。
- *  signed_volume_x6_tetrahedron(a, b, c, d)  见 Triangle·空间三角形.hpp。
- *  tetrahedron_volume(a, b, c, d)            见 Triangle·空间三角形.hpp。
+ *  signed_volume_x6_tetrahedron(a, b, c, d) — 见 Triangle·空间三角形.hpp。
+ *  tetrahedron_volume(a, b, c, d)           — 见 Triangle·空间三角形.hpp。
  *
  * Notes:
  *  point_in_tet 要求四面体顶点 CCW 朝外(各面法向量指向外部);否则内 / 外翻转。

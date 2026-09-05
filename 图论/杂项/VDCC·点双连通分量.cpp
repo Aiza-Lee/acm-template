@@ -5,7 +5,7 @@
  * 算法介绍: 使用 Tarjan 算法求解无向图的割点与点双连通分量。
  * 模板参数: 无
  * Interface:
- *      VDCC(GraphFS& g): 构造函数，计算 V-DCC
+ *      VDCC(GraphFS& g) — 构造函数，计算 V-DCC
  * Note:
  *      1. Time: O(V + E)
  *      2. Space: O(V + E)

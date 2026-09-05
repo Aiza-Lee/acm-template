@@ -8,8 +8,8 @@
  *  Andrew 单调链算法求二维点集凸包，以及凸包的几何重心。
  *
  * API:
- *  convex_hull(pts) -> Polygon<T>          点集凸包；结果按逆时针排列，自动去重且不包含多余共线点。Time O(N log N), Space O(N)。
- *  convex_hull_centroid(hull) -> Point<ld> 凸包（逆时针）几何重心；空凸包返回 (0, 0)。Time O(N)。
+ *  convex_hull(pts) -> Polygon<T>          — 点集凸包；结果按逆时针排列，自动去重且不包含多余共线点。Time O(N log N), Space O(N)。
+ *  convex_hull_centroid(hull) -> Point<ld> — 凸包（逆时针）几何重心；空凸包返回 (0, 0)。Time O(N)。
  *
  * Notes:
  *  模板参数 T: 点集 / 凸包顶点坐标类型。

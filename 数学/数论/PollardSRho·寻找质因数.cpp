@@ -5,10 +5,10 @@
  * 算法介绍: 配合 Miller-Rabin 在 64 位范围内快速分解质因数。
  * 模板参数: None
  * Interface:
- *      PollardRho::is_prime(n)       判定 n 是否为素数，Time: O(log^3 n)
- *      PollardRho::get_one_factor(n) 返回一个非平凡因子，Time: 期望 O(n^(1/4) log n)
- *      PollardRho::factorize(n)      返回全部质因子并排序，Time: 期望 O(n^(1/4) log n)
- *      PollardRho::factor_count(n)   返回 {质因子, 次数}，Time: 同 factorize
+ *      PollardRho::is_prime(n)       — 判定 n 是否为素数，Time: O(log^3 n)
+ *      PollardRho::get_one_factor(n) — 返回一个非平凡因子，Time: 期望 O(n^(1/4) log n)
+ *      PollardRho::factorize(n)      — 返回全部质因子并排序，Time: 期望 O(n^(1/4) log n)
+ *      PollardRho::factor_count(n)   — 返回 {质因子, 次数}，Time: 同 factorize
  * Note:
  *      1. Time: 期望 O(n^(1/4) log n)
  *      2. Space: O(log n)

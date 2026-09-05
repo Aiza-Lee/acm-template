@@ -6,11 +6,11 @@
  * 模板参数: None
  * Interface:
  *      LCTPathAdd(n), init(n)
- *      set_val(x, v), modify_add(x, y, v): 路径 x -> y 上所有点 +v
+ *      set_val(x, v), modify_add(x, y, v) — 路径 x -> y 上所有点 +v
  *      make_root(x), find_root(x), split(x, y)
  *      link(x, y), cut(x, y), connected(x, y)
- *      query_sum(x, y)  查询路径 x -> y 上的点权和
- *      query_size(x, y) 查询路径 x -> y 上的点数
+ *      query_sum(x, y)  — 查询路径 x -> y 上的点权和
+ *      query_size(x, y) — 查询路径 x -> y 上的点数
  *      query_component_size(x), query_subtree_size(root, x)
  *      lca(x, y)
  * Internal Methods:

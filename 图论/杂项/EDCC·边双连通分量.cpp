@@ -5,7 +5,7 @@
  * 算法介绍: 使用 Tarjan 算法求解无向图的边双连通分量与桥。
  * 模板参数: 无
  * Interface:
- *      EDCC(GraphFS& g): 构造函数，计算桥和 E-DCC
+ *      EDCC(GraphFS& g) — 构造函数，计算桥和 E-DCC
  * Note:
  *      1. Time: O(V + E)
  *      2. Space: O(V + E)

@@ -5,10 +5,10 @@
  * 算法介绍: 用连分数展开求解 x^2 - D*y^2 = ±1 的基本解与通解。
  * 模板参数: None
  * Interface:
- *     Pell::solve(D)                返回 x^2 - D*y^2 = 1 的最小正解 (x1, y1), D 为完全平方时返回 (-1, -1)
- *     Pell::kth_solution(x1, y1, k) 由基本解计算第 k 个解 (x_k, y_k), 第 0 个解为 (1, 0)
- *     Pell::solve_minimal_x(D)      仅返回最小的 x
- *     Pell::solve_negative_pell(D)  返回 x^2 - D*y^2 = -1 的基本解, 无解返回 (-1, -1)
+ *     Pell::solve(D)                — 返回 x^2 - D*y^2 = 1 的最小正解 (x1, y1), D 为完全平方时返回 (-1, -1)
+ *     Pell::kth_solution(x1, y1, k) — 由基本解计算第 k 个解 (x_k, y_k), 第 0 个解为 (1, 0)
+ *     Pell::solve_minimal_x(D)      — 仅返回最小的 x
+ *     Pell::solve_negative_pell(D)  — 返回 x^2 - D*y^2 = -1 的基本解, 无解返回 (-1, -1)
  * Note:
  *     1. Time: 连分数展开 O(√D), 乘方 O(log k)
  *     2. Space: O(1)

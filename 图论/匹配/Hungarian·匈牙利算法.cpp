@@ -4,8 +4,8 @@
  * 匈牙利算法 (Hungarian Algorithm)
  * 算法介绍: 用于求解无权二分图的最大匹配。通过寻找增广路的方式不断增加匹配数。
  * Interface:
- *      void add_edge(int u, int v) 添加无向边 u-v
- *      int solve()                 求解并返回最大匹配数（即匹配边的数量）
+ *      void add_edge(int u, int v) — 添加无向边 u-v
+ *      int solve()                 — 求解并返回最大匹配数（即匹配边的数量）
  * Note:
  *      1. Time: O(VE)
  *      2. Space: O(V + E)

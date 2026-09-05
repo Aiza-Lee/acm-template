@@ -9,12 +9,12 @@
  *      无
  *
  * Interface:
- *      ZFunc(s) / init(s)   初始化模式串
- *      extend(t)            返回 1-based 的 ex 数组，ex[i] = lcp(t[i...], s[1...])
- *      match(t)             在文本串中查找所有匹配位置，返回 1-based 起点
- *      border_len()         整个模式串的最长 border 长度
- *      min_period()         返回最小循环节长度
- *      z                  Z 数组，z[i] 表示 s[i...m] 与 s[1...m] 的 LCP 长度
+ *      ZFunc(s) / init(s) — 初始化模式串
+ *      extend(t)          — 返回 1-based 的 ex 数组，ex[i] = lcp(t[i...], s[1...])
+ *      match(t)           — 在文本串中查找所有匹配位置，返回 1-based 起点
+ *      border_len()       — 整个模式串的最长 border 长度
+ *      min_period()       — 返回最小循环节长度
+ *      z                  — Z 数组，z[i] 表示 s[i...m] 与 s[1...m] 的 LCP 长度
  *
  * Note:
  *      1. Time: init O(M), extend / match O(N)

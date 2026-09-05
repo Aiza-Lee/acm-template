@@ -17,7 +17,7 @@
  *      deal_subtree(u, f)
  *          对 u 子树对应区间调用一次 f(l, r)
  *      heuristic_dfs(u, insert, erase, query)
- *          DSU on Tree 模板，维护以 u 为根子树的信息并在每个点处触发 query
+ *          DSU on Tree — 模板，维护以 u 为根子树的信息并在每个点处触发 query
  * Note:
  *      1. Time: O(N) 预处理，单次链剖相关查询/拆链 O(log N)
  *      2. Space: O(N)

@@ -4,14 +4,14 @@
  * 线段树分裂 (Segment Tree Split)
  * 算法介绍: 维护值域 [1, N] 上的动态开点线段树，支持单点加、区间求和、线段树分裂与合并。
  * Interface:
- *      reserve(cap)                  可选预留 cap 个结点容量
- *      reset_pool()                  清空共享结点池, 旧节点编号全部失效
- *      SegTreeSplit(int n)           初始化值域 [1, n] 的空线段树
- *      void insert(int pos, i64 val) 在位置 pos 增加 val
- *      i64 query(int l, int r)       查询区间 [l, r] 的和
+ *      reserve(cap)                  — 可选预留 cap 个结点容量
+ *      reset_pool()                  — 清空共享结点池, 旧节点编号全部失效
+ *      SegTreeSplit(int n)           — 初始化值域 [1, n] 的空线段树
+ *      void insert(int pos, i64 val) — 在位置 pos 增加 val
+ *      i64 query(int l, int r)       — 查询区间 [l, r] 的和
  *      static void split(SegTreeSplit& a, SegTreeSplit& b, int k)
  *                                      // 将 a 在 k 处分裂, [1, k] 保留在 a, (k, N] 分入 b
- *      void merge(SegTreeSplit& other)     // 将 other 合并入 *this, other 被消耗 (root 置空)
+ *      void merge(SegTreeSplit& other) — 将 other 合并入 *this, other 被消耗 (root 置空)
  * Note:
  *      1. Time: insert / query O(log N); split O(log N); merge O(重叠结点数)
  *      2. Space: O(操作涉及结点数); split 只创建 O(log N) 个新结点, 原有子树通过指针转移

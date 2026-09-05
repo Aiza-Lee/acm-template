@@ -10,11 +10,11 @@
  *  提供点和矩阵两种返回值的形式;附欧拉角 ZYX 顺序互转矩阵。
  *
  * API:
- *  rodrigues_rotate(p, axis, angle) -> Point<ld>                         绕单位轴 axis 旋转 angle 后 p 的新坐标。浮点。O(1)。
- *  rotation_matrix_about_axis(axis, angle) -> array<array<ld, 3>, 3>     绕单位轴旋转的 3×3 矩阵。浮点。O(1)。
- *  euler_zyx_to_matrix(yaw, pitch, roll) -> array<array<ld, 3>, 3>       ZYX 顺序 (先 yaw 后 pitch 后 roll) 的合成旋转矩阵。浮点。O(1)。
- *  matrix_to_euler_zyx(m) -> tuple<ld, ld, ld> -> (yaw, pitch, roll)     反解;奇异时 pitch = ±π/2,任选 yaw 0。浮点。O(1)。
- *  matrix_apply(m, p) -> Point<ld>                                       用 3×3 矩阵对向量 p 作线性变换。浮点。O(1)。
+ *  rodrigues_rotate(p, axis, angle) -> Point<ld>                     — 绕单位轴 axis 旋转 angle 后 p 的新坐标。浮点。O(1)。
+ *  rotation_matrix_about_axis(axis, angle) -> array<array<ld, 3>, 3> — 绕单位轴旋转的 3×3 矩阵。浮点。O(1)。
+ *  euler_zyx_to_matrix(yaw, pitch, roll) -> array<array<ld, 3>, 3>   — ZYX 顺序 (先 yaw 后 pitch 后 roll) 的合成旋转矩阵。浮点。O(1)。
+ *  matrix_to_euler_zyx(m) -> tuple<ld, ld, ld> -> (yaw, pitch, roll) — 反解;奇异时 pitch = ±π/2,任选 yaw 0。浮点。O(1)。
+ *  matrix_apply(m, p) -> Point<ld>                                   — 用 3×3 矩阵对向量 p 作线性变换。浮点。O(1)。
  *
  * Notes:
  *  axis 必须为单位向量;非单位向量应先调用 PointFP::normalize(注释强调,不在内部自动归一)。

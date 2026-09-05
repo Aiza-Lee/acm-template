@@ -9,10 +9,10 @@
  *  快速增量法 (Clarkson-Shor 简化变体) 求三维点集凸包;返回三角面表。
  *
  * API:
- *  struct Face                               单个三角面;3 个顶点索引 + 朝外法向量。
- *  convex_hull_3d(pts) -> vector<Face>       点集凸包面表;N ≤ 3 返回空。Time O(N²) worst case。
- *  convex_hull_volume(hull, pts) -> ld       由面表与点表还原体积;按有向面积公式 1/6 Σ V_ijk,k。Time O(F)。
- *  convex_hull_surface_area(hull, pts) -> ld 由面表求表面积;Σ Area_i。Time O(F)。
+ *  struct Face                               — 单个三角面;3 个顶点索引 + 朝外法向量。
+ *  convex_hull_3d(pts) -> vector<Face>       — 点集凸包面表;N ≤ 3 返回空。Time O(N²) worst case。
+ *  convex_hull_volume(hull, pts) -> ld       — 由面表与点表还原体积;按有向面积公式 1/6 Σ V_ijk,k。Time O(F)。
+ *  convex_hull_surface_area(hull, pts) -> ld — 由面表求表面积;Σ Area_i。Time O(F)。
  *
  * Notes:
  *  复杂度最坏 O(N²);N ≤ 4e4 时实测可接受。退化为 4 个共面点 / N ≤ 3 返回空面表。

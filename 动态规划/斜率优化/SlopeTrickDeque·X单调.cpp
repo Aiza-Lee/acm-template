@@ -1,18 +1,22 @@
 #include "aizalib.h"
-/**
- * 斜率优化 - 单调队列
- * 算法介绍: 维护按 x 单调插入的下凸壳，支持查询 min(y-kx)。
- * 模板参数: None
- * Interface:
- *      add(x, y)      插入点 (x, y)
- *      query_inc_k(k) 查询 min(y-kx)，要求 k 单调递增
- *      query(k)       查询 min(y-kx)
- *      clear()        清空
- * Note:
- *      1. Time: 单次 add O(1) 均摊，query_inc_k O(1) 均摊，query O(log N)
- *      2. Space: O(N)
- *      3. 适用于插入点 x 单调不降；若 x 相同，仅保留 y 更小的点
+/*
+ * 斜率优化 - 单调队列 (Slope Trick with Monotone Deque)
+ *
+ * Overview:
+ *      维护按 x 单调不降顺序插入的点集下凸壳，支持高效查询 min(y - kx)。
+ *
+ * API:
+ *      add(x, y)      — 插入点 (x, y)，要求 x 坐标单调不降。若 x 相同，自动保留 y 更小的点。
+ *      query_inc_k(k) — 查询 min(y - kx)，要求查询斜率 k 单调递增，单次 O(1) 均摊。
+ *      query(k)       — 通过二分查询 min(y - kx)，对 k 无单调性要求，单次 O(log N)。
+ *      clear()        — 清空凸壳中的点。
+ *
+ * Notes:
+ *      1. Time: 单次 add O(1) 均摊，query_inc_k O(1) 均摊，query O(log N)。
+ *      2. Space: O(N)。
+ *      3. 内部采用 __int128 计算叉积，避免溢出。
  */
+
 struct SlopeDeque {
     struct Point {
         i64 x, y;

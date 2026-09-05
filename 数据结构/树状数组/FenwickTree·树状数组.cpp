@@ -4,13 +4,13 @@
  * 算法介绍: 维护 1-based 前缀和，支持单点加、前缀和、区间和与树上二分第 k 小/大。
  * 模板参数: T
  * Interface:
- *      BitTree<T>(n), init(n) 初始化长度为 n 的树状数组
- *      BitTree<T>(a), init(a) 用 1-based 数组 a 线性建树
- *      add(p, v)              令 a[p] += v
- *      sum_prefix(p), pre(p)  查询前缀 [1, p] 的和
- *      sum(l, r), query(l, r) 查询区间 [l, r] 的和
- *      all_sum()              查询整体 [1, n] 的和
- *      kth(k)                 返回最小 pos 使前缀和 >= k；若不存在返回 n + 1
+ *      BitTree<T>(n), init(n) — 初始化长度为 n 的树状数组
+ *      BitTree<T>(a), init(a) — 用 1-based 数组 a 线性建树
+ *      add(p, v)              — 令 a[p] += v
+ *      sum_prefix(p), pre(p)  — 查询前缀 [1, p] 的和
+ *      sum(l, r), query(l, r) — 查询区间 [l, r] 的和
+ *      all_sum()              — 查询整体 [1, n] 的和
+ *      kth(k)                 — 返回最小 pos 使前缀和 >= k；若不存在返回 n + 1
  * Note:
  *      1. Time: 单次 add / sum_prefix / sum / kth O(log N)，线性建树 O(N)
  *      2. Space: O(N)

@@ -8,8 +8,8 @@
  *  提供三角形外心与内心的直接计算。
  *
  * API:
- *  circum_center(a, b, c) -> Point<T> 外接圆圆心。O(1)。
- *  in_center(a, b, c) -> Point<T>     角平分线交点。O(1)。
+ *  circum_center(a, b, c) -> Point<T> — 外接圆圆心。O(1)。
+ *  in_center(a, b, c) -> Point<T>     — 角平分线交点。O(1)。
  *
  * Notes:
  *  仅支持浮点坐标。

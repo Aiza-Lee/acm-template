@@ -5,9 +5,9 @@
  * 算法介绍: 使用 Tarjan 算法在线求有向图的强连通分量。
  * 模板参数: 无
  * Interface:
- *      SCC(Graph& g)                      构造时完成求解
- *      int scc_cnt                        强连通分量个数
- *      std::vector<int> scc        scc[u] 为点 u 所属的强连通分量编号
+ *      SCC(Graph& g)        — 构造时完成求解
+ *      int scc_cnt          — 强连通分量个数
+ *      std::vector<int> scc — scc[u] 为点 u 所属的强连通分量编号
  * Note:
  *      1. Time: O(V + E)
  *      2. Space: O(V)

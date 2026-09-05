@@ -5,10 +5,10 @@
  * 算法介绍: 在线性时间内求质数表、最小质因子、欧拉函数与莫比乌斯函数。
  * 模板参数: None
  * Interface:
- *      EulerSieve(n)                  预处理 [1, n] 的 primes / minp / phi / mu，Time: O(n)
- *      sieve.primes / minp / phi / mu 质数表、最小质因子、欧拉函数、莫比乌斯函数
- *      sieve.is_prime(x)              判断 x 是否为质数，Time: O(1)
- *      sieve.factorize(x)             分解 x 的质因数，Time: O(质因子个数)
+ *      EulerSieve(n)                  — 预处理 [1, n] 的 primes / minp / phi / mu，Time: O(n)
+ *      sieve.primes / minp / phi / mu — 质数表、最小质因子、欧拉函数、莫比乌斯函数
+ *      sieve.is_prime(x)              — 判断 x 是否为质数，Time: O(1)
+ *      sieve.factorize(x)             — 分解 x 的质因数，Time: O(质因子个数)
  * Note:
  *      1. Time: O(n)
  *      2. Space: O(n)

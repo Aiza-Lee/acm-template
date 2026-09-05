@@ -5,9 +5,9 @@
  * 算法介绍: 递归选择当前连通块重心，处理跨重心贡献后删除重心并分治子块。
  * 模板参数: None
  * Interface:
- *      get_size(u, fa)            计算未删除连通块大小
- *      get_centroid(u, fa, total) 返回当前块重心
- *      centroid_decomp(u)         对 u 所在连通块执行点分治
+ *      get_size(u, fa)            — 计算未删除连通块大小
+ *      get_centroid(u, fa, total) — 返回当前块重心
+ *      centroid_decomp(u)         — 对 u 所在连通块执行点分治
  * Note:
  *      1. Time: 框架 O(N log N)，实际复杂度取决于 calc
  *      2. Space: O(N)

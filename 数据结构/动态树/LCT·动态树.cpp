@@ -5,19 +5,19 @@
  *          路径和查询、路径大小查询、子树大小查询、连通块大小查询与 LCA 查询。
  * 模板参数: None
  * Interface:
- *      LCT(n), init(n)             初始化 1...n 个点的动态森林
- *      set_val(x, v)               把点 x 的点权改为 v
- *      make_root(x)                将 x 所在树改为以 x 为根
- *      find_root(x)                返回 x 所在树当前实义下的树根编号
- *      split(x, y)                 提取 x 到 y 的路径，使 y 成为该辅助树根
- *      link(x, y)                  若 x, y 不连通，则连边并返回 1，否则返回 0
- *      cut(x, y)                   若边 (x, y) 存在，则断开并返回 1，否则返回 0
- *      connected(x, y)             判断 x, y 是否连通
- *      query_sum(x, y)             查询路径 x -> y 上的点权和
- *      query_size(x, y)            查询路径 x -> y 上的点数
- *      query_component_size(x)     返回 x 所在连通块的总点数
- *      query_subtree_size(root, x) 以 root 为整棵树的根时，返回 x 的子树大小
- *      lca(x, y)                   返回 x, y 的最近公共祖先，若不连通则返回 0
+ *      LCT(n), init(n)             — 初始化 1...n 个点的动态森林
+ *      set_val(x, v)               — 把点 x 的点权改为 v
+ *      make_root(x)                — 将 x 所在树改为以 x 为根
+ *      find_root(x)                — 返回 x 所在树当前实义下的树根编号
+ *      split(x, y)                 — 提取 x 到 y 的路径，使 y 成为该辅助树根
+ *      link(x, y)                  — 若 x, y 不连通，则连边并返回 1，否则返回 0
+ *      cut(x, y)                   — 若边 (x, y) 存在，则断开并返回 1，否则返回 0
+ *      connected(x, y)             — 判断 x, y 是否连通
+ *      query_sum(x, y)             — 查询路径 x -> y 上的点权和
+ *      query_size(x, y)            — 查询路径 x -> y 上的点数
+ *      query_component_size(x)     — 返回 x 所在连通块的总点数
+ *      query_subtree_size(root, x) — 以 root 为整棵树的根时，返回 x 的子树大小
+ *      lca(x, y)                   — 返回 x, y 的最近公共祖先，若不连通则返回 0
  * Internal Methods:
  *      _check(x)   边界检查，debug 模式下 assert
  *      _dir(p)     返回 p 是其父节点的左孩子(0)还是右孩子(1)

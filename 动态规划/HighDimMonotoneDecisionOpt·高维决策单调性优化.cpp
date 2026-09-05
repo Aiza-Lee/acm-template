@@ -1,25 +1,23 @@
 #include "aizalib.h"
-
-/**
- * 高维决策单调性分治优化
- * 算法介绍:
- *      多层形式: dp[t][i] = min_{j < i}(dp[t - 1][j] + cost(t, j, i))。
+/*
+ * 高维决策单调性分治优化 (2D Divide and Conquer DP Optimization)
+ *
+ * Overview:
+ *      多层 DP 形式：dp[t][i] = min_{j < i}(dp[t - 1][j] + cost(t, j, i))。
  *      若每层最优决策单调，即 opt[t][i] <= opt[t][i + 1]，可逐层分治优化。
- * 适用条件:
- *      1. 每一层都需要最优决策单调。
- *      2. 四边形不等式是常见充分条件，见文字资料。
- * 模板参数:
- *      T: DP 值类型；F: 代价函数类型
- * Interface:
- *      DCDP2D(m, n, inf, cost) 多层优化，cost(t, j, i) 返回第 t 层从 j 转移到 i 的附加代价
- *      DCDP2D::set_base(base)  设置 dp[0]
- *      DCDP2D::solve_layer(t, l = 1, r = n, ql = 0, qr = n - 1)
- *      DCDP2D::solve_all(l = 1, r = n, ql = 0, qr = n - 1)
- * Note:
- *      1. Time: O(m (r - l + 1) log (qr - ql + 2))
- *      2. Space: O(mn)
- *      3. 默认使用 1-based 状态下标，决策点通常为 j in [0, i - 1]
- *      4. cost(...) 应能较快计算
+ *
+ * API:
+ *      DCDP2D(m, n, inf, cost)      — 初始化多层优化器，cost(t, j, i) 返回从 j 到 i 的代价。
+ *      set_base(base)               — 设置基础层 dp[0]。
+ *      solve_layer(t, l, r, ql, qr) — 求解第 t 层。
+ *      solve_all(l, r, ql, qr)      — 求解全部 1..m 层。
+ *      value(t, i)                  — 获取 dp[t][i]。
+ *      decision(t, i)               — 获取 opt[t][i]。
+ *
+ * Notes:
+ *      1. Time: O(m * n log n)。
+ *      2. Space: O(m * n)。
+ *      3. 状态采用 1-based 下标，决策点通常为 j in [0, i - 1]。
  */
 template<class T, class F>
 struct DCDP2D {

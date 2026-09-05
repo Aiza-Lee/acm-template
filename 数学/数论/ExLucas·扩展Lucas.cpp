@@ -5,7 +5,7 @@
  * 算法介绍: 求组合数 C(n, m) mod mod；先拆成若干个 mod = p^k 的子问题，再用 ExCRT 合并。
  * 模板参数: None
  * Interface:
- *      ExLucas::C(n, m, mod) // 求组合数 C(n, m) mod mod，适合 mod 的各个质因数幂规模不太大
+ *      ExLucas::C(n, m, mod) — 求组合数 C(n, m) mod mod，适合 mod 的各个质因数幂规模不太大
  * Note:
  *      1. Time: 约 O(sum(p^k) + t log n)，其中 t 为 mod 的不同质因子个数
  *      2. Space: O(sum(p^k))

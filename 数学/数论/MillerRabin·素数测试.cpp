@@ -5,7 +5,7 @@
  * 算法介绍: 用固定底数集合在 64 位范围内做确定性素性判定。
  * 模板参数: None
  * Interface:
- *      MillerRabin::is_prime(n) // 判定 n 是否为素数，Time: O(log^3 n)
+ *      MillerRabin::is_prime(n) — 判定 n 是否为素数，Time: O(log^3 n)
  * Note:
  *      1. Time: O(log^3 n)
  *      2. Space: O(1)

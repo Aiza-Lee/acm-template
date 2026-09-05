@@ -20,10 +20,10 @@
  *      TreeDiameterDPPath<T>(G).solve(root = 1)
  *          求直径与路径，返回
  *              Result { len, u, v, edges, path }
- *          len          直径长度（边权和）；
- *          u, v         两端点，u <= v；
- *          edges        路径边数 == path.size() - 1；
- *          path  u -> v 的有序点集。
+ *          len   — 直径长度（边权和）；
+ *          u, v  — 两端点，u <= v；
+ *          edges — 路径边数 == path.size() - 1；
+ *          path  — u -> v 的有序点集。
  *          复杂度 O(N)。
  *
  * Notes:

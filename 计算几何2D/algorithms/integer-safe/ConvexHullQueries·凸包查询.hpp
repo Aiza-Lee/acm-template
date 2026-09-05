@@ -8,10 +8,10 @@
  *  凸多边形上的快速查询接口：点积极值、切点和点包含判定。
  *
  * API:
- *  argmax_dot(poly, dir) -> int                  沿 dir 点积最大的顶点索引。O(log N)。
- *  argmin_dot(poly, dir) -> int                  沿 dir 点积最小的顶点索引。O(log N)。
- *  tangent_from_point(poly, p) -> pair<int, int> 左 / 右切线端点索引。O(N)。
- *  point_in_convex(poly, p) -> int               严格内部 1，边界 0，外部 -1。O(log N)。
+ *  argmax_dot(poly, dir) -> int                  — 沿 dir 点积最大的顶点索引。O(log N)。
+ *  argmin_dot(poly, dir) -> int                  — 沿 dir 点积最小的顶点索引。O(log N)。
+ *  tangent_from_point(poly, p) -> pair<int, int> — 左 / 右切线端点索引。O(N)。
+ *  point_in_convex(poly, p) -> int               — 严格内部 1，边界 0，外部 -1。O(log N)。
  *
  * Notes:
  *  模板参数 T: 坐标类型。

@@ -4,13 +4,13 @@
  * 算法介绍: 维护离散整数值域 [lb, rb] 上的多条一次函数线段，支持区间插入与单点最大值查询
  * 模板参数: T: 坐标/函数值类型，默认 i64
  * Interface:
- *      LiChaoSeg(lb, rb, line_cap = 0): 初始化值域，line_cap 为可选预留线段数
+ *      LiChaoSeg(lb, rb, line_cap = 0) — 初始化值域，line_cap 为可选预留线段数
  * 
- *      init(lb, rb, line_cap = 0)      重置结构
- *      add_line(k, b, id = 0)          插入整段直线 y = kx + b，覆盖整个值域；返回实际 id
- *      add_segment(l, r, k, b, id = 0) 插入定义域为 [l, r] 的线段；返回实际 id，完全越界则返回 0
- *      query_line(x)                   查询 x 处最优线段，返回 Line；id = 0 表示不存在
- *      query(x)                        查询 x 处最大值；不存在返回 lowest()
+ *      init(lb, rb, line_cap = 0)      — 重置结构
+ *      add_line(k, b, id = 0)          — 插入整段直线 y = kx + b，覆盖整个值域；返回实际 id
+ *      add_segment(l, r, k, b, id = 0) — 插入定义域为 [l, r] 的线段；返回实际 id，完全越界则返回 0
+ *      query_line(x)                   — 查询 x 处最优线段，返回 Line；id = 0 表示不存在
+ *      query(x)                        — 查询 x 处最大值；不存在返回 lowest()
  * Note:
  *      1. Time: 单次插入/查询 O(log V)，V = rb - lb + 1
  *      2. Space: O(插入线段数 * log V)，动态开点

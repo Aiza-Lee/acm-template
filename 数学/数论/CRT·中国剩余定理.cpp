@@ -5,7 +5,7 @@
  * 算法介绍: 求解模数两两互质的同余方程组 x = r[i] (mod m[i])。
  * 模板参数: None
  * Interface:
- *      CRT::solve(r, m) // 解同余方程组并返回最小非负解，Time: O(n log max(m[i]))
+ *      CRT::solve(r, m) — 解同余方程组并返回最小非负解，Time: O(n log max(m[i]))
  * Note:
  *      1. Time: O(n log max(m[i]))
  *      2. Space: O(1)

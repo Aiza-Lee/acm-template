@@ -7,8 +7,8 @@
  *     分别枚举所有独立集，预处理左半部的 (邻接到右半部的掩码, 大小) 最优表，
  *     再通过 SOS DP 对右半部的每个独立集 O(1) 查询兼容的左半部最大独立集。
  * Interface:
- *     int solve_general(adj_masks, n) 一般图 MIS，adj_masks[i] 为顶点 i 的邻接掩码（u64 位）
- *     std::vector<int> get_set()      返回最近一次求解得到的 MIS 顶点集（1-based）
+ *     int solve_general(adj_masks, n) — 一般图 MIS，adj_masks[i] 为顶点 i 的邻接掩码（u64 位）
+ *     std::vector<int> get_set()      — 返回最近一次求解得到的 MIS 顶点集（1-based）
  * Note:
  *     1. solve_general: 时间 O(2^{n/2} * n)，适用于 n ≤ 50。邻接掩码中第 j 位（0-indexed）为 1 表示与顶点 j+1 相邻。
  *     2. 所有顶点编号均为 1-based。
