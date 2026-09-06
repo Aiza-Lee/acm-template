@@ -1,0 +1,28 @@
+{
+	"version": "2.0.0",
+	"options": {
+		"shell": {
+			"executable": "cmd.exe",
+			"args": ["/C"]
+		}
+	},
+	"tasks": [
+		{
+			"label": "build",
+			"type": "shell",
+			"command": "g++ -std=c++23 -DLOCAL -DDEBUG -g -O0 -fdiagnostics-color=always ${file} -o ${fileDirname}\\build\\${fileBasenameNoExtension}.exe",
+			"group": "build",
+			"problemMatcher": "$gcc"
+		},
+		{
+			"label": "build-and-run",
+			"type": "shell",
+			"command": "${fileDirname}\\build\\${fileBasenameNoExtension}.exe < ${workspaceFolder}\\input.txt",
+			"dependsOn": "build",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
