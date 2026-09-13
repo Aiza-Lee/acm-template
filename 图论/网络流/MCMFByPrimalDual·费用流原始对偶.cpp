@@ -4,22 +4,22 @@
  * MCMFByPrimalDual·费用流原始对偶
  *
  * Overview:
- *     原始对偶算法，先用 SPFA 求初始势能，再用 Dijkstra 在非负化边权上反复寻找最短增广路。
+ *     原始对偶算法，先用 SPFA 求初始势能，再用 Dijkstra
+ *     在非负化边权上反复寻找最短增广路。
  *
  * API:
- *     MCMF_PrimalDual(int n, int m = 0)                             — 初始化 n 个点、预估 m 条原图边的网络
- *     void add_edge(int u, int v, Cap w, Cost c)                    — 添加一条容量为 w、费用为 c 的有向边
- *     std::pair<Cap, Cost> solve(int s, int t, Cap limit = INF_CAP) — 返回至多增广 limit 流量后的 {flow, cost}
+ *     MCMF_PrimalDual(n, m) — 初始化 n 个点、预估 m 条边的网络。
+ *     add_edge(u, v, w, c)  — 添加一条容量为 w、费用为 c 的有向边。
+ *     solve(s, t, limit)    — 返回至多增广 limit 流量后的 {flow, cost}。
  *
  * Notes:
  *     模板参数: Cap (容量类型), Cost (费用类型)
  *     1. Time: O(FE log V)，通常比纯 SPFA 版更稳
  *     2. Space: O(V + E)
  *     3. 1-based indexing. 支持负费用边，但要求不存在从源点可达的负环。
- *     4. 用法/技巧:
- *     4.1 若只需发送部分流量，可直接传入 solve(s, t, limit)。
- *     4.2 若要求最大费用最大流，可将边权费用取反，答案费用再取反。
- *     4.3 当费用流规模较大或需要更稳定的复杂度时，优先使用本模板而不是纯 SPFA 版。
+ *     4. 用法/技巧: 4.1 若只需发送部分流量，可直接传入 solve(s, t, limit)。4.2
+ *        若要求最大费用最大流，可将边权费用取反，答案费用再取反。4.3
+ *        当费用流规模较大或需要更稳定的复杂度时，优先使用本模板。
  */
 
 template<typename Cap, typename Cost>
@@ -35,7 +35,8 @@ struct Graph {
     std::vector<Edge> e;   // 残量网络边集
     int ec;                // 当前边计数，边下标从 2 开始，便于 i ^ 1 找反边
 
-    Graph(int n, int m = 0) : n(n), head(n + 1, 0), e(std::max(2 * m + 2, 2)), ec(1) {}
+    Graph(int n, int m = 0)
+        : n(n), head(n + 1, 0), e(std::max(2 * m + 2, 2)), ec(1) {}
 
     void add_edge(int u, int v, Cap w, Cost c) {
         AST(1 <= u && u <= n);
@@ -61,7 +62,9 @@ struct MCMF_PrimalDual {
     std::vector<char> in;  // in[u]: 是否在 SPFA 队列中
     int n;                 // 点数
 
-    MCMF_PrimalDual(int n, int m = 0) : g(n, m), dis(n + 1), h(n + 1), pv(n + 1), pe(n + 1), in(n + 1), n(n) {}
+    MCMF_PrimalDual(int n, int m = 0)
+        : g(n, m), dis(n + 1), h(n + 1), pv(n + 1), pe(n + 1),
+          in(n + 1), n(n) {}
 
     void add_edge(int u, int v, Cap w, Cost c) {
         g.add_edge(u, v, w, c);

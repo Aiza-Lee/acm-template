@@ -22,8 +22,9 @@ struct VDCC {
     std::vector<int> dfn;                    // dfn[u]: 节点u的DFS序
     std::vector<int> low;                    // low[u]: 节点u能到达的最小DFS序
     std::vector<bool> is_cut;                // is_cut[u]: 节点u是否为割点
-    std::vector<std::vector<int>> v_dcc;     // v_dcc: 存储所有的点双连通分量
-    std::vector<std::vector<int>> v_dcc_edges; // v_dcc_edges: 存储点双连通分量中边的编号(1-based)
+    std::vector<std::vector<int>> v_dcc;     // 存储所有的点双连通分量
+    // v_dcc_edges: 存储点双连通分量中边的编号(1-based)
+    std::vector<std::vector<int>> v_dcc_edges;
     std::stack<int> stk_v;                   // 维护V-DCC的点的栈
     std::stack<int> stk_e;                   // 维护V-DCC的边的栈
     int dfn_cnt;                             // DFS序计数器
@@ -67,9 +68,10 @@ private:
                     
                     int edge_id;
                     do {
-                        edge_id = stk_e.top(); 
+                        edge_id = stk_e.top();
                         stk_e.pop();
-                        comp_edges.emplace_back(edge_id / 2); // 取 1-based 的插入序号
+                        // 取 1-based 的插入序号
+                        comp_edges.emplace_back(edge_id / 2);
                     } while (edge_id != e);
                     
                     v_dcc.emplace_back(std::move(comp));

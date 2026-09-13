@@ -1,23 +1,36 @@
 #include "aizalib.h"
 
-/**
- * Suffix Balanced Tree 后缀平衡树
- * 
- * 算法介绍:
- *      动态维护后缀排序的数据结构。支持在字符串前端添加字符，并维护所有后缀的字典序排名。
- *      使用替罪羊树(Scapegoat Tree)思想，通过维护每个节点的实数值(tag)来实现O(1)比较后缀大小。
- * 
- * Interface:
- *      push_front(char c)      — 在前端添加字符c
- *      query_rank(int k)       — 查询第k个添加的后缀的排名(1-based)
- *      get_sa(vector<int>& sa) — 获取当前的后缀数组到sa中
- * 
- * Note:
- *      1. Time: push_front O(log N), 均摊。
- *      2. Space: O(N)
- *      3. 节点索引: i 表示第 i 次 push_front 后形成的后缀 (即 S[N-i+1...N])。
- *         tr[i].tag 维护了该后缀的相对大小值。
- *         tr[0] 为空后缀/哨兵，tag=0。
+/*
+ * Suffix Balanced Tree (后缀平衡树)
+ *
+ * Overview:
+ *     以重量平衡树 (替罪羊树) 动态维护字符串所有后缀字典序全序关系的数据结构。
+ *     支持在字符串前端动态追加字符 (push_front)，均摊 O(log N) 维护后缀有序拓扑：
+ *     - 实数标签 (Tag 机制): 每个节点映射到实数区间中点 tag，
+ *       树的中序遍历严格对应字典序大小。
+ *     - O(1) 归纳比较器: 比较新后缀与树中后缀时，先比首字符；
+ *       首字符相同时剩余后缀已在树中，直接比较历史节点的 tag 即可在 O(1) 决出胜负。
+ *     - 结构与工具: 替罪羊拍平重构保证树高 O(log N) 与实数精度，
+ *       提供动态排名查询与动态 SA 导出。
+ *
+ * API:
+ *     struct Node:
+ *         ls, rs — 左右孩子节点编号 (0 为空)
+ *         tag    — 实数序标签，保证中序遍历严格递增
+ *         size   — 子树大小
+ *     SuffixBalancedTree(n) — 构造函数，预分配空间并初始化哨兵节点 0 (tag=0)
+ *     push_front(c)         — 在串前端插入字符 c，均摊 O(log N) 维护后缀树与排名
+ *     query_rank(k)         — 查询第 k 次添加的后缀在当前所有后缀中的字典序排名
+ *                              (1-based)，O(log N)
+ *     get_sa(sa_vec)        — 中序遍历导出当前所有后缀按字典序排列的 ID 序列
+ *                              (1-based 后缀编号)，O(N)
+ *
+ * Notes:
+ *     1. Time: 单次 push_front 均摊 O(log N)，query_rank O(log N)，get_sa O(N)。
+ *     2. Space: O(N)。
+ *     3. 节点索引约定: 下标 i 代表第 i 次 push_front 添加后形成的前缀串后缀 (即
+ *        S[k-i+1...k])。
+ *     4. ALPHA 取 0.75 为替罪羊树经典平衡因子，兼顾重构频率与树高上限。
  */
 struct SuffixBalancedTree {
     static constexpr double ALPHA = 0.75;

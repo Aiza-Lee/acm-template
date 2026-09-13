@@ -1,31 +1,34 @@
 #include "aizalib.h"
 
-/**
+/*
  * General Suffix Automaton (广义后缀自动机)
  *
- * 算法介绍:
- *   用于处理多模式串的后缀自动机。
- *   本质上是将所有字符串插入到一颗 Trie 树中，然后对 Trie 树构建 SAM。
- *   为了避免构建 Trie 的显式过程，可以直接在 SAM 上进行插入。
- *   关键点：
- *   1. 每次插入新串时，重置 last 指针到 root (或者是该串在 Trie 上的结束位置)。
- *   2. 特判：如果特判转移已经存在 (len[q] == len[p] + 1)，则不需要新建节点，直接移动 last。
- *      如果转移存在但 len 不对 (len[q] > len[p] + 1)，则需要分裂 (类似普通 SAM 的 clone)。
+ * Overview:
+ *     将后缀自动机扩展到多模式串集合的确定性有限状态自动机。
+ *     通过在线增量插入与已有转移特判分裂，免去构建显式 Trie 的开销，保证无空节点：
+ *     - 广义 endpos: 子串在模式串集合中出现的 (串ID, 右端点) 二元组集合。
+ *     - 转移特判与分裂: 插入新串重置 last=root。向状态 p 转移字符 c 时，
+ *       若转移已存在目标 q，len(q)==len(p)+1 则直接复用；len(q)>len(p)+1 则分裂 q
+ *       生成 clone 节点并重定向 link。
+ *     - 结构与工具: 提供多串转移 DAG 与广义 Parent 树，用于多串公共子串、
+ *       出现频次汇聚与本质不同子串统计。
  *
- * 模板参数:
- *   ALPHABET: 字符集大小 (默认 26)
- *   MIN_CHAR: 起始字符 (默认 'a')
+ * API:
+ *     struct Node:
+ *         len  — 该等价类中最长子串的长度 (DAG 深度)
+ *         link — 后缀链接 (Parent Tree 父节点)，0 为无 link (仅根节点)
+ *         next — 字符转移数组，next[c] 为转移到的状态编号 (0 为无转移)
+ *     GeneralSAM(n) — 构造函数，预分配 2n+2 个节点的状态空间
+ *     insert(s)     — 增量插入字符串 s，维护自动机与 Parent 树结构，O(|s| *
+ *                      |Sigma|)
  *
- * Interface:
- *   insert(s) — 插入字符串
- *   build()   — ( 可选) 可以在所有串插入完后进行拓扑排序等预处理
- *
- * Note:
- *   1. Time: O(\sum |S|)
- *   2. Space: O(\sum |S| * ALPHABET)
- *   3. 状态数 max 2 * \sum |S|
- *   4. 节点编号 1-base: 节点 0 是未使用的哨兵，节点 1 是 root
- *      根的 link = 0 表示"无后缀链接"
+ * Notes:
+ *     1. Time: 构建总时间 O(sum|S| * |Sigma|)，单字符插入均摊 O(|Sigma|)。
+ *     2. Space: O(sum|S| * |Sigma|)，状态数最多为 2 * sum|S|。
+ *     3. 节点编号 1-based: 节点 0 为未使用的哨兵，节点 1 为 root 根节点 (len=0,
+ *        link=0)。
+ *     4. 统计技巧: 若要统计子串在多少个不同串中出现，可在各串插入完后对最后状态沿
+ *        link 向上打标记 (结合时间戳避免重复)。
  */
 
 struct GeneralSAM {

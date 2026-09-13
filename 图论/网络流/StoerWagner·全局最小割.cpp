@@ -16,9 +16,8 @@
  *     1. Time: O(n^3)
  *     2. Space: O(n^2)
  *     3. 1-based indexing. 适用于无向图、非负边权；重边会自动合并。
- *     4. 用法/技巧:
- *     4.1 若图不连通，则全局最小割为 0。
- *     4.2 solve_with_cut().side 返回最优割的一侧点集，另一侧为补集。
+ *     4. 用法/技巧: 4.1 若图不连通，则全局最小割为 0。4.2 solve_with_cut().side
+ *        返回最优割的一侧点集，另一侧为补集。
  */
 template<typename T = i64>
 struct StoerWagner {
@@ -83,7 +82,9 @@ struct StoerWagner {
                         w[prev][v] += w[pick][v];
                         w[v][prev] = w[prev][v];
                     }
-                    comp[prev].insert(comp[prev].end(), comp[pick].begin(), comp[pick].end());
+                    comp[prev].insert(
+                        comp[prev].end(),
+                        comp[pick].begin(), comp[pick].end());
                     alive.erase(std::find(alive.begin(), alive.end(), pick));
                     break;
                 }

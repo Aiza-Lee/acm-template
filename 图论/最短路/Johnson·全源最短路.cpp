@@ -4,18 +4,16 @@
  * Johnson·全源最短路
  *
  * Overview:
- *     Johnson's Algorithm
- *     全源最短路算法。
+ *     Johnson's Algorithm 全源最短路算法。
  *     1. 新建虚拟源点 0，向所有点连边权为 0 的边。
- *     2. 跑一遍 SPFA 求出 0 到各点的最短路 h[u]（势能）。
- *     若存在负环则返回 false。
+ *     2. 跑一遍 SPFA 求出 0 到各点的最短路 h[u]（势能）。若存在负环则返回 false。
  *     3. 利用 h[u] 对边权进行重赋权: w'(u, v) = w(u, v) + h[u] - h[v]。
- *     这一步保证了所有新边权非负，从而可以使用 Dijkstra。
+ *        这一步保证了所有新边权非负，从而可以使用 Dijkstra。
  *     4. 对每个点跑一遍 Dijkstra 求出基于新边权的最短路 d'[v]。
  *
  * API:
- *     add_edge(u, v, w)
- *     solve() -> bool (false if negative cycle)
+ *     add_edge(u, v, w) — 添加从 u 到 v 权值为 w 的有向边
+ *     solve()           — 求解全源最短路；若存在负环返回 false，否则返回 true
  *
  * Notes:
  *     模板参数: T (权值类型)
@@ -49,7 +47,8 @@ struct Johnson {
     std::vector<std::vector<T>> dis;
     int n;
 
-    Johnson(int n, int m = 0) : g(n, m), h(n + 1), dis(n + 1, std::vector<T>(n + 1)), n(n) {}
+    Johnson(int n, int m = 0)
+        : g(n, m), h(n + 1), dis(n + 1, std::vector<T>(n + 1)), n(n) {}
 
     void add_edge(int u, int v, T w) {
         g.add_edge(u, v, w);
@@ -77,8 +76,12 @@ struct Johnson {
                     h[v] = h[u] + w;
                     if (++cnt[v] > n) return false; // Negative cycle
                     if (!in[v]) {
-                        if (!q.empty() && h[v] < h[q.front()]) q.push_front(v); // SLF
-                        else q.push_back(v);
+                        // SLF 优化
+                        if (!q.empty() && h[v] < h[q.front()]) {
+                            q.push_front(v);
+                        } else {
+                            q.push_back(v);
+                        }
                         in[v] = true;
                     }
                 }

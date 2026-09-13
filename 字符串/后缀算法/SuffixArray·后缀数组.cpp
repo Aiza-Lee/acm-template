@@ -1,24 +1,45 @@
 #include "aizalib.h"
 
-/**
- * Suffix Array (SA) 后缀数组
- * 
- * interface:
- *      SuffixArray(string s)                  — 构造函数，O(N log N)
- *      lcp(i, j)                              — 求排名为i和j的后缀的最长公共前缀长度 O(1)
- *      lcp_pos(p1, p2)                        — 求原串位置p1和p2开始的后缀的LCP (p1, p2为1-based索引) O(1)
- *      count_distinct_substrings()            — 计算本质不同子串个数 O(N)
- *      find_substring(string sub)             — 查找子串sub在原串中的出现位置范围 [L, R] (在sa数组中的下标范围) O(|sub| * log N)
- *      find_substring(pos, len)               — 查找原串子串str[pos...pos+len-1]在后缀数组中的范围 [L, R] O(log N)
- *      compare_substrings(p1, len1, p2, len2) — 比较两个子串的大小 O(1)
- *      kth_distinct_substring(k)              — 求第k小(字典序)的本质不同子串 O(N)
- * 
- * note:
- *      1. sa[i]: 排名为i的后缀的起始位置 (1-based, 值域 1~n)
- *      2. rk[i]: 起始位置为i的后缀的排名 (1-based, 值域 1~n)
- *      3. height[i]: LCP(suffix(sa[i]), suffix(sa[i-1]))
- *      4. 构造复杂度 O(N log N)
- *      5. 内部实现使用 1-based 索引，输入字符串s会被拷贝并前置一个占位符。
+/*
+ * Suffix Array (SA, 后缀数组)
+ *
+ * Overview:
+ *     在 O(N log N) 时间内将字符串所有后缀按字典序升序排序的核心数据结构。
+ *     构建后缀全序关系与 height 数组的 ST 表，提供子串比较、定位与统计工具：
+ *     - sa[i] / rk[i]: 字典序排第 i 的后缀起始位置为 sa[i]；以 i 开头的后缀排名为
+ *       rk[i]，互为逆映射。
+ *     - height[i]: 排名相邻后缀的 LCP 长度，满足 height[rk[i]] >= height[rk[i-1]] -
+ *       1 递推性质。
+ *     - RMQ-ST 表: 任意两后缀的 LCP 等于区间 height 最小值，提供 O(1)
+ *       任意两子串字典序比较。
+ *     - 区间与去重工具: 模式串出现起点在 sa 上呈连续区间 [L, R]，支持二分定位；排名
+ *       i 的后缀产生 (n - sa[i] + 1) - height[i] 个新子串，支持去重计数与第 k
+ *       小查询。
+ *
+ * API:
+ *     SuffixArray(s)              — 构造函数，倍增基数排序构建 SA、rk、height 及
+ *                                    ST 表，O(N log N)
+ *     lcp(x, y)                   — 查询排名为 x 和 y 的后缀的 LCP 长度 (1-based
+ *                                    排名)，O(1)
+ *     lcp_pos(p1, p2)             — 查询起始位置为 p1 和 p2 的后缀的 LCP 长度
+ *                                    (1-based 位置)，O(1)
+ *     count_distinct_substrings() — 计算原串本质不同子串总个数，O(N)
+ *     find_substring(sub)         — 二分查找外部模式串 sub 在 sa 上的匹配区间 [L,
+ *                                    R]，O(|sub| * log N)
+ *     find_substring(pos, len)    — 二分查找原串子串 S[pos...pos+len-1] 在 sa
+ *                                    上的匹配区间 [L, R]，O(log N)
+ *
+ *     compare_substrings(p1, len1, p2, len2) — O(1) 比较两个原串子串的字典序大小，
+ *                                               返回 -1 (<), 0 (==), 1 (>)
+ *     kth_distinct_substring(k)              — 查询原串字典序第 k 小的本质不同子
+ *                                               串，O(N)
+ *
+ * Notes:
+ *     1. Time: 构造 O(N log N)，LCP / 子串比较 O(1)，子串二分 O(log N) ~ O(|sub|
+ *        log N)。
+ *     2. Space: O(N log N) (主要为 ST 表)，数组基础空间 O(N)。
+ *     3. 内部索引 1-based: sa, rk, height 均为 1-based，输入串前置空格占位对齐下标。
+ *     4. find_substring 若未找到匹配，返回 {n + 1, n} (即 L > R)。
  */
 struct SuffixArray {
     int n, m;
@@ -28,7 +49,8 @@ struct SuffixArray {
     std::vector<std::vector<int>> st;
     std::vector<int> lg;
 
-    void _radix_pass(const std::vector<int>& keys, const std::vector<int>& items, int limit) {
+    void _radix_pass(const std::vector<int>& keys,
+                     const std::vector<int>& items, int limit) {
         std::fill(cnt.begin(), cnt.begin() + limit + 1, 0);
         rep(i, 1, n) cnt[keys[items[i]]]++;
         rep(i, 1, limit) cnt[i] += cnt[i - 1];

@@ -5,7 +5,9 @@ struct Tree {
     std::vector<std::vector<int>> adj;
     int dfn_cnt;
     std::vector<int> dfn, idfn, fa, size;
-    Tree(int n) : n(n), adj(n + 1), dfn(n + 1), idfn(n + 1), fa(n + 1), dfn_cnt(0), size(n + 1) {}
+    Tree(int n)
+        : n(n), adj(n + 1), dfn(n + 1), idfn(n + 1), fa(n + 1),
+          dfn_cnt(0), size(n + 1) {}
     void add_edge(int u, int v) {
         adj[u].push_back(v);
         adj[v].push_back(u);

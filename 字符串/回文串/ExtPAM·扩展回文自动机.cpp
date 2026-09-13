@@ -1,31 +1,50 @@
 #include "aizalib.h"
 
-/**
- * ExtPAM
- * 算法介绍:
- *      扩展回文自动机，在普通 PAM 上维护 diff / slink(series link)，便于做回文划分类 DP。
+/*
+ * Extended Palindromic Automaton (ExtPAM, 扩展回文自动机 / 回文级数划分)
  *
- * 模板参数:
- *      ALPHABET: 字符集大小，默认 26
- *      BASE_CHAR: 字符集起点，默认 'a'
+ * Overview:
+ *     在 PAM 基础上引入 diff 与 slink (Series Link) 链条压缩的结构。
+ *     利用弱周期引理将回文后缀链压缩为至多 O(log N) 段等差数列，专用于优化回文划分
+ *     DP：
+ *     - diff[u]: diff[u] = len[u] - len[fail[u]]，
+ *       表示回文与其最长真回文后缀的长度差。
+ *     - slink[u]: 沿 fail 树跳过同 diff 的连续祖先，直达首个不同 diff 的祖先
+ *       (等差段外祖先)。
+ *     - 结构与工具: 将回文后缀链划分为至多 O(log N) 个等差段，利用周期性在每段内
+ *       O(1) 维护与转移 DP 和，使回文划分 DP 复杂度由 O(N^2) 降至 O(N log N)。
  *
- * Interface:
- *      ExtPAM(n) / init(n)  — 初始化，n 用于 reserve
- *      extend(c)            — 末尾插入字符 c，返回当前最长回文后缀节点
- *      build(s)             — 插入整个字符串
- *      count_occurrences()  — 汇总每个本质回文串出现次数
- *      distinct()           — 本质不同回文串个数
- *      longest_suffix_len() — 当前最长回文后缀长度
- *      for_each_series(f)   — 沿当前最长回文后缀的 series link 链枚举，段数 O(log n)
+ * API:
+ *     struct Node:
+ *         next[ALPHABET] — 字符转移数组，next[c] 为两端包裹字符 c 形成的回文节点
+ *                           ID (0 为无转移)
+ *         len            — 该回文串的长度
+ *         fail           — 最长严格真回文后缀节点 ID
+ *         diff           — 回文长度差 len[u] - len[fail[u]]
+ *         slink          — 系列链接，指向首个 diff 不同的祖先节点
+ *         cnt            — 出现次数统计
+ *         num            — 该节点包含的回文后缀链长度
+ *     ExtPAM(n) / init(m)   — 构造/初始化自动机，预分配空间并建立偶根(0)与奇根 (1)
+ *     extend(c)             — 增量插入单个字符 c，维护 diff 与 slink，
+ *                              返回当前最长回文后缀节点 ID，均摊 O(1)
+ *     build(str)            — 连续插入完整字符串 str，O(|str| * |Sigma|)
+ *     count_occurrences()   — 沿 Fail 树自底向上拓扑汇聚计算每个本质回文串在原串中
+ *                              的总出现次数，O(|nodes|)
+ *     distinct()            — 返回原串中本质不同回文子串的总个数
+ *     longest_suffix_len()  — 查询当前串的最长回文后缀长度
+ *     longest_suffix_node() — 查询当前串的最长回文后缀所对应的节点 ID
+ *     for_each_series(f)    — 沿当前最长回文后缀的 series link
+ *                              链枚举所有等差段代表节点，段数 O(log n)
  *
- * Note:
- *      1. Time: Build O(N), count_occurrences O(N)
- *      2. Space: O(N)
- *      3. 内部统一 1-based，节点 0/1 分别为偶根(len=0)和奇根(len=-1)
- *      4. 用法/技巧: diff[x] = len[x] - len[fail[x]]，slink[x] 为同 diff 段压缩后的祖先
- *      5. 复杂度保证: 一个位置的所有回文后缀按 diff 分段后只有 O(log n) 段
- *         因此很多沿回文后缀链转移的 DP 可由 O(n^2) 降到 O(n log n)
- *      6. 相关笔记: 见 1-文字资料/字符串/弱周期分段与SeriesLink.tex
+ * Notes:
+ *     1. Time: 单字符 extend 均摊 O(1)，for_each_series 遍历 O(log N)。
+ *     2. Space: O(N * |Sigma|)，节点数最多为 N + 2。
+ *     3. 节点编号: 节点 0 为偶根 (len=0, fail=1, slink=1)，节点 1 为奇根 (len=-1,
+ *        fail=1, slink=1)。
+ *
+ * Related:
+ *     1-文字资料/字符串/弱周期分段与SeriesLink.tex: 弱周期引理与回文划分 DP
+ *     的理论推导与应用细节。
  */
 template<int ALPHABET = 26, char BASE_CHAR = 'a'>
 struct ExtPAM {
@@ -60,7 +79,9 @@ struct ExtPAM {
             tr[u].fail = tr[q].next[d];
             tr[u].num = tr[tr[u].fail].num + 1;
             tr[u].diff = tr[u].len - tr[tr[u].fail].len;
-            tr[u].slink = tr[u].diff == tr[tr[u].fail].diff ? tr[tr[u].fail].slink : tr[u].fail;
+            tr[u].slink = tr[u].diff == tr[tr[u].fail].diff
+                              ? tr[tr[u].fail].slink
+                              : tr[u].fail;
             tr[p].next[d] = u;
         }
         last = tr[p].next[d], ++tr[last].cnt;

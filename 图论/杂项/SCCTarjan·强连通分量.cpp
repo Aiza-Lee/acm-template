@@ -16,10 +16,10 @@
  *     1. Time: O(V + E)
  *     2. Space: O(V)
  *     3. 1-based indexing. 对不连通图会自动逐块处理。
- *     4. 用法/技巧:
- *     4.1 若后续要做缩点 DAG，直接按 scc[u] != scc[v] 收集跨分量边即可。
- *     4.2 若更偏好两遍 DFS 写法，可改用同目录下的 SCC_kosaraju(强连通分量).cpp。
- *     4.3 per(i, scc_cnt, 1) 遍历顺序即为缩点图的拓扑顺序。
+ *     4. 用法/技巧: 4.1 若后续要做缩点 DAG，直接按 scc[u] != scc[v]
+ *        收集跨分量边即可。4.2 若更偏好两遍 DFS 写法，可改用同目录下的
+ *        SCC_kosaraju(强连通分量).cpp。4.3 per(i, scc_cnt, 1)
+ *        遍历顺序即为缩点图的拓扑顺序。
  */
 
 struct SCC {
@@ -33,7 +33,8 @@ struct SCC {
     int scc_cnt;                // 强连通分量个数
 
     SCC(Graph& g)
-        : g(g), dfn(g.n + 1), low(g.n + 1), scc(g.n + 1), in_stk(g.n + 1), stk(), dfn_cnt(0), scc_cnt(0) {
+        : g(g), dfn(g.n + 1), low(g.n + 1), scc(g.n + 1),
+          in_stk(g.n + 1), stk(), dfn_cnt(0), scc_cnt(0) {
         stk.reserve(g.n);
         rep(i, 1, g.n) if (!dfn[i]) _tarjan(i);
     }

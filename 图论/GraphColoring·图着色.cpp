@@ -23,18 +23,12 @@ struct Graph {
  *     转移: dp[mask] = 1 + min_{I ⊆ mask, I 是独立集, LSB(mask) ∈ I} dp[mask \ I]。
  *
  * API:
- *     static std::vector<int> greedy_coloring(const Graph& graph, const std::vector<int>& order)
- *     按指定顺序贪心着色，返回 1-based 颜色编号 (1 到 n)。
- *     static std::vector<int> greedy_coloring(const Graph& graph)
- *     按度数降序贪心着色 (Welsh-Powell 启发式)。
- *     static bool is_bipartite(const Graph& graph)
- *     判断图是否可二着色。
- *     static std::vector<int> bipartite_coloring(const Graph& graph)
- *     返回 1-based 二着色方案 (颜色 1 或 2)，不可二着色返回空 vector。
- *     static int chromatic_number(const Graph& graph)
- *     精确色数 (要求 n ≤ 20)，使用独立集 DP 求解。
- *     static std::vector<int> minimum_coloring(const Graph& graph)
- *     返回最优着色方案 (要求 n ≤ 20)。
+ *     greedy_coloring(graph, order) — 按指定顺序贪心着色，返回 1-based 颜色
+ *     greedy_coloring(graph)        — 按度数降序贪心着色 (Welsh-Powell)
+ *     is_bipartite(graph)           — 判断图是否可二着色
+ *     bipartite_coloring(graph)     — 返回 1-based 二着色方案，不可二着色返回空
+ *     chromatic_number(graph)       — 精确色数 (要求 n ≤ 20)，独立集 DP 求解
+ *     minimum_coloring(graph)       — 返回最优着色方案 (要求 n ≤ 20)
  *
  * Notes:
  *     1. 贪心着色: Time O(V + E), Space O(V).
@@ -46,7 +40,8 @@ struct Graph {
 
 struct GraphColoring {
     // 按指定顺序贪心着色，为每个顶点分配最小的可用颜色
-    static std::vector<int> greedy_coloring(const Graph& graph, const std::vector<int>& order) {
+    static std::vector<int> greedy_coloring(
+        const Graph& graph, const std::vector<int>& order) {
         int n = graph.n;
         std::vector<int> color(n + 1, 0);
         std::vector<char> used(n + 2, 0);
@@ -130,7 +125,8 @@ struct GraphColoring {
         rep(mask, 1, full) {
             int v = __builtin_ctz((unsigned)mask);
             int v_bit = 1 << v;
-            // 枚举所有包含 v 的独立子集 I: I = v_bit ∪ sub, sub ⊆ (mask ∩ ~adj_mask[v] \ {v})
+            // 枚举所有包含 v 的独立子集 I: I = v_bit ∪ sub, sub ⊆ (mask
+            // ∩ ~adj_mask[v] \ {v})
             int rest = mask & ~adj_mask[v] & ~v_bit;
             for (int sub = rest; ; sub = (sub - 1) & rest) {
                 int I = sub | v_bit;

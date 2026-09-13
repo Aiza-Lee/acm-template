@@ -1,22 +1,22 @@
 #include "aizalib.h"
 /*
- * I128 Helper
+ * 128 位整数助手 (I128 Helper)
  *
  * Overview:
- *     提供 GCC/Clang 下 128 位有符号整型 (i128 / __int128_t) 的极值常量、
+ *     提供 GCC/Clang 环境下 128 位有符号整型（i128 / __int128_t）的极值常量定义、
  *     溢出安全的读写函数与流输入输出操作符重载。
  *
  * API:
- *     i128_MAX          — 128 位有符号整数最大值 (2^127 - 1)
- *     i128_MIN          — 128 位有符号整数最小值 (-2^127)
- *     read()            — 从 std::cin 读取一个 i128 整数
- *     output(x)         — 向 std::cout 输出一个 i128 整数
- *     operator<<(os, x) — 流输出重载
- *     operator>>(is, x) — 流输入重载
+ *     i128_MAX          — 128 位有符号整数最大值 (2^127 - 1)。
+ *     i128_MIN          — 128 位有符号整数最小值 (-2^127)。
+ *     read()            — 从 std::cin 读入一个 i128 整数。
+ *     output(x)         — 向 std::cout 输出一个 i128 整数。
+ *     operator<<(os, x) — 支持 std::cout << x 格式化输出。
+ *     operator>>(is, x) — 支持 std::cin >> x 流读入。
  *
  * Notes:
- *     1. 彻底规避负数取反有符号溢出 (UB)；采用无符号 u128 补码运算安全支持 i128_MIN。
- *     2. 内部统一采用 4 空格缩进。
+ *     1. Time: 读写时间复杂度均为 O(位数)（约 39 位，常数极小）。
+ *     2. Space: O(1)。
  */
 
 constexpr i128 i128_MAX = ~((i128)1 << 127);

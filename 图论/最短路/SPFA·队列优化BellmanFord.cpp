@@ -4,10 +4,9 @@
  * SPFA·队列优化BellmanFord
  *
  * Overview:
- *     SPFA 算法模板 (Shortest Path Faster Algorithm)
- *     SPFA 是 Bellman-Ford 算法的队列优化版本。
+ *     SPFA 算法模板 (Shortest Path Faster Algorithm) SPFA 是 Bellman-Ford
+ *     算法的队列优化版本。
  *     用于求解带负权边图的单源最短路，并可用于检测负环。
- *     最坏时间复杂度为指数级，但在随机图上表现良好。
  *
  * API:
  *     add_edge(u, v, w)  — 添加有向边
@@ -15,9 +14,8 @@
  *     has_negative_cycle — 求解后标记是否存在负环
  *
  * Notes:
- *     模板参数:
- *     T: 边权类型 (默认为 i64)
- *     INF: 无穷大值 (默认为 numeric_limits<T>::max() / 2)
+ *     模板参数: T: 边权类型 (默认为 i64) INF: 无穷大值 (默认为
+ *     numeric_limits<T>::max() / 2)
  *     1. 时间复杂度: 平均 O(kE), k 为常数 (~2). 最坏 O(VE).
  *     2. 空间复杂度: O(V + E)
  *     3. 1-based indexing
@@ -42,7 +40,9 @@ struct SPFA {
     std::vector<bool> inq;
     bool has_negative_cycle;
 
-    SPFA(int n) : graph(n), dis(n + 1), cnt(n + 1), inq(n + 1), has_negative_cycle(false) {}
+    SPFA(int n)
+        : graph(n), dis(n + 1), cnt(n + 1), inq(n + 1),
+          has_negative_cycle(false) {}
 
     void add_edge(int u, int v, T w) {
         graph.add_edge(u, v, w);

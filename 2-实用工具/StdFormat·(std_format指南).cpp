@@ -2,7 +2,7 @@
 
 /**
  * C++20/23 std::format 终极指南
- * 
+ *
  * 核心特性:
  * 1. 类型安全，性能优于 printf/iostream
  * 2. 语法接近 Python str.format()

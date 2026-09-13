@@ -1,27 +1,44 @@
 #include "aizalib.h"
 
-/**
- * PAM
- * 算法介绍:
- *      回文自动机用于维护字符串的所有本质不同回文子串，支持在线插入与出现次数统计。
+/*
+ * Palindromic Automaton (PAM / EERTREE, 回文自动机)
  *
- * 模板参数:
- *      ALPHABET: 字符集大小，默认 26
- *      BASE_CHAR: 字符集起点，默认 'a'
+ * Overview:
+ *     在线维护字符串所有本质不同回文子串的树状有向自动机 (状态数至多 N+2)。
+ *     通过双根结构与回文包含关系，提供回文识别、计数与树形分析工具：
+ *     - 双根结构: 奇根 (节点 1, len=-1) 沿字符转移得长度 1 回文；偶根 (节点 0,
+ *       len=0) 转移得长度 2 回文。
+ *     - 双端扩展边: 节点 u 沿字符 c 转移到 v 表示两端包裹 c 形成 c+u+c，len[v] =
+ *       len[u] + 2。
+ *     - fail 指针: 指向节点代表回文的最长严格真回文后缀。
+ *     - Fail 树与统计工具: 所有 fail 构成以奇根为根的外向树；num
+ *       记录回文后缀链长度，cnt 在插入时打点，沿 Fail
+ *       树逆序拓扑累加可得各回文串在原串中的全局出现次数。
  *
- * Interface:
- *      PAM(n) / init(n)     — 初始化，n 用于 reserve
- *      extend(c)            — 末尾插入字符 c，返回当前最长回文后缀节点
- *      build(s)             — 插入整个字符串
- *      count_occurrences()  — 汇总每个本质回文串出现次数
- *      distinct()           — 本质不同回文串个数
- *      longest_suffix_len() — 当前最长回文后缀长度
+ * API:
+ *     struct Node:
+ *         next[ALPHABET] — 字符转移数组，next[c] 为两端包裹字符 c 形成的回文节点
+ *                           ID (0 为无转移)
+ *         len            — 该回文串的长度
+ *         fail           — 最长严格真回文后缀节点 ID
+ *         cnt            — 出现次数统计 (调用 count_occurrences 前为后缀命中数，
+ *                           调用后为全局出现次数)
+ *         num            — 该节点包含的回文后缀链长度 (含自身)
+ *     PAM(n) / init(m)      — 构造/初始化自动机，预分配空间并建立偶根(0)与奇根 (1)
+ *     extend(c)             — 串末尾增量插入单个字符 c，返回当前串的最长回文后缀节
+ *                              点 ID，均摊 O(1)
+ *     build(str)            — 连续插入完整字符串 str，O(|str| * |Sigma|)
+ *     count_occurrences()   — 沿 Fail 树自底向上拓扑汇聚计算每个本质回文串在原串中
+ *                              的总出现次数，O(|nodes|)
+ *     distinct()            — 返回原串中本质不同回文子串的总个数
+ *     longest_suffix_len()  — 查询当前串的最长回文后缀长度
+ *     longest_suffix_node() — 查询当前串的最长回文后缀所对应的节点 ID
  *
- * Note:
- *      1. Time: Build O(N), count_occurrences O(N)
- *      2. Space: O(N)
- *      3. 内部统一 1-based，节点 0/1 分别为偶根(len=0)和奇根(len=-1)
- *      4. 用法/技巧: cnt[x] 为该回文作为后缀被插入的次数，需汇总后才是总出现次数
+ * Notes:
+ *     1. Time: 单字符 extend 均摊 O(1) (仅考虑字符集常数)，count_occurrences O(N)。
+ *     2. Space: O(N * |Sigma|)，节点数最多为 N + 2。
+ *     3. 节点编号: 节点 0 为偶根 (len=0)，节点 1 为奇根 (len=-1)，有效回文节点从 2
+ *        开始。
  */
 template<int ALPHABET = 26, char BASE_CHAR = 'a'>
 struct PAM {

@@ -10,7 +10,8 @@
  *     SteinerTree(int n)                               — 初始化 1..n 个点的图
  *     void add_edge(int u, int v, T w)                 — 添加一条无向带权边 (u, v)
  *     void set_key_nodes(const std::vector<int>& keys) — 设置关键点集合
- *     T solve()                                        — 求解连接所有关键点的最小代价
+ *     T solve()                                        — 求解连接所有关键点的最小代
+ *                                                         价
  *
  * Notes:
  *     1. 状态定义: dp[mask][u] 为以 u 为根连接关键点集合 mask 的最小代价。
@@ -70,7 +71,8 @@ struct SteinerTree {
             // 枚举 s 的子集 sub
             rep(i, 0, n) { 
                 for (int sub = (s - 1) & s; sub; sub = (sub - 1) & s) {
-                    // 这里的转移利用了 sub 和 s^sub 的根都是 i，意味着 i 是连接两个子树的连接点
+                    // 这里的转移利用了 sub 和 s^sub 的根都是 i，意味着 i
+                    // 是连接两个子树的连接点
                     if (dp[sub][i] != INF && dp[s ^ sub][i] != INF) {
                         dp[s][i] = std::min(dp[s][i], dp[sub][i] + dp[s ^ sub][i]);
                     }
@@ -79,7 +81,8 @@ struct SteinerTree {
 
             // 2. 最短路转移 (Dijkstra)
             // 对于当前状态 s，尝试通过边来松弛 dp[s][v] = dp[s][u] + w
-            std::priority_queue<std::pair<T, int>, std::vector<std::pair<T, int>>, std::greater<std::pair<T, int>>> pq;
+            using PII = std::pair<T, int>;
+            std::priority_queue<PII, std::vector<PII>, std::greater<PII>> pq;
             
             rep(i, 0, n) {
                 if (dp[s][i] != INF) {

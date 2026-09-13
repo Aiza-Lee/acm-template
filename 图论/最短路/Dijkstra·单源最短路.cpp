@@ -4,8 +4,7 @@
  * Dijkstra·单源最短路
  *
  * Overview:
- *     Dijkstra
- *     求解非负权图的单源最短路。使用堆优化，每次扩展当前距离最小的点。
+ *     Dijkstra 求解非负权图的单源最短路。堆优化，每次扩展当前距离最小的点。
  *
  * API:
  *     add_edge(u, v, w) — 添加有向边
@@ -14,9 +13,7 @@
  *     path_to(t)        — 还原 s -> t 的一条最短路点集
  *
  * Notes:
- *     模板参数:
- *     T: 权值类型
- *     INF: 无穷大，默认 numeric_limits<T>::max() / 2
+ *     模板参数: T: 权值类型 INF: 无穷大，默认 numeric_limits<T>::max() / 2
  *     1. Time: O(E log V)
  *     2. Space: O(V + E)
  *     3. 1-based indexing

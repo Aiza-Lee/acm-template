@@ -1,28 +1,38 @@
 #include "aizalib.h"
 
-/**
- * Z Function
- * 算法介绍:
- *      线性求 Z 数组，并支持求文本每个后缀与模式串的 LCP（即扩展 KMP / ex 数组）。
+/*
+ * Z-Function (Z函数 / 扩展 KMP)
  *
- * 模板参数:
- *      无
+ * Overview:
+ *     在线性时间内计算字符串所有后缀与自身前缀的最长公共前缀 (LCP)。
+ *     通过维护最右匹配区间 (Z-box) 消除重复字符比对，
+ *     提供高效的前缀匹配与周期性分析工具：
+ *     - z[i]: 后缀 s[i...m] 与前缀 s[1...m] 的 LCP 长度，特别地 z[1] = m。
+ *     - Z-box [l, r]: 满足 s[l...r] == s[1...r-l+1] 的最右区间；i <= r
+ *       时继承前缀匹配值 min(r - i + 1, z[i - l + 1]) 作为下界加速比对，
+ *       右端点单调推进保证严格 O(M)。
+ *     - 结构与工具: extend 在 O(|T|) 内求文本各后缀与模式串的 LCP；i + z[i] - 1 ==
+ *       m 当且仅当 m - i + 1 为 border，支持一次线性扫描直接求出全串所有 border
+ *       与最小循环节。
  *
- * Interface:
- *      ZFunc(s) / init(s) — 初始化模式串
- *      extend(t)          — 返回 1-based 的 ex 数组，ex[i] = lcp(t[i...], s[1...])
- *      match(t)           — 在文本串中查找所有匹配位置，返回 1-based 起点
- *      border_len()       — 整个模式串的最长 border 长度
- *      min_period()       — 返回最小循环节长度
- *      z                  — Z 数组，z[i] 表示 s[i...m] 与 s[1...m] 的 LCP 长度
+ * API:
+ *     ZFunc()            — 默认构造函数
+ *     ZFunc(s) / init(s) — 初始化 0-based 模式串视图，计算 Z 数组，O(M)
+ *     extend(t)          — 计算 0-based 文本串 t 各后缀与模式串的 LCP 数组
+ *                           (1-based 返回)，O(|t|)
+ *     match(t)           — 在文本串 t 中精确查找模式串的所有匹配位置 (1-based
+ *                           起始下标)，O(|t|)
+ *     border_len()       — 返回整个模式串的最长真 border 长度
+ *     min_period()       — 返回整个模式串的最小整周期 (循环节) 长度
+ *     z                  — std::vector<int> 存储的 Z 数组 (1-based)
  *
- * Note:
- *      1. Time: init O(M), extend / match O(N)
- *      2. Space: O(M)（extend 返回值额外 O(N)）
- *      3. 字符串存储 0-base（以 string_view 引用输入，不拷贝），算法内部 1-based
- *      4. 用法/技巧: extend 常用于跨串 LCP、循环同构判定、前后缀拼接判定
- *      5. 枚举 i | m 时，若 i + z[i] - 1 == m，则 i - 1 是一个 border 长度
- *      6. 模式串以 string_view 保存，需保证底层串在 ZFunc 生命周期内有效
+ * Notes:
+ *     1. Time: init 构造 O(M)，extend / match 扫描 O(|T|)，border_len / min_period
+ *        线性扫描 O(M)。
+ *     2. Space: O(M) (extend 返回值额外占用 O(|T|))。
+ *     3. 索引约定: 输入参数 string_view 为常规 0-based 视图 (不拷贝字符串)，
+ *        算法内部及返回值统一 1-based。
+ *     4. 模式串以 string_view 保存，需保证底层串在 ZFunc 生命周期内有效。
  */
 struct ZFunc {
     std::string_view s; // 0-base 视图，引用输入串
@@ -59,7 +69,9 @@ struct ZFunc {
                 int k = i - l + 1;
                 ex[i] = std::min(r - i + 1, k <= m ? z[k] : 0);
             }
-            while (ex[i] < m && i + ex[i] <= n && t[i + ex[i] - 1] == s[ex[i]]) ++ex[i];
+            while (ex[i] < m && i + ex[i] <= n && t[i + ex[i] - 1] == s[ex[i]]) {
+                ++ex[i];
+            }
             if (i + ex[i] - 1 > r) {
                 l = i;
                 r = i + ex[i] - 1;

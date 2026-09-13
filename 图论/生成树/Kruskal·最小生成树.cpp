@@ -4,22 +4,20 @@
  * Kruskal·最小生成树
  *
  * Overview:
- *     Kruskal
- *     一种求解加权无向图最小生成树的算法。
- *     将所有边按权值从小到大排序，顺序处理每条边，如果该边连接的两个节点不在同一个连通分量中，则加入该边。
+ *     Kruskal 一种求解加权无向图最小生成树的算法。
+ *     将所有边按权值从小到大排序，顺序处理每条边，
+ *     如果该边连接的两个节点不在同一个连通分量中，则加入该边。
  *
  * API:
  *     T solve() — 返回最小生成树的边权之和。如果不连通返回 -1。
  *
  * Notes:
- *     模板参数:
- *     T: 边权类型, 默认为 i64
+ *     模板参数: T: 边权类型, 默认为 i64
  *     1. Time: O(E log E)
  *     2. Space: O(V + E)
  *     3. 1-based indexing，边按无向边加入。
- *     4. 用法/技巧:
- *     4.1 适合稀疏图；若只需要 MST 权值，通常是首选写法。
- *     4.2 solve() 每次会重置并查集，因此同一对象可重复求解当前边集。
+ *     4. 用法/技巧: 4.1 适合稀疏图；若只需要 MST 权值，通常是首选写法。4.2 solve()
+ *        每次会重置并查集，因此同一对象可重复求解当前边集。
  */
 
 template<typename T>
@@ -48,7 +46,8 @@ struct Kruskal {
 
     T solve() {
         std::iota(fa.begin(), fa.end(), 0);
-        std::sort(graph.edges.begin(), graph.edges.end(), [](auto& a, auto& b) { return a.w < b.w; });
+        std::sort(graph.edges.begin(), graph.edges.end(),
+                  [](auto& a, auto& b) { return a.w < b.w; });
         
         T res = 0; int cnt = 0;
         for (auto& [u, v, w] : graph.edges) {

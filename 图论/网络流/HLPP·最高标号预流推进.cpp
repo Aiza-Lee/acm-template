@@ -4,10 +4,12 @@
  * HLPP·最高标号预流推进
  *
  * Overview:
- *     最高标号预流推进算法，维护预流与高度标号，始终优先处理最高标号活跃点并执行 push / relabel。
+ *     最高标号预流推进算法，维护预流与高度标号，始终优先处理最高标号活跃点并执行
+ *     push / relabel。
  *
  * API:
- *     HLPP(int n, int m = 0)                   — 初始化 n 个点、预估 m 条原图边的网络
+ *     HLPP(int n, int m = 0)                   — 初始化 n 个点、预估 m
+ *                                                 条原图边的网络
  *     void add_edge(int u, int v, Cap w)       — 添加一条容量为 w 的有向边
  *     Cap solve(int s, int t, Cap limit = INF) — 返回至多增广 limit 流量后的最大流
  *
@@ -16,10 +18,10 @@
  *     1. Time: 理论最坏 O(V^2\sqrt{E}) 量级，实现中通常在大规模最大流上表现稳定
  *     2. Space: O(V + E)
  *     3. 1-based indexing.
- *     4. 用法/技巧:
- *     4.1 HLPP 适合边数多、容量大、Dinic 分层增广轮数较多的最大流模型。
- *     4.2 若只需发送部分流量，可直接传入 solve(s, t, limit)。
- *     4.3 本模板包含最高标号策略、GAP 优化与初始全局重标号；若只求易写版本，Dinic 通常更直观。
+ *     4. 用法/技巧: 4.1 HLPP 适合边数多、容量大、Dinic
+ *        分层增广轮数较多的最大流模型。4.2 若只需发送部分流量，可直接传入 solve(s,
+ *        t, limit)。4.3 本模板包含最高标号策略、GAP 优化与初始全局重标号；
+ *        若只求易写版本，Dinic 通常更直观。
  */
 
 template<typename Cap>
@@ -34,7 +36,8 @@ struct Graph {
     std::vector<Edge> e;   // 残量网络边集
     int ec;                // 当前边计数，边下标从 2 开始，便于 i ^ 1 找反边
 
-    Graph(int n, int m = 0) : n(n), head(n + 1, 0), e(std::max(2 * m + 2, 2)), ec(1) {}
+    Graph(int n, int m = 0)
+        : n(n), head(n + 1, 0), e(std::max(2 * m + 2, 2)), ec(1) {}
 
     void add_edge(int u, int v, Cap w) {
         AST(1 <= u && u <= n);
@@ -63,7 +66,8 @@ struct HLPP {
     int highest;                 // 当前最高活跃高度
 
     HLPP(int n, int m = 0)
-        : g(n, m), excess(n + 1), h(n + 2), cur(n + 1), cnt(n + 2), in(n + 1), buk(n + 1), n(n), s(0), t(0), highest(0) {}
+        : g(n, m), excess(n + 1), h(n + 2), cur(n + 1), cnt(n + 2),
+          in(n + 1), buk(n + 1), n(n), s(0), t(0), highest(0) {}
 
     void add_edge(int u, int v, Cap w) {
         g.add_edge(u, v, w);

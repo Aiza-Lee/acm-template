@@ -4,25 +4,22 @@
  * PruferSequence·Prufer序列
  *
  * Overview:
- *     Prufer 序列
- *     Prufer 序列是无根树的一种线性表示，具有双射性质。
+ *     Prufer 序列 Prufer 序列是无根树的一种线性表示，具有双射性质。
  *     对于 n 个节点的带标号无根树，其 Prufer 序列长度为 n-2。
  *     性质:
  *     1. 对应关系: 节点在序列中出现的次数 = 度数 - 1。
  *
  * API:
- *     static std::vector<int> encode(const Graph& G)
- *     static std::vector<std::pair<int, int>> decode(const std::vector<int>& code)
+ *     encode(G)    — 将无根树 G 编码为 Prufer 序列，长度为 n-2
+ *     decode(code) — 将 Prufer 序列解码为无根树边列表，点数为 code.size() + 2
  *
  * Notes:
- *     模板参数:
- *     无
+ *     模板参数: 无
  *     1. Time: O(N)
  *     2. Space: O(N)
  *     3. 1-based indexing；decode(code) 得到的树点数为 code.size() + 2
- *     4. 用法/技巧:
- *     4.1 encode 要求输入是连通无向树，默认以 n 为根构建父亲数组。
- *     4.2 序列中点 x 出现次数等于 deg[x] - 1，可直接用于度数受限计数。
+ *     4. 用法/技巧: 4.1 encode 要求输入是连通无向树，默认以 n 为根构建父亲数组。4.2
+ *        序列中点 x 出现次数等于 deg[x] - 1，可直接用于度数受限计数。
  */
 
 struct Graph {

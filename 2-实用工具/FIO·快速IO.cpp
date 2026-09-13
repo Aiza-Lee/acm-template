@@ -1,23 +1,33 @@
 #include "aizalib.h"
-
-/**
- * FastIO 卡常工具
- * 通过大缓冲区读写加速，适用于大数据量场景。
- * Interface:
- *      FIO::read(T &x)                     — 读入整数
- *      FIO::readFloat(T &x)                — 读入浮点数
- *      FIO::write(T x)                     — 写出整数
- *      FIO::writeFloat(T x, int p)         — 写出浮点数，p 为小数位数，默认 6
- *      FIO::readWord()                     — 读入单词，返回 std::string
- *      FIO::writeStr(const std::string &s) — 写出字符串
- *      FIO::writeStr(const char *s)        — 写出字符串
- *      FIO::nl()                           — 写出换行符
- *      FIO::flush()                        — 主动刷新输出缓冲区
+/*
+ * 快速输入输出 (Fast I/O)
+ *
+ * Overview:
+ *     利用大内存块缓冲区（1MB）与底层无格式字符吞吐（std::fread / std::fwrite），
+ *     极大摊薄系统调用开销，提供高效的整型、浮点型、字符串及换行快速读写支持。
+ *     - 缓冲机制：输入维护 1MB ibuf 与扫描指针 ipos；输出维护 1MB obuf 与写指针
+ *       opos。
+ *     - 格式解析与转换：
+ *       1. 整数解析：跳过空白字符，解析可选负号，逐位累加；写出时提取符号，
+ *          逆序填入字符栈后一次性压入输出缓冲区。
+ *       2. 浮点解析：分别累加整数部分与小数部分；写出时按指定精度固定四舍五入。
+ *
+ * API:
+ *     read(x)              — 快速读入整数，返回 bool 表示是否成功读入（EOF 返回
+ *                             false）。
+ *     readFloat(x)         — 快速读入浮点数，返回 bool 表示是否成功读入。
+ *     write(x)             — 快速写出整数。
+ *     writeFloat(x, p = 6) — 快速写出浮点数，p 为保留小数位数。
+ *     readWord()           — 读入下一个非空白字符串，返回 std::string。
+ *     writeStr(s)          — 写出 std::string 或 const char* 字符串。
+ *     nl()                 — 输出换行符 '\n'。
+ *     flush()              — 主动刷新写出缓冲区至标准输出（程序结束前必须调用）。
+ *
  * Notes:
- *      1. 交互题尽量不使用该工具卡常。
- *      2. 读入函数返回 bool，表示是否成功读入（遇到 EOF 则返回 false）。
- *      3. 输出后需要手动调用 flush() 刷新缓冲区。
+ *     1. 交互题中禁止使用基于全局缓冲区的 FIO，以免阻塞交互流。
+ *     2. 程序结束前必须显式调用 FIO::flush()，否则留在缓冲区的末尾数据会丢失。
  */
+
 namespace FIO {
 
 static const int SZ = 1 << 20; // 1MB 缓冲
@@ -92,7 +102,8 @@ template <class T>
 inline void write(T x) { // 整数写出
     static_assert(std::is_integral<T>::value, "write only integral");
     if (x == 0) return pc('0'), void();
-    using U = std::make_unsigned_t<std::conditional_t<std::is_same_v<T, bool>, unsigned int, T>>;
+    using U = std::make_unsigned_t<
+        std::conditional_t<std::is_same_v<T, bool>, unsigned int, T>>;
     U u = static_cast<U>(x);
     if constexpr (std::is_signed_v<T>) {
         if (x < 0) {

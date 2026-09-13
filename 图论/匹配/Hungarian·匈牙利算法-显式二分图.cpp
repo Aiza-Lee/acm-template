@@ -17,7 +17,9 @@
  *     1. Time: O(nE)
  *     2. Space: O(n + m + E)
  *     3. 1-based indexing. 左部点编号为 1~n，右部点编号为 1~m。
- *     4. 用法/技巧: 显式二分图写法适合题目天然给出左右部时直接建图；调用 solve() 后，可通过 match_l / match_r 读取匹配结果；若只关心是否完美匹配，可检查 solve() == n 或 solve() == min(n, m) 的目标值。
+ *     4. 用法/技巧: 显式二分图写法适合题目天然给出左右部时直接建图；调用 solve()
+ *        后，可通过 match_l / match_r 读取匹配结果；若只关心是否完美匹配，可检查
+ *        solve() == n 或 solve() == min(n, m) 的目标值。
  */
 struct ExplicitBipartiteGraph {
     int n; // 左部点数
@@ -33,13 +35,16 @@ struct ExplicitBipartiteGraph {
 
 struct ExplicitHungarian {
     ExplicitBipartiteGraph graph;
-    std::vector<int> match_l; // match_l[u]: 左部点 u 当前匹配到的右部点，0 表示未匹配
-    std::vector<int> match_r; // match_r[v]: 右部点 v 当前匹配到的左部点，0 表示未匹配
+    // match_l[u]: 左部点 u 当前匹配到的右部点，0 表示未匹配
+    std::vector<int> match_l;
+    // match_r[v]: 右部点 v 当前匹配到的左部点，0 表示未匹配
+    std::vector<int> match_r;
     std::vector<int> vis;     // vis[v]: 时间戳判重，避免一次增广中重复访问右部点
     int stamp;                // 当前增广使用的时间戳
 
     ExplicitHungarian(int n, int m)
-        : graph(n, m), match_l(n + 1, 0), match_r(m + 1, 0), vis(m + 1, 0), stamp(0) {}
+        : graph(n, m), match_l(n + 1, 0), match_r(m + 1, 0),
+          vis(m + 1, 0), stamp(0) {}
 
     void add_edge(int u, int v) {
         graph.add_edge(u, v);

@@ -16,8 +16,8 @@
  *     1. Time: O(V + E)
  *     2. Space: O(V + E)
  *     3. 1-based indexing. 对不连通图会自动逐块处理。
- *     4. 用法/技巧:
- *     4.1 分量编号顺序取决于第二遍 DFS 的展开顺序，通常只比较是否同属一个 SCC。
+ *     4. 用法/技巧: 4.1 分量编号顺序取决于第二遍 DFS 的展开顺序，
+ *        通常只比较是否同属一个 SCC。
  */
 
 struct SCCKosaraju {
@@ -28,7 +28,9 @@ struct SCCKosaraju {
     std::vector<char> vis;              // DFS 访问标记
     int scc_cnt;                        // 强连通分量个数
 
-    SCCKosaraju(Graph& g) : g(g), radj(g.n + 1), order(), scc(g.n + 1), vis(g.n + 1), scc_cnt(0) {
+    SCCKosaraju(Graph& g)
+        : g(g), radj(g.n + 1), order(), scc(g.n + 1), vis(g.n + 1),
+          scc_cnt(0) {
         order.reserve(g.n);
         rep(u, 1, g.n) {
             for (int v : g.adj[u]) radj[v].emplace_back(u);

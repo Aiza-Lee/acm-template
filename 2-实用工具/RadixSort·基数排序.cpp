@@ -1,17 +1,20 @@
 #include "aizalib.h"
-
-/**
- * Radix Sort
- * 算法介绍: 对 int / i64 做 LSD 基数排序；每趟按 16 bit 计数，通过翻转符号位转成无符号序。
- * Interface:
- *      RadixSort rs;
- *      rs.sort(a); — 将 vector<int> 或 vector<i64> 升序排序
- * Note:
- *      1. Time: O(P * (n + 2^16))，P 为有效趟数，32 位至多 2 趟，64 位至多 4 趟
- *      2. Space: O(n + 2^16)
- *      3. 常数优化: 16 bit 分桶 + 稳定计数排序 + 若某段 16 bit 全相同则自动跳过该趟
- *      4. 适合整数排序卡常；模板里只保留 int / i64 两套常用版本
+/*
+ * 基数排序 (Radix Sort - LSD)
+ *
+ * Overview:
+ *     针对 32 位/64 位整数的高性能最低有效位优先（LSD）非比较基数排序。
+ *     - 工具：RadixSort 结构体、sort 重载（vector<int> 与 vector<i64>）。
+ *
+ * API:
+ *     RadixSort() — 初始化基数排序桶内存。
+ *     sort(a)     — 对 std::vector<int> 或 std::vector<i64> 原地升序排序。
+ *
+ * Notes:
+ *     1. Time: O(P * (n + 2^16))，P 为有效趟数（int 至多 2 趟，i64 至多 4 趟）。
+ *     2. Space: O(n + 2^16)，需大小为 n 的辅助缓冲区与 65536 大小的计数组。
  */
+
 struct RadixSort {
     static constexpr int B = 16;
     static constexpr int M = 1 << B;

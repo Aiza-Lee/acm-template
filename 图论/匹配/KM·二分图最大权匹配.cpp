@@ -6,18 +6,18 @@
  *     Kuhn-Munkres 算法，求显式二分图左部全部匹配时的最大权完备匹配。
  *
  * API:
- *     KM(int n, int m)                 — 初始化左部 1~n、右部 1~m 的二分图，要求 n <= m
- *     void add_edge(int u, int v, T w) — 加入一条左 u 到右 v 的边，重边自动取最大权
- *     std::pair<bool, T> solve()       — 返回是否存在覆盖全部左部的匹配及其最大权值
+ *     KM(int n, int m)            — 初始化左部 1~n、右部 1~m 的二分图，要求 n <= m
+ *     add_edge(int u, int v, T w) — 加入一条左 u 到右 v 的边，重边自动取最大权
+ *     solve()                     — 返回是否存在覆盖全部左部的匹配及其最大权值
  *
  * Notes:
  *     模板参数: T (边权类型)
  *     1. Time: O(n^2 m)
  *     2. Space: O(nm)
- *     3. 1-based indexing. 本模板求“左部全部匹配”的最大权匹配；若需一般最大权匹配，可自行补虚点。
- *     4. 用法/技巧:
- *     4.1 缺边视作不可选，不能像费用流那样默认补 0 边。
- *     4.2 match_l[u] / match_r[v] 为匹配对象，0 表示未匹配。
+ *     3. 1-based indexing. 本模板求“左部全部匹配”的最大权匹配；
+ *        若需一般最大权匹配，可自行补虚点。
+ *     4. 用法/技巧: 4.1 缺边视作不可选，不能像费用流那样默认补 0 边。4.2 match_l[u]
+ *        / match_r[v] 为匹配对象，0 表示未匹配。
  */
 template<typename T = i64>
 struct KM {
@@ -31,8 +31,9 @@ struct KM {
     std::vector<char> vis_l, vis_r;     // 预留访问标记
 
     KM(int n, int m)
-        : n(n), m(m), w(n + 1, std::vector<T>(m + 1, NEG_INF)), lx(n + 1), ly(m + 1),
-          slack(m + 1), match_l(n + 1), match_r(m + 1), pre(m + 1), vis_l(n + 1), vis_r(m + 1) {}
+        : n(n), m(m), w(n + 1, std::vector<T>(m + 1, NEG_INF)),
+          lx(n + 1), ly(m + 1), slack(m + 1), match_l(n + 1),
+          match_r(m + 1), pre(m + 1), vis_l(n + 1), vis_r(m + 1) {}
 
     void add_edge(int u, int v, T val) {
         AST(1 <= u && u <= n);

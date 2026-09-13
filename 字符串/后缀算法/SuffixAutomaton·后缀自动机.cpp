@@ -3,23 +3,52 @@
  * Suffix Automaton (SAM, 后缀自动机)
  *
  * Overview:
- *     线性时间内构建识别字符串所有子串的有向无环图 (DAG)，节点代表 endpos 等价类，
- *     Parent Tree (link 树) 刻画了后缀等价类的包含关系。
+ *     以 O(|S|) 空间和时间在线构建的确定性有限状态自动机，接受字符串的所有后缀。
+ *     包含转移 DAG 与 Parent 树双重对偶结构，以 endpos 等价类为节点压缩状态空间：
+ *     - endpos(t): 子串 t 在原串 S 中所有出现位置的结束字符下标集合 (1-based)。
+ *     - endpos 等价类: endpos 相同的子串归入同一节点，互为后缀且长度连续覆盖
+ *       [len(link(u))+1, len(u)]。
+ *     - 转移 DAG: 以字符为有向边，从 root 出发的每条路径唯一对应原串的一个子串，
+ *       用于沿字符转移与拓扑 DP。
+ *     - Parent 树: 依 endpos 真包含关系构成的外向树 (link 指向最长真后缀状态)，
+ *       拓扑等价于反串前缀树，用于出现次数统计与后缀分析。
+ *     - 克隆状态 (clone): 当转移非连续 (len(q) > len(p)+1) 时分裂 q，
+ *       拆分公共后缀转移以维持结构一致性。
  *
  * API:
- *     SAM(n)                — 构造函数，预分配状态空间
- *     extend(c) / extend(s) — 增量插入单个字符或整个字符串视图
- *     calc_size()           — 沿 Parent Tree 自底向上统计各等价类子串在原串的出现次数
- *     calc_sub_cnt()        — 沿 DAG 拓扑排序计算从各状态出发可形成的本质不同子串数
- *     kth_substring(k)      — 返回字典序第 k 小的本质不同子串 (需先调用 calc_sub_cnt)
- *     get_lcs(s)            — 求原串与文本串 s 的最长公共子串长度
- *     calc_total_length()   — 计算原串所有本质不同子串的总长度
+ *     struct Node:
+ *         len            — 该等价类中最长子串的长度 (DAG 拓扑深度)
+ *         link           — 后缀链接 (Parent Tree 父节点)，
+ *                           指向最长严格后缀所属等价类 (0 为根)
+ *         next[ALPHABET] — 字符转移数组，next[c] 为转移到的状态编号 (0 为无转移)
+ *         size           — endpos 集合大小 (该类子串在原串中的出现次数)
+ *         sub_cnt        — 从该状态出发可形成的本质不同子串数 (含自身空串)
+ *         first_pos      — 该类子串在原串中首次出现的结束位置 (1-based)
+ *         is_clone       — 是否为分裂产生的克隆状态
+ *     SAM(n)              — 构造函数，预分配 2n+2 个节点的状态空间
+ *     extend(c)           — 在原串末尾增量追加单个字符 c，更新自动机结构，
+ *                            O(|Sigma|)
+ *     extend(s)           — 连续增量追加字符串视图 s，O(|s| * |Sigma|)
+ *     get_sorted_nodes()  — 按 len 计数排序返回所有状态的拓扑序数组，O(|nodes|)
+ *     calc_size()         — 沿 Parent Tree 自底向上拓扑聚合各状态的 endpos 大小
+ *                            (出现次数)，O(|nodes|)
+ *     calc_sub_cnt()      — 沿 DAG 逆拓扑序计算每个状态出发的本质不同子串数，
+ *                            O(|nodes| * |Sigma|)
+ *     kth_substring(k)    — 查询字典序第 k 小的本质不同子串 (需先调用
+ *                            calc_sub_cnt)，O(|ans| * |Sigma|)
+ *     get_lcs(s)          — 在 DAG 上运行模式串 s 求与原串的最长公共子串长度，
+ *                            O(|s|)
+ *     calc_total_length() — 沿所有状态统计原串所有本质不同子串的总长度之和，
+ *                            O(|nodes|)
  *
  * Notes:
- *     1. Time: O(|S|) 构建与统计。
- *     2. Space: O(|S| * |\Sigma|)，最多 2|S| - 1 个状态节点。
- *     3. 节点编号 1-based: 节点 0 为未使用的哨兵，节点 1 为 root 根节点 (link = 0)。
- *     4. kth_substring 返回 std::string，当 k <= 0 或 k 超限时安全返回空串。
+ *     1. Time: 构建 O(|S| * |Sigma|)，单次字符插入均摊 O(|Sigma|)。
+ *     2. Space: O(|S| * |Sigma|)，节点数最多为 2|S| - 1 (含 root 为 2|S|)。
+ *     3. 节点编号 1-based: 节点 0 为未使用的哨兵/空指针，节点 1 为 root 根节点
+ *        (len=0, link=0)。
+ *     4. kth_substring 返回 std::string，当 k <= 0 或 k 超限时返回空串。
+ *     5. 出现次数统计: 只有实节点 (非 clone 节点) 初始 size=1，需调用 calc_size()
+ *        后各节点 size 才代表真实出现次数。
  */
 
 struct SAM {
@@ -28,7 +57,8 @@ struct SAM {
 
     struct Node {
         int len;            // 该等价类中最长子串的长度 (DAG深度)
-        int link;           // 后缀链接 (Parent Tree中的父节点), 指向最长后缀所属的等价类; 0 表示无 link (仅根节点)
+        // 后缀链接 (Parent Tree中的父节点), 指向最长后缀所属等价类; 0 为无 link (根)
+        int link;
         int next[ALPHABET]; // 转移边: next[c]表示字符c转移到的状态; 0 表示无转移
         i64 size;           // endpos集合大小 (该等价类中子串在原串中的出现次数)
         i64 sub_cnt;        // 该状态出发能构成的本质不同子串数 (用于求第k小)
@@ -36,14 +66,15 @@ struct SAM {
         bool is_clone;      // 是否为克隆状态 (只有克隆状态的size初始为0)
 
         Node(int len = 0, int link = 0, int first = 0, bool clone = false)
-            : len(len), link(link), size(0), sub_cnt(0), first_pos(first), is_clone(clone) {
+            : len(len), link(link), size(0), sub_cnt(0),
+              first_pos(first), is_clone(clone) {
             memset(next, 0, sizeof(next));
         }
     };
 
     std::vector<Node> nodes;
     int last = 1; // 上一个插入字符对应的状态 (1-based 节点 ID)
-    std::vector<int> pos_id; // pos_id[i]: 原串前 i 个字符对应的状态编号 (i \in [1, n])
+    std::vector<int> pos_id; // pos_id[i]: 原串前 i 个字符对应的状态编号 (1-based)
 
     SAM(int n = 0) {
         nodes.reserve(n * 2 + 2);

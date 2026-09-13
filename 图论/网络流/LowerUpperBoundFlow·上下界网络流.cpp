@@ -3,26 +3,30 @@
  * LowerUpperBoundFlow·上下界网络流
  *
  * Overview:
- *     将每条边的下界拆入结点需求，配合超级源汇与 Dinic 处理可行环流、可行流、最小流、最大流。
+ *     将每条边的下界拆入结点需求，配合超级源汇与 Dinic 处理可行环流、可行流、
+ *     最小流、最大流。
  *
  * API:
  *     LowerUpperBoundFlow(int n)                       — 初始化 1~n 点的网络
- *     int add_edge(int u, int v, Cap low, Cap high)    — 添加一条上下界边 [low, high]
- *     bool feasible_circulation()                      — 判断是否存在满足所有上下界的一组环流
- *     std::pair<bool, Cap> feasible_flow(int s, int t) — 返回一组可行 s->t 流及其流量
+ *     int add_edge(int u, int v, Cap low, Cap high)    — 添加一条上下界边 [low,
+ *                                                         high]
+ *     bool feasible_circulation()                      — 判断是否存在满足所有上下界
+ *                                                         的一组环流
+ *     std::pair<bool, Cap> feasible_flow(int s, int t) — 返回一组可行 s->t
+ *                                                         流及其流量
  *     std::pair<bool, Cap> min_flow(int s, int t)      — 返回最小可行 s->t 流
  *     std::pair<bool, Cap> max_flow(int s, int t)      — 返回最大可行 s->t 流
- *     Cap edge_flow(int id) const                      — 读取最近一次成功求解后原图第 id 条边的流量
+ *     Cap edge_flow(int id) const                      — 读取最近一次成功求解后原图
+ *                                                         第 id 条边的流量
  *
  * Notes:
  *     模板参数: Cap (容量类型)
  *     1. Time: 单次求解约为一次或两次 Dinic，O(V^2E) 量级
  *     2. Space: O(V + E)
  *     3. 1-based indexing. 所有边默认容量非负，要求 0 <= low <= high。
- *     4. 用法/技巧:
- *     4.1 feasible_flow / min_flow / max_flow 均会覆盖 flow，可随后用 edge_flow(id) 取原边流量。
- *     4.2 无源汇时直接调用 feasible_circulation()。
- *     4.3 最小流 / 最大流都基于同一组上下界约束；若题目还带费用，再另行建模到费用流。
+ *     4. 用法/技巧: 4.1 feasible_flow / min_flow / max_flow 均会覆盖 flow，可随后用
+ *        edge_flow(id) 取原边流量。4.2 无源汇时直接调用 feasible_circulation()。4.3
+ *        最小流 / 最大流都基于同一组上下界约束；若题目还带费用，再另行建模到费用流。
  */
 template<typename Cap = i64>
 struct LowerUpperBoundFlow {
@@ -47,12 +51,15 @@ struct LowerUpperBoundFlow {
         std::vector<Edge> e;        // 残量网络边集
 
         Dinic(int n, int m = 0)
-            : n(n), ec(1), head(n + 1), dep(n + 1), cur(n + 1), e(std::max(2 * m + 2, 2)) {}
+            : n(n), ec(1), head(n + 1), dep(n + 1), cur(n + 1),
+              e(std::max(2 * m + 2, 2)) {}
 
         int add_edge(int u, int v, Cap w) {
             AST(1 <= u && u <= n);
             AST(1 <= v && v <= n);
-            if (ec + 2 >= (int)e.size()) e.resize(std::max((int)e.size() * 2, ec + 3));
+            if (ec + 2 >= (int)e.size()) {
+                e.resize(std::max((int)e.size() * 2, ec + 3));
+            }
             e[++ec] = {v, head[u], w};
             head[u] = ec;
             e[++ec] = {u, head[v], 0};
@@ -116,7 +123,8 @@ struct LowerUpperBoundFlow {
         Cap need;                   // 需要由超级源送出的总流量
 
         BuildResult(int tot, int m)
-            : g(tot, m), edge_id(), helper_id(), ss(tot - 1), tt(tot), ts_id(0), need(0) {}
+            : g(tot, m), edge_id(), helper_id(), ss(tot - 1), tt(tot),
+              ts_id(0), need(0) {}
     };
 
     int n;                          // 原图点数

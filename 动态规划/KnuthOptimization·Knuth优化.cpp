@@ -1,21 +1,26 @@
 #include "aizalib.h"
 /*
- * Knuth优化 (Knuth Optimization)
+ * Knuth Optimization (Knuth 决策单调性优化)
  *
  * Overview:
- *      对于区间 DP：dp[i][j] = min_{i <= k < j}(dp[i][k] + dp[k + 1][j] + cost(i, j))。
- *      若 cost 满足四边形不等式与区间单调性，最优分割点满足 opt[i][j - 1] <= opt[i][j] <= opt[i + 1][j]，
- *      可将枚举范围降为均摊 O(1)，总体时间降至 O(n^2)。
+ *     区间动态规划的决策单调性双向夹逼优化算法：
+ *     dp[i][j] = min_{i <= k < j}(dp[i][k] + dp[k + 1][j] + cost(i, j))。
+ *     - 四边形不等式与区间单调性: 若代价函数满足四边形不等式 cost(a, c) + cost(b,
+ *       d) <= cost(a, d) + cost(b, c) 且满足区间单调包含 cost(b, c) <= cost(a, d)
+ *       (对任意 a <= b <= c <= d 成立)。
+ *     - Knuth 夹逼定理: 最优分割点满足 opt[i][j - 1] <= opt[i][j] <= opt[i + 1][j]。
  *
  * API:
- *      KnuthDP::solve(n, cost)      — 返回 dp[1][n]，cost(i, j) 为合并区间 [i, j] 的代价。
- *      KnuthDP::solve_full(n, cost) — 返回 pair(dp 表, opt 表)，opt[i][j] 记录最优分割点。
+ *     KnuthDP::solve(n, cost)      — 求解区间 [1, n] 的最小合并代价 dp[1][n]，
+ *                                     O(N^2)
+ *     KnuthDP::solve_full(n, cost) — 求解并返回完整 dp 表与最优分割点 opt 表，
+ *                                     O(N^2)
  *
  * Notes:
- *      1. Time: O(n^2)。
- *      2. Space: O(n^2)。
- *      3. 下标采用 1-based，dp[i][i] = 0。
- *      4. 适用条件：cost(a, c) + cost(b, d) <= cost(a, d) + cost(b, c) 且 cost(b, c) <= cost(a, d) (a <= b <= c <= d)。
+ *     1. Time: O(N^2)。
+ *     2. Space: O(N^2)。
+ *     3. 下标采用 1-based，基础状态 dp[i][i] = 0。
+ *     4. 适用经典问题: 石子合并 (Garsia-Wachs 替代解)、最优二叉搜索树构建。
  */
 
 struct KnuthDP {

@@ -4,10 +4,11 @@
  * DominatorTree·支配树
  *
  * Overview:
- *     Lengauer-Tarjan 算法 (支配树)
- *     Lengauer-Tarjan 算法用于在有向图中求解支配树。
- *     对于有向图中的源点 S 和任意节点 U, V，如果从 S 到 V 的所有路径都必须经过 U，则称 U 支配 V。
- *     对于 V，所有支配它的节点中（不包含 V 自身），距离 V 最近的节点称为最近支配点 (Immediate Dominator, idom)。
+ *     Lengauer-Tarjan 算法 (支配树) Lengauer-Tarjan 算法用于在有向图中求解支配树。
+ *     对于有向图中的源点 S 和任意节点 U, V，如果从 S 到 V 的所有路径都必须经过 U，
+ *     则称 U 支配 V。
+ *     对于 V，所有支配它的节点中（不包含 V 自身），距离 V 最近的节点称为最近支配点
+ *     (Immediate Dominator, idom)。
  *     IDOM 关系构成了一棵树，称为支配树。
  *
  * API:
@@ -15,9 +16,6 @@
  *     void build(int s)           — 以 s 为源点构建支配树
  *
  * Notes:
- *     模板参数:
- *     无
- *     1. 时间复杂度: O(M \alpha(N)) 或 O(M \log N)
  *     2. 空间复杂度: O(N + M)
  *     3. 1-based indexing
  *     4. 适用场景: 需要求有向图必经点、支配关系、必经边等问题。
@@ -52,10 +50,11 @@ struct LengauerTarjan {
     
     int timer;
 
-    LengauerTarjan(int n) : n(n), graph(n), 
-                            dfn(n + 1), inv_dfn(n + 1), fa(n + 1), sdom(n + 1), idom(n + 1), 
-                            dsu(n + 1), mn(n + 1), 
-                            semi_bucket(n + 1), dom_tree(n + 1), timer(0) {
+    LengauerTarjan(int n)
+        : n(n), graph(n),
+          dfn(n + 1), inv_dfn(n + 1), fa(n + 1), sdom(n + 1),
+          idom(n + 1), dsu(n + 1), mn(n + 1),
+          semi_bucket(n + 1), dom_tree(n + 1), timer(0) {
         std::iota(dsu.begin(), dsu.end(), 0);
         std::iota(mn.begin(), mn.end(), 0);
         std::iota(sdom.begin(), sdom.end(), 0);

@@ -1,21 +1,25 @@
 #include "aizalib.h"
 /*
- * 决策单调性分治优化 (1D Divide and Conquer DP Optimization)
+ * 1D Divide and Conquer DP Optimization (决策单调性分治优化)
  *
  * Overview:
- *      单层 DP 形式：f[i] = min_{j < i} cost(j, i)。
- *      若最优决策单调，即 opt[i] <= opt[i + 1]，可利用分治在 O(n log n) 内求解全部状态。
+ *     求解具有决策单调性的单层动态规划方程：f[i] = min_{j < i} cost(j, i)。
+ *     - 决策单调性与四边形不等式: 若代价函数满足四边形不等式，则最优决策点满足
+ *       opt[i] <= opt[i + 1]。
+ *     - 递归分治区间收敛: 求解状态区间 [l, r] 时，暴力计算中点 mid = (l + r) / 2
+ *       在决策候选 [ql, qr] 内的最优决策点 opt[mid]；由单调性将左区间 [l, mid - 1]
+ *       的决策范围限制在 [ql, opt[mid]]，右区间限制在 [opt[mid], qr]。
  *
  * API:
- *      DCDP(n, inf, cost)  — 初始化优化器，cost(j, i) 返回从 j 转移到 i 的代价。
- *      solve(l, r, ql, qr) — 执行分治求解。
- *      value(i)            — 查询 f[i]。
- *      decision(i)         — 查询 opt[i]。
+ *     DCDP(n, inf, cost)  — 构造 n 个状态的优化器，传入转移代价函数 cost(j, i)
+ *     solve(l, r, ql, qr) — 执行分治求解状态区间 [l, r] 的最优值与决策点
+ *     value(i)            — 查询状态 i 的最优值 f[i]
+ *     decision(i)         — 查询状态 i 的最优决策点 opt[i]
  *
  * Notes:
- *      1. Time: O(n log n)。
- *      2. Space: O(n)。
- *      3. 状态采用 1-based 下标，决策点通常为 j in [0, i - 1]。
+ *     1. Time: O(N log N)。
+ *     2. Space: O(N)。
+ *     3. 状态采用 1-based 下标，决策点通常为 j in [0, i - 1]。
  */
 template<class T, class F>
 struct DCDP {

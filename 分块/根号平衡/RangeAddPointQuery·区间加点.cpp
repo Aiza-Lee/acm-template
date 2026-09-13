@@ -1,23 +1,30 @@
 #include "aizalib.h"
 /*
- * 根号平衡 - 区间加单点查 (Range Add Point Query)
+ * Range Add Point Query (根号平衡 - 区间加单点查)
  *
  * Overview:
- *      提供两种平衡复杂度的分块方案求解区间加与单点查询：
- *      1. Sqrt_ModSqrt_Query1: 修改 O(sqrt N)，查询 O(1)，适合查询密集型。
- *      2. Sqrt_Mod1_QuerySqrt: 修改 O(1)，查询 O(sqrt N)，适合修改密集型。
+ *     基于根号平衡思想，提供修改/查询复杂度对偶互换的区间加与单点查询数据结构：
+ *     - 块划分与分块大小 B: 将长度为 n 的数组划分为块长约 sqrt(n) 的连续分块。
+ *     - Sqrt_ModSqrt_Query1 (查密集型): 散块暴力累加各位置原始数组 val[i]，
+ *       整块累加懒标记 lazy[b]；查询时由 val[x] + lazy[bl[x]] 在 O(1)
+ *       立即求得当前值。
+ *     - Sqrt_Mod1_QuerySqrt (改密集型): 借助差分数组与前缀块聚合，区间加转为两端点
+ *       O(1) 差分修改；查询时沿所属分块暴力扫描差分前缀和在 O(B) 还原点值。
  *
  * API:
- *      Sqrt_ModSqrt_Query1<T>(n) — 初始化大小为 n 的分块结构。
- *          modify(l, r, v): 区间 [l, r] 增加 v，复杂度 O(sqrt N)。
- *          query(x): 查询单点 x 的当前值，复杂度 O(1)。
- *      Sqrt_Mod1_QuerySqrt<T>(n) — 初始化大小为 n 的分块结构。
- *          modify(l, r, v): 区间 [l, r] 增加 v，复杂度 O(1)。
- *          query(x): 查询单点 x 的当前值，复杂度 O(sqrt N)。
+ *     struct Sqrt_ModSqrt_Query1<T>:
+ *         Sqrt_ModSqrt_Query1(n) — 构造分块结构，B = sqrt(n)，O(N)
+ *         modify(l, r, v)        — 区间 [l, r] 增加 v (散块暴力+整块打标)，O(sqrt
+ *                                   N)
+ *         query(x)               — 单点 x 查值 (val[x] + lazy[bl[x]])，O(1)
+ *     struct Sqrt_Mod1_QuerySqrt<T>:
+ *         Sqrt_Mod1_QuerySqrt(n) — 构造差分分块结构，B = sqrt(n)，O(N)
+ *         modify(l, r, v)        — 区间 [l, r] 增加 v (差分端点更新)，O(1)
+ *         query(x)               — 单点 x 查值 (扫描差分前缀和)，O(sqrt N)
  *
  * Notes:
- *      1. 均采用 1-based 下标，要求 1 <= l <= r <= n, 1 <= x <= n。
- *      2. 空间复杂度均为 O(N)。
+ *     1. 均采用 1-based 下标，要求 1 <= l <= r <= n, 1 <= x <= n。
+ *     2. 空间复杂度均为 O(N)。
  */
 
 // 方案1: modify O(sqrt N), query O(1)

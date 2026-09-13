@@ -3,20 +3,35 @@
  * AC Automaton (AC自动机)
  *
  * Overview:
- *     多模式串匹配算法，包含 Trie 图优化与 Fail 树 (DAG) 拓扑排序答案汇总。
+ *     用于多模式串并发匹配的确定性有限状态自动机 (DFA)。
+ *     在 Trie 树上融合失配回跳与图转移补全，提供多模式串的高效定位与频次统计工具：
+ *     - fail 指针: 状态 u 对应前缀 P，fail[u] 指向模式串集合中作为 P
+ *       的最长严格真后缀的状态。
+ *     - Trie 图优化: BFS 补全缺失转移直接指向 fail 祖先对应转移，实现字符转移 O(1)
+ *       单向推进且不回溯。
+ *     - Fail 树与拓扑汇聚: fail 反向构成以 root 为根的 Fail 树，状态的所有 Fail
+ *       祖先即为匹配的模式串。匹配时仅在状态打点，结束后沿 Fail 树拓扑自底向上求和，
+ *       以 O(sum|P|) 完成多串频次统计。
  *
  * API:
- *     insert(s, id)       — 插入模式串并绑定编号 id (通常从 1 开始)
- *     build()             — 构建 Fail 指针与 Trie 图，需在全部 insert 完成后调用
- *     query(s)            — 查询文本串，在 Trie 图上运行并对沿途节点打标记
- *     get_results(max_id) — 拓扑排序汇总所有模式串出现次数，返回下标对应模式串 ID
- *     clear()             — 清空并重置自动机
+ *     ACAM()              — 构造函数，初始化并建立哨兵节点 0 与空根节点 1
+ *     clear()             — 清空所有状态并重置自动机
+ *     new_node()          — 内部/外部新建状态节点
+ *     insert(s, id)       — 插入模式串视图 s 并绑定模式串编号 id (通常 1-based)
+ *     build()             — BFS 构建 fail 指针与 Trie 图补全，必须在所有 insert
+ *                            完成后调用，O(sum|P| * |Sigma|)
+ *     query(s)            — 在 Trie 图上运行文本串 s 并为沿途到达的状态打计数标记，
+ *                            O(|s|)
+ *     get_results(max_id) — 沿 Fail 树拓扑排序汇聚各模式串的最终出现频次，
+ *                            返回下标对应模式串 ID，O(sum|P|)
  *
  * Notes:
- *     1. Time: 构建 O(\sum |P| * |\Sigma|)，查询 O(|T|)，汇总 O(\sum |P|)。
- *     2. Space: O(\sum |P| * |\Sigma|)。
- *     3. 节点编号 1-based: 节点 0 为未使用的哨兵，节点 1 为 root 空根节点。
- *     4. get_results 采用局部状态拓扑上推，保证调用幂等性，支持增量多次统计。
+ *     1. Time: 构建 O(sum|P| * |Sigma|)，单次 query 文本扫描 O(|T|)，get_results
+ *        拓扑汇聚 O(sum|P|)。
+ *     2. Space: O(sum|P| * |Sigma|)。
+ *     3. 节点编号 1-based: 节点 0 为未使用的哨兵/空指针，节点 1 为 root 空根节点。
+ *     4. get_results 采用局部状态拓扑上推，调用幂等且不破坏原 count 标记，
+ *        支持多文本增量累加。
  */
 
 struct ACAM {
@@ -59,7 +74,8 @@ struct ACAM {
 
     void build() {
         std::queue<int> q;
-        // 把 root (节点 1) 的所有孩子入队；其余字符的转移设为自环到 root (Trie图优化)
+        // 把 root (节点 1) 的所有孩子入队；其余字符的转移设为自环到 root
+        // (Trie图优化)
         rep(i, 0, ALPHABET - 1) {
             if (next[1][i]) {
                 int v = next[1][i];

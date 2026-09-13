@@ -1,11 +1,27 @@
 #include "aizalib.h"
-
-/**
- * Modular Arithmetic Class (模数类) - Compact
- * 算法介绍:
- *      极简、高性能的模数类。
- *      利用 constexpr 和 pass-by-value 优化，移除多余分支。
+/*
+ * 模数类扩展 (Modular Arithmetic Class Extended)
+ *
+ * Overview:
+ *     包含高性能极简模数类 MInt 以及支持零乘除撤销的扩展模数类 ZMInt。
+ *     - MInt 算术设计：constexpr 无分支加减优化、费马小定理快速幂求逆元。
+ *     - ZMInt 零因子追踪：在模乘累乘场景下，将数值表示为 val = non_zero_part * 0^z。
+ *       支持在区间滑动窗口或动态乘积维护中撤销乘 0 操作（即 z 计数减 1），
+ *       专用于乘除法。
+ *     - 工具：MInt<P>、ZMInt<P>、Mint、ZMint。
+ *
+ * API:
+ *     MInt(v = 0)     — 构造标准模数。
+ *     ZMInt(v = 1)    — 构造追踪零计数的扩展模数。
+ *     ZMInt::val()    — 返回当前真实模值（z > 0 时为 0，否则为 non_zero_part）。
+ *     ZMInt::toMInt() — 转为标准 MInt。
+ *     operator*, /=   — ZMInt 专用乘除法（支持撤销乘 0）。
+ *
+ * Notes:
+ *     1. ZMInt 专用于乘除法累乘场景，不提供加减法运算符。
+ *     2. 要求模数 P 为质数。
  */
+
 template<int P>
 struct MInt {
     int x;
@@ -17,11 +33,20 @@ struct MInt {
         return r;
     }
     constexpr MInt inv() const { return power(*this, P - 2); }
-    constexpr MInt& operator+=(const MInt& r) { if ((x += r.x) >= P) x -= P; return *this; }
-    constexpr MInt& operator-=(const MInt& r) { if ((x -= r.x) < 0) x += P; return *this; }
-    constexpr MInt& operator*=(const MInt& r) { x = 1ll * x * r.x % P; return *this; }
+    constexpr MInt& operator+=(const MInt& r) {
+        if ((x += r.x) >= P) x -= P;
+        return *this;
+    }
+    constexpr MInt& operator-=(const MInt& r) {
+        if ((x -= r.x) < 0) x += P;
+        return *this;
+    }
+    constexpr MInt& operator*=(const MInt& r) {
+        x = 1ll * x * r.x % P;
+        return *this;
+    }
     constexpr MInt& operator/=(const MInt& r) { return *this *= r.inv(); }
-    
+
     friend constexpr MInt power(MInt a, u64 b) {
         MInt r = 1;
         for (; b; b >>= 1, a *= a) if (b & 1) r *= a;
@@ -31,27 +56,29 @@ struct MInt {
     friend constexpr MInt operator-(MInt l, const MInt& r) { return l -= r; }
     friend constexpr MInt operator*(MInt l, const MInt& r) { return l *= r; }
     friend constexpr MInt operator/(MInt l, const MInt& r) { return l /= r; }
-    friend constexpr bool operator==(const MInt& l, const MInt& r) { return l.x == r.x; }
-    friend constexpr bool operator!=(const MInt& l, const MInt& r) { return l.x != r.x; }
-    friend std::ostream& operator<<(std::ostream& os, const MInt& a) { return os << a.x; }
-    friend std::istream& operator>>(std::istream& is, MInt& a) { i64 v; is >> v; a = MInt(v); return is; }
+    friend constexpr bool operator==(const MInt& l, const MInt& r) {
+        return l.x == r.x;
+    }
+    friend constexpr bool operator!=(const MInt& l, const MInt& r) {
+        return l.x != r.x;
+    }
+    friend std::ostream& operator<<(std::ostream& os, const MInt& a) {
+        return os << a.x;
+    }
+    friend std::istream& operator>>(std::istream& is, MInt& a) {
+        i64 v;
+        is >> v;
+        a = MInt(v);
+        return is;
+    }
 };
 
-/**
- * Zero-Tracked Modular Arithmetic (支持0乘除的模数类)
- * 算法介绍:
- *      在 MInt 基础上额外维护 0 的个数，从而支持"除以0"（撤销乘0）。
- *      本质是维护 val = (non_zero_part) * 0^(zero_cnt)。
- *      注意：
- *          1. 主要用于维护乘积比较/累乘场景。
- *          2. 加减法不通过此结构维护（加减法会导致 non_zero_part 变化复杂）。
- *          3. 仅支持乘除法。
- */
+// 维护 val = (non_zero_part) * 0^(zero_cnt)，支持撤销乘 0
 template<int P>
 struct ZMInt {
     MInt<P> x;
     int z; // zero count
-    
+
     constexpr ZMInt(i64 v = 1) {
         if (v % P == 0) {
             x = 1, z = 1;
@@ -59,7 +86,7 @@ struct ZMInt {
             x = v, z = 0;
         }
     }
-    
+
     // 从 MInt 构造
     constexpr ZMInt(const MInt<P>& v) {
         if (v.val() == 0) {
@@ -77,7 +104,7 @@ struct ZMInt {
         z += r.z;
         return *this;
     }
-    
+
     constexpr ZMInt& operator/=(const ZMInt& r) {
         x /= r.x;
         z -= r.z;
@@ -89,8 +116,10 @@ struct ZMInt {
 
     friend constexpr ZMInt operator*(ZMInt l, const ZMInt& r) { return l *= r; }
     friend constexpr ZMInt operator/(ZMInt l, const ZMInt& r) { return l /= r; }
-    
-    friend std::ostream& operator<<(std::ostream& os, const ZMInt& a) { return os << a.val(); }
+
+    friend std::ostream& operator<<(std::ostream& os, const ZMInt& a) {
+        return os << a.val();
+    }
 };
 
 using Mint = MInt<md>;

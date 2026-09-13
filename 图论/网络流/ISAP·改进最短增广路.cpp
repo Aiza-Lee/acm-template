@@ -4,10 +4,12 @@
  * ISAP·改进最短增广路
  *
  * Overview:
- *     改进的最短增广路算法，先通过反向 BFS 初始化距离标号，再结合当前弧与 GAP 优化持续增广。
+ *     改进的最短增广路算法，先通过反向 BFS 初始化距离标号，再结合当前弧与 GAP
+ *     优化持续增广。
  *
  * API:
- *     ISAP(int n, int m = 0)                   — 初始化 n 个点、预估 m 条原图边的网络
+ *     ISAP(int n, int m = 0)                   — 初始化 n 个点、预估 m
+ *                                                 条原图边的网络
  *     void add_edge(int u, int v, Cap w)       — 添加一条容量为 w 的有向边
  *     Cap solve(int s, int t, Cap limit = INF) — 返回至多增广 limit 流量后的最大流
  *
@@ -16,10 +18,9 @@
  *     1. Time: O(V^2E)，实战中常数通常优于朴素 Dinic
  *     2. Space: O(V + E)
  *     3. 1-based indexing.
- *     4. 用法/技巧:
- *     4.1 GAP 优化可在某层节点数清零时直接判定源点后续不可达。
- *     4.2 若只需发送部分流量，可直接传入 solve(s, t, limit)。
- *     4.3 反向 BFS 依赖残量网络中的反向可达性，因此建图时仍按常规有向边添加即可。
+ *     4. 用法/技巧: 4.1 GAP 优化可在某层节点数清零时直接判定源点后续不可达。4.2
+ *        若只需发送部分流量，可直接传入 solve(s, t, limit)。4.3 反向 BFS
+ *        依赖残量网络中的反向可达性，因此建图时仍按常规有向边添加即可。
  */
 
 template<typename Cap>
@@ -34,7 +35,8 @@ struct Graph {
     std::vector<Edge> e;   // 残量网络边集
     int ec;                // 当前边计数，边下标从 2 开始，便于 i ^ 1 找反边
 
-    Graph(int n, int m = 0) : n(n), head(n + 1, 0), e(std::max(2 * m + 2, 2)), ec(1) {}
+    Graph(int n, int m = 0)
+        : n(n), head(n + 1, 0), e(std::max(2 * m + 2, 2)), ec(1) {}
 
     void add_edge(int u, int v, Cap w) {
         AST(1 <= u && u <= n);
@@ -58,7 +60,8 @@ struct ISAP {
     int n;                // 点数
     int s, t;             // 当前源汇点
 
-    ISAP(int n, int m = 0) : g(n, m), dep(n + 2), gap(n + 2), cur(n + 1), n(n), s(0), t(0) {}
+    ISAP(int n, int m = 0)
+        : g(n, m), dep(n + 2), gap(n + 2), cur(n + 1), n(n), s(0), t(0) {}
 
     void add_edge(int u, int v, Cap w) {
         g.add_edge(u, v, w);

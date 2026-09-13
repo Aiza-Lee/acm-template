@@ -4,22 +4,23 @@
  * MCMFBySPFA·费用流SPFA
  *
  * Overview:
- *     基于 SPFA 的最短增广路算法，每轮在残量网络中求一条 s 到 t 的最短费用路并沿该路增广。
+ *     基于 SPFA 的最短增广路算法，每轮在残量网络中求一条 s 到 t
+ *     的最短费用路并沿该路增广。
  *
  * API:
- *     MCMF(int n, int m = 0)                                        — 初始化 n 个点、预估 m 条原图边的网络
- *     void add_edge(int u, int v, Cap w, Cost c)                    — 添加一条容量为 w、费用为 c 的有向边
- *     std::pair<Cap, Cost> solve(int s, int t, Cap limit = INF_CAP) — 返回至多增广 limit 流量后的 {flow, cost}
+ *     MCMF(n, m)           — 初始化 n 个点、预估 m 条边的网络。
+ *     add_edge(u, v, w, c) — 添加一条容量为 w、费用为 c 的有向边。
+ *     solve(s, t, limit)   — 返回至多增广 limit 流量后的 {flow, cost}。
  *
  * Notes:
  *     模板参数: Cap (容量类型), Cost (费用类型)
  *     1. Time: O(FVE)，适合负边费用、稠密度不高或数据范围较小的最小费用最大流
  *     2. Space: O(V + E)
  *     3. 1-based indexing.
- *     4. 用法/技巧:
- *     4.1 若要求最大费用最大流，可将边权费用取反，答案费用再取反。
- *     4.2 若只需发送部分流量，可直接传入 solve(s, t, limit)。
- *     4.3 若图中不存在可增广路，solve() 会直接返回当前答案；若数据较大可改用 Primal-Dual 版本。
+ *     4. 用法/技巧: 4.1 若要求最大费用最大流，可将边权费用取反，答案费用再取反。4.2
+ *        若只需发送部分流量，可直接传入 solve(s, t, limit)。4.3
+ *        若图中不存在可增广路，solve() 会直接返回当前答案；数据较大时用 Primal-Dual
+ *        版。
  */
 
 template<typename Cap, typename Cost>
@@ -35,7 +36,8 @@ struct Graph {
     std::vector<Edge> e;   // 残量网络边集
     int ec;                // 当前边计数，边下标从 2 开始，便于 i ^ 1 找反边
 
-    Graph(int n, int m = 0) : n(n), head(n + 1, 0), e(std::max(2 * m + 2, 2)), ec(1) {}
+    Graph(int n, int m = 0)
+        : n(n), head(n + 1, 0), e(std::max(2 * m + 2, 2)), ec(1) {}
 
     void add_edge(int u, int v, Cap w, Cost c) {
         AST(1 <= u && u <= n);
@@ -60,7 +62,8 @@ struct MCMF {
     std::vector<char> in;  // in[u]: 是否在 SPFA 队列中
     int n;                 // 点数
 
-    MCMF(int n, int m = 0) : g(n, m), dis(n + 1), pv(n + 1), pe(n + 1), in(n + 1), n(n) {}
+    MCMF(int n, int m = 0)
+        : g(n, m), dis(n + 1), pv(n + 1), pe(n + 1), in(n + 1), n(n) {}
 
     void add_edge(int u, int v, Cap w, Cost c) {
         g.add_edge(u, v, w, c);
@@ -92,8 +95,12 @@ struct MCMF {
                 pv[v] = u;
                 pe[v] = i;
                 if (!in[v]) {
-                    if (!q.empty() && dis[v] < dis[q.front()]) q.push_front(v); // SLF
-                    else q.push_back(v);
+                    // SLF 优化
+                    if (!q.empty() && dis[v] < dis[q.front()]) {
+                        q.push_front(v);
+                    } else {
+                        q.push_back(v);
+                    }
                     in[v] = 1;
                 }
             }

@@ -1,20 +1,30 @@
 #include "aizalib.h"
 /*
- * 舞蹈链 (Dancing Links X / DLX)
+ * Dancing Links (DLX, 舞蹈链)
  *
  * Overview:
- *      使用双向十字循环链表求解精确覆盖问题（Exact Cover Problem）的高效回溯算法。
+ *     以双向十字循环链表实现 Knuth Algorithm X 的精确覆盖问题 (Exact Cover)
+ *     回溯搜索算法：
+ *     - 十字循环双向链表: 每个节点维护 L, R, U, D 四向环形指针，支持在 O(1)
+ *       时间内将某行/列从网格中摘除并在回溯时原位无损恢复。
+ *     - 列头节点与启发式选择: 虚拟头节点 0~m 维护每列 1 的数量 S[c]，每步优先覆盖 1
+ *       最少的列以大幅压缩搜索分支。
+ *     - 结构与工具: 精确覆盖问题 (Exact Cover)、数独 (Sudoku)、
+ *       多米诺骨牌覆盖与正交划分的高效搜索底座。
  *
  * API:
- *      DancingLinks(n, m, max_nodes = 0) — 初始化 n 行 m 列的 DLX，支持指定预估总 1 的个数。
- *      add(r, c)                         — 在第 r 行第 c 列添加一个 1 (1-based)。
- *      solve(callback)                   — 搜索所有精确覆盖解，每找到一组解通过 callback(ans) 回调（ans 包含所选行编号）。
+ *     DancingLinks(n, m, max_nodes = 0) — 初始化 n 行 m 列的 DLX 链表，
+ *                                          支持预分配容量
+ *     add(r, c)                         — 在第 r 行第 c 列添加一个 1 (1-based)，
+ *                                          O(1)
+ *     solve(callback)                   — 深度优先搜索所有精确覆盖解，每组解以
+ *                                          vector<int> 传入 callback
  *
  * Notes:
- *      1. Time: 指数级回溯，由于十字双向链表 O(1) 摘除与恢复节点，常数极小。
- *      2. Space: O(n * m + m)。
- *      3. 行列均采用 1-based 下标。
- *      4. callback 采用模板引用传递，零拷贝开销。
+ *     1. Time: 指数级回溯，由于十字双向链表 O(1) 摘除与恢复节点，常数极小。
+ *     2. Space: O(n * m + m)。
+ *     3. 行列均采用 1-based 下标。
+ *     4. callback 采用模板引用传递，零拷贝开销。
  */
 
 class DancingLinks {

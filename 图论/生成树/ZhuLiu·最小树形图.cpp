@@ -16,10 +16,9 @@
  *     1. Time: O(VE)
  *     2. Space: solve 为 O(V + E)，solve_with_plan 额外记录收缩历史，空间 O(VE)
  *     3. 1-based indexing. root 不需要入边；其余每个点都必须可由 root 到达。
- *     4. 用法/技巧:
- *     4.1 自环会被自动忽略。
- *     4.2 若返回 false，说明不存在以 root 为根、覆盖所有点的树形图。
- *     4.3 solve_with_plan() 返回的 parent[v] 为父亲，in_eid[v] 为原图入边编号；root 位置分别为 0 / -1。
+ *     4. 用法/技巧: 4.1 自环会被自动忽略。4.2 若返回 false，说明不存在以 root 为根、
+ *        覆盖所有点的树形图。4.3 solve_with_plan() 返回的 parent[v] 为父亲，
+ *        in_eid[v] 为原图入边编号；root 位置分别为 0 / -1。
  */
 template<typename T = i64>
 struct ZhuLiu {
@@ -84,7 +83,8 @@ private:
 
         while (true) {
             std::vector<T> in(cur_n + 1, std::numeric_limits<T>::max());
-            std::vector<int> pick(cur_n + 1, -1), pre(cur_n + 1, 0), id(cur_n + 1, 0), vis(cur_n + 1, 0);
+            std::vector<int> pick(cur_n + 1, -1), pre(cur_n + 1, 0);
+            std::vector<int> id(cur_n + 1, 0), vis(cur_n + 1, 0);
 
             // 1. 先为每个点选一条最小入边。
             for (int i = 0; i < (int)cur_edges.size(); i++) {
@@ -94,7 +94,9 @@ private:
             }
             in[cur_root] = 0;
             rep(v, 1, cur_n) {
-                if (in[v] == std::numeric_limits<T>::max()) return {false, 0, {}, {}};
+                if (in[v] == std::numeric_limits<T>::max()) {
+                    return {false, 0, {}, {}};
+                }
             }
 
             rep(v, 1, cur_n) ans += in[v];
@@ -122,7 +124,9 @@ private:
                 for (int i = (int)history.size() - 1; i >= 0; i--) {
                     auto& layer = history[i];
                     std::vector<int> prev_sel(layer.n + 1, -1);
-                    rep(v, 1, layer.n) if (v != layer.root) prev_sel[v] = layer.pick[v];
+                    rep(v, 1, layer.n) {
+                        if (v != layer.root) prev_sel[v] = layer.pick[v];
+                    }
                     for (int v = 1; v < (int)sel.size(); v++) {
                         if (sel[v] == -1) continue;
                         int pe = build_edges[sel[v]].pre_eid;
@@ -133,7 +137,8 @@ private:
                     build_edges = layer.edges;
                 }
 
-                Result res{true, ans, std::vector<int>(n + 1, 0), std::vector<int>(n + 1, -1)};
+                Result res{true, ans, std::vector<int>(n + 1, 0),
+                           std::vector<int>(n + 1, -1)};
                 rep(v, 1, n) {
                     if (v == root) continue;
                     int eid = sel[v];
@@ -146,7 +151,10 @@ private:
             rep(i, 1, cur_n) if (!id[i]) id[i] = ++cnt;
 
             // 3. 把每个环缩成一个新点，并把跨环边权减去被选中的入边权。
-            if (need_plan) history.push_back({cur_n, cur_root, std::move(cur_edges), pick});
+            if (need_plan) {
+                history.push_back(
+                    {cur_n, cur_root, std::move(cur_edges), pick});
+            }
             auto& src = need_plan ? history.back().edges : cur_edges;
             std::vector<NodeEdge> nxt;
             nxt.reserve(src.size());
