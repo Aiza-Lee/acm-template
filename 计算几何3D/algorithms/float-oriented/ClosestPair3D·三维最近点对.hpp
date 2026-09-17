@@ -6,12 +6,13 @@
  *
  * Overview:
  *  求三维点集最近点对的距离平方与对应下标。
- *  当前实现为 O(N²) 双层暴力;针对 ICPC 题目常见 N ≤ 2000 足够。
- *      N 更大时可换 kd-tree + 跨子树缓冲 (本文件保留扩展位)。
+ *  当前实现为 O(N²) 双层暴力;针对 ICPC 题目常见 N ≤ 2000 足够。N 更大时可换 kd-tree
+ *  + 跨子树缓冲 (本文件保留扩展位)。
  *
  * API:
- *  closest_pair_3d(pts) -> tuple<ld, int, int> — 最近点对距离平方 + 下标 (a, b)。
- *      N ≤ 1 返回 (+inf, -1, -1);多点重合返回 (0, a, b) (a < b)。Time O(N²), Space O(1)。
+ *     closest_pair_3d(pts) — 最近点对距离平方 + 下标 (a,b)。N ≤ 1 返回 (+inf, -1,
+ *                             -1);多点重合返回 (0, a, b) (a <b)。Time O(N²), Space
+ *                             O(1)。
  *
  * Notes:
  *  返回值是距离平方 (T 整数时仍按 ld 输出,sqrt 在调用方按需);

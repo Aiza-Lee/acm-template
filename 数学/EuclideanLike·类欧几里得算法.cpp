@@ -1,16 +1,21 @@
 #include "aizalib.h"
 /*
- * EuclideanLike·类欧几里得算法
+ * Euclidean-Like Algorithm (类欧几里得算法)
  *
  * Overview:
- *     类欧几里得算法，用于在对数时间内计算下取整一次函数和 f(a, b, c, n) = ∑_{i=0}^n ⌊(ai + b)/c⌋。
+ *     用于在对数时间内计算下取整一次函数和 f(a, b, c, n) = sum_{i=0}^n floor((a*i +
+ *     b) / c)。
+ *     利用辗转相除思想在斜率 > 1 时消去整除商、斜率 < 1
+ *     时对调主副坐标轴翻转求和区域，在 O(log(min(a, c, n)))
+ *     步内完成二维阶梯网格点计数。
  *
  * API:
- *     sim_euclid::solve(a, b, c, n) — 计算 ∑_{i=0}^n ⌊(ai + b)/c⌋，复杂度 O(log(min(a, c, n)))
+ *     sim_euclid::solve(a, b, c, n) — 计算 sum_{i=0}^n floor((a*i + b) / c)
  *
  * Notes:
- *     1. 要求 a, b, c >= 0 且 c > 0, n >= 0。
- *     2. 递归通过类辗转相除法将坐标系翻转，复杂度与 gcd 相同。
+ *     1. 参数要求: a, b, c >= 0 且 c > 0, n >= 0。
+ *     2. 时间复杂度: 复杂度与 gcd(a, c) 相同，为 O(log(min(a, c, n)))。
+ *     3. 空间复杂度: 递归栈空间 O(log(min(a, c, n)))。
  */
 
 namespace sim_euclid {

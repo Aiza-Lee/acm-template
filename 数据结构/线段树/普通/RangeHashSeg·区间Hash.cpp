@@ -1,19 +1,23 @@
+#include "aizalib.h"
 #include "SegTreeBase·通用线段树基类.hpp"
-
-/**
- * 区间 Hash 线段树
- * 算法介绍: 维护序列多项式哈希，支持区间整体加值和区间哈希查询。
- * 模板参数: 无
- * Interface:
- *      H_init(n, base = 13331) — 初始化幂与前缀幂和
- *      using SegHash = SegTree<Info, Tag>
- *      modify(l, r, {add}) — 对区间每个位置值加 add
- *      query(l, r).hash    — 查询 [l,r] 哈希，低位对应区间左端
- * Note:
- *      1. Time: 初始化 O(N)，单次修改/查询 O(log N)
- *      2. Space: O(N)
- *      3. 1-based indexing；使用 u64 自然溢出
- *      4. 用法/技巧: 必须先调用 H_init(n)，且同一批比较应使用同一个 H_BASE
+/*
+ * Range Hash Segment Tree (区间 Hash 线段树)
+ *
+ * Overview:
+ *     基于通用线段树维护序列的多项式哈希值。支持区间整体加上标量值，
+ *     以及快速查询任意子区间的哈希值，用于动态字符串匹配、回文判定与序列比对。
+ *
+ * API:
+ *     H_init(n, base=13331)   — 预处理基数幂次表与等比数列前缀和 using SegHash =
+ *     SegTree<Info, Tag> Info — 结构体，维护区间哈希值 hash 与区间长度 len Tag:
+ *                                结构体，维护区间加法标记 add modify(l, r, {add}):
+ *                                对区间 [l, r] 内所有字符/数值加上 add query(l, r):
+ *                                查询区间 [l, r] 的多项式哈希
+ *
+ * Notes:
+ *     1. 时间复杂度: 预处理 O(N)，单次修改与查询 O(log N)；空间复杂度 O(N)。
+ *     2. 索引约定: 外部统一采用 1-based 索引；哈希计算低位对应区间左端。
+ *     3. 溢出与模数: 默认采用 u64 自然溢出（相当于 mod 2^64）。
  */
 std::vector<u64> H_POW, H_PRE;
 u64 H_BASE = 13331;

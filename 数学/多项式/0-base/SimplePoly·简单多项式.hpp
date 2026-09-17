@@ -1,11 +1,26 @@
 #include "aizalib.h"
-/**
- * Simplified Poly Template
- * Features: +, -, *, inverse, deriv, integral
- * 
- * Note:
- *      1. Omitted: exp/ln/sqrt/trig/eval to save lines.
- *      2. No memory pool, simple std::vector inheritance.
+/*
+ * Simplified Polynomial (极简多项式模板)
+ *
+ * Overview:
+ *      轻量级多项式结构体，直接继承自 std::vector<int>，不依赖外部内存池。
+ *      内嵌就地 NTT 算法，提供常用的多项式加减法、NTT 卷积乘法、
+ *      基于牛顿迭代的多项式求逆、导数与不定积分运算。适合代码行数敏感的比赛场景。
+ *
+ * API:
+ *     struct Poly        — 继承自 vector<int> 的简易多项式结构。
+ *     Poly::ntt(a, type) — 就地 NTT 变换 (type = 1 为 DFT，-1 为 IDFT)。
+ *     a + b, a           — b, a * b: 多项式代数运算。
+ *     a.inverse(n)       — 模 x^n 多项式求逆，要求 a[0] != 0。
+ *     a.deriv()          — 多项式求导。
+ *     a.integral()       — 多项式不定积分。
+ *
+ * Notes:
+ *      1. 依赖全局函数 add, sub, mul, fp, inv 及模数常量 md。
+ *      2. 省略了 Ln, Exp, Sqrt, Pow 等高阶函数以精简代码行数。
+ *
+ * Related:
+ *      数学/多项式/0-base/Poly·多项式全家桶.hpp: 功能完备的高性能多项式类。
  */
 struct Poly : std::vector<int> {
     using vector::vector;

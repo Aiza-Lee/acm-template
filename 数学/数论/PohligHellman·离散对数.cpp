@@ -1,29 +1,30 @@
 #include "aizalib.h"
 
-/**
- * Pohlig-Hellman (离散对数 - 光滑阶)
- * 算法介绍: 当 ord(a) 的质因子较小（smooth）时，将 a^x = b (mod p) 的离散对数分解到各质数幂子群中分别求解，再通过 CRT 合并。
- * 模板参数: None
- * Interface:
- *      PohligHellman::solve(a, b, p)                 — 求最小非负整数解，Time: O(sum e_i * q_i)
- *      PohligHellman::solve(a, b, p, factors_of_pm1) — 带 p-1 预分解因子，格式 vector<pair<质数, 指数>>
- * Note:
- *      1. p 需为质数（群阶 = p-1），gcd(a, p) = 1；否则需 ExBSGS
- *      2. Time: O(sum e_i * q_i)，ord(a) = prod q_i^{e_i}
- *         小规模子群使用暴力枚举 O(q)；当单个 q 较大（如 > 1e6）时可替换为 BSGS::solve 降至 O(sqrt(q))
- *      3. Space: O(质因子个数)
- *      4. 返回最小非负整数解，无解返回 -1
- *      5. 用法/技巧: p 很大时需用 PollardRho 分解 p-1，内部自动将阶降至 ord(a)
- *      6. 常见模数 p-1 分解:
- *         NTT 友好质数（smooth，Pohlig-Hellman 高效）:
- *           998244353  → 2^23 × 7 × 17
- *           469762049  → 2^26 × 7
- *           167772161  → 2^25 × 5
- *           1004535809 → 2^21 × 479
- *           104857601  → 2^22 × 5^2
- *         ACM 常用质数（非 smooth，BSGS 更合适）:
- *           1000000007 → p-1 = 2 × 500000003（大质因子）
- *           1000000009 → p-1 = 2^3 × 125000001（大质因子）
+/*
+ * Pohlig-Hellman Algorithm (光滑阶离散对数算法)
+ *
+ * Overview:
+ *      在素数模 p 下求解离散对数 a^x = b (mod p)。
+ *      当群阶 p - 1 或 a 的乘法阶 ord(a) 的所有质因子均较小（光滑数 smooth
+ *      number）时，将离散对数问题分解为各个素数幂子群 a^(n / q_i^{e_i}) 上的子问题。
+ *      在每个素数幂子群中通过 p-adic 逐位提取确定 x mod q_i^{e_i}，
+ *      最后利用中国剩余定理 (CRT) 组合得到模 ord(a) 的全局解。
+ *
+ * API:
+ *     solve(a, b, p)                 — 自动试除分解 p-1 求解 a^x = b (mod p)
+ *                                       的最小非负解，无解返回 -1。复杂度 O(sqrt(p)
+ *                                       + sum(e_i * q_i)) 时间。
+ *     solve(a, b, p, factors_of_pm1) — 传入 p-1 的质因数分解 {(q, e)} 求解。复杂度
+ *                                       O(sum(e_i * q_i)) 时间。
+ *
+ * Notes:
+ *      1. 要求 p 为质数且 gcd(a, p) = 1。
+ *      2. 极适用于 NTT 模数（如 998244353 = 2^23 * 7 * 17 + 1 等）。
+ *      3. 若 p - 1 含有大质因子（如 10^9 + 7），建议改用 BSGS。
+ *
+ * Related:
+ *      数学/数论/BSGS·求离散对数.cpp: 大质因子子群或一般离散对数。
+ *      数学/数论/CRT·中国剩余定理.cpp: 子群结果合并。
  */
 struct PohligHellman {
     static i64 _norm(i64 x, i64 mod) {
@@ -107,7 +108,10 @@ struct PohligHellman {
         return solve(a, b, p, _factor(p - 1));
     }
 
-    static i64 solve(i64 a, i64 b, i64 p, const std::vector<std::pair<i64, int>>& factors_of_pm1) {
+    static i64 solve(
+        i64 a, i64 b, i64 p,
+        const std::vector<std::pair<i64, int>> &factors_of_pm1
+    ) {
         AST(p > 1);
         a = _norm(a, p), b = _norm(b, p);
         if (b == 1) return 0;

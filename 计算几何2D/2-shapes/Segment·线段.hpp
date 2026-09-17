@@ -8,9 +8,10 @@
  *  提供二维线段类型、点在线段上的判定以及两线段相交判定。
  *
  * API:
- *  Segment<T>(a, b)          — 由两端点构造。
- *  on_segment(p, s)          — 点 p 是否在线段 s 上（含端点）。O(1)。
- *  segment_intersect(s1, s2) — 两线段是否相交（含端点接触与共线部分重叠）。O(1)。
+ *     Segment<T>(a, b)          — 由两端点构造。
+ *     on_segment(p, s)          — 点 p 是否在线段 s 上（含端点）。O(1)。
+ *     segment_intersect(s1, s2) — 两线段是否相交（含端点接触与共线部分重叠）。
+ *                                  O(1)。
  *
  * Notes:
  *  浮点路径使用 sgn 和 EPS 进行容差比较。
@@ -35,8 +36,10 @@ bool segment_intersect(Segment<T> s1, Segment<T> s2) {
     Point<T> &a = s1.a, &b = s1.b, &c = s2.a, &d = s2.b;
 
     // 1. 快速排斥实验 (Bounding Box)
-    if (std::max(a.x, b.x) < std::min(c.x, d.x) || std::max(c.x, d.x) < std::min(a.x, b.x) ||
-        std::max(a.y, b.y) < std::min(c.y, d.y) || std::max(c.y, d.y) < std::min(a.y, b.y)) {
+    if (std::max(a.x, b.x) < std::min(c.x, d.x) ||
+        std::max(c.x, d.x) < std::min(a.x, b.x) ||
+        std::max(a.y, b.y) < std::min(c.y, d.y) ||
+        std::max(c.y, d.y) < std::min(a.y, b.y)) {
         return false;
     }
 

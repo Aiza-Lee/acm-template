@@ -8,7 +8,8 @@
  *  分治法求点集中欧氏距离最近的两个点。
  *
  * API:
- *  closest_point_pair(pts) -> pair<Point<T>, Point<T>> — 距离最近的一对点（按距离平方比较，整数安全）。Time O(N log N), Space O(N)。
+ *     closest_point_pair(pts) — 距离最近的一对点（按距离平方比较，整数安全）。
+ *                                Time O(N log N),Space O(N)。
  *
  * Notes:
  *  模板参数 T: 坐标类型，支持纯整型。
@@ -56,7 +57,11 @@ std::pair<Point<T>, Point<T>> closest_point_pair(std::vector<Point<T>>& pts) {
         T midx = pts[mid].x;
         Node cur = better(solve(l, mid), solve(mid + 1, r));
 
-        std::merge(pts.begin() + l, pts.begin() + mid + 1, pts.begin() + mid + 1, pts.begin() + r + 1, buf.begin() + l, by_y);
+        std::merge(
+            pts.begin() + l, pts.begin() + mid + 1,
+            pts.begin() + mid + 1, pts.begin() + r + 1,
+            buf.begin() + l, by_y
+        );
         rep(i, l, r) pts[i] = buf[i];
 
         int sz = 0;

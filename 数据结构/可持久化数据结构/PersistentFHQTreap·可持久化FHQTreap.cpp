@@ -1,23 +1,30 @@
 #include "aizalib.h"
-/**
- * 可持久化 FHQ Treap
- * 算法介绍: 用 FHQ Treap 维护有序 multiset，split / merge 时按需拷贝结点以保留历史版本。
- * 模板参数: None
- * Interface:
- *      PersistentFHQTreap(m), init(m)       — 初始化，预留 m 个线性版本
- *      insert(ver, v)                       — 在 ver 版本基础上插入 v，生成新版本
- *      erase(ver, v)                        — 在 ver 版本基础上删除一个值为 v 的点，生成新版本
- *      query_rank(ver, v)                   — 查询 v 在 ver 版本中的排名（比它小的数个数 + 1）
- *      query_value_at_rank(ver, k)          — 查询 ver 版本中排名为 k 的值
- *      query_pre(ver, v), query_suc(ver, v) — 查询 ver 版本中 v 的前驱 / 后继
- *      append_version(ver)                  — 复制 ver 版本作为最新版本
- *      get_inorder(ver)                     — 按升序导出 ver 版本全部元素
- * Note:
- *      1. Time: 修改均摊 O(log N)，查询 O(log N)，导出 O(N)
- *      2. Space: O(修改次数 log N)
- *      3. 版本号采用 0-based；0 号版本为空树
- *      4. 用法/技巧: 查询不生成新版本；空前驱 / 后继分别返回 INT_MIN + 1 / INT_MAX
- *      5. 用法/技巧: 结点池采用 reserve + push_back，超出预留后交给 vector 自动扩容
+/*
+ * Persistent FHQ Treap (可持久化无旋Treap)
+ *
+ * Overview:
+ *     基于路径复制（Path Copying）机制实现的可持久化平衡二叉搜索树。在 split 与
+ *     merge 递归过程中，对访问到的历史节点进行浅拷贝生成新节点，
+ *     从而在保持二叉搜索树键值顺序与堆优先级随机平衡的同时，
+ *     保留任意历史版本的树形结构。
+ *
+ * API:
+ *     PersistentFHQTreap(m), init(m)       — 初始化，预留 m 个线性版本
+ *     insert(ver, v)                       — 在 ver 版本基础上插入 v，生成新版本
+ *     erase(ver, v)                        — 在 ver 版本基础上删除一个值为 v 的点，
+ *                                             生成新版本
+ *     query_rank(ver, v)                   — 查询 v 在 ver 版本中的排名（比它小的数
+ *                                             个数 + 1）
+ *     query_value_at_rank(ver, k)          — 查询 ver 版本中排名为 k 的值
+ *     query_pre(ver, v), query_suc(ver, v) — 查询 ver 版本中 v 的前驱 / 后继
+ *     append_version(ver)                  — 复制 ver 版本作为最新版本
+ *     get_inorder(ver)                     — 按升序导出 ver 版本全部元素
+ *
+
+ * Notes:
+ *     1. 时间复杂度: 插入/删除/查询期望 O(log N)，导出 O(N)；空间复杂度 O(M log N)。
+ *     2. 索引约定: 版本号采用 0-based，版本 0 为初始空树。
+ *     3. 边界处理: 若前驱不存在返回 INT_MIN + 1，若后继不存在返回 INT_MAX。
  */
 struct PersistentFHQTreap {
     struct Node {

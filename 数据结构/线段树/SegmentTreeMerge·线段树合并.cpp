@@ -1,19 +1,27 @@
 #include "aizalib.h"
 
-/**
- * 线段树合并 (Segment Tree Merge)
- * 模板参数:
- *      T: 值类型，默认为 i64
- * interface:
- *      SegTreeMerge(int max_nodes)                  — 构造函数，指定最大节点数
- *      update(int &u, int l, int r, int pos, T val) — 单点修改
- *      query(int u, int ql, int qr)                 — 区间查询
- *      merge(int x, int y)                          — 合并两棵线段树，返回合并后的根节点
- * note:
- *      1. 空间复杂度 O(N log N)，通常需要开 32*N ~ 64*N 的空间
- *      2. 默认 merge 会破坏原树结构（复用节点），如需可持久化请参考 merge_new 注释部分
- *      3. 适用于：树上统计、维护集合、求逆序对等
- *      4. update 的 u 参数是引用，传入外部存储根节点的变量(初始0)，会自动分配新节点
+/*
+ * Segment Tree Merge (线段树合并)
+ *
+ * Overview:
+ *     动态开点权值/区间线段树的树上合并算法。通过递归遍历两棵结构重叠的动态线段树，
+ *     将对应区间的统计信息叠加（如频数和），并将空分支直接指向非空子树指针。
+ *     常用于树上子树信息自底向上汇总、离线逆序对统计等树上计数场景。
+ *
+ * API:
+ *     SegTreeMerge(max_nodes)   — 构造函数，预分配节点池大小
+ *     new_node()                — 分配新节点编号
+ *     update(u, l, r, pos, val) — 在以 u 为根的线段树上单点 pos 累加 val
+ *     query(u, ql, qr)          — 在以 u 为根的线段树上查询区间 [ql, qr] 权值和
+ *     merge(x, y)               — 破坏性合并以 x 和 y 为根的两棵线段树，
+ *                                  返回新根节点编号
+ *
+ * Notes:
+ *     1. 时间复杂度: 合并两棵树的总复杂度与两树共有节点数成正比，全局总均摊 O(N log
+ *        V)。
+ *     2. 空间复杂度: 动态开点消耗 O(N log V) 空间，建议开 32*N ~ 64*N 大小。
+ *     3. 内存所有权: 默认 merge 为原地破坏性合并（复用现有节点）；若需保留原树历史，
+ *        应采用可持久化合并（克隆新建节点）。
  */
 template<typename T = i64>
 struct SegTreeMerge {

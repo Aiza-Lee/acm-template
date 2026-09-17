@@ -1,65 +1,37 @@
 #include "aizalib.h"
-/**
- * Link-Cut Tree (LCT)
- * 算法介绍: 用 Splay 维护动态森林的实链，支持换根、连边、断边、点权修改、
- *          路径和查询、路径大小查询、子树大小查询、连通块大小查询与 LCA 查询。
- * 模板参数: None
- * Interface:
- *      LCT(n), init(n)             — 初始化 1...n 个点的动态森林
- *      set_val(x, v)               — 把点 x 的点权改为 v
- *      make_root(x)                — 将 x 所在树改为以 x 为根
- *      find_root(x)                — 返回 x 所在树当前实义下的树根编号
- *      split(x, y)                 — 提取 x 到 y 的路径，使 y 成为该辅助树根
- *      link(x, y)                  — 若 x, y 不连通，则连边并返回 1，否则返回 0
- *      cut(x, y)                   — 若边 (x, y) 存在，则断开并返回 1，否则返回 0
- *      connected(x, y)             — 判断 x, y 是否连通
- *      query_sum(x, y)             — 查询路径 x -> y 上的点权和
- *      query_size(x, y)            — 查询路径 x -> y 上的点数
- *      query_component_size(x)     — 返回 x 所在连通块的总点数
- *      query_subtree_size(root, x) — 以 root 为整棵树的根时，返回 x 的子树大小
- *      lca(x, y)                   — 返回 x, y 的最近公共祖先，若不连通则返回 0
- * Internal Methods:
- *      _check(x)   边界检查，debug 模式下 assert
- *      _dir(p)     返回 p 是其父节点的左孩子(0)还是右孩子(1)
- *      _is_root(p) 判断 p 是否为其 splay 辅助树的根
- *          （即 p 的父节点不存在或父节点的孩子不指向 p）
- *      fa(p) / ch(p) / siz(p) / cnt(p) / virt_siz(p) /
- *      val(p) / sum(p) / rev(p)     内联访问器，返回对应字段引用。
- *          通过访问器访问字段（而非 t[p].field），使代码保持 SoA 风格的
- *          "方法调用"可读性，同时让编译器仍能完全内联为裸指针算术
- *      _push_up(p)                  用左右孩子和自身值更新 p 的 sum、siz、cnt。
- *          注意：旋转、access 中切换孩子后必须调用。
- *          ⚠【自定义指南】如需维护路径最小值/异或，改这里
- *      _apply_rev(p)                翻转 p 的左右孩子，标记 rev[p] ^= 1。
- *          不影响 sum（sum 的合并通过 + 保证交换性）
- *      _push_down(p)                下传 p 的 rev 到左右孩子。
- *          ⚠【自定义指南】如需加法懒标记，参考 LCTPathAdd·路径加.cpp
- *      _push_all(p)                 从 p 向上走到 splay 根，收集路径上所有节点，
- *          再自上而下依次 _push_down。_splay 的第一步
- *      _rotate(p)                   将 p 向上旋转一次。
- *          注意：不检查 _is_root，调用方需保证旋转合法
- *      _splay(p)                    将 p splay 到其辅助树的根。
- *          先 _push_all(p) 下传路径标记，然后双旋直至 _is_root(p)
- *      _access(p)                   LCT 核心操作。将 p 到根的路径变为 preferred path（实链），
- *          返回 access 前与 p 同链的最深节点（即最后一次循环的 q）。
- *          注意：(1) _access 后 p 不一定是 splay 根——通常需要再 _splay(p)；
- *          (2) _access 会修改虚子树信息 virt_siz
- * Note:
- *      1. Time: 单次均摊 O(log N)
- *      2. Space: O(N)
- *      3. 结点编号采用 1-based，使用前先 init(n)
- *      4. 用法/技巧: link/cut 返回操作是否成功，query_* 要求两点连通
- *      5. 用法/技巧: query_subtree_size 需指定整棵树的根，内部会 make_root(root)
- *      6. 用法/技巧: query_component_size 内部会 make_root(x)，会改变树根
- *      7. 用法/技巧: lca 通过两次 access 实现
- *      8. 自定义指南:
- *          8.1 路径和 → 路径最小值: sum 改为 mint，+ 改为 min
- *          8.2 路径和 → 路径异或: sum 改为 xsum，+ 改为 ^
- *          8.3 加懒标记: 参考 LCTPathAdd·路径加.cpp（新增 add_tag、_apply_add）
- *          8.4 边权 LCT: 每条边拆成虚点 (u → edge_node → v)，虚点 val = 边权
- *          8.5 乘加双标记: 参考 RangeAffineSeg·区间乘加.cpp
- *      9. 实现细节: AoS 存储，每节点 ~40B（含填充），一条 cache line 装 1~2 个节点，
- *          沿 splay 链访问时整节点字段一并预取，比 SoA 减少约 30% cache miss
+/*
+ * Link-Cut Tree (动态树 / LCT)
+ *
+ * Overview:
+ *     利用 Splay 森林维护动态树（森林）的实链剖分（Preferred Path Decomposition）。
+ *     每个 Splay 对应原树中一条深度严格递增的实路径，
+ *     其根节点的父指针指向原树上该链顶节点的父节点（虚边，父认子而子不认父）。
+ *     通过 access 操作可打通任意点到根的实链；结合 Splay
+ *     翻转打标实现换根（make_root），从而支持动态连边、断边、
+ *     路径信息维护与子树/连通块信息统计。
+ *
+ * API:
+ *     LCT(n), init(n)             — 初始化 1...n 个点的动态森林
+ *     set_val(x, v)               — 把点 x 的点权改为 v
+ *     make_root(x)                — 将 x 所在树改为以 x 为根
+ *     find_root(x)                — 返回 x 所在树当前实义下的树根编号
+ *     split(x, y)                 — 提取 x 到 y 的路径，使 y 成为该辅助树根
+ *     link(x, y)                  — 若 x, y 不连通，则连边并返回 1，否则返回 0
+ *     cut(x, y)                   — 若边 (x, y) 存在，则断开并返回 1，否则返回 0
+ *     connected(x, y)             — 判断 x, y 是否连通
+ *     query_sum(x, y)             — 查询路径 x -> y 上的点权和
+ *     query_size(x, y)            — 查询路径 x -> y 上的点数
+ *     query_component_size(x)     — 返回 x 所在连通块的总点数
+ *     query_subtree_size(root, x) — 以 root 为整棵树的根时，返回 x 的子树大小
+ *     lca(x, y)                   — 返回 x, y 的最近公共祖先，若不连通则返回 0
+ *
+
+ * Notes:
+ *     1. 时间复杂度: 各类动态树操作均摊 O(log N)；空间复杂度 O(N)。
+ *     2. 索引约定: 节点编号采用 1-based (1..n)。
+ *     3. 虚子树维护: 节点维护 virt_siz 以支持原树子树大小与连通块大小统计。
+ *     4. 换根副作用: query_component_size 与 query_subtree_size 内部会调用
+ *        make_root。
  */
 struct LCT {
 private:

@@ -9,19 +9,24 @@
  *  快速增量法 (Clarkson-Shor 简化变体) 求三维点集凸包;返回三角面表。
  *
  * API:
- *  struct Face                               — 单个三角面;3 个顶点索引 + 朝外法向量。
- *  convex_hull_3d(pts) -> vector<Face>       — 点集凸包面表;N ≤ 3 返回空。Time O(N²) worst case。
- *  convex_hull_volume(hull, pts) -> ld       — 由面表与点表还原体积;按有向面积公式 1/6 Σ V_ijk,k。Time O(F)。
- *  convex_hull_surface_area(hull, pts) -> ld — 由面表求表面积;Σ Area_i。Time O(F)。
+ *     struct Face                         — 单个三角面;3 个顶点索引 +朝外法向量。
+ *     convex_hull_3d(pts)                 — 点集凸包面表;N ≤ 3 返回空。TimeO(N²)
+ *                                            worst case。
+ *     convex_hull_volume(hull, pts)       — 由面表与点表还原体积;按有向面积公式
+ *                                            1/6 Σ V_ijk,k。Time O(F)。
+ *     convex_hull_surface_area(hull, pts) — 由面表求表面积;Σ Area_i。TimeO(F)。
  *
  * Notes:
  *  复杂度最坏 O(N²);N ≤ 4e4 时实测可接受。退化为 4 个共面点 / N ≤ 3 返回空面表。
- *  共面处理采用"按点序号加极小扰动":对第 i 个点,坐标加 (i*1e-9, i*2e-9, i*3e-9),对最终结果无影响,可避免整列共面导致初始失败。
- *  可见面判断:对面 (i, j, k),若 p 与该面的带符号体积 > 0 (即 (p - vi) · n_ijk > 0) 则 p 可见。
+ *  共面处理采用"按点序号加极小扰动":对第 i 个点,坐标加 (i*1e-9, i*2e-9, i*3e-9),
+ *  对最终结果无影响,可避免整列共面导致初始失败。
+ *  可见面判断:对面 (i, j, k),若 p 与该面的带符号体积 > 0 (即 (p - vi) · n_ijk > 0)
+ *  则 p 可见。
  *  冲突边集合:每个面有 3 条对偶边;当两邻面在 horizon 一侧互相不可见时,形成新面替代。
  *
  * Related:
- *  Triangle·空间三角形.hpp::signed_volume_x6_tetrahedron: 凸包体积与可见面判定复用。
+ *  Triangle·空间三角形.hpp::signed_volume_x6_tetrahedron:
+ *  凸包体积与可见面判定复用。
  */
 namespace Geo3D {
 
@@ -62,7 +67,9 @@ std::vector<Face3<T>> convex_hull_3d(std::vector<Point<T>> pts) {
         }
         if (c >= n) return false;
         for (d = c + 1; d < n; ++d) {
-            if (!is_zero(signed_volume_x6_tetrahedron(p_ld[a], p_ld[b], p_ld[c], p_ld[d]))) break;
+            auto v6 = signed_volume_x6_tetrahedron(
+                p_ld[a], p_ld[b], p_ld[c], p_ld[d]);
+            if (!is_zero(v6)) break;
         }
         if (d >= n) return false;
         return true;
@@ -91,7 +98,8 @@ std::vector<Face3<T>> convex_hull_3d(std::vector<Point<T>> pts) {
         std::vector<bool> vis(faces.size(), false);
         for (size_t f = 0; f < faces.size(); ++f) {
             Face3<T>& fc = faces[f];
-            auto vol = signed_volume_x6_tetrahedron(p_ld[fc.i], p_ld[fc.j], p_ld[fc.k], p_ld[p]);
+            auto vol = signed_volume_x6_tetrahedron(
+                p_ld[fc.i], p_ld[fc.j], p_ld[fc.k], p_ld[p]);
             if (sgn(vol) > 0) vis[f] = true;
         }
         if (std::none_of(vis.begin(), vis.end(), [](bool b) { return b; })) continue;
@@ -141,10 +149,12 @@ std::vector<Face3<T>> convex_hull_3d(std::vector<Point<T>> pts) {
 // 凸包体积(浮点):按有向面积公式 1/6 Σ V_ijk,k
 template<typename T>
 requires std::is_floating_point_v<T>
-T convex_hull_volume(const std::vector<Face3<T>>& hull, const std::vector<Point<T>>& pts) {
+T convex_hull_volume(
+    const std::vector<Face3<T>>& hull, const std::vector<Point<T>>& pts) {
     T vol = 0;
     for (const auto& f : hull) {
-        vol += signed_volume_x6_tetrahedron(pts[f.i], pts[f.j], pts[f.k], Point<T>(0, 0, 0));
+        vol += signed_volume_x6_tetrahedron(
+            pts[f.i], pts[f.j], pts[f.k], Point<T>(0, 0, 0));
     }
     return std::abs(vol) / (T)6;
 }
@@ -152,7 +162,8 @@ T convex_hull_volume(const std::vector<Face3<T>>& hull, const std::vector<Point<
 // 凸包表面积:Σ triangle_area(v_i, v_j, v_k)
 template<typename T>
 requires std::is_floating_point_v<T>
-T convex_hull_surface_area(const std::vector<Face3<T>>& hull, const std::vector<Point<T>>& pts) {
+T convex_hull_surface_area(
+    const std::vector<Face3<T>>& hull, const std::vector<Point<T>>& pts) {
     T s = 0;
     for (const auto& f : hull) {
         s += triangle_area(pts[f.i], pts[f.j], pts[f.k]);

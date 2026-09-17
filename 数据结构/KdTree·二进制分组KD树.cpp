@@ -1,28 +1,26 @@
 #include "aizalib.h"
-/**
- * 二进制分组 kd-tree
- * 模板参数:
- *      T: 坐标类型，默认为i64
- *      K: 维度，默认为2
- *      VT: 附加值类型，默认为 int
- * interface:
- *      KDTree(int siz)                     — 构造函数，指定最大节点数，内部实现会回收节点
- *      insert(Point pt)                    — 插入节点，pt为Point类型，包含坐标信息
- *      query_nearest(Point pt)             — 查询与pt最近的点的距离平方
- *      query_box(Point lower, Point upper) — 查询矩形范围内点权值和
- * note:
- *      1. 时间复杂度：
- *          - 插入：采用二进制分组重构，均摊 O(log^2 n)
- *          - 最近点查询 (NN)：平均 O(log n)，最坏 O(n^(1-1/K))
- *          - 矩形区域查询 (Box)：最坏 O(n^(1-1/K))
- *          - 空间复杂度：O(n)
- *      2. 该版本kd-tree不支持删除操作，只能通过标记删除实现
- *      3. 二进制分组实现，每次插入会合并siz相同的子树，保证每个子kd-tree的节点数均为2的幂次方
- *      4. 若题目只是常规二维数点/矩形计数，通常有更优替代：
- *          4.1 静态离线矩形数点，优先考虑扫描线 + 树状数组，复杂度稳定且常数通常更优。
- *          4.2 静态在线区间数点 / 第 k 小，可考虑主席树、划分树等基于值域划分的做法。
- *          4.3 坐标范围较小且需要在线修改时，可优先考虑二维树状数组 / 二维前缀和。
- *          4.4 kd-tree 更适合低维空间中的在线插入、最近点查询、以及一般矩形权值统计。
+/*
+ * Binary Grouping KD-Tree (二进制分组KD树)
+ *
+ * Overview:
+ *     基于二进制分组（Binary Grouping）重构技术的在线动态低维空间检索数据结构。
+ *     维护最多 O(log N) 棵大小为 2 的幂次的静态 KD 树森林。
+ *     新点插入时类似二进制加法将同阶子树合并重构，以均摊代价消除动态 KD 树退化；
+ *     各子树利用包围盒（Bounding Box）剪枝，支持低维空间在线最近点查询（NN）
+ *     与多维正交范围矩形权值和统计。
+ *
+ * API:
+ *     KDTree(siz)             — 构造函数，指定最大节点容量
+ *     insert(pt)              — 动态插入带权高维点 pt
+ *     query_nearest(pt)       — 查询点集内与 pt 距离最近的欧氏距离平方
+ *     query_box(lower, upper) — 查询轴对齐超矩形范围内的点权值总和
+ *
+ * Notes:
+ *     1. 时间复杂度: 插入均摊 O(log^2 N)；最近点查询平均 O(log N)，矩形范围查询最坏
+ *        O(N^(1-1/K))。
+ *     2. 空间复杂度: 节点复用与垃圾回收池实现，空间复杂度 O(N)。
+ *     3. 选型建议: 静态矩形数点优先采用扫描线 + BIT；KD
+ *        树适用于在线插入与几何近邻搜索。
  */
 template<typename T = i64, int K = 2, typename VT = int>
 struct KDTree {
@@ -101,17 +99,28 @@ struct KDTree {
         T best_span = 0;
         rep(d, 0, K - 1) {
             T mn = pts[l][d], mx = pts[l][d];
-            rep(i, l + 1, r) mn = std::min(mn, pts[i][d]), mx = std::max(mx, pts[i][d]);
+            rep(i, l + 1, r) {
+                mn = std::min(mn, pts[i][d]);
+                mx = std::max(mx, pts[i][d]);
+            }
             if (d == 0 || mx - mn > best_span) best = d, best_span = mx - mn;
         }
         return best;
     }
     bool _box_in(int u, const Point& lower, const Point& upper) const {
-        rep(i, 0, K - 1) if (min_val(u, i) < lower[i] || max_val(u, i) > upper[i]) return false;
+        rep(i, 0, K - 1) {
+            if (min_val(u, i) < lower[i] || max_val(u, i) > upper[i]) {
+                return false;
+            }
+        }
         return true;
     }
     bool _box_out(int u, const Point& lower, const Point& upper) const {
-        rep(i, 0, K - 1) if (max_val(u, i) < lower[i] || min_val(u, i) > upper[i]) return true;
+        rep(i, 0, K - 1) {
+            if (max_val(u, i) < lower[i] || min_val(u, i) > upper[i]) {
+                return true;
+            }
+        }
         return false;
     }
     bool _point_in(int u, const Point& lower, const Point& upper) const {

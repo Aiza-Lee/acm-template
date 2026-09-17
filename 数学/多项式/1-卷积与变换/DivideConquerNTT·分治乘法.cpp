@@ -1,16 +1,32 @@
+#include "aizalib.h"
 #include "0-base/Poly·多项式全家桶.hpp"
+/*
+ * Divide and Conquer NTT & Semi-online Convolution (分治 NTT 与半在线卷积)
+ *
+ * Overview:
+ *      提供通用的 CDQ 分治 NTT 计算框架与多项式乘积运算。
+ *      包含三个主要组件：
+ *      1. cdq_framework: 通用半在线递推框架，用户传入基础赋值与区间转移闭包。
+ *      2. cdq_ntt: 标准半在线卷积求解 F(x) = C / (1 - G(x))，其中 G[0] = 0。
+ *      3. poly_prod: 归并二分分治计算多个多项式的总连乘积 prod P_i。
+ *
+ * API:
+ *     cdq_framework(n, init_base, relax) — 通用分治框架，复杂度 O(n log^2 n)。
+ *     cdq_ntt(n, g, f_0)                 — 求解半在线卷积 f[i] = sum_{j=1..i}
+ *                                           f[i-j] * g[j]，返回长为 n 的多项式。
+ *                                           复杂度 O(n log^2 n)。
+ *     poly_prod(polys)                   — 分治计算多项式序列的乘积 prod P_i。
+ *                                           复杂度 O(N log^2 N)，其中 N = sum
+ *                                           deg(P_i)。
+ *
+ * Notes:
+ *      1. cdq_ntt 要求 g[0] = 0 以消除自环依赖。
+ *
+ * Related:
+ *      数学/多项式/0-base/Poly·多项式全家桶.hpp: 底层多项式支持。
+ */
 
 namespace poly_ext {
-
-/**
- * 通用分治 NTT (半在线卷积)
- * 计算分治结构，用户提供 relax 闭包处理 [l, mid] 状态对 [mid+1, r] 的转移
- * 可以极大扩展处理复杂的多项式相互依赖情况
- *
- * @param n 区间大小 [0, n - 1]
- * @param init_base 处理基础条件(如初始赋值) void(int i)
- * @param relax 从 [l, mid] 转移到 [mid+1, r] 的贡献 (如 NTT 计算后累加) void(int l, int mid, int r)
- */
 template<typename F1, typename F2>
 void cdq_framework(int n, F1 init_base, F2 relax) {
     if (n <= 0) return;
@@ -26,19 +42,6 @@ void cdq_framework(int n, F1 init_base, F2 relax) {
     };
     run(run, 0, n - 1);
 }
-
-/**
- * 分治 NTT 计算标准的半在线卷积
- * 形式化描述: F(x) = F(x)G(x) + C (mod x^n), 且 G[0]=0
- *等价于 F(x) = C / (1 - G(x))
- * 
- * 复杂度: O(n log^2 n)
- * 
- * @param n 需要计算的项数，即计算 f[0]...f[n-1]
- * @param g 卷积多项式 g (要求 g[0] = 0), 确保没有自依赖
- * @param f_0 f 的初始项 f[0]，默认为 1
- * @return 计算得到的 f (大小为 n)
- */
 Poly cdq_ntt(int n, const Poly& g, int f_0 = 1) {
     if (n <= 0) return Poly();
     Poly f(n);
@@ -77,15 +80,6 @@ Poly cdq_ntt(int n, const Poly& g, int f_0 = 1) {
     return f;
 }
 
-/**
- * 分治乘法 (计算多个多项式的乘积)
- * 计算 P = \prod P_i
- * 
- * 复杂度: O(N log^2 N)，其中 N 为所有多项式的度数之和
- * 
- * @param polys 多项式集合
- * @return 乘积多项式
- */
 Poly poly_prod(const std::vector<Poly>& polys) {
     if (polys.empty()) return Poly({1});
         

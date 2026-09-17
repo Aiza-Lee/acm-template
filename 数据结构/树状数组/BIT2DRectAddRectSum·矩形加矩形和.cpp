@@ -1,21 +1,26 @@
 #include "aizalib.h"
-/**
- * 矩形加矩形和树状数组
- * 算法介绍: 用四棵 1-based 二维树状数组维护二维差分，支持矩形加、矩形前缀和与子矩形求和。
- * 模板参数: T
- * Interface:
- *      RectBitTree2D<T>(n, m), init(n, m) — 初始化 n * m 的结构
- *      RectBitTree2D<T>(a), init(a)       — 用 1-based 矩阵 a 建树
- *      add(x1, y1, x2, y2, v)             — 令 a[x1..x2][y1..y2] += v
- *      sum_prefix(x, y)                   — 查询子矩形 [1, x] * [1, y] 的和
- *      sum(x1, y1, x2, y2)                — 查询子矩形 [x1, x2] * [y1, y2] 的和
- *      all_sum()                          — 查询整体 [1, n] * [1, m] 的和
- * Note:
- *      1. Time: 单次 add / sum_prefix / sum O(log N log M)，建树 O(NM)
- *      2. Space: O(NM)
- *      3. 下标从 1 开始；若传入矩阵建树，则要求 a[1..n][1..m] 有效，0 行/列留空
- *      4. 用法/技巧:
- *          4.1 维护二维差分 d，则前缀和可写成 (x+1)(y+1)sum(d)-(y+1)sum(i*d)-(x+1)sum(j*d)+sum(i*j*d)。
+/*
+ * BIT2DRectAddRectSum·矩形加矩形和
+ *
+ * Overview:
+ *      利用四棵二维树状数组分别维护二维差分项 d[i][j]、i*d[i][j]、j*d[i][j] 以及
+ *      i*j*d[i][j]。
+ *      由二维前缀和对差分的展开公式将矩形覆写转化为 4 个角点的差分修改，支持 O(log
+ *      n log m) 的子矩形加与子矩形求和。
+ *
+ * API:
+ *     RectBitTree2D<T>(n, m) / init(n, m) — 初始化 n * m 的二维差分树状数组。
+ *     RectBitTree2D<T>(a) / init(a)       — 用 1-based 矩阵 a 线性 O(nm) 建树。
+ * 
+ *     add(x1, y1, x2, y2, v) — 子矩形 [x1, x2] * [y1, y2] 所有元素增加 v。
+ *     sum_prefix(x, y)       — 查询前缀子矩形 [1, x] * [1, y] 的元素和。
+ *     sum(x1, y1, x2, y2)    — 查询子矩形 [x1, x2] * [y1, y2] 的元素和。
+ *     all_sum()              — 查询全局总和 [1, n] * [1, m]。
+ *
+ * Notes:
+ *      1. 1-based indexing；坐标范围 1..n, 1..m。传入二维数组 a 时第 0 行/列留空。
+ *      2. Time: add/sum 均为 O(log n log m)，线性建树 O(nm)；Space: O(nm)。
+ *      3. 四棵树常数较小，代码远比二维线段树轻简，适合二维平面离散区域批量更新求和。
  */
 template<typename T = i64>
 struct RectBitTree2D {
@@ -28,7 +33,9 @@ struct RectBitTree2D {
 
     static int _lowbit(int x) { return x & -x; }
 
-    void _build(std::vector<std::vector<T>>& tr, const std::vector<std::vector<T>>& a) {
+    void _build(
+        std::vector<std::vector<T>>& tr,
+        const std::vector<std::vector<T>>& a) {
         AST((int)a.size() == n + 1);
         tr.assign(n + 1, std::vector<T>(m + 1, T{}));
         rep(i, 1, n) {
@@ -120,7 +127,8 @@ struct RectBitTree2D {
     T sum(int x1, int y1, int x2, int y2) const {
         AST(1 <= x1 && x1 <= x2 && x2 <= n);
         AST(1 <= y1 && y1 <= y2 && y2 <= m);
-        return sum_prefix(x2, y2) - sum_prefix(x1 - 1, y2) - sum_prefix(x2, y1 - 1) + sum_prefix(x1 - 1, y1 - 1);
+        return sum_prefix(x2, y2) - sum_prefix(x1 - 1, y2)
+             - sum_prefix(x2, y1 - 1) + sum_prefix(x1 - 1, y1 - 1);
     }
     T all_sum() const { return sum_prefix(n, m); }
 };

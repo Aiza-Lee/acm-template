@@ -1,24 +1,33 @@
 #include "aizalib.h"
 #include "PolyCore·多项式核心.hpp"
 
-/**
- * MTT (任意模数多项式加减乘、求逆、Ln、Exp) - 基于 3模数NTT + CRT
- * 算法介绍: 
- *      只有"多项式乘法(卷积)"纯整数相加乘，可以使用 CRT 合并。
- *      求逆、Ln、Exp 包含有理数除法，破坏了整数大小关系，不能直接分三个模数计算再合并，必须在外部写黑盒牛顿迭代。
- * 模板参数: 
- *      依赖全局模数配置：MTT::modP (使用前务必初始化！)
- * interface: 
- *      AnyModPoly(vector)
- *      + - * / %
- *      deriv(), integral()
- *      inverse(n), ln(n), exp(n)
- *      mul_poly(A, B) -> — 调用底层的 3 模数 NTT 乘法
- * note:
- *      1. 时间复杂度: 乘法 O(N log N) / 操作由于不复用点值常数略大
- *      2. 使用模数: 998244353, 1004535809, 469762049 (原根均为 3)
- *      3. 初始化方法: MTT::modP = P;
- *      4. 依赖项: PolyCore<MD, G>::mul (仅使用其点值域乘法核心)
+/*
+ * Any-Modulus Polynomial (MTT / 三模数 NTT 多项式)
+ *
+ * Overview:
+ *      基于三模数 NTT (998244353, 1004535809, 469762049) 与中国剩余定理 (CRT)，
+ *      支持在任意模数 modP 下进行多项式加减乘、求导、积分以及基于牛顿迭代的求逆、Ln
+ *      与 Exp。
+ *      乘法使用纯整数在三个 NTT 模数下分别卷积后经 Garner 算法精确合并，再对目标
+ *      modP 取模。
+ *
+ * API:
+ *     MTT::modP               — 当前全局目标模数配置变量。
+ *     mul_poly(a, b)          — 纯三模数 NTT 卷积，返回 a * b mod modP，复杂度
+ *                                O((n+m) log(n+m))。
+ *     AnyModPoly              — 任意模数多项式结构（继承自 vector<int>）。
+ *     P + Q, P                — Q, P * Q: 多项式代数运算。
+ *     P.deriv(), P.integral() — 多项式求导与不定积分。
+ *     P.inverse(n)            — 模 x^n 多项式求逆，复杂度 O(n log n)。
+ *     P.ln(n)                 — 模 x^n 多项式求对数 Ln，复杂度 O(n log n)。
+ *     P.exp(n)                — 模 x^n 多项式求指数 Exp，复杂度 O(n log n)。
+ *
+ * Notes:
+ *      1. 使用前务必设定 MTT::modP = P。
+ *      2. 要求逆、Ln、Exp 时常数项需满足模意义下的可逆条件。
+ *
+ * Related:
+ *      数学/多项式/0-base/PolyCore·多项式核心.hpp: 单模数 NTT 基础计算核心。
  */
 namespace MTT {
     // 预计算常量
@@ -112,7 +121,9 @@ namespace MTT {
             if (empty()) return {};
             AnyModPoly res(size() + 1);
             res[0] = 0;
-            rep(i, 0, (int)size() - 1) res[i + 1] = 1ll * (*this)[i] * MTT::inv(i + 1) % modP;
+            rep(i, 0, (int)size() - 1) {
+                res[i + 1] = 1ll * (*this)[i] * MTT::inv(i + 1) % modP;
+            }
             return res;
         }
 

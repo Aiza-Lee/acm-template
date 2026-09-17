@@ -1,19 +1,24 @@
 #include "aizalib.h"
-
-/**
- * Linked DSU (链式并查集 / 序列并查集)
- * 算法介绍: 用于维护序列中元素的删除操作，支持快速查找下一个未被删除的元素。
- * 模板参数: None
- * Interface:
- *      LinkedDSU(n) — 初始化位置 1..n，并保留 n+1 作为哨兵
- *      find(x)      — 返回 x 之后(包含 x)第一个未被删除的位置
- *      remove(x)    — 删除位置 x
- *      removed(x)   — 判断 x 是否已删除
- * Note:
- *      1. Time: 单次 find / remove / removed 均摊 O(alpha(n))
- *      2. Space: O(n)
- *      3. 1-based indexing；n + 1 是“没有下一个”的哨兵位置
- *      4. 用法/技巧: 常用于离线区间染色、删除后跳到下一个候选位置等场景。
+/*
+ * LinkedDSU·链式并查集
+ *
+ * Overview:
+ *      维护一维有序序列中的元素删除与后继跳跃，每个元素在并查集中指向自身或下一个存
+ *      活位置。
+ *      构建了支持 O(alpha(n)) 快速跳过已删除区间的序列压缩工具。
+ *
+ * API:
+ *     LinkedDSU(n) — 初始化位置 1..n，设置 n+1 为哨兵终点。
+ *     find(x)      — 返回位置 x 及其之后第一个未被删除的位置，均摊 O(alpha(n))。
+ *     remove(x)    — 标记删除位置 x，将其后继定向到 x+1 的有效代表元，均摊
+ *                     O(alpha(n))。
+ *     removed(x)   — 判断位置 x 是否已被删除，均摊 O(alpha(n))。
+ *
+ * Notes:
+ *      1. 1-based indexing；n+1 作为越界终止哨兵（find 返回 n+1
+ *         表示之后无可用元素）。
+ *      2. Time: 单次操作均摊 O(alpha(n))；Space: O(n)。
+ *      3. 广泛用于区间染色覆写、网格/序列上批量跳跃扫描与图上度数批量削减。
  */
 struct LinkedDSU {
     int n;

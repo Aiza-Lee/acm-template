@@ -1,16 +1,26 @@
 #include "aizalib.h"
 
-/**
- * ExLucas (扩展 Lucas)
- * 算法介绍: 求组合数 C(n, m) mod mod；先拆成若干个 mod = p^k 的子问题，再用 ExCRT 合并。
- * 模板参数: None
- * Interface:
- *      ExLucas::C(n, m, mod) — 求组合数 C(n, m) mod mod，适合 mod 的各个质因数幂规模不太大
- * Note:
- *      1. Time: 约 O(sum(p^k) + t log n)，其中 t 为 mod 的不同质因子个数
- *      2. Space: O(sum(p^k))
- *      3. 通过递归计算 n! 中去掉 p 因子的部分，再补上 p 的次数
- *      4. 用法/技巧: 若 mod 是质数可直接用 Lucas；ExLucas 更适合一般合数模数
+/*
+ * Extended Lucas Theorem (扩展 Lucas 定理)
+ *
+ * Overview:
+ *      计算任意正整数模数 mod 下的组合数 C(n, m) mod mod。
+ *      将模数质因数分解为 mod = prod(p_i^{k_i})，分别计算每个质数幂模数下的 C(n, m)
+ *      mod p_i^{k_i}，最后利用扩展中国剩余定理 (ExCRT) 合并出模 mod 的解。
+ *      计算 n! mod p^k 时提取所有质因子 p，利用阶乘循环节和递归分治计算与 p
+ *      互质部分。
+ *
+ * API:
+ *     C(n, m, mod) — 计算组合数 C(n, m) mod mod。复杂度 O(sum(p_i^{k_i}) + t log
+ *                     n) 时间，O(max(p_i^{k_i})) 空间，其中 t 为 mod
+ *                     的不同质因子数。
+ *
+ * Notes:
+ *      1. 要求 mod > 0。若 m < 0 或 m > n 返回 0。若 mod = 1 返回 0。
+ *      2. 适用于各 p_i^{k_i} 较小（通常 <= 10^6）的一般模数组合数计算。
+ *
+ * Related:
+ *      数学/数论/ExtendedCRT·扩展中国剩余定理.cpp: 用于合并各同余方程。
  */
 struct ExLucas {
     static i64 _norm(i64 x, i64 mod) {

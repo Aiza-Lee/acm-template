@@ -3,23 +3,28 @@
 
 namespace poly_ext {
 
-/**
- * Newton 恒等式
- * 用途:
- *      在同一组根的 p、e、f 之间转换。
- *      公式和应用见文字资料「数学/多项式/牛顿恒等式」。
+/*
+ * Newton's Identities (牛顿恒等式与对称多项式变换)
  *
- * Interface:
- *      Poly p_to_e(p, n) p_1..p_n -> e_0..e_n
- *      Poly e_to_p(e, m) e -> p_0..p_m
- *      Poly p_to_f(p, n) p -> f(x)=prod(x-a_i)
- *      Poly f_to_p(f, m) f -> p_0..p_m
+ * Overview:
+ *      建立同一组变量根集合的幂和对称多项式 p_k = sum a_i^k、初等对称多项式 e_k =
+ *      sum a_{i_1}...a_{i_k} 以及首一特征多项式 f(x) = prod (x - a_i)
+ *      之间的快速双向转换。
+ *      利用母函数对数导数关系 E(x) = sum e_k x^k = exp(sum (-1)^{k-1} p_k x^k / k)，
+ *      结合多项式 Exp 与求逆在 O(n log n) 时间内完成三者互化。
  *
- * Note:
- *      1. p[0] 表示 p_0，输入时可忽略；返回时 p[0] = 根数。
- *      2. e[0] = 1，f 为低位在前且 f[n] = 1。
- *      3. Time: O(n log n) / O(m log m)。
- *      4. 由 p 恢复 e 时需要 1..n 在模意义下可逆。
+ * API:
+ *     p_to_e(p, n) — 幂和 p_1..p_n 转化为初等对称多项式 e_0..e_n，复杂度 O(n log n)。
+ *     e_to_p(e, m) — 初等对称多项式 e 转化为前 m 项幂和 p_0..p_m，复杂度 O(m log m)。
+ *     p_to_f(p, n) — 幂和 p 转化为特征多项式 f(x) = prod(x - a_i)，复杂度 O(n log n)。
+ *     f_to_p(f, m) — 特征多项式 f 转化为前 m 项幂和 p_0..p_m，复杂度 O(m log m)。
+ *
+ * Notes:
+ *      1. 要求 1..n 在模意义下存在逆元。
+ *      2. p[0] 返回根的总数 n，e[0] = 1，f 为升幂排列且最高次项系数 f[n] = 1。
+ *
+ * Related:
+ *      数学/多项式/0-base/Poly·多项式全家桶.hpp: 多项式 Exp 与求逆。
  */
 struct NewtonIdentities {
     // E(x)=sum e_k x^k = exp(sum (-1)^{k-1} p_k x^k / k)

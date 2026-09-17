@@ -2,47 +2,36 @@
 #include "aizalib.h"
 #include "PolyCore·多项式核心.hpp"
 
-/**
- * [多项式全家桶] (Refactored)
- * 算法介绍:
- *      基于NTT的多项式运算库。
- *      支持多项式加减乘除、求导积分、求逆、ln、exp、sqrt、pow、三角函数、多点求值。
- * 
- * Impl:
- *      poly_core.hpp: 核心运算 (NTT, Mul, Inv, etc.)
- * 
- * Interface:
- *      Poly(vector)
- *      + - * / %
- *      deriv(), integral()
- *      inverse(n), ln(n), exp(n)
- *      sqrt(n), pow(k, n)
- *      sin(n), cos(n), tan(n)
- * 
- * Note:
- *      1. 继承自 std::vector<int>，可直接使用 vector 的方法
- *      2. 内部使用静态内存池优化，减少内存分配开销
- *      3. 注意创建常数 1，使用 Poly({1})，而不是 Poly(1)
- * 
- * Inverse Note:
- *      1. 需要保证常数项不为 0 (a[0] != 0)
- * 
- * Ln / Exp / Pow Note:
- *      1. Ln: 要求常数项必须为 1 (a[0] = 1)
- *      2. Exp: 要求常数项必须为 0 (a[0] = 0)
- *      3. Pow: 由于实现为 exp(k * ln(A))，要求常数项必须为 1 (a[0] = 1)
- * 
- * Trig Note (sin / cos / tan):
- *      1. 依赖欧拉公式的 exp 实现，要求多项式的常数项必须为 0 (a[0] = 0)
- * 
- * Sqrt Note:
- *      1. 常数项不为 0 时: 要求常数项可开方，如果有多个平方根，会有不同结果
- *      2. 常数项为 0 时: 将 g(x) 分解为 x^k f(x)，保证 f(x) 常数项不为零，k 为偶数，且 f(x) 可以开方
- *      3. 常数项不为 1 时: 需要使用二次剩余计算常数项的平方根
- * 
- * Div/Mod Note:
- *      1. 除法要求除数 b 的最高次项系数不为 0
- *      2. 余数的大小会被调整为 b.size()-1
+/*
+ * Polynomial Toolbox (多项式全家桶)
+ *
+ * Overview:
+ *      现代面向对象多项式类模板 Polynomial<MD, G, IMG_UNIT>（默认模数 998244353）。
+ *      继承自 std::vector<int>，具备动态数组特性，无缝衔接 STL 容器操作。
+ *      基于底层 PolyCore 实现全套代数算子：加减乘除模、求导积分、求逆、Ln、Exp、
+ *      开方 Sqrt、快速幂 Pow、三角函数 (sin, cos, tan)、单点求值与去零收缩。
+ *
+ * API:
+ *     using Poly = Polynomial<>    — 预设模数 998244353 的别名。
+ *     P + Q, P                     — Q, P * Q, P * k: 多项式代数四则运算。
+ *     P / Q, P % Q, div_mod(Q)     — 多项式带余除法，返回 {商 Q, 余数 R}，复杂度
+ *                                     O(n log n)。
+ *     P.deriv(), P.integral()      — 多项式求导与不定积分。
+ *     P.inverse(n)                 — 模 x^n 多项式求逆，要求常数项 a[0] != 0。
+ *     P.ln(n)                      — 模 x^n 对数函数 Ln，要求常数项 a[0] = 1。
+ *     P.exp(n)                     — 模 x^n 指数函数 Exp，要求常数项 a[0] = 0。
+ *     P.sqrt(n)                    — 模 x^n 开方函数 Sqrt，要求常数项 a[0] = 1。
+ *     P.pow(k, n)                  — 模 x^n 快速幂 A^k，支持首项非 1 与低次项为 0。
+ *     P.sin(n), P.cos(n), P.tan(n) — 模 x^n 三角函数，要求常数项 a[0] = 0。
+ *     P.eval(x)                    — 霍纳法则 O(n) 计算多项式在单点 x 处的值 P(x)。
+ *     P.shrink()                   — 移除最高次项的多余前导零。
+ *
+ * Notes:
+ *      1. 创建常数 1 请使用 Poly({1}) 而不是 Poly(1)。
+ *      2. 各级牛顿迭代函数若未显式指定 n，默认截断到当前自身 size()。
+ *
+ * Related:
+ *      数学/多项式/0-base/PolyCore·多项式核心.hpp: 底层 NTT 与内存池支持。
  */
 template<int MD = 998244353, int G = 3, int IMG_UNIT = 86583718>
 struct Polynomial : public std::vector<int> {
@@ -106,7 +95,9 @@ struct Polynomial : public std::vector<int> {
 
     Polynomial inverse(int n = -1) const {
         if (n == -1) n = size();
-        if ((int)size() < n) { Polynomial A = *this; A.resize(n); return A.inverse(n); }
+        if ((int)size() < n) {
+            Polynomial A = *this; A.resize(n); return A.inverse(n);
+        }
         Polynomial res(n);
         Core::inv_impl(data(), n, res.data());
         return res;
@@ -114,7 +105,9 @@ struct Polynomial : public std::vector<int> {
 
     Polynomial ln(int n = -1) const {
         if (n == -1) n = size();
-        if ((int)size() < n) { Polynomial A = *this; A.resize(n); return A.ln(n); }
+        if ((int)size() < n) {
+            Polynomial A = *this; A.resize(n); return A.ln(n);
+        }
         Polynomial res(n);
         Core::ln(data(), n, res.data());
         return res;
@@ -122,7 +115,9 @@ struct Polynomial : public std::vector<int> {
 
     Polynomial exp(int n = -1) const {
         if (n == -1) n = size();
-        if ((int)size() < n) { Polynomial A = *this; A.resize(n); return A.exp(n); }
+        if ((int)size() < n) {
+            Polynomial A = *this; A.resize(n); return A.exp(n);
+        }
         Polynomial res(n);
         Core::exp(data(), n, res.data());
         return res;
@@ -130,7 +125,9 @@ struct Polynomial : public std::vector<int> {
 
     Polynomial sqrt(int n = -1) const {
         if (n == -1) n = size();
-        if ((int)size() < n) { Polynomial A = *this; A.resize(n); return A.sqrt(n); }
+        if ((int)size() < n) {
+            Polynomial A = *this; A.resize(n); return A.sqrt(n);
+        }
         Polynomial res(n);
         Core::sqrt(data(), n, res.data());
         return res;
@@ -138,7 +135,9 @@ struct Polynomial : public std::vector<int> {
 
     Polynomial pow(int k, int n = -1) const {
         if (n == -1) n = size();
-        if ((int)size() < n) { Polynomial A = *this; A.resize(n); return A.pow(k, n); }
+        if ((int)size() < n) {
+            Polynomial A = *this; A.resize(n); return A.pow(k, n);
+        }
         Polynomial res(n);
         Core::pow(data(), n, k, res.data());
         return res;
@@ -148,7 +147,9 @@ struct Polynomial : public std::vector<int> {
         if (n == -1) n = size();
         Polynomial A(n);
         // Note: size constraint check
-        rep(i, 0, std::min(n, (int)size()) - 1) A[i] = Core::mul((*this)[i], IMG_UNIT);
+        rep(i, 0, std::min(n, (int)size()) - 1) {
+            A[i] = Core::mul((*this)[i], IMG_UNIT);
+        }
         auto E1 = A.exp(n), E2 = E1.inverse(n);
         Polynomial res = E1 - E2;
         int inv2i = Core::inv(Core::mul(2, IMG_UNIT));
@@ -159,7 +160,9 @@ struct Polynomial : public std::vector<int> {
     Polynomial cos(int n = -1) const {
         if (n == -1) n = size();
         Polynomial A(n);
-        rep(i, 0, std::min(n, (int)size()) - 1) A[i] = Core::mul((*this)[i], IMG_UNIT);
+        rep(i, 0, std::min(n, (int)size()) - 1) {
+            A[i] = Core::mul((*this)[i], IMG_UNIT);
+        }
         auto E1 = A.exp(n), E2 = E1.inverse(n);
         Polynomial res = E1 + E2;
         int inv2 = Core::inv(2);
@@ -205,7 +208,9 @@ struct Polynomial : public std::vector<int> {
 
     friend Polynomial operator*(int k, const Polynomial& a) { return a * k; }
     friend std::ostream& operator<<(std::ostream& os, const Polynomial& a) {
-        rep(i, 0, (int)a.size() - 1) os << a[i] << (i == (int)a.size() - 1 ? "" : " ");
+        rep(i, 0, (int)a.size() - 1) {
+            os << a[i] << (i == (int)a.size() - 1 ? "" : " ");
+        }
         return os;
     }
 };

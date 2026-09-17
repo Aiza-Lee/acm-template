@@ -1,20 +1,24 @@
 #include "aizalib.h"
-/**
- * 可持久化并查集
- * 算法介绍: 用可持久化线段树维护 fa / siz 数组；每次合并仅改动并查集根对应的两个位置。
- * 模板参数: None
- * Interface:
- *      PersistentDSU(n, m), init(n, m) — 初始化 n 个点、预留 m 个线性版本
- *      unite(ver, x, y)                — 在 ver 版本基础上合并 x, y，生成新版本
- *      query_same(ver, x, y)           — 查询 ver 版本中 x, y 是否连通
- *      append_version(ver)             — 复制 ver 版本作为最新版本
- *      find_root(ver, x)               — 查询 ver 版本中 x 所在集合代表元
- * Note:
- *      1. Time: 单次操作 O(log N log N)，其中 find_root 需要沿并查集父链查询
- *      2. Space: O(N + 修改次数 log N)
- *      3. 结点编号、版本编号均采用 1-based / 0-based 常规约定：点为 1...n，版本从 0 开始
- *      4. 用法/技巧: 不做路径压缩，否则会破坏可持久化；用按大小合并保证高度
- *      5. 用法/技巧: 结点池采用 reserve + push_back，多次修改后不足时交给 vector 自动扩容
+/*
+ * Persistent Disjoint Set Union (可持久化并查集)
+ *
+ * Overview:
+ *     利用单点修改的可持久化线段树维护并查集的父节点指针 fa 与连通块大小 sz。
+ *     为避免路径压缩破坏历史版本拓扑结构，仅采用按秩/按大小合并保持树高为 O(log N)，
+ *     支持在历史任意版本上查询点连通性及分叉产生新连通状态。
+ *
+ * API:
+ *     PersistentDSU(n, m), init(n, m) — 初始化 n 个点、预留 m 个线性版本
+ *     unite(ver, x, y)                — 在 ver 版本基础上合并 x, y，生成新版本
+ *     query_same(ver, x, y)           — 查询 ver 版本中 x, y 是否连通
+ *     append_version(ver)             — 复制 ver 版本作为最新版本
+ *     find_root(ver, x)               — 查询 ver 版本中 x 所在集合代表元
+ *
+
+ * Notes:
+ *     1. 时间复杂度: find_root 与 unite 均为 O(log^2 N)；空间复杂度 O(N + M log N)。
+ *     2. 索引约定: 元素编号采用 1-based (1..n)，版本编号从 0 开始。
+ *     3. 树高保证: 严禁路径压缩，严格依赖启发式合并保证树高不超过 log N。
  */
 struct PersistentDSU {
     struct Node {
@@ -73,12 +77,14 @@ private:
     int _query_fa(int p, int pos, int l, int r) const {
         if (l == r) return tr[p].fa;
         int mid = (l + r) >> 1;
-        return pos <= mid ? _query_fa(tr[p].l, pos, l, mid) : _query_fa(tr[p].r, pos, mid + 1, r);
+        return pos <= mid ? _query_fa(tr[p].l, pos, l, mid)
+                          : _query_fa(tr[p].r, pos, mid + 1, r);
     }
     int _query_sz(int p, int pos, int l, int r) const {
         if (l == r) return tr[p].sz;
         int mid = (l + r) >> 1;
-        return pos <= mid ? _query_sz(tr[p].l, pos, l, mid) : _query_sz(tr[p].r, pos, mid + 1, r);
+        return pos <= mid ? _query_sz(tr[p].l, pos, l, mid)
+                          : _query_sz(tr[p].r, pos, mid + 1, r);
     }
     void _update(int old, int& p, int pos, int new_fa, int new_sz, int l, int r) {
         p = _is_old(old) ? _clone(old) : old;

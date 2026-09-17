@@ -1,25 +1,22 @@
 #include "aizalib.h"
 #include <bit>
-
-/**
- * 二维ST表 (2D Sparse Table)
- * 算法介绍:
- *      基于倍增预处理静态二维矩阵矩形最小值查询 (RMQ)。
- *      对于任意轴对齐矩形，通过 4 个预处理的 2^k1 × 2^k2 方块覆盖查询区域。
+/*
+ * SparseTable2D·二维ST表
  *
- * 模板参数:
- *      T: 值类型，需支持 operator< 及默认构造
+ * Overview:
+ *      二维倍增静态矩形最小值预处理结构。
+ *      通过 4 个大小为 2^k1 * 2^k2 的重叠子矩形无缝覆盖任意轴对齐目标矩形，
+ *      构建了静态二维网格上严格 O(1) 时间的矩形 RMQ 查询工具。
  *
- * Interface:
- *      SparseTable2D(grid)   — 传入 1-based 二维网格 (n 行 m 列) 构建
- *      query(r1, c1, r2, c2) — 查询矩形 [r1, r2] × [c1, c2] 内的最小值，O(1)
+ * API:
+ *     SparseTable2D(grid)   — 传入 1-based 二维网格 (n 行 m 列) 进行倍增构建。
+ *     build(grid)           — 重新由二维网格构建，O(nm log n log m)。
+ *     query(r1, c1, r2, c2) — 查询矩形 [r1, r2] * [c1, c2] 内的最小值，严格 O(1)。
  *
- * Note:
- *      1. Time: Build O(N M log N log M), Query O(1)
- *      2. Space: O(N M log N log M)
- *      3. 1-based indexing, grid[0][*] 和 grid[*][0] 预留不用
- *      4. 取 min 满足幂等性，因此 4 个预处理的方块可以重叠覆盖查询矩形
- *      5. st[k1][k2][i][j] 表示以 (i,j) 为左上角，大小为 2^k1 行 × 2^k2 列矩形的最小值
+ * Notes:
+ *      1. 1-based indexing；有效坐标 1..n, 1..m。grid[0][*] 和 grid[*][0] 留空。
+ *      2. Time: 预处理 O(nm log n log m)，单次查询 O(1)；Space: O(nm log n log m)。
+ *      3. 连续一维扁平化存储以提升缓存命中率与内存紧凑度。
  */
 template<typename T>
 struct SparseTable2D {

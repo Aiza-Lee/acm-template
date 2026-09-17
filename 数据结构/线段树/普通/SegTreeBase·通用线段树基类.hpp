@@ -2,43 +2,50 @@
 
 #include "aizalib.h"
 
-/**
- * 通用线段树基类 (Lazy Segment Tree Base)
- * 算法介绍: 维护一类支持区间修改、区间查询和线段树二分的懒标记线段树框架，具体维护内容由 Info / Tag 自定义。
- * 模板参数: Info (节点信息), Tag (懒标记)
- * Interface:
- *      SegTree(int n)                         — 初始化长度为 n 的空线段树
- *      SegTree(const std::vector<Info>& init) — 用 1-based 的 Info 数组建树
- * 
- *      void modify(int ql, int qr, const Tag& tag) — 区间打标记
- *      Info query(int ql, int qr)                  — 查询区间信息
- *      Info all_info()                             — 返回整棵树信息
- *      void set(int pos, const Info& value)        — 单点赋值
- *      int find_first(int ql, int qr, Pred pred)   — 在线段树上二分第一个满足条件的位置
- *      int find_last(int ql, int qr, Pred pred)    — 在线段树上二分最后一个满足条件的位置
- * Note:
- *      1. Time: build O(n)，modify / query / set / find O(log n)
- *      2. Space: O(n)
- *      3. 1-based indexing.
- *      4. 用法/技巧:
- *          4.1 Info 需要支持 operator+，用于合并左右儿子信息。
- *          4.2 Tag 需要支持 merge(rhs)、has_value()、apply_to(Info&, int l, int r)。
- *          4.3 find_first / find_last 中的 pred(info) 应满足单调性，否则二分结果没有意义。
- *          4.4 当前二分不维护前缀累加器；适合用 max/min/exists 等区间信息判定，前缀和二分需另写带 accumulator 的版本。
- *          4.5 不需要懒标记时可直接用 SegNullTag<Info>，或 SegTreePoint<Info> 别名。
+/*
+ * Segment Tree Base (通用线段树基类)
+ *
+ * Overview:
+ *     支持区间修改、区间查询与树上二分的通用延迟标记线段树框架。通过 C++20 Concept
+ *     解耦聚合节点信息（Info）与延迟标记（Tag），提供统一的单点修改、区间打标、
+ *     区间聚合查询与树上二分查找能力。
+ *
+ * API:
+ *     SegTree(int n)                              — 初始化长度为 n 的空线段树
+ *     SegTree(const std::vector<Info>& init)      — 用 1-based 的 Info 数组建树
+ *     void modify(int ql, int qr, const Tag& tag) — 区间打标记
+ *     Info query(int ql, int qr)                  — 查询区间信息
+ *     Info all_info()                             — 返回整棵树信息
+ *     void set(int pos, const Info& value)        — 单点赋值
+ *     int find_first(int ql, int qr, Pred pred)   — 在线段树上二分第一个满足条件的
+ *                                                    位置
+ *     int find_last(int ql, int qr, Pred pred)    — 在线段树上二分最后一个满足条件
+ *                                                    的位置
+ *
+
+ * Notes:
+ *     1. 时间复杂度: 建树 O(N)，单次 modify / query / set / find 均为 O(log N)。
+ *     2. 空间复杂度: 4N 数组实现，空间占用 O(N)。
+ *     3. 索引约定: 外部统一采用 1-based 索引。
+ *     4. 概念要求: Info 需支持默认构造和加法半群 operator+；Tag 需支持 has_value、
+ *        merge 与 apply_to。
  */
 
 template<class Info>
-concept SegInfo = std::default_initializable<Info> && requires(const Info& a, const Info& b) {
-    { a + b } -> std::same_as<Info>;
-};
+concept SegInfo =
+    std::default_initializable<Info> &&
+    requires(const Info& a, const Info& b) {
+        { a + b } -> std::same_as<Info>;
+    };
 
 template<class Tag, class Info>
-concept SegTag = std::default_initializable<Tag> && requires(Tag tag, const Tag& rhs, Info& info, int l, int r) {
-    { rhs.has_value() } -> std::convertible_to<bool>;
-    { tag.merge(rhs) } -> std::same_as<void>;
-    { rhs.apply_to(info, l, r) } -> std::same_as<void>;
-};
+concept SegTag =
+    std::default_initializable<Tag> &&
+    requires(Tag tag, const Tag& rhs, Info& info, int l, int r) {
+        { rhs.has_value() } -> std::convertible_to<bool>;
+        { tag.merge(rhs) } -> std::same_as<void>;
+        { rhs.apply_to(info, l, r) } -> std::same_as<void>;
+    };
 
 template<class Info>
 struct SegNullTag {

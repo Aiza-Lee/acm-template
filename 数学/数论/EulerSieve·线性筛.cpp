@@ -1,19 +1,35 @@
 #include "aizalib.h"
 
-/**
- * Euler Sieve (线性筛)
- * 算法介绍: 在线性时间内求质数表、最小质因子、欧拉函数与莫比乌斯函数。
- * 模板参数: None
- * Interface:
- *      EulerSieve(n)                  — 预处理 [1, n] 的 primes / minp / phi / mu，Time: O(n)
- *      sieve.primes / minp / phi / mu — 质数表、最小质因子、欧拉函数、莫比乌斯函数
- *      sieve.is_prime(x)              — 判断 x 是否为质数，Time: O(1)
- *      sieve.factorize(x)             — 分解 x 的质因数，Time: O(质因子个数)
- * Note:
- *      1. Time: O(n)
- *      2. Space: O(n)
- *      3. 下标按 1..n，phi[1]=mu[1]=1，minp[x] 为最小质因子
- *      4. 用法/技巧: 本文件下方保留了通用积性函数线性筛 MultiplicativeSieve<T>
+/*
+ * Euler Sieve & Multiplicative Sieve (线性筛与通用积性函数筛)
+ *
+ * Overview:
+ *      基于线性筛（欧拉筛）原理，每个合数恰好被其最小质因子 minp 筛去一次，在 O(n)
+ *      时间内预处理质数表、最小质因子、欧拉函数 phi 与莫比乌斯函数 mu。
+ *      同时提供通用积性函数线性筛 MultiplicativeSieve<T>，
+ *      通过维护最小质因子的最高幂 low[i] = p^k 与次数 cnt[i]，
+ *      将数分解为互质的两部分 i = low[i] * (i / low[i])，只需传入质数幂处的计算函数
+ *      calc_pk(p, c, pk) 即可筛出任意积性函数。
+ *
+ * API:
+ *     EulerSieve(n)                      — 构造函数，预处理 [1, n] 的筛表。复杂度
+ *                                           O(n) 时间与空间。
+ *     sieve.primes                       — 质数表 vector<int>。
+ *     sieve.minp                         — 最小质因子数组 vector<int>。
+ *     sieve.phi                          — 欧拉函数数组 vector<int>。
+ *     sieve.mu                           — 莫比乌斯函数数组 vector<int>。
+ *     sieve.is_prime(x)                  — O(1) 判断 2 <= x <= n 是否为质数。
+ *     sieve.factorize(x)                 — 质因数分解，返回 {(p, c)}，复杂度
+ *                                           O(质因子种数)。
+ *     MultiplicativeSieve<T>(n, calc_pk) — 构造函数，利用回调 calc_pk(p, c, pk)
+ *                                           预处理积性函数。复杂度 O(n) 时间与空间。
+ *     msieve.f                           — 积性函数值数组 vector<T>。
+ *     msieve.low                         — 最小质因子最高幂 low[i] = p^k。
+ *     msieve.cnt                         — 最小质因子次数 cnt[i] = k。
+ *
+ * Notes:
+ *      1. 下标均为 1-based [1..n]。
+ *      2. MultiplicativeSieve 要求 f 为积性函数且 f(1) = 1。
  */
 struct EulerSieve {
     int n;
@@ -61,23 +77,6 @@ struct EulerSieve {
     }
 };
 
-/**
- * Multiplicative Sieve (通用积性函数线性筛)
- * 算法介绍: 在线性筛过程中维护 i = rest * p^k，从而筛任意积性函数 f。
- * 模板参数: T
- * Interface:
- *      MultiplicativeSieve<T>(n, calc_pk) // 预处理 [1, n] 的 f[i]，Time: O(n)
- *      sieve.f[i]                         // f(i)
- *      sieve.primes / minp / low / cnt   // 质数表、最小质因子、最小质因子最高幂、对应次数
- *      sieve.is_prime(x)                  // 判断 x 是否为质数，Time: O(1)
- *      sieve.factorize(x)                 // 分解 x 的质因数，Time: O(质因子个数)
- *      calc_pk(p, c, pk) -> f(p^c)        // 返回 prime power 的函数值
- * Note:
- *      1. Time: O(n)
- *      2. Space: O(n)
- *      3. 要求 f(1) = 1，且对 gcd(a, b) = 1 有 f(ab) = f(a) * f(b)
- *      4. 用法/技巧: 只需定义 prime power 的值；例如 phi(p^c) = pk - pk / p，mu(p) = -1，mu(p^c) = 0 (c > 1)
- */
 template<class T>
 struct MultiplicativeSieve {
     int n;

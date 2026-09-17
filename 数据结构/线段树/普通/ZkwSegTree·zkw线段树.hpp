@@ -1,32 +1,29 @@
 #pragma once
 
-#include "SegTreeBase·通用线段树基类.hpp"
 #include "aizalib.h"
-
-/**
- * zkw 线段树 (Iterative Segment Tree)
- * 算法介绍: 自底向上建树的非递归版线段树，常数小、栈安全。
- * 模板参数: Info (节点信息), Tag (懒标记)
- * Interface:
- *      ZkwSegTree(int n)                         — 初始化长度为 n 的空线段树
- *      ZkwSegTree(const std::vector<Info>& init) — 用 1-based 的 Info 数组建树
- * 
- *      void modify(int ql, int qr, const Tag& tag) — 区间打标记
- *      Info query(int ql, int qr)                  — 查询区间信息
- *      Info all_info()                             — 返回整棵树信息
- *      void set(int pos, const Info& value)        — 单点赋值
- *      int find_first(int ql, int qr, Pred pred)   — 在线段树上二分第一个满足条件的位置
- *      int find_last(int ql, int qr, Pred pred)    — 在线段树上二分最后一个满足条件的位置
- * Note:
- *      1. Time: build O(n)，modify / query / set / find O(log n)
- *      2. Space: O(2N)，N 为向上取整到 2 的幂的值
- *      3. 1-based indexing; 内部将 n 向上取整到 2 的幂得到 N，叶子存放在 [N, N+n)。
- *      4. 用法/技巧:
- *          4.1 Info 需要支持 operator+，用于合并左右儿子信息。
- *          4.2 Tag 需要支持 merge(rhs)、has_value()、apply_to(Info&, int l, int r)；其中 l, r 为该节点覆盖的原始 1-based 区间。
- *          4.3 find_first / find_last 中的 pred(info) 应满足单调性，否则二分结果没有意义。
- *          4.4 不支持自定义定义域 —— zkw 树必须以闭区间 [1, n] 为定义域。
- *          4.5 当 n 不是 2 的幂时，多余的 padding 叶子位置 [n+1, N] 不存储有效数据，初始为 Info()；要求 Info() 是 operator+ 的幺元，使得 padding 贡献在合并时被消去。
+#include "SegTreeBase·通用线段树基类.hpp"
+/*
+ * Zkw Segment Tree (zkw 线段树)
+ *
+ * Overview:
+ *     基于完全二叉树存储的非递归迭代式线段树。将长度 n 补齐至 2 的幂 N，
+ *     叶子节点连续排布在 [N, N+n-1]，支持自底向上更新与开区间 (l-1, r+1)
+ *     双指针自底向上迭代查询。常数极小、无需函数递归栈开销，并支持懒标记与树上二分。
+ *
+ * API:
+ *     ZkwSegTree(n)                 — 初始化长度为 n 的空线段树
+ *     ZkwSegTree(init)              — 用 1-based 的 Info 数组建树
+ *     void modify(ql, qr, tag)      — 区间打标记
+ *     Info query(ql, qr)            — 查询区间信息
+ *     Info all_info()               — 返回整棵树信息
+ *     void set(pos, value)          — 单点赋值
+ *     find_first(ql, qr, Pred pred) — 在线段树上二分第一个满足条件的位置
+ *     find_last(ql, qr, Pred pred)  — 在线段树上二分最后一个满足条件的位置
+ *
+ * Notes:
+ *     1. 时间复杂度: 建树 O(N)，单次 modify / query / set / find 均为 O(log N)。
+ *     2. 空间复杂度: 补齐至 2 的幂开辟 2N 空间，空间常数优于传统 4N 线段树。
+ *     3. 索引约定: 外部输入统一为 1-based；padding 叶节点以 Info() 填充且需为幺元。
  */
 template<SegInfo Info, class Tag>
     requires SegTag<Tag, Info>

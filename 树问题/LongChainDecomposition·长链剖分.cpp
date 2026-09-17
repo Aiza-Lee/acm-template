@@ -1,24 +1,45 @@
 #include "aizalib.h"
 /*
- * Long Chain Decomposition (长链剖分)
+ * 长链剖分 (Long Chain Decomposition)
  *
  * Overview:
- *     按子树最大高度选择长儿子，将树剖分为若干长链。
- *     结合倍增与链头上下预处理数组，支持 O(1) 查询任意点 k 级祖先（Level Ancestor）。
+ *     按子树最大深度（树高）选取长儿子，将树剖分为若干互不相交的长链。
+ *     结合倍增与链头上下预处理数组，支持 O(1) 在线查询任意点 k 级祖先。
+ *     - 剖分机制与链长性质：
+ *       1. 长儿子选取：子树最大深度最大的子节点选为长儿子（heavy），
+ *          长边相连构成极大长链。
+ *       2. 链长定理：若长链链头 h 的长链长度为 len[h]，则以 h 为根的子树最大深度为
+ *          len[h]，且 h 向上至少存在 len[h] 级祖先。
+ *     - Level Ancestor O(1) 原理：
+ *       1. 预处理：对每个链头 h，预处理其向上 len[h]
+ *          级祖先（up_nodes）与向下长链上的 len[h] 个节点（down_nodes），
+ *          总空间严格为 O(N)。
+ *       2. O(1) 定位：查询 u 的第 k 级祖先时，设 2^t <= k < 2^{t + 1}。
+ *          利用倍增一步跳 2^t 步到达 x，剩余步数 rem = k - 2^t < 2^t。由于 x
+ *          所在长链长度 >= 其子树深度 >= 2^t > rem，因此目标祖先必定落在 x
+ *          所在长链链头的向上或向下预处理数组内，实现 O(1) 索引。
+ *     - 工具：Graph 结构、LongChainDecomposition 求解器、kth_ancestor、lca、
+ *       dist、jump。
  *
  * API:
- *     struct Graph(n)                     — 树的邻接表表示，1-based
- *     Graph::add_edge(u, v)               — 添加无向边 (u, v)
- *     LongChainDecomposition(G, root = 1) — 以 root 为根预处理长链信息，时间复杂度 O(N log N)
- *     kth_ancestor(u, k)                  — 查询 u 的第 k 级祖先，越界返回 0，复杂度 O(1)
- *     lca(u, v)                           — 查询 u 和 v 的最近公共祖先，复杂度 O(log N)
- *     dist(u, v)                          — 查询树上距离（边数），复杂度 O(log N)
- *     jump(u, v, k)                       — 返回路径 u -> v 上从 u 出发第 k 条边到达的点，越界返回 0
+ *     struct Graph(n)                     — 树的邻接表表示（1-based）。
+ *     Graph::add_edge(u, v)               — 添加无向树边 (u, v)。
+ *     LongChainDecomposition(G, root = 1) — 预处理长链信息，时间复杂度 O(N log N)。
+ *     kth_ancestor(u, k)                  — 在线查询节点 u 的第 k 级祖先，
+ *                                            时间复杂度严格 O(1)。
+ *     lca(u, v)                           — 查询节点 u 和 v 的最近公共祖先，
+ *                                            时间复杂度 O(log N)。
+ *     dist(u, v)                          — 查询两点树上边数距离，时间复杂度 O(log
+ *                                            N)。
+ *     jump(u, v, k)                       — 返回路径 u -> v 上从 u 出发第 k
+ *                                            步到达的节点，越界返回 0。
  *
  * Notes:
- *     1. 全部下标均为 1-based，dep[root] = 0。
- *     2. Time: 预处理 O(N log N)，kth_ancestor O(1)，lca / dist / jump O(log N)；Space: O(N log N)。
- *     3. 典型应用: Level Ancestor 快速查询、树上路径任意步长跳跃、按深度进行树上背包/DP 空间优化。
+ *     1. 全部下标均为 1-based，根节点深度定义为 0。
+ *     2. Time: 预处理 O(N log N)，kth_ancestor 为 O(1)，lca / dist / jump 为 O(log
+ *        N)；Space: O(N log N)。
+ *     3. 长链剖分亦常用于树上与深度相关的 DP 空间优化（利用指针复用达到 O(N)
+ *        空间）。
  */
 
 struct Graph {
@@ -37,19 +58,21 @@ struct LongChainDecomposition {
     const Graph& G;
     int n, root, LOG;
     std::vector<std::vector<int>> up;
-    std::vector<std::vector<int>> up_nodes;     // 仅链头有效，up_nodes[h][k] = h 的第 k 级祖先
-    std::vector<std::vector<int>> down_nodes;   // 仅链头有效，down_nodes[h][k] = 链上深度 +k 的点
+    std::vector<std::vector<int>> up_nodes;   // 链头 h 的第 k 级祖先
+    std::vector<std::vector<int>> down_nodes; // 链头 h 向下长链深度 +k 的点
     std::vector<int> fa;
     std::vector<int> dep;
-    std::vector<int> len;       // len[u]: 以 u 为起点的最长向下链长（按点数）
+    std::vector<int> len;   // len[u]: 以 u 为起点的最长向下链长（按点数）
     std::vector<int> heavy; // 长儿子
-    std::vector<int> top;       // 所在长链链头
-    std::vector<int> pos;       // 在所在长链中的位置
+    std::vector<int> top;   // 所在长链链头
+    std::vector<int> pos;   // 在所在长链中的位置
 
     LongChainDecomposition(const Graph& G, int root = 1)
-        : G(G), n(G.n), root(root), LOG(std::bit_width((unsigned)std::max(1, G.n))),
-          up(n + 1, std::vector<int>(LOG)), up_nodes(n + 1), down_nodes(n + 1), fa(n + 1),
-          dep(n + 1), len(n + 1), heavy(n + 1), top(n + 1), pos(n + 1) {
+        : G(G), n(G.n), root(root),
+          LOG(std::bit_width((unsigned)std::max(1, G.n))),
+          up(n + 1, std::vector<int>(LOG)), up_nodes(n + 1),
+          down_nodes(n + 1), fa(n + 1), dep(n + 1), len(n + 1),
+          heavy(n + 1), top(n + 1), pos(n + 1) {
         _dfs(root, 0);
         _decompose(root, root);
         _build_chain_vectors();

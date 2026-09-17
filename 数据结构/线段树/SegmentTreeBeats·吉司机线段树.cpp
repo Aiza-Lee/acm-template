@@ -1,22 +1,28 @@
 #include "aizalib.h"
 
-/**
- * 吉司机线段树 (Segment Tree Beats)
- * 算法介绍:
- *      支持特殊的区间最值操作，如 "区间 chmin" (A[i] = min(A[i], v))。
- *      通过维护最大值(max1)、次大值(max2)和最大值计数(cnt)，利用势能分析保证复杂度。
- *      本模板支持：区间加、区间取 Min、区间求和、区间求 Max。
- * 
- * Interface:
- *      range_add(l, r, v)   — 区间 A[i] += v
- *      range_chmin(l, r, v) — 区间 A[i] = min(A[i], v)
- *      query_sum(l, r)      — 区间和
- *      query_max(l, r)      — 区间最大值
- * 
- * Note:
- *      1. Time: O(M log N)，最坏情况下通常也很优秀。
- *      2. Space: O(4N)
- *      3. 1-based indexing.
+/*
+ * Segment Tree Beats (吉司机线段树)
+ *
+ * Overview:
+ *     维护区间最值修改（如 A[i] = min(A[i], v)）的高级线段树。
+ *     每个节点维护区间最大值 max1、严格次大值 max2、最大值频数 cnt、区间和 sum
+ *     以及加法懒标记。
+ *     当 chmin 的截断值 v 处于 (max2, max1] 之间时，
+ *     利用最大值频数直接更新区间和打标记返回；仅当 v <= max2 时才递归细化子节点。
+ *     结合势能分析保证均摊时间复杂度。
+ *
+ * API:
+ *     range_add(l, r, v)   — 区间 A[i] += v
+ *     range_chmin(l, r, v) — 区间 A[i] = min(A[i], v)
+ *     query_sum(l, r)      — 区间和
+ *     query_max(l, r)      — 区间最大值
+ *
+
+ * Notes:
+ *     1. 时间复杂度: 区间加法与区间 chmin 均摊 O(M log N)；空间复杂度 O(4N)。
+ *     2. 索引约定: 外部与内部均采用 1-based 索引。
+ *     3. 标记下推: 优先下推区间加标记 lazy_add，再依据父节点的 max1 截断子节点的
+ *        max1。
  */
 
 struct SegTreeBeats {
@@ -141,8 +147,12 @@ struct SegTreeBeats {
         _push_down(u, l, r);
         int mid = (l + r) >> 1;
         i64 res = -INF;
-        if (ql <= mid) res = std::max(res, _query_max(u << 1, l, mid, ql, qr));
-        if (qr > mid) res = std::max(res, _query_max(u << 1 | 1, mid + 1, r, ql, qr));
+        if (ql <= mid) {
+            res = std::max(res, _query_max(u << 1, l, mid, ql, qr));
+        }
+        if (qr > mid) {
+            res = std::max(res, _query_max(u << 1 | 1, mid + 1, r, ql, qr));
+        }
         return res;
     }
 

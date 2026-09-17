@@ -1,24 +1,26 @@
 #include "aizalib.h"
 #include "../0-base/PolyCore·多项式核心.hpp"
 
-/**
- * MTT (CRT 结果合并 - 纯整数域)
- * 
- * =================================================================
- * 【！！！ DANGER ！！！】
- * 警告：必须保证合并的多项式或序列的每次运算，在数学上都等价于“纯整数域”的运算！
- *       （例如单纯的多项式乘法、加法、不带分数系数的差分等）
- * 绝对不能用于合并带有除法、求逆、Ln、Exp 等包含有理数域（模逆元）的对应结果！
- * 有理数取模后在不同模数下并不对齐，强行使用 CRT 合并会得到彻底错误的结果！
- * =================================================================
- * 
- * 适用场景：
- *      1. 多次普通的超大规模多项式相乘，结果可能超过单模数 998244353，需要拿结果反推大整数
- *      2. 需要对某两个固定多项式分别进行多模数计算以保留大整数信息，最后统一步骤合并
- * 
- * 接口: 
- *      MTT_CRT::merge_val(r1, r2, r3, p) -> int (单值合并)
- *      MTT_CRT::merge(r1, r2, r3, p) -> vector<int> (整段序列合并)
+/*
+ * MTT CRT Integer Merge (三模数 MTT 纯整数结果合并)
+ *
+ * Overview:
+ *      基于 Garner 算法的三模数 (998244353, 1004535809, 469762049) CRT 合并工具。
+ *      用于将分别在三个 NTT 模数下计算出的多项式纯整数卷积结果精确合并，
+ *      并对目标模数 p 取模。
+ *
+ * API:
+ *     merge_val(r1, r2, r3, p) — 单个数值的三模数 CRT 合并，返回模 p 结果。
+ *     merge(r1, r2, r3, p)     — 整段多项式序列的三模数 CRT 合并，返回
+ *                                 vector<int>。复杂度 O(len) 时间。
+ *
+ * Notes:
+ *      1. 必须保证运算在数学上等价于“纯整数域”的运算（如加减卷积），
+ *         严禁用于包含模逆元除法的式子。
+ *      2. 三模数乘积约为 10^27，能够容纳绝大多数组合与多项式卷积的系数范围。
+ *
+ * Related:
+ *      数学/多项式/0-base/MTT·任意模数NTT.cpp: 封装完整 AnyModPoly 类的 MTT 实现。
  */
 namespace MTT_CRT {
     constexpr int m1 = 998244353, m2 = 1004535809, m3 = 469762049;
@@ -41,7 +43,10 @@ namespace MTT_CRT {
     }
 
     // 整个多项式合并
-    std::vector<int> merge(const std::vector<int>& r1, const std::vector<int>& r2, const std::vector<int>& r3, int p) {
+    std::vector<int> merge(
+        const std::vector<int>& r1, const std::vector<int>& r2,
+        const std::vector<int>& r3, int p
+    ) {
         int len = r1.size();
         std::vector<int> ans(len);
         i64 m1_mod_p = m1 % p;

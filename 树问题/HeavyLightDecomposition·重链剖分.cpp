@@ -1,28 +1,45 @@
 #include "aizalib.h"
 /*
- * Heavy-Light Decomposition (重链剖分)
+ * 重链剖分 (Heavy-Light Decomposition)
  *
  * Overview:
- *     树上重链剖分框架。维护树链信息，支持 LCA、距离、祖先跳跃、路径/子树转连续区间，以及 DSU on Tree。
+ *     树上轻重链剖分通用框架，将树上路径与子树拓扑保序投影至一维 DFN 序列。
+ *     - 剖分机制与链长性质：
+ *       1. 重儿子选取：子树节点数 siz 最大的子节点选为重儿子（heavy），
+ *          其余为轻儿子。重儿子相连形成极大重链，每个节点唯一归属于一条重链。
+ *       2. 轻边跳转减半定理：从任意节点到根节点的简单路径上，至多经过 log2(N)
+ *          条轻边（每经过一条轻边，子树规模至少翻倍）。
+ *     - 序列连续性与路径拆分：
+ *       1. 子树连续：以 u 为根的子树对应区间 [dfn[u], dfn[u] + siz[u] - 1]。
+ *       2. 路径对数拆分：任意树上路径 u -> v 可被拆解为至多 O(log N) 段重链内的连续
+ *          DFN 区间，支持在线段树上进行高效区间修改与查询。
+ *     - 树上启发式合并（DSU on Tree）：利用重儿子优先保留计算状态，
+ *       轻儿子暴力递归并清空，保证每个节点被统计的总次数不超过 O(N log N)。
+ *     - 工具：HeavyPathDecomposition 结构、lca、kth_ancestor、jump、
+ *       deal_path_vertex、deal_path_edge、deal_subtree、heuristic_dfs。
  *
  * API:
- *     struct Graph(n)                        — 树的邻接表表示，1-based
- *     Graph::add_edge(u, v)                  — 添加无向边 (u, v)
- *     HeavyPathDecomposition(G, root = 1)    — 以 root 为根完成重链剖分与 dfn 编号
- *     lca(u, v)                              — 查询 u 和 v 的最近公共祖先，复杂度 O(log N)
- *     kth_ancestor(u, k)                     — 查询 u 的第 k 级祖先，越界返回 0，复杂度 O(log N)
- *     jump(u, v, k)                          — 返回路径 u -> v 上从 u 出发第 k 条边到达的点，越界返回 0
- *     deal_path_vertex(u, v, f)              — 将点路径拆成若干 dfn 连续区间，对每段调用 f(l, r)
- *     deal_path_edge(u, v, f)                — 将边路径拆成若干 dfn 连续区间，自动跳过 LCA
- *     deal_subtree(u, f)                     — 对 u 子树对应连续区间调用一次 f(l, r)
- *     heuristic_dfs(u, insert, erase, query) — DSU on Tree 树上启发式合并模板
+ *     struct Graph(n)                      — 树的邻接表表示（1-based）。
+ *     Graph::add_edge(u, v)               — 添加无向树边 (u, v)。
+ *     HeavyPathDecomposition(G, root = 1) — 预处理重链剖分与 DFN 序列。
+ * 
+ *     lca(u, v)                  — 查询节点 u 和 v 的最近公共祖先，时间复杂度 O(log N)。
+ *     kth_ancestor(u, k)         — 查询节点 u 的第 k 级祖先，越界返回 0，
+ *                                   复杂度 O(log N)。
+ *     jump(u, v, k)              — 返回路径 u -> v 上从 u 出发第 k 步到达的节点，
+ *                                   越界返回 0。
+ *     deal_path_vertex(u, v, f)  — 将点路径拆为若干连续 DFN 区间并依次调用 f(l, r)。
+ *     deal_path_edge(u, v, f)    — 将边路径拆为若干连续 DFN 区间并跳过 LCA。
+ *     deal_subtree(u, f)         — 对节点 u 的子树连续 DFN 区间调用一次 f(l, r)。
+ *
+ *     heuristic_dfs(u, insert, erase, query) — DSU on Tree 树上启发式合并。
  *
  * Notes:
- *     1. 全部下标均为 1-based，dep[root] = 0。点权映射到 dfn[u]，边权映射到较深端点的 dfn。
- *     2. Time: 预处理 O(N)，单次链剖相关查询/拆链 O(log N)；Space: O(N)。
- *     3. jump(u, v, k) 中 k 是边数，k=0 返回 u，k=dist(u, v) 返回 v。
- *     4. heuristic_dfs 默认从传入 u 开始，执行完会清空当前子树贡献。
+ *     1. 下标统一为 1-based，根节点深度定义为 0。
+ *     2. 点权映射至 dfn[u]，边权映射至深度较深端点的 dfn 编号。
+ *     3. Time: 预处理 O(N)，单次路径/查询最坏 O(log N)；Space: O(N)。
  */
+
 struct Graph {
     int n;
     std::vector<std::vector<int>> adj;
@@ -48,17 +65,17 @@ concept HLDNodeOp = requires(F& f, int u) {
 struct HeavyPathDecomposition {
     const Graph& G;
     int n, root, dfn_cnt;
-    std::vector<int> fa;        // 父节点
-    std::vector<int> dep;       // 深度，root 深度为 0
-    std::vector<int> siz;       // 子树大小
+    std::vector<int> fa;    // 父节点
+    std::vector<int> dep;   // 深度，root 深度为 0
+    std::vector<int> siz;   // 子树大小
     std::vector<int> heavy; // 重儿子，无则为 0
-    std::vector<int> head;      // 所在重链链头
-    std::vector<int> dfn;       // dfs 序
-    std::vector<int> idfn;      // dfs 序反查节点
+    std::vector<int> head;  // 所在重链链头
+    std::vector<int> dfn;   // dfs 序
+    std::vector<int> idfn;  // dfs 序反查节点
 
     HeavyPathDecomposition(const Graph& G, int root = 1)
-        : G(G), n(G.n), root(root), dfn_cnt(0), fa(n + 1), dep(n + 1), siz(n + 1),
-          heavy(n + 1), head(n + 1), dfn(n + 1), idfn(n + 1) {
+        : G(G), n(G.n), root(root), dfn_cnt(0), fa(n + 1), dep(n + 1),
+          siz(n + 1), heavy(n + 1), head(n + 1), dfn(n + 1), idfn(n + 1) {
         _dfs(root, 0);
         _decompose(root, root);
     }

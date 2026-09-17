@@ -1,33 +1,30 @@
 #include "aizalib.h"
-/**
- * Link-Cut Tree — 路径加版
- * 算法介绍: 与 LCT·动态树.cpp 功能一致，但新增路径加懒标记。
- *          支持对路径上所有点同时加上一个值。
- * 模板参数: None
- * Interface:
- *      LCTPathAdd(n), init(n)
- *      set_val(x, v), modify_add(x, y, v) — 路径 x -> y 上所有点 +v
- *      make_root(x), find_root(x), split(x, y)
- *      link(x, y), cut(x, y), connected(x, y)
- *      query_sum(x, y)  — 查询路径 x -> y 上的点权和
- *      query_size(x, y) — 查询路径 x -> y 上的点数
- *      query_component_size(x), query_subtree_size(root, x)
- *      lca(x, y)
- * Internal Methods:
- *      字段访问器、内部分析同 LCT·动态树.cpp。额外:
- *      add_tag(p)       访问路径加懒标记
- *      _apply_add(p, v) 对节点 p 应用加法标记 v
- *          更新 val(p) += v, sum(p) += v * cnt(p)（精确累加需乘以路径大小）
- *          add_tag(p) += v，rev 不变
- *      _push_down       先下传 rev，再下传 add_tag（因为 add 不依赖左右方向）
- * Note:
- *      1. Time: 单次均摊 O(log N)
- *      2. Space: O(N)
- *      3. 结点编号 1-based，先 init(n)
- *      4. AoS: 节点紧凑存储（~48B），cache 友好
- *      5. 自定义指南:
- *          加法 + 翻转 → 乘加双标记: 参考 RangeAffineSeg·区间乘加.cpp
- *          加法 + 赋值: add 前先下传 assign（若 assign_tag 非空则忽略 add）
+/*
+ * Link-Cut Tree with Path Addition (支持路径加的动态树)
+ *
+ * Overview:
+ *     在标准 LCT 基础上引入路径加延迟标记（add_tag）。通过 split(x, y) 将路径 x 到
+ *     y 隔离为独立 Splay 辅助树后，直接在辅助树根节点打上加法标记，
+ *     利用路径实际节点数 cnt[p] 精确维护区间点权和 sum[p]，
+ *     支持动态树路径加值与路径求和。
+ *
+ * API:
+ *     LCTPathAdd(n), init(n)                  — 初始化 1...n 个点的动态森林
+ *     set_val(x, v)                           — 把点 x 的点权改为 v
+ *     modify_add(x, y, v)                     — 路径 x -> y 上所有点权累加 v
+ *     make_root(x), find_root(x), split(x, y) — 换根、找根、提取路径为辅助树
+ *     link(x, y), cut(x, y), connected(x, y)  — 动态加边、删边与连通性判断
+ *     query_sum(x, y)                         — 查询路径 x -> y 上的点权和
+ *     query_size(x, y)                        — 查询路径 x -> y 上的点数
+ *     query_component_size(x)                 — 返回 x 所在连通块的点数
+ *     query_subtree_size(root, x)             — 返回以 root 为根时 x 子树的点数
+ *     lca(x, y)                               — 查询以当前根为准的最近公共祖先
+ *
+
+ * Notes:
+ *     1. 时间复杂度: 各项操作均摊 O(log N)；空间复杂度 O(N)。
+ *     2. 索引约定: 节点编号采用 1-based (1..n)。
+ *     3. 标记复合: 下推时先下传翻转标记 rev，再下传加法标记 add_tag。
  */
 struct LCTPathAdd {
 private:

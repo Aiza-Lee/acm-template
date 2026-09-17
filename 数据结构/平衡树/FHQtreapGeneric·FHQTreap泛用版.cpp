@@ -1,5 +1,37 @@
 #include "aizalib.h"
 
+/*
+ * FHQtreapGeneric·FHQTreap泛用版
+ *
+ * Overview:
+ *      基于 split/merge 原语的高度模块化泛型平衡树，
+ *      解耦聚合信息（Info）与懒标记（Tag）。
+ *      既可通过按值分裂充当动态维护区间/子树信息的 BST，
+ *      也可通过按大小分裂充当支持区间翻转、区间赋值与仿射变换的文艺平衡树。
+ *
+ * API:
+ *     FHQ<Info, Tag, T>(n) / init(n)    — 初始化并预留空间。
+ *     insert(pos, v)                    — 在第 pos 个位置之后插入元素 v，期望
+ *                                          O(log n)。
+ *     erase(pos)                        — 删除第 pos 个位置的元素，期望 O(log n)。
+ *     modify(l, r, tag)                 — 对序列区间 [l, r] 应用懒标记 tag，期望
+ *                                          O(log n)。
+ *     query(l, r)                       — 查询序列区间 [l, r] 的聚合信息 Info，
+ *                                          期望 O(log n)。
+ *     build(a)                          — 由初始数组 a 线性 O(n) 建树。
+ *     insert_val(v) / erase_val(v)      — 按值插入/删除（BST/multiset 模式）。
+ *     modify_val(lv, rv, tag)           — 值域区间修改（需保证不破坏有序性）。
+ *     rank(v), kth(k), prev(v), next(v) — BST 模式常用查询。
+ *     size(), empty(), clear()          — 基础状态查询与清空。
+ *
+ * Notes:
+ *      1. 1-based indexing；区间 [l, r] 满足 1 <= l <= r <= n。
+ *      2. Info 需支持单位元默认构造与结合律 operator+；Tag 需支持 has_value, merge,
+ *         apply_to。
+ *      3. Time: 增删改查单次期望 O(log n)，线性建树 O(n)；Space: O(n)。
+ *      4. 末尾提供了常用包装：FHQSumInfo, FHQRevAddTag 与 FHQSeqSum。
+ */
+
 // 传递给 Tag::apply_to 的节点属性包
 // 允许 Tag 直接修改节点结构(l, r)与数据(val, info)
 template<typename Info, typename T>
@@ -35,35 +67,6 @@ struct FHQNullTag {
     void merge(const FHQNullTag&) {}
     void apply_to(FHQNodeProp<Info, T>&) const {}
 };
-
-/**
- * FHQ Treap - 通用 Info/Tag 版
- * 算法介绍: 基于 split / merge 维护序列或有序 multiset；聚合信息与懒标记均由用户自定义。
- * 模板参数: Info, Tag, T
- * Interface:
- *      FHQ<Info, Tag, T>(n), init(n)     — 初始化，可选预留 n 个结点
- *      size(), empty(), clear()          — 常用辅助接口
- *      insert(pos, v), erase(pos)        — 按排名插入 / 删除（序列模式）
- *      modify(l, r, tag), query(l, r)    — 序列区间修改 / 查询
- *      build(a)                          — 按给定顺序 O(N) 建树（序列模式）
- *      insert_val(v), erase_val(v)       — 按值插入 / 删除（BST / multiset 模式）
- *      modify_val(lv, rv, tag)           — 值域区间修改（需保证 Tag 不破坏 BST 有序性）
- *      rank(v), kth(k), prev(v), next(v) — BST 常用查询
- * Note:
- *      1. Time: 所有操作期望 O(log N)，build O(N)
- *      2. Space: O(N)
- *      3. Info 需要支持 Info(T) 与 operator+；Tag 需要默认构造、has_value/merge/apply_to
- *      4. 用法/技巧:
- *          4.1 不需要懒标记时可直接用 FHQNullTag<Info, T>。
- *          4.2 文件末尾提供了 FHQSumInfo<T>、FHQRevAddTag<T> 与别名 FHQSeqSum<T>，可直接做区间和/区间加/翻转。
- *          4.3 generic 基础层只提供 modify(l, r, tag)；像翻转这类具体语义由 Tag 自身表达。
- *      5. 内部原语:
- *          5.1 _split_val(u, v, x, y): 按值分裂——x 是 val ≤ v 的部分，y 是 val > v 的部分
- *          5.2 _split_val_less(u, v, x, y): 按值分裂——x 是 val < v 的部分，y 是 val ≥ v 的部分
- *          5.3 _split_rk(u, k, x, y): 按排名分裂——x 是前 k 个结点（中序最靠前的 k 个），y 是其余；
- *              序列模式下同样用于按位置切片（rank == pos）
- *          5.4 _merge(u, v): 合并两棵 BST 序的 treap；要求 u 中所有 val 都 < v 中所有 val
- */
 template<class Info, class Tag, typename T>
 requires FHQInfoLike<Info, T> && FHQTagLike<Tag, Info, T>
 struct FHQ {
@@ -240,7 +243,8 @@ public:
         }
         root = _merge(_merge(x, y), z);
     }
-    void modify_val(const T& lv, const T& rv, const Tag& t) requires std::totally_ordered<T> {
+    void modify_val(const T& lv, const T& rv, const Tag& t)
+        requires std::totally_ordered<T> {
         AST(!(rv < lv));
         int x, y, z;
         _split_val(root, rv, x, z);

@@ -2,43 +2,49 @@
 
 #include "aizalib.h"
 
-/**
- * 动态开点线段树基类 (Dynamic Lazy Segment Tree Base)
- * 算法介绍: 维护一类支持稀疏建点、区间修改、区间查询和线段树二分的懒标记线段树框架，具体维护内容由 Info / Tag 自定义。
- * 模板参数: Info (节点信息), Tag (懒标记)
- * Interface:
- *      DynSegTree(int n, int reserve_nodes = 0)    — 初始化定义域 [1, n] 的空线段树
- *      DynSegTree(int l, int r, int reserve_nodes) — 初始化定义域 [l, r] 的空线段树
- * 
- *      void reserve(int reserve_nodes)             — 预留结点池空间
- *      void modify(int ql, int qr, const Tag& tag) — 区间打标记
- *      Info query(int ql, int qr)                  — 查询区间信息
- *      Info all_info()                             — 返回整棵树信息
- *      void set(int pos, const Info& value)        — 单点赋值
- *      int find_first(int ql, int qr, Pred pred)   — 在线段树上二分第一个满足条件的位置
- *      int find_last(int ql, int qr, Pred pred)    — 在线段树上二分最后一个满足条件的位置
- * Note:
- *      1. Time: 单次 modify / query / set / find O(log V)，V = r - l + 1
- *      2. Space: O(实际访问结点数)；结点池按需扩容，递归以返回值回写子树根下标，无需预估 reserve
- *      3. Info 需要支持 operator+ 和 static Info from_range(int l, int r)
- *      4. Tag 需要支持 merge(rhs)、has_value()、apply_to(Info&, int l, int r)
- *      5. 空结点默认表示其整段区间都处于初始状态，因此 Info::from_range(l, r) 必须返回该区间的默认信息
- *      6. find_first / find_last 中的 pred(info) 应满足单调性，否则二分结果没有意义
- *      7. 当前二分不维护前缀累加器；适合用 max/min/exists 等区间信息判定，前缀和二分需另写带 accumulator 的版本
+/*
+ * Dynamic Segment Tree Base (动态开点线段树基类)
+ *
+ * Overview:
+ *     支持稀疏值域建点、区间修改、区间查询与线段树二分的通用延迟标记线段树框架。
+ *     具体聚合内容与懒标记逻辑由 Info 与 Tag 概念约束解耦；
+ *     未分配的空节点默认代表初始零状态区间，按需递归开辟子节点以优化空间。
+ *
+ * API:
+ *     DynSegTree(n, reserve_nodes = 0) — 初始化定义域为 [1, n] 的空线段树
+ *     DynSegTree(l, r, reserve_nodes)  — 初始化定义域为 [l, r] 的空线段树
+ *     reserve(reserve_nodes)           — 预留节点池空间
+ *     modify(ql, qr, tag)              — 对区间 [ql, qr] 应用懒标记 tag
+ *     query(ql, qr)                    — 查询区间 [ql, qr] 的聚合信息 Info
+ *     all_info()                       — 返回整棵树全局聚合信息
+ *     set(pos, value)                  — 单点 pos 赋值为 value
+ *     find_first(ql, qr, pred)         — 在 [ql, qr] 上二分首个满足 pred 的位置
+ *     find_last(ql, qr, pred)          — 在 [ql, qr] 上二分末个满足 pred 的位置
+ *
+ * Notes:
+ *     1. 时间复杂度: 单次 modify / query / set / find 均为 O(log V)，V = r - l + 1。
+ *     2. 空间复杂度: O(实际访问节点数)，节点池按需自增扩容。
+ *     3. 概念约束: Info 需支持 operator+ 与 static Info::from_range(l, r)；Tag
+ *        需满足 has_value()、merge(Tag) 与 apply_to(Info&, l, r)。
+ *     4. 二分条件: pred(info) 必须在区间上前缀/后缀单调。
  */
 
 template<class Info>
-concept DynSegInfo = std::default_initializable<Info> && requires(const Info& a, const Info& b, int l, int r) {
-    { a + b } -> std::same_as<Info>;
-    { Info::from_range(l, r) } -> std::same_as<Info>;
-};
+concept DynSegInfo =
+    std::default_initializable<Info> &&
+    requires(const Info& a, const Info& b, int l, int r) {
+        { a + b } -> std::same_as<Info>;
+        { Info::from_range(l, r) } -> std::same_as<Info>;
+    };
 
 template<class Tag, class Info>
-concept DynSegTag = std::default_initializable<Tag> && requires(Tag tag, const Tag& rhs, Info& info, int l, int r) {
-    { rhs.has_value() } -> std::convertible_to<bool>;
-    { tag.merge(rhs) } -> std::same_as<void>;
-    { rhs.apply_to(info, l, r) } -> std::same_as<void>;
-};
+concept DynSegTag =
+    std::default_initializable<Tag> &&
+    requires(Tag tag, const Tag& rhs, Info& info, int l, int r) {
+        { rhs.has_value() } -> std::convertible_to<bool>;
+        { tag.merge(rhs) } -> std::same_as<void>;
+        { rhs.apply_to(info, l, r) } -> std::same_as<void>;
+    };
 
 template<DynSegInfo Info, class Tag>
     requires DynSegTag<Tag, Info>
@@ -69,25 +75,52 @@ struct DynSegTree {
         tr.push_back({});
     }
 
-    void reserve(int reserve_nodes) { if (reserve_nodes + 1 > (int)tr.capacity()) tr.reserve(reserve_nodes + 1); }
+    void reserve(int reserve_nodes) {
+        if (reserve_nodes + 1 > (int)tr.capacity()) {
+            tr.reserve(reserve_nodes + 1);
+        }
+    }
 
-    void modify(int ql, int qr, const Tag& v) { AST(lb <= ql && ql <= qr && qr <= rb); root = _modify(root, ql, qr, v, lb, rb); }
+    void modify(int ql, int qr, const Tag& v) {
+        AST(lb <= ql && ql <= qr && qr <= rb);
+        root = _modify(root, ql, qr, v, lb, rb);
+    }
 
-    Info query(int ql, int qr) { AST(lb <= ql && ql <= qr && qr <= rb); return _query(root, ql, qr, lb, rb); }
+    Info query(int ql, int qr) {
+        AST(lb <= ql && ql <= qr && qr <= rb);
+        return _query(root, ql, qr, lb, rb);
+    }
 
-    Info all_info() const { AST(lb <= rb); return _get_info(root, lb, rb); }
+    Info all_info() const {
+        AST(lb <= rb);
+        return _get_info(root, lb, rb);
+    }
 
-    void set(int pos, const Info& v) { AST(lb <= pos && pos <= rb); root = _set(root, pos, v, lb, rb); }
+    void set(int pos, const Info& v) {
+        AST(lb <= pos && pos <= rb);
+        root = _set(root, pos, v, lb, rb);
+    }
 
     template<class Pred>
-    int find_first(int ql, int qr, Pred pred) { AST(lb <= ql && ql <= qr && qr <= rb); return _find_first(root, ql, qr, pred, lb, rb); }
+    int find_first(int ql, int qr, Pred pred) {
+        AST(lb <= ql && ql <= qr && qr <= rb);
+        return _find_first(root, ql, qr, pred, lb, rb);
+    }
 
     template<class Pred>
-    int find_last(int ql, int qr, Pred pred) { AST(lb <= ql && ql <= qr && qr <= rb); return _find_last(root, ql, qr, pred, lb, rb); }
+    int find_last(int ql, int qr, Pred pred) {
+        AST(lb <= ql && ql <= qr && qr <= rb);
+        return _find_last(root, ql, qr, pred, lb, rb);
+    }
 
-    int _new_node(int l, int r) { tr.push_back({0, 0, Info::from_range(l, r), Tag()}); return (int)tr.size() - 1; }
+    int _new_node(int l, int r) {
+        tr.push_back({0, 0, Info::from_range(l, r), Tag()});
+        return (int)tr.size() - 1;
+    }
 
-    Info _get_info(int p, int l, int r) const { return p ? tr[p].info : Info::from_range(l, r); }
+    Info _get_info(int p, int l, int r) const {
+        return p ? tr[p].info : Info::from_range(l, r);
+    }
 
     void _pull(int p, int l, int r) {
         if (l == r) return;
@@ -143,7 +176,8 @@ struct DynSegTree {
         int mid = (l + r) >> 1;
         if (qr <= mid) return _query(p ? tr[p].ls : 0, ql, qr, l, mid);
         if (ql > mid) return _query(p ? tr[p].rs : 0, ql, qr, mid + 1, r);
-        return _query(p ? tr[p].ls : 0, ql, qr, l, mid) + _query(p ? tr[p].rs : 0, ql, qr, mid + 1, r);
+        return _query(p ? tr[p].ls : 0, ql, qr, l, mid) +
+               _query(p ? tr[p].rs : 0, ql, qr, mid + 1, r);
     }
 
     template<class Pred>

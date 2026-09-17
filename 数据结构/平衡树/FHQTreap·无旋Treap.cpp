@@ -1,27 +1,31 @@
 #include "aizalib.h"
-
-/**
- * FHQ Treap (无旋 Treap)
- * 算法介绍: 维护有序 multiset，基于 split / merge 支持插入、删除、排名与第 k 小查询。
- * 模板参数: T
- * Interface:
- *      FHQ(n), init(n)          — 初始化，可选预留 n 个结点
- *      insert_val(v)            — 插入一个值 v
- *      erase_val(v)             — 删除一个值 v
- *      rank(v)                  — 查询 v 的排名（比它小的数个数 + 1）
- *      kth(k)                   — 查询第 k 小
- *      prev(v), next(v)         — 查询前驱 / 后继
- *      size(), empty(), clear() — 常用辅助接口
- * Note:
- *      1. Time: 所有操作期望 O(log N)
- *      2. Space: O(N)
- *      3. 默认定位为 BST / multiset 模式；不再默认内置 rev，序列翻转等需求建议使用 FHQtreap_Generic.cpp
- *      4. 用法/技巧: 支持重复值；erase_val(v) 仅删除一个值为 v 的结点
- *      5. 内部原语:
- *          5.1 _split_val(u, v, x, y): 按值分裂——x 是 val ≤ v 的部分，y 是 val > v 的部分
- *          5.2 _split_val_less(u, v, x, y): 按值分裂——x 是 val < v 的部分，y 是 val ≥ v 的部分
- *          5.3 _split_rk(u, k, x, y): 按排名分裂——x 是前 k 个结点（中序最靠前的 k 个），y 是其余
- *          5.4 _merge(u, v): 合并两棵满足 BST 序的 treap；要求 u 中所有 val 都 < v 中所有 val
+/*
+ * FHQTreap·无旋Treap
+ *
+ * Overview:
+ *      基于随机优先级与分裂（split）/合并（merge）原语的非旋转平衡二叉搜索树。
+ *      同时维护 BST 键值全序与小根堆优先级堆序性质，无须传统树旋转。
+ *      提供了支持重复元素的多重集合（multiset），包含插入、删除、
+ *      双向排名与前驱后继查询。
+ *
+ * API:
+ *     FHQ<T>(n) / init(n) — 初始化，可选预留 n 个节点。
+ * 
+ *     insert_val(v) — 插入一个数值 v，期望 O(log n)。
+ *     erase_val(v)  — 删除单个数值为 v 的节点（若有多个仅删一个），期望 O(log n)。
+ *     rank(v)       — 查询 v 在集合中的排名（严格小于 v 的元素个数 + 1），
+ *                      期望 O(log n)。
+ *     kth(k)        — 查询集合中排名第 k 小的元素值，期望 O(log n)。
+ *     prev(v)       — 查询严格小于 v 的最大前驱，不存在返回 nullopt，期望 O(log n)。
+ *     next(v)       — 查询严格大于 v 的最小后继，不存在返回 nullopt，期望 O(log n)。
+ * 
+ *     size() / empty() / clear() — 基础状态查询与清空。
+ *
+ * Notes:
+ *      1. 1-based 排名语义；kth 范围 1..size()。
+ *      2. Time: 单次操作期望 O(log n)；Space: O(n)，内含垃圾回收池复用节点。
+ *      3. 本模板专注 BST/multiset 语义；若需区间操作/翻转请使用
+ *         FHQtreapGeneric·FHQTreap泛用版.cpp。
  */
 template<typename T>
 struct FHQ {

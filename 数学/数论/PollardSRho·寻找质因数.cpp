@@ -1,19 +1,30 @@
 #include "aizalib.h"
 
-/**
- * Pollard-Rho (整数分解)
- * 算法介绍: 配合 Miller-Rabin 在 64 位范围内快速分解质因数。
- * 模板参数: None
- * Interface:
- *      PollardRho::is_prime(n)       — 判定 n 是否为素数，Time: O(log^3 n)
- *      PollardRho::get_one_factor(n) — 返回一个非平凡因子，Time: 期望 O(n^(1/4) log n)
- *      PollardRho::factorize(n)      — 返回全部质因子并排序，Time: 期望 O(n^(1/4) log n)
- *      PollardRho::factor_count(n)   — 返回 {质因子, 次数}，Time: 同 factorize
- * Note:
- *      1. Time: 期望 O(n^(1/4) log n)
- *      2. Space: O(log n)
- *      3. 适用于正 64 位整数，n=1 时分解结果为空
- *      4. 用法/技巧: 若只需判素数，直接调 is_prime 即可
+/*
+ * Pollard's Rho & Miller-Rabin Factorization (Pollard-Rho 质因数分解)
+ *
+ * Overview:
+ *      基于生日悖论与伪随机迭代序列 f(x) = (x^2 + c) mod n
+ *      的大整数快速因数分解算法。
+ *      结合确定性 Miller-Rabin 素性测试，通过 Floyd / Pollard 判环和 gcd
+ *      累积检测在期望 O(n^(1/4)) 时间内寻找非平凡因子并递归分解，支持 64
+ *      位大整数的高效质因数分解。
+ *
+ * API:
+ *     is_prime(n)       — 判定 64 位整数 n 是否为素数。复杂度 O(k log n) 时间。
+ *     get_one_factor(n) — 返回合数 n 的一个非平凡因子。期望复杂度 O(n^(1/4) log
+ *                          n)。
+ *     factorize(n)      — 返回 n 的全部质因子列表（从小到大排序）。期望复杂度
+ *                          O(n^(1/4) log n)。
+ *     factor_count(n)   — 返回质因数分解 {(p, c)} 形式列表。期望复杂度 O(n^(1/4)
+ *                          log n)。
+ *
+ * Notes:
+ *      1. 要求 n >= 1。若 n = 1 返回空列表。
+ *      2. 内部使用 i128 模乘防止运算溢出。
+ *
+ * Related:
+ *      数学/数论/MillerRabin·素数测试.cpp: 内部使用的素性测试。
  */
 struct PollardRho {
     static inline std::mt19937_64 _rng{
@@ -79,12 +90,14 @@ struct PollardRho {
 
     static bool is_prime(i64 n) {
         if (n < 2) return false;
-        for (i64 p : {2LL, 3LL, 5LL, 7LL, 11LL, 13LL, 17LL, 19LL, 23LL, 29LL, 31LL, 37LL}) {
+        for (i64 p : {2LL, 3LL, 5LL, 7LL, 11LL, 13LL, 17LL, 19LL, 23LL, 29LL,
+                      31LL, 37LL}) {
             if (n % p == 0) return n == p;
         }
         i64 d = n - 1, s = 0;
         while (!(d & 1)) d >>= 1, ++s;
-        for (i64 a : {2LL, 325LL, 9375LL, 28178LL, 450775LL, 9780504LL, 1795265022LL}) {
+        for (i64 a : {2LL, 325LL, 9375LL, 28178LL, 450775LL, 9780504LL,
+                      1795265022LL}) {
             if (!_check(a, s, d, n)) return false;
         }
         return true;

@@ -1,32 +1,27 @@
 #include "aizalib.h"
 #include "0-base/Poly·多项式全家桶.hpp"
 
-/**
- * 集合元素连续幂和 (Power Sum)
- * 算法介绍:
- * 给定集合 (或多重集) A = {a_0, a_1, ..., a_{n-1}}，
- * 对所有的 i 在 [0, m-1] 内，快速求出 g(i) = (a_0)^i + (a_1)^i + ... + (a_{n-1})^i
- * 
- * 推导过程:
- * 构造多项式: P(x) = (1 - a_0*x) * (1 - a_1*x) * ... * (1 - a_{n-1}*x)
- * 对 P(x) 取自然对数:
- * ln P(x) = sum( ln(1 - a_k*x) )
- * 由于 ln(1 - z) = - (z + z^2/2 + z^3/3 + ...)，代入得:
- * ln P(x) = - sum_k sum_i (a_k^i * x^i / i)
- *         = - sum_i (x^i / i * sum_k a_k^i)
- *         = - sum_i (g(i) / i * x^i)
- * 所以对于 i >= 1，有 g(i) = -i * (ln P(x) 第 i 次项的系数)。
- * 特别地，g(0) = n。
- * 
- * 模板参数:
- * 
- * Interface:
- * Poly power_sums(const std::vector<int>& a, int m);
- * 
- * Note:
- *      1. Time: O(n log^2 n + m log m)
- *      2. Space: O(n + m)
- *      3. O(n log^2 n) 部分对应分治乘法，O(m log m) 对应多项式求导积分及求逆。
+/*
+ * Set Power Sum (集合元素连续幂和)
+ *
+ * Overview:
+ *      给定多重集合 A = {a_0, a_1, ..., a_{n-1}}，对所有 0 <= i < m，求出集合幂和
+ *      g(i) = sum_{k=0}^{n-1} (a_k)^i。
+ *      构造生成多项式 P(x) = prod (1 - a_k * x)，两边取对数展开得 ln P(x) = -
+ *      sum_{i=1}^inf (g(i) / i) * x^i。
+ *      利用分治 NTT 展开 P(x) 后求 Ln，即可在 O(n log^2 n + m log m)
+ *      内求出全部幂和。
+ *
+ * API:
+ *     power_sums(a, m) — 计算集合 a 的 0 到 m-1 次幂和，返回长为 m 的多项式。
+ *                         复杂度 O(n log^2 n + m log m) 时间，O(n + m) 空间。
+ *
+ * Notes:
+ *      1. 特别地，常数项 g(0) = n。
+ *
+ * Related:
+ *      数学/多项式/2-数列与生成函数/NewtonIdentities·牛顿恒等式.cpp:
+ *      对称多项式体系。
  */
 
 namespace poly_ext {

@@ -1,20 +1,32 @@
 #include "aizalib.h"
 
-/**
- * Pell (Pell方程)
- * 算法介绍: 用连分数展开求解 x^2 - D*y^2 = ±1 的基本解与通解。
- * 模板参数: None
- * Interface:
- *     Pell::solve(D)                — 返回 x^2 - D*y^2 = 1 的最小正解 (x1, y1), D 为完全平方时返回 (-1, -1)
- *     Pell::kth_solution(x1, y1, k) — 由基本解计算第 k 个解 (x_k, y_k), 第 0 个解为 (1, 0)
- *     Pell::solve_minimal_x(D)      — 仅返回最小的 x
- *     Pell::solve_negative_pell(D)  — 返回 x^2 - D*y^2 = -1 的基本解, 无解返回 (-1, -1)
- * Note:
- *     1. Time: 连分数展开 O(√D), 乘方 O(log k)
- *     2. Space: O(1)
- *     3. D 需为非完全平方的正整数; D 为完全平方时无 y>0 的正解
- *     4. i128 用于中间乘法防止溢出
- *     5. kth_solution: x_k + y_k*√D = (x1 + y1*√D)^k, D 由 (x1, y1) 反推
+/*
+ * Pell's Equation (Pell 方程)
+ *
+ * Overview:
+ *      求解不定方程 x^2 - D * y^2 = 1 与负 Pell 方程 x^2 - D * y^2 = -1 的正整数解。
+ *      利用 sqrt(D) 的连分数展开周期循环节 L，由其渐近分数 p / q 导出基本解
+ *      (最小正整数解)。
+ *      若周期 L 为奇数，则 p^2 - D * q^2 = -1，由此平方可得标准 Pell 方程的基本解；
+ *      若周期 L 为偶数，负 Pell 方程无解。所有后续正整数解由基本解通过代数数域乘方生
+ *      成。
+ *
+ * API:
+ *     solve(D)                — 求解 x^2 - D*y^2 = 1 的最小正解 (x1, y1)。若 D
+ *                                为完全平方数返回 {-1, -1}。复杂度 O(sqrt(D)) 时间，
+ *                                O(1) 空间。
+ *     solve_minimal_x(D)      — 仅返回最小的 x1。
+ *     solve_negative_pell(D)  — 求解 x^2 - D*y^2 = -1 的最小正解。无解返回 {-1,
+ *                                -1}。复杂度 O(sqrt(D)) 时间，O(1) 空间。
+ *     kth_solution(x1, y1, k) — 由基本解计算第 k 个解 (x_k, y_k)。第 0 个解为 (1,
+ *                                0)。复杂度 O(log k) 时间，O(1) 空间。
+ *
+ * Notes:
+ *      1. 要求 D 为非完全平方正整数。
+ *      2. kth_solution 满足 x_k + y_k * sqrt(D) = (x1 + y1 * sqrt(D))^k。
+ *
+ * Related:
+ *      数学/数论/ContinuedFraction·连分数.cpp: 连分数理论。
  */
 struct Pell {
 private:

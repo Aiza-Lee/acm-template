@@ -1,4 +1,29 @@
 #include "aizalib.h"
+/*
+ * Splay Tree (Generic Info/Tag)
+ *
+ * Overview:
+ *     基于伸展树（Splay Tree）实现的泛型序列平衡树。利用双旋操作将目标区间 [l, r]
+ *     隔离为单棵子树，支持自定义区间聚合信息（Info）与延迟标记（Tag），
+ *     通用支持区间翻转、区间赋值/加法等序列操作。
+ *
+ * API:
+ *     Splay<Info, Tag, T>(n), init(n), reserve(n) — 初始化 / 预留空间
+ *     size(), empty(), clear(), all_info()        — 常用辅助接口
+ *     insert(pos, v), erase(pos)                  — 按位置插入 / 删除
+ *     modify(l, r, tag), query(l, r)              — 区间修改 / 查询
+ *     kth(k)                                      — 查询第 k 个元素
+ *     build(a)                                    — 按给定顺序 O(N) 建树
+ *     traverse(func)                              — 中序遍历全部实际元素
+ *
+
+ * Notes:
+ *     1. 时间复杂度: build 为 O(N)，其余单次操作均摊 O(log N)；空间复杂度 O(N)。
+ *     2. 索引约定: 外部逻辑位置统一为 1-based；首尾插入哑节点以规避越界。
+ *     3. 类型约束: Info 需满足默认构造、Info(T) 与加法半群；Tag 需满足 has_value()、
+ *        merge(Tag) 与 apply_to(SplayNodeProp)。
+ *     4. 辅助类型: 提供 SplayNullTag 空标记与 SplaySeqSum 实用特化。
+ */
 
 // 传递给 Tag::apply_to 的节点属性包
 // 允许 Tag 直接修改节点结构(l, r)与数据(val, info)
@@ -36,28 +61,6 @@ struct SplayNullTag {
     void merge(const SplayNullTag&) {}
     void apply_to(SplayNodeProp<Info, T>&) const {}
 };
-
-/**
- * Splay Tree - 通用 Info/Tag 版
- * 算法介绍: 维护序列的文艺平衡树；聚合信息与懒标记均由用户自定义。
- * 模板参数: Info, Tag, T
- * Interface:
- *      Splay<Info, Tag, T>(n), init(n), reserve(n) — 初始化 / 预留空间
- *      size(), empty(), clear(), all_info()        — 常用辅助接口
- *      insert(pos, v), erase(pos)                  — 按位置插入 / 删除
- *      modify(l, r, tag), query(l, r)              — 区间修改 / 查询
- *      kth(k)                                      — 查询第 k 个元素
- *      build(a)                                    — 按给定顺序 O(N) 建树
- *      traverse(func)                              — 中序遍历全部实际元素
- * Note:
- *      1. Time: 所有操作均摊 O(log N)，build O(N)
- *      2. Space: O(N)
- *      3. Info 需要支持默认构造(单位元)、Info(T) 与 operator+
- *      4. 用法/技巧:
- *          4.1 不需要懒标记时可直接用 SplayNullTag<Info, T>。
- *          4.2 文件末尾提供了 SplaySumInfo<T>、SplayRevAddTag<T> 与别名 SplaySeqSum<T>。
- *          4.3 外部位置统一为 1-based；插入位置 pos 表示插到前 pos 个元素之后。
- */
 template<class Info, class Tag, typename T>
 requires SplayInfoLike<Info, T> && SplayTagLike<Tag, Info, T>
 struct Splay {

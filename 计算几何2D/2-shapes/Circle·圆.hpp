@@ -2,30 +2,43 @@
 #include "../1-base/Line·直线.hpp"
 
 /*
- * 圆
+ * 圆 (Circle)
  *
  * Overview:
- *  提供圆类型、点与圆的位置判定，以及圆与直线、圆与圆和切线相关运算。
+ *     提供圆的几何表达、点与圆位置关系判定，以及圆与直线、圆与圆相交和公切线求解。
+ *     - 内部结构：包含圆心点 c 与半径 r。
+ *     - 几何计算：
+ *       1. 点在圆内：dist2(c, p) <= r^2。
+ *       2. 圆线相交：通过圆心到直线垂足与弦长勾股定理求交点。
+ *       3. 圆圆相交：余弦定理求两圆心连线与公弦夹角，旋转偏移得交点。
+ *       4. 公切线：包括外公切线与内公切线，向量旋转求得切点。
+ *     - 工具：Circle、contains、point、circle_line_intersection、
+ *       circle_circle_intersection、tangents_point_circle、tangents_circle_circle。
  *
  * API:
- *  Circle<T>(c, r) / Circle<T>()                                      — 构造圆或默认圆。
- *  contains(p)                                                        — 点 p 是否在圆内（含边界）。O(1)。
- *  point(angle)                                                       — 圆周上对应弧度 angle 的点。O(1)。
- *  circle_line_intersection(c, l) -> vector<Point<T>>                 — 圆与直线的交点，可能返回 0/1/2 个。O(1)。
- *  circle_circle_intersection(c1, c2) -> vector<Point<T>>             — 圆与圆的交点，可能返回 0/1/2 个。O(1)。
- *  tangents_point_circle(p, c) -> vector<Point<T>>                    — 过点 p 的圆切点列表。O(1)。
- *  tangents_circle_circle(c1, c2) -> vector<pair<Point<T>, Point<T>>> — 两圆的公切线切点对列表。O(1)。
- *  CircleFP                                                           — Circle<ld> 的常用别名。
+ *     Circle<T>(c, r)                    — 构造指定圆心与半径的圆。
+ *     contains(p)                        — 判定点 p 是否在圆内（含边界），O(1)。
+ *     point(angle)                       — 返回圆周上对应极角 angle 的点坐标，
+ *                                           O(1)。
+ *     circle_line_intersection(c, l)     — 求圆与直线的交点列表（0/1/2 个），O(1)。
+ *     circle_circle_intersection(c1, c2) — 求两圆的交点列表（0/1/2 个），O(1)。
+ *     tangents_point_circle(p, c)        — 求过点 p 的切点列表（0/1/2 个），O(1)。
+ *     tangents_circle_circle(c1, c2)     — 求两圆的公切线切点对列表，O(1)。
+ *     CircleFP                           — Circle<ld> 的常用别名。
  *
  * Notes:
- *  仅支持浮点类型；浮点比较通过 sgn / EPS 完成。
- *  circle_circle_intersection 不处理两圆完全重合（返回空集，与无交无法区分）。
- *  tangents_point_circle: 点在圆内返回空；点在圆上返回 1 个切点（p 自身）；点在圆外返回 2 个切点。
- *  tangents_circle_circle: 内含或完全重合时返回空；否则分别给出外公切线与内公切线对应的切点对。
+ *     1. 仅支持浮点类型 T（要求 std::is_floating_point_v<T>）。
+ *     2. circle_circle_intersection 不处理两圆完全重合情形（返回空集）。
+ *     3. tangents_point_circle: 点在圆内返回空；点在圆上返回 1 个切点（p 自身）；
+ *        点在圆外返回 2 个切点。
+ *     4. tangents_circle_circle: 内含或完全重合时返回空；
+ *        否则分别给出外公切线与内公切线对应的切点对。
  *
  * Related:
- *  MinEnclosingCircle·最小圆覆盖.hpp::smallest_enclosing_circle: 给定点集的最小覆盖圆（Welzl）。
- *  CirclePolygonArea·圆与多边形面积交.hpp::circle_polygon_area: 圆与多边形有向面积交。
+ *     MinEnclosingCircle·最小圆覆盖.hpp::smallest_enclosing_circle:
+ *     给定点集的最小覆盖圆（Welzl）。
+ *     CirclePolygonArea·圆与多边形面积交.hpp::circle_polygon_area:
+ *     圆与多边形有向面积交。
  */
 namespace Geo2D {
 
@@ -111,7 +124,9 @@ std::vector<Point<T>> tangents_point_circle(Point<T> p, Circle<T> c) {
 
 template<typename T>
 requires std::is_floating_point_v<T>
-std::vector<std::pair<Point<T>, Point<T>>> tangents_circle_circle(Circle<T> c1, Circle<T> c2) {
+std::vector<std::pair<Point<T>, Point<T>>> tangents_circle_circle(
+    Circle<T> c1, Circle<T> c2
+) {
     std::vector<std::pair<Point<T>, Point<T>>> res;
     if (c1.r < c2.r) {
         auto tmp = tangents_circle_circle(c2, c1);

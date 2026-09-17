@@ -1,0 +1,73 @@
+\textbf{模意义乘法群}
+
+\textbf{记号与定义}
+对正整数 $m$，模 $m$ 意义下的乘法群（简化剩余系）记作 $(\mathbb{Z}/m\mathbb{Z})^\times$ 或 $\mathbb{Z}_m^*$：
+\[
+(\mathbb{Z}/m\mathbb{Z})^\times = \{a\in [1,m]\mid \gcd(a,m)=1\}
+\]
+其二元运算为模 $m$ 乘法。群阶为欧拉函数值：
+\[
+|(\mathbb{Z}/m\mathbb{Z})^\times| = \varphi(m) = m\prod_{p\mid m}\left(1-\frac{1}{p}\right).
+\]
+
+\textbf{群同构直积分解}
+设 $m = 2^k p_1^{e_1}\cdots p_r^{e_r}$ 为质因数分解，由中国剩余定理诱导单位群同构：
+\[
+(\mathbb{Z}/m\mathbb{Z})^\times \cong (\mathbb{Z}/2^k\mathbb{Z})^\times \times \prod_{i=1}^r (\mathbb{Z}/p_i^{e_i}\mathbb{Z})^\times
+\]
+各素数幂分量的具体结构为：
+\begin{itemize}
+\item 奇素数幂分量：恒为循环群 $(\mathbb{Z}/p^e\mathbb{Z})^\times \cong C_{\varphi(p^e)} = C_{p^{e-1}(p-1)}$，由模 $p^e$ 的原根生成。
+\item $2$ 的幂分量：
+\begin{itemize}
+\item $k \le 1$：平凡群 $C_1$。
+\item $k = 2$：循环群 $C_2$，由 $-1\equiv 3\pmod 4$ 生成。
+\item $k \ge 3$：双循环群直积 $C_2 \times C_{2^{k-2}}$，由符号元 $-1$（阶为 $2$）与乘法元 $5$（阶为 $2^{k-2}$）生成。
+\end{itemize}
+\end{itemize}
+
+\textbf{Carmichael 函数（群指数）}
+Carmichael 函数 $\lambda(m)$ 定义为群元阶的最小公倍数（即满足 $\forall \gcd(a,m)=1,\, a^L\equiv 1\pmod m$ 的最小正整数 $L$）：
+\[
+\lambda(2^k) = \begin{cases} 1 & k \le 1 \\ 2 & k = 2 \\ 2^{k-2} & k \ge 3 \end{cases}, \quad \lambda(p^e) = p^{e-1}(p-1)\ (p > 2)
+\]
+\[
+\lambda(m) = \operatorname{lcm}\big(\lambda(2^k), \lambda(p_1^{e_1}), \dots, \lambda(p_r^{e_r})\big).
+\]
+\begin{itemize}
+\item 加强版欧拉定理：对任意 $\gcd(a,m)=1$，恒有 $a^{\lambda(m)}\equiv 1\pmod m$。
+\item 原根存在充要条件：$\lambda(m) = \varphi(m) \iff m \in \{1, 2, 4, p^e, 2p^e\}$（$p$ 为奇素数）。
+\end{itemize}
+
+\textbf{基底与坐标化（离散对数向量）}
+将各分量生成元经 CRT 提升为模 $m$ 全局正交基底 $\mathbf{G} = (G_1, \dots, G_K)$，对应阶数 $\mathbf{d} = (d_1, \dots, d_K)$：
+\[
+(\mathbb{Z}/m\mathbb{Z})^\times \cong \bigoplus_{j=1}^K C_{d_j}
+\]
+任意互质元 $x$ 具有唯一坐标向量 $\mathbf{c} = (c_1, \dots, c_K)$，其中 $c_j \in [0, d_j - 1]$：
+\[
+x \equiv \prod_{j=1}^K G_j^{c_j} \pmod m.
+\]
+群乘法严格同构于向量分量模加法：$x \cdot y \leftrightarrow (\mathbf{c}_x + \mathbf{c}_y) \pmod{\mathbf{d}}$。
+\begin{itemize}
+\item 模 $2^k$ 分量求解：由 $x\bmod 4$ 确定符号位 $c_1$；用 Hensel 提升（位运算）在 $O(k)$ 步求解 $5^{c_2}\equiv \pm x\pmod{2^k}$。
+\item 模 $p^e$ 分量求解：模 $p$ BSGS 求底阶对数，再用 $p$-adic 逐阶线性提升到模 $p^e$。
+\end{itemize}
+
+\textbf{关键推论与方程计数}
+设已知元素 $a$ 的坐标为 $\mathbf{c}_a = (c_{a,1}, \dots, c_{a,K})$：
+\begin{itemize}
+\item 元素乘法阶：$\operatorname{ord}_m(x) = \operatorname{lcm}_{j=1}^K \frac{d_j}{\gcd(c_j, d_j)}$。
+\item 高次同余根数：方程 $x^k \equiv a \pmod m$ 在群内有解充要条件为 $\forall j,\, \gcd(k, d_j) \mid c_{a,j}$。有解时的解数为：
+\[
+\prod_{j=1}^K \gcd(k, d_j).
+\]
+特别地，$x^k \equiv 1\pmod m$ 恒有解，解数恒为 $\prod_{j=1}^K \gcd(k, d_j)$。
+\item 平方剩余充要条件：$\forall j$ 使得 $2\mid d_j$，均有 $2\mid c_{a,j}$。
+\end{itemize}
+
+\textbf{快记}
+\begin{itemize}
+\item 合数模的群结构是多个互质分量的直积；$2^k\ (k\ge 3)$ 不是循环群，必拆为两个基底（$-1$ 与 $5$）。
+\item 坐标化将模 $m$ 乘法完全转为向量加法，也是多维乘法循环卷积（Multiplicative FFT）的代数基础。
+\end{itemize}

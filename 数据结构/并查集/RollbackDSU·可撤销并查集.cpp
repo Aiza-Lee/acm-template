@@ -1,22 +1,28 @@
 #include "aizalib.h"
-/**
- * RollbackDSU (可撤销并查集)
- * 算法介绍: 不做路径压缩，仅按大小合并，并将修改记录入栈，支持回滚到历史版本。
- * 模板参数: 无
- * Interface:
- *      RollbackDSU(int n)            — 初始化 1~n
- *      int find(int x) const         — 查询所在连通块代表元
- *      bool same(int x, int y) const — 判断是否连通
- *      bool merge(int x, int y)      — 合并两个集合，返回是否真的合并
- *      int size(int x) const         — 查询所在连通块大小
- *      int snapshot() const          — 返回当前历史栈位置
- *      void rollback(int snap)       — 回滚到给定快照
- *      int components() const        — 当前连通块个数
- * Note:
- *      1. Time: 单次 find / merge / rollback 均摊 O(log n)
- *      2. Space: O(n + 操作数)
- *      3. 1-based indexing.
- *      4. 用法/技巧: 适合配合线段树分治、CDQ 分治等离线可撤销场景；不要加路径压缩。
+/*
+ * RollbackDSU·可撤销并查集
+ *
+ * Overview:
+ *      禁用路径压缩，仅保留按大小（秩）启发式合并，并用版本变更历史栈记录树边变更。
+ *      提供了支持后进先出（LIFO）状态撤销的动态连通性与分量计数工具。
+ *
+ * API:
+ *     RollbackDSU(n) — 初始化 1..n 的独立集合。
+ *     find(x)        — 查找 x 所在树根代表元，严格 O(log n)。
+ *     same(x, y)     — 判断 x 与 y 是否同属一个集合，O(log n)。
+ *     merge(x, y)    — 启发式合并集合，记录历史修改，返回是否发生真实合并，O(log
+ *                       n)。
+ *     size(x)        — 查询 x 所在连通块大小，O(log n)。
+ *     snapshot()     — 返回当前历史栈版本号，O(1)。
+ *     rollback(snap) — 将状态回滚到快照 snap 处，单步撤销 O(1)。
+ *     components()   — 返回当前连通分量总数，O(1)。
+ *
+ * Notes:
+ *      1. 1-based indexing；点编号 1..n。
+ *      2. Time: find/merge 严格 O(log n)，rollback 单步 O(1)；Space: O(n +
+ *         历史操作数)。
+ *      3. 严禁使用路径压缩（会破坏回滚的历史拓扑）；
+ *         常与线段树分治/离线动态连通性搭配。
  */
 struct RollbackDSU {
     struct Change {

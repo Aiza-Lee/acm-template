@@ -1,44 +1,44 @@
 #include "aizalib.h"
 /*
- * BigInt 高精度整数 (NTT / FFT 卷积乘法)
+ * BigInt (高精度整数 - NTT/FFT 卷积乘法)
  *
  * Overview:
- *      NTT 或 FFT 加速大整数乘法的高精度整数模板。数字低位在前存于
- *      vector<int>，乘法把数字数组视作多项式做卷积，再统一进位。
- *      整数逻辑（解析 / 输出 / 比较 / 加减乘）通过模板参数 Conv 复用，
- *      两套卷积引擎 NttConv 与 FftConv 各有精度上限，见各自注释。
+ *     基于快速多项式卷积加速超长整数乘法的高精度带符号整数模板：
+ *     - 压位表示与符号解耦: 数字数组低位在前存于 vector<int>，符号由 sgn (+1/-1)
+ *       单独维护；所有运算结果均自动规范化消除前导零。
+ *     - 卷积乘法代数结构: 将大整数数组视作系数多项式做卷积并统一进位，
+ *       将高精度乘法复杂度由 O(N^2) 降低到 O(N log N)。
+ *     - 双卷积引擎支持: 提供模 998244353 的数论变换引擎 NttConv (无浮点精度误差，
+ *       支持数百万位) 与浮点 FftConv (常数小，适用 3e4 位内快速乘法)。
+ *     - 结构与工具: 支持高精度带符号加、减、乘、三态比较与输入输出流。
  *
  * API:
- *      BigInt<Conv>::BigInt() / BigInt(i64) / BigInt(const string&):
- *          构造。空为 0；i64 与十进制字符串均支持前导 '-' 与前导零。
- *      BigInt<Conv>::read(const string&)                         — 从十进制字符串解析，覆盖旧值。
- *      BigInt<Conv>::toString()                                  — 十进制字符串，0 返回 "0"。
- *      BigInt<Conv>::trim()                                      — 去高位零；归零时符号置 +1。
- *      BigInt<Conv>::isZero()                                    — 是否为零。
- *      BigInt<Conv>::sgn                                         — 符号 ±1（值为 0 时恒为 +1）。
- *      BigInt<Conv>::operator== / != / < / > / <= / >=           — 带符号比较。
- *      BigInt<Conv>::operator+ / - / *                           — 加减乘；乘用 Conv::conv + 进位。
- *      BigInt<Conv>::operator+= / -= / *=                        — 就地运算。
- *      BigInt<Conv>::operator-                                   — (一元) / abs(): 取负 / 取绝对值。
- *      BigInt<Conv>::cmp(b)                                      — 带符号三态比较，返回 < -1，= 0，> 1。
- *      BigInt<Conv>::BASE / BASE_DIGITS                          — 进制及其十进制宽度，由引擎决定。
- *      BigInt<Conv>::operator>> / <<                             — 流读写，输出同 toString。
- *      NttConv / FftConv                                         — 卷积引擎，O(L log L)，L 为数字个数。
- *      BigIntNTT = BigInt<NttConv> / BigIntFFT = BigInt<FftConv> — 预置别名。
+ *     BigInt<Conv>()              — 默认构造函数，初值为 0
+ *     BigInt<Conv>(i64)           — 由 64 位整数构造，支持负数
+ *     BigInt<Conv>(const string&) — 由十进制字符串解析构造，支持前导符号与前导零
+ *     read(const string&)         — 从十进制字符串解析重置当前数值
+ *     toString()                  — 转换为标准十进制字符串 (0 返回 "0")
+ *     trim()                      — 规范化去除高位多余零，并在归零时将符号重置为 +1
+ *     isZero()                    — 判定数值是否为零
+ *     sgn                         — 符号指示 (+1 表示非负，-1 表示负数)
+ *     cmp(b)                      — 带符号三态比较，返回 -1 (<), 0 (==), 1 (>)
+ *     operator+ / - / *           — 带符号加法、减法、卷积乘法 (均返回新对象)
+ *     operator+= / -= / *=        — 就地自增、自减、自乘运算
+ *     operator-()                 — 一元取负运算符
+ *     abs()                       — 取绝对值
+ *     NttConv / FftConv           — 卷积引擎，单次乘法 O(L log L) (L 为数字长度)
+ *     BigIntNTT / BigIntFFT       — 预置特化类型别名
  *
  * Notes:
- *      1. 数字数组低位在前，每位 ∈ [0, BASE)，BASE 由引擎决定；所有
- *         运算结果都保持 trim 后的规范形态，便于比较与输出。
- *      2. 卷积系数必须精确：NTT 单模 998244353（119·2^23+1，原根 3），
- *         变换长度 ≤ 2^23，而系数上界 (BASE-1)^2·min(n,m) = 81·min(n,m)
- *         < MOD 恒成立，故十进制单操作数位数上限约 4.2e6；FFT 用 double，
- *         频率域点乘值 ≤ (sum|a|)·(sum|b|) 需在 2^53 内，实测 base 10^4
- *         下约 3e4 位十进制数（约 8e3 个数字）内可靠，更大请用 BigIntNTT。
- *      3. 加 / 减 / 比较按带符号数值语义；异号相加取 |大|-|小|，符号随大者。
- *      4. "0" 与 "-0" 均归约为零且 sgn = +1，输出不会出现 "-0"。
+ *     1. 数字数组低位在前，每位属于 [0, BASE)，BASE 由具体引擎决定；
+ *        所有运算结果均保持 trim 后的规范形态。
+ *     2. 卷积精度约束: NTT 引擎模 998244353 (原根 3)，十进制单操作数长度上限约
+ *        4.2e6 位；FFT 引擎基于 double，实测十进制 3e4 位内稳定可靠。
+ *     3. 加减法严格按带符号数值语义执行；异号相加取绝对值差，符号随绝对值较大者。
+ *     4. "0" 与 "-0" 均统一归约为零且 sgn = +1，输出不会产生 "-0"。
  *
  * Related:
- *      数学/多项式/0-base/PolyCore·多项式核心.hpp: 同模数的 NTT 参考实现。
+ *     数学/多项式/0-base/PolyCore·多项式核心.hpp: 同模数 NTT 参考实现。
  */
 
 // ============================ 卷积引擎 ============================
@@ -49,7 +49,8 @@ struct NttConv {
     static constexpr int BASE_DIGITS = 1;
 
     // 返回未进位的精确卷积系数（真实值 < MOD，故取模后即原值）
-    static std::vector<i64> conv(const std::vector<int>& a, const std::vector<int>& b) {
+    static std::vector<i64> conv(const std::vector<int>& a,
+                                 const std::vector<int>& b) {
         int len = a.size() + b.size() - 1, n = 1;
         while (n < len) n <<= 1;
         std::vector<int> fa(a.begin(), a.end()), fb(b.begin(), b.end());
@@ -105,7 +106,8 @@ struct FftConv {
     static constexpr int BASE_DIGITS = 4;
 
     // 返回未进位的卷积系数（double 四舍五入到整数）
-    static std::vector<i64> conv(const std::vector<int>& a, const std::vector<int>& b) {
+    static std::vector<i64> conv(const std::vector<int>& a,
+                                 const std::vector<int>& b) {
         int len = a.size() + b.size() - 1, n = 1;
         while (n < len) n <<= 1;
         std::vector<C> fa(n), fb(n);
@@ -211,7 +213,12 @@ struct BigInt {
     bool operator>=(const BigInt& b) const { return cmp(b) >= 0; }
 
     // ---- 符号 ----
-    BigInt operator-() const { BigInt t = *this; t.sgn = -t.sgn; if (t.isZero()) t.sgn = 1; return t; }
+    BigInt operator-() const {
+        BigInt t = *this;
+        t.sgn = -t.sgn;
+        if (t.isZero()) t.sgn = 1;
+        return t;
+    }
     BigInt abs() const { BigInt t = *this; t.sgn = 1; return t; }
 
     // ---- 加减 ----

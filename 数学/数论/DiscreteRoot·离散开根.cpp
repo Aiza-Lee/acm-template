@@ -1,16 +1,27 @@
 #include "aizalib.h"
 
-/**
+/*
  * Discrete Root (离散开根)
- * 算法介绍: 在素数模 p 下求解 x^k = a (mod p)，做法是原根化后转成线性同余。
- * 模板参数: None
- * Interface:
- *      DiscreteRoot::solve(k, a, p) — 返回全部解并从小到大排序；要求 p 为素数且 k > 0
- * Note:
- *      1. Time: 试除版约 O(求原根 + sqrt(p) + ans log p)
- *      2. Space: O(sqrt(p))
- *      3. 当 a != 0 时，先把 a 写成 g^t，再解 k * y = t (mod p - 1)
- *      4. 用法/技巧: 当前版本仅处理素数模；一般合数模需要额外讨论
+ *
+ * Overview:
+ *      在素数模 p 下求解高次同余方程 x^k = a (mod p) 的全部非负解。
+ *      利用模 p 的原根 g 将元素转化为指标（对数）：设 x = g^y, a = g^t，
+ *      方程转化为一次同余方程 k * y = t (mod (p - 1))。利用 BSGS 求解 t，
+ *      再用扩展欧几里得解线性同余方程，即可得到所有 y 并还原回 x。
+ *
+ * API:
+ *     solve(k, a, p) — 求解 x^k = a (mod p)，返回从小到大排序去重后的全部解。
+ *                       复杂度 O(求原根 + sqrt(p) + d log d) 时间，O(sqrt(p)) 空间，
+ *                       其中 d = gcd(k, p - 1)。
+ *
+ * Notes:
+ *      1. 要求 p 为素数且 k > 0。
+ *      2. 若 a = 0 (mod p)，直接返回单一解 {0}。
+ *      3. 若方程无解则返回空向量。
+ *
+ * Related:
+ *      数学/数论/BSGS·求离散对数.cpp: 用于求解指标 t = ind_g(a)。
+ *      数学/数论/PrimitiveRoot·原根.cpp: 原根求取算法。
  */
 struct DiscreteRoot {
     struct Hash {

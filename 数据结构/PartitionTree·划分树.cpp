@@ -1,21 +1,23 @@
 #include "aizalib.h"
 
-/**
- * 划分树 (Partition Tree)
- * 算法介绍: 基于快速排序划分思想维护静态数组，支持区间第 k 小查询。每层按当前值域中位数把元素稳定划分到左右两侧，并记录前缀中进入左侧的元素个数。
- * 模板参数: T (值类型)
- * Interface:
- *      PartitionTree(const std::vector<T>& a) — 用 1-based 数组 a 建树
- *      T query(int l, int r, int k)           — 查询区间 [l, r] 的第 k 小值
- * Note:
- *      1. Time: build O(n log n), query O(log n)
- *      2. Space: O(n log n)
- *      3. 1-based indexing.
- *      4. 用法/技巧:
- *          4.1 只支持静态区间第 k 小，不支持修改。
- *          4.2 若题目是区间第 k 小的在线查询，划分树常数通常优于主席树，但功能更单一。
- *          4.3 构造时传入的数组需为 1-based，即 a[1..n] 有效，a[0] 留空。
- *          4.4 支持重复值；内部按目标中位数稳定划分以保证重复元素计数正确。
+/*
+ * Partition Tree (划分树)
+ *
+ * Overview:
+ *     基于快速排序划分（Partition）思想的静态二叉树结构。在递归的每一层中，
+ *     以当前区间排序后的中位数作为基准，将较小元素稳定划分至左半区、其余进入右半区，
+ *     并以前缀和 cnt[dep][i] 记录当前区间前缀进入左侧的元素个数。查询时通过 cnt
+ *     数组以 O(1) 转移子区间边界，单次 O(log N) 快速定位区间第 k 小。
+ *
+ * API:
+ *     PartitionTree(const std::vector<T>& a) — 用 1-based 数组 a 建树
+ *     T query(int l, int r, int k)           — 查询区间 [l, r] 的第 k 小值
+ *
+
+ * Notes:
+ *     1. 时间复杂度: 建树 O(N log N)，单次查询 O(log N)；空间复杂度 O(N log N)。
+ *     2. 索引约定: 外部输入数组与查询区间均采用 1-based。
+ *     3. 性能特点: 纯静态算法，不支持动态修改；常数与缓存局部性优于主席树。
  */
 
 template<typename T = i64>
@@ -25,8 +27,9 @@ struct PartitionTree {
 
     int n;                          // 数组长度
     std::vector<std::vector<T>> val; // val[dep][i]: 第 dep 层位置 i 的值
-    std::vector<std::vector<int>> cnt; // cnt[dep][i]: 第 dep 层当前块前缀中被划到左侧的个数
-    std::vector<T> b;               // 排序后的目标序列
+    // cnt[dep][i]: 第 dep 层当前块前缀中被划到左侧的个数
+    std::vector<std::vector<int>> cnt;
+    std::vector<T> b;                // 排序后的目标序列
 
     PartitionTree() : n(0) {}
 

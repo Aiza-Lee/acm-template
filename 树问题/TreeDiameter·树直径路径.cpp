@@ -1,50 +1,45 @@
 #include "aizalib.h"
-
 /*
- * 树直径（树形 DP，输出有序点集）
+ * 树直径路径（树形 DP） (Tree Diameter Path - Tree DP)
  *
  * Overview:
- *      树直径：在带权树中找最长路径（点权和 = 边权和累计）。
- *      本模板沿用树形 DP：以 root 定根，按 BFS 序倒序处理。
- *      每个节点记录最长向下链与最远叶端点，全局最优在每个节点处
- *      合并两条子链取最大。同步记录 parent 链，最终可在 O(N) 重建
- *      直径路径上的有序点集。
- *
- *      相较 TreeDiameter·树直径(树形DP).cpp，本模板额外输出
- *      std::vector<int> path，便于在直径上做点级操作
- *      （点权和、区间染色、统计等）。
+ *     基于树形动态规划自底向上求解树的直径，并同步记录转移前驱链，
+ *     在求得最大路径长度的同时在 O(N) 时间内完整回溯重构直径上的有序节点序列。
+ *     - 动态规划与转移追踪：
+ *       1. 向下最长链：以 root 定根，按 BFS 序倒序自底向上迭代。
+ *          每个节点记录其子树内的最长向下链与其末端叶节点。
+ *       2. 全局拼合与折返点：在每个节点 u 处合并两条来自不同子分支的最长链，
+ *          若优于当前全局最优，则记录直径端点及折返点 LCA（best_lca = u）。
+ *       3. 线性路径重构：通过父节点指针数组 fa，从两端点分别向上遍历至 best_lca，
+ *          翻转后拼接生成严格按树上移动顺序排列的节点序列 path（u -> ... -> v）。
+ *     - 工具：Graph 结构、TreeDiameterDPPath 求解器、solve。
  *
  * API:
- *      Graph<T>(n) / add_edge(u, v, w = 1)
- *          建无向树，1-based，边权需非负。
- *      TreeDiameterDPPath<T>(G).solve(root = 1)
- *          求直径与路径，返回
- *              Result { len, u, v, edges, path }
- *          len   — 直径长度（边权和）；
- *          u, v  — 两端点，u <= v；
- *          edges — 路径边数 == path.size() - 1；
- *          path  — u -> v 的有序点集。
- *          复杂度 O(N)。
+ *     struct Graph<T>(n)           — 树的带权邻接表表示（1-based，边权需非负）。
+ *     Graph::add_edge(u, v, w = 1) — 添加无向树边 (u, v, w)。
+ *     TreeDiameterDPPath<T>(G)     — 构造树直径与路径求解器。
+ *     solve(root = 1)              — 求解直径与有序点序列，返回 Result {len, u, v,
+ *                                     edges, path}。
  *
  * Notes:
- *      1. 1-based indexing；n >= 1。
- *      2. 边权需非负；权重零时退化为最长（边数最多）路径。
- *      3. path.front() == u，path.back() == v；相邻点之间必有边。
- *      4. 平局规则：len 较大者优先；同 len 时边数多者优先；再相同按
- *          端点字典序。路径在所有 tie-break 后做单次重建。
+ *     1. 下标统一为 1-based。
+ *     2. 边权需非负；path.front() == u, path.back() == v，相邻节点间必有树边。
+ *     3. Time: O(N)；Space: O(N)。
  *
  * Related:
- *      TreeDiameter·树直径(树形DP).cpp: 不输出路径的简化版。
- *      TreeDiameter·树直径(两次DFS).cpp: 两次 BFS/DFS 实现，同样只输出端点。
+ *     TreeDiameter·树直径(树形DP).cpp: 仅求端点与长度的轻量版。
+ *     TreeDiameter·树直径(两次DFS).cpp: 两次遍历实现。
  */
 
 template<typename T>
-concept TreeDiameterWeight = std::default_initializable<T> && std::totally_ordered<T> && requires(T a, T b) {
-    { a + b } -> std::convertible_to<T>;
-};
+concept TreeDiameterWeight =
+    std::default_initializable<T> && std::totally_ordered<T> &&
+    requires(T a, T b) {
+        { a + b } -> std::convertible_to<T>;
+    };
 
 template<typename T = i64>
-requires TreeDiameterWeight<T>
+    requires TreeDiameterWeight<T>
 struct Graph {
     struct Edge { int v; T w; };
     int n;
@@ -61,7 +56,7 @@ struct Graph {
 };
 
 template<typename T = i64>
-requires TreeDiameterWeight<T>
+    requires TreeDiameterWeight<T>
 struct TreeDiameterDPPath {
     struct Result {
         T len{};

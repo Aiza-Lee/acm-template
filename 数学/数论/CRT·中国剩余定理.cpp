@@ -1,16 +1,25 @@
 #include "aizalib.h"
 
-/**
- * CRT (中国剩余定理)
- * 算法介绍: 求解模数两两互质的同余方程组 x = r[i] (mod m[i])。
- * 模板参数: None
- * Interface:
- *      CRT::solve(r, m) — 解同余方程组并返回最小非负解，Time: O(n log max(m[i]))
- * Note:
- *      1. Time: O(n log max(m[i]))
- *      2. Space: O(1)
- *      3. 返回 [0, M) 内最小解，其中 M = m[0] * m[1] * ... * m[n-1]
- *      4. 用法/技巧: 若模数不互质请改用 ExtendedCRT
+/*
+ * Chinese Remainder Theorem (CRT)
+ *
+ * Overview:
+ *      求解模数两两互质的线性同余方程组 x = r[i] (mod m[i])。
+ *      令总模数 M = prod(m[i]), M[i] = M / m[i]，由于 gcd(M[i], m[i]) = 1，
+ *      求出模逆元 t[i] = M[i]^(-1) (mod m[i]) 后，唯一特解为 sum(r[i] * M[i] *
+ *      t[i]) (mod M)。
+ *
+ * API:
+ *     solve(r, m) — 求解同余方程组并返回 [0, M) 内的唯一最小非负解。复杂度 O(n
+ *                    log(max m)) 时间，O(1) 额外空间。
+ *
+ * Notes:
+ *      1. 要求各 m[i] > 0 且两两互质，且乘积 M = prod(m[i]) 不超过 i64 上限。
+ *      2. 若模数不两两互质，应使用 ExtendedCRT。
+ *
+ * Related:
+ *      数学/数论/ExtendedCRT·扩展中国剩余定理.cpp:
+ *      模数不保证两两互质时的一般方程组求解。
  */
 struct CRT {
     static i64 _exgcd(i64 a, i64 b, i64 &x, i64 &y) {

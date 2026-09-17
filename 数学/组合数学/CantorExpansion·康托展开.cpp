@@ -3,28 +3,31 @@
  * Cantor Expansion (康托展开)
  *
  * Overview:
- *      排列与其字典序序号的双向转换。设 a_i 为「第 i 位之后值比 p_i 小的元素个数」，则
- *      0-based 序号 rank = Σ a_i · (n-i)!。正向支持精确序号 (n <= 20) 与取模序号 mod md
- *      (任意 n, 直接使用 aizalib 的模运算)；逆向由精确序号逐位反解 (n <= 20)。
+ *      排列与其字典序序号的双向转换。设 a_i 为「第 i 位之后值比 p_i 小的元素个数」，
+ *      则 0-based 序号 rank = Σ a_i · (n-i)!。正向支持精确序号 (n <= 20)
+ *      与取模序号 mod md (任意 n, 直接使用 aizalib 的模运算)；
+ *      逆向由精确序号逐位反解 (n <= 20)。
  *      值域计数用树状数组，双向均为 O(n log n)。
  *
  * API:
- *      Cantor(n)      — 预处理 0..n 的模阶乘 (n <= 20 时额外预处理精确阶乘)；n >= 0。
- *      rank_of(p)     — 返回精确 0-based 序号 (i64)；要求 n <= 20。p 为 1-based，p[1..n] 是 1..n 的排列，p[0] 未用。
- *      rank_mod_of(p) — 返回序号 mod md (int)；任意 n，使用 aizalib 的 inc / mul。
- *      perm_of(rank)  — 返回精确序号为 rank 的排列 (1-based)；要求 0 <= rank < n! 且 n <= 20。
- *      _reset()       — 重置内部计数，令每个值可用 1 次。
+ *     Cantor(n)      — 预处理 0..n 的模阶乘 (n <= 20 时额外预处理精确阶乘)；n >= 0。
+ *     rank_of(p)     — 返回精确 0-based 序号 (i64)；要求 n <= 20。p 为 1-based，
+ *                       p[1..n] 是 1..n 的排列，p[0] 未用。
+ *     rank_mod_of(p) — 返回序号 mod md (int)；任意 n，使用 aizalib 的 inc / mul。
+ *     perm_of(rank)  — 返回精确序号为 rank 的排列 (1-based)；要求 0 <= rank < n!
+ *                       且 n <= 20。
+ *     _reset()       — 重置内部计数，令每个值可用 1 次。
  *
+
  * Notes:
- *      1. Time: 预处理 O(n)，rank_of / rank_mod_of / perm_of 均 O(n log n)；Space: O(n)。
- *      2. 当 n <= 12 时 n! < md，rank_of 与 rank_mod_of 结果相等；13 <= n <= 20 时取模结果见 rank_mod_of。
- *      3. perm_of 需对阶乘精确整除，故限制 n <= 20；不满足时结果未定义 (LOCAL 下 AST 报错)。
- *      4. 内部树状数组按值域 1..n 计数，与 数据结构/树状数组/FenwickTree·树状数组.cpp 的 BitTree 一致。
- *      5. 若输入是 0-based 的 {0..n-1} 排列，先对每个元素 +1 再调用。
- *      6. n = 0 时 rank_of / rank_mod_of 恒返回 0，perm_of 返回仅含占位 0 的长度 1 向量。
+ *     1. 时间复杂度: 预处理 O(N)，rank_of / rank_mod_of / perm_of 均为 O(N log N)。
+ *     2. 空间复杂度: O(N)。
+ *     3. 阶乘精确性: perm_of 与 rank_of 依赖精确阶乘整除，严格限制 n <= 20。
+ *     4. 索引约定: 排列下标与元素值域均为 1-based；序号 rank 为 0-based。
  *
  * Related:
- *      数据结构/树状数组/FenwickTree·树状数组.cpp::BitTree: 内部计数所用树状数组的完整版 (含 kth)。
+ *      数据结构/树状数组/FenwickTree·树状数组.cpp::BitTree:
+ *      内部计数所用树状数组的完整版 (含 kth)。
  *      1-文字资料/数学/组合数学/康托展开.tex: 公式与变体速查。
  */
 

@@ -1,19 +1,22 @@
 #include "aizalib.h"
-
-/**
- * DSU (并查集)
- * 算法介绍: 用父指针集合维护不交集合，路径压缩配合按大小合并。
- * 模板参数: None
- * Interface:
- *      DSU(n)      — 初始化 1..n
- *      find(x)     — 返回所在集合代表元
- *      same(x, y)  — 判断是否同集合
- *      merge(x, y) — 合并两集合，成功合并返回 true
- * Note:
- *      1. Time: 单次 find / same / merge 均摊 O(alpha(n))
- *      2. Space: O(n)
- *      3. 1-based indexing；构造后合法点编号为 1..n
- *      4. 用法/技巧: merge 返回 false 表示两点已经连通，常用于 Kruskal 判环。
+/*
+ * DSU·并查集
+ *
+ * Overview:
+ *      用森林结构维护不相交集合，支持路径压缩配合按大小启发式合并。
+ *      提供快速判断连通性与等价类动态合并工具。
+ *
+ * API:
+ *     DSU(n)      — 初始化 1..n 的独立单元素集合。
+ *     find(x)     — 返回 x 所在集合代表元，带路径压缩，均摊 O(alpha(n))。
+ *     same(x, y)  — 判断 x 与 y 是否属于同一集合，均摊 O(alpha(n))。
+ *     merge(x, y) — 合并两集合，若新合并返回 true，已连通返回 false，均摊
+ *                    O(alpha(n))。
+ *
+ * Notes:
+ *      1. 1-based indexing；合法节点编号为 1..n。
+ *      2. Time: 单次操作均摊 O(alpha(n))；Space: O(n)。
+ *      3. merge 返回 false 表示两点已连通，常用于 Kruskal 算法判环与生成树边计数。
  */
 class DSU {
 public:

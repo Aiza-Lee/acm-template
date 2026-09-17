@@ -1,22 +1,34 @@
 #include "aizalib.h"
 /*
- * Tree Hash (树哈希)
+ * 树哈希 (Tree Hash)
  *
  * Overview:
- *     对无序有根树递归混合子树哈希，无根树取重心根的最小哈希代表。
- *     默认使用确定性伪随机掩码，支持跨实例直接判定无向树同构。
+ *     将树的同构等价类保序映射为 64 位无符号整数，
+ *     用于常数时间判定有根树或无根树的拓扑同构。
+ *     - 有根树哈希与置换不变性：
+ *       1. 多重集置换不变：子树内部的兄弟子节点无序，采用可交换加法与非线性位移置换
+ *          shift 函数聚合子树哈希。
+ *       2. 递归递推：叶节点哈希为 1，非叶节点递归计算 sub[u] = 1 + sum_{v in
+ *              ch(u)} shift(sub[v])。
+ *     - 无根树重心归一化：
+ *       1. 重心同构不变性：树的重心（1 个或 2 个）在树同构变换下保持不变。
+ *       2. 标准型代表元：分别以树的所有重心为根计算有根树哈希，
+ *          取最小哈希值作为该无根树的唯一标准代表元，支持无根树同构判定。
+ *     - 工具：TreeHash 结构、add_edge、set_mask、get_rooted_hash、
+ *       get_unrooted_hash。
  *
  * API:
- *     TreeHash(n, mask = DEFAULT_MASK) — 初始化 n 个点的树哈希结构体，支持指定掩码
- *     add_edge(u, v)                   — 添加无向边 (1-based)
- *     set_mask(new_mask)               — 设置防碰撞随机掩码
- *     get_rooted_hash(root)            — 计算以 root 为根的有根树哈希值
- *     get_unrooted_hash()              — 计算无根树哈希值，自动处理单/双重心归一化
+ *     TreeHash(n, mask = DEFAULT_MASK) — 初始化包含 n 个节点的树哈希求解器。
+ *     add_edge(u, v)                   — 添加无向树边（1-based）。
+ *     set_mask(new_mask)               — 设置自定义随机掩码以防御卡常/Hash 碰撞。
+ *     get_rooted_hash(root)            — 计算以 root 为定根的有根树哈希值，复杂度
+ *                                         O(N)。
+ *     get_unrooted_hash()              — 计算无根树重心归一化哈希值，复杂度 O(N)。
  *
  * Notes:
- *     1. 1-based indexing；计算前需加入 n-1 条树边。
- *     2. Time: 单次 rooted / unrooted hash 复杂度均为 O(N)；Space: O(N)。
- *     3. 默认 mask 为确定性常量，不同 TreeHash 实例可直接比对同构哈希值；若需防 Hack 可传入自定义随机数。
+ *     1. 下标统一为 1-based；计算前需加入恰好 n - 1 条树边。
+ *     2. Time: 单次求解均为严格 O(N)；Space: O(N)。
+ *     3. 默认 mask 为确定性常量，不同实例可直接比对；竞赛防 Hack 可传入动态随机数。
  */
 
 struct TreeHash {
@@ -27,7 +39,8 @@ struct TreeHash {
     std::vector<u64> sub;
     u64 mask;
 
-    TreeHash(int _n, u64 mask = DEFAULT_MASK) : n(_n), adj(_n + 1), sub(_n + 1), mask(mask) {}
+    TreeHash(int _n, u64 mask = DEFAULT_MASK)
+        : n(_n), adj(_n + 1), sub(_n + 1), mask(mask) {}
 
     void set_mask(u64 new_mask) {
         mask = new_mask;

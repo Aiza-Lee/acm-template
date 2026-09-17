@@ -1,17 +1,25 @@
 #include "aizalib.h"
 
-/**
- * BSGS (Baby-Step Giant-Step)
- * 算法介绍: 求离散对数 a^x = b (mod p)，并支持 ExBSGS 处理 gcd(a, p) != 1。
- * 模板参数: None
- * Interface:
- *      BSGS::solve(a, b, p)    — 在 gcd(a, p) = 1 时求最小非负解，Time: O(sqrt(p))
- *      BSGS::ex_solve(a, b, p) — 一般情形求最小非负解，Time: O(sqrt(p))
- * Note:
- *      1. Time: O(sqrt(p))
- *      2. Space: O(sqrt(p))
- *      3. 返回最小非负整数解，无解返回 -1
- *      4. 用法/技巧: solve 仅适用于 gcd(a, p) = 1；一般情况直接用 ex_solve
+/*
+ * Baby-Step Giant-Step & Extended BSGS
+ *
+ * Overview:
+ *      求解高次同余方程 a^x = b (mod p) 的最小非负整数解 x。通过分块思想令 x =
+ *      i*m - j (m = ceil(sqrt(p)))，将原方程化为 (a^m)^i = b * a^j (mod p)。
+ *      小步阶段预处理右侧哈希表，大步阶段枚举左侧步进匹配。ExBSGS 通过不断提取 g =
+ *      gcd(a, p) 进行约分消除不互质因子，转化为互质的普通 BSGS 求解。
+ *
+ * API:
+ *     solve(a, b, p)    — 在 gcd(a, p) = 1 时求最小非负整数解 x，无解返回 -1。
+ *                          复杂度 O(sqrt(p)) 时间与空间。
+ *     ex_solve(a, b, p) — 任意正整数 p 下求最小非负整数解 x，无解返回 -1。复杂度
+ *                          O(sqrt(p)) 时间与空间。
+ *
+ * Notes:
+ *      1. 要求 p > 0。若 p = 1，解恒为 0。
+ *      2. 若 a, b 未取模，内部会自动正规化为 [0, p-1]。
+ *      3. 若 gcd(a, p) != 1，直接调用 solve 会返回 -1；一般情况建议直接使用
+ *         ex_solve。
  */
 struct BSGS {
     struct Hash {

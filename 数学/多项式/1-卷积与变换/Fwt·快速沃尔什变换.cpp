@@ -1,48 +1,39 @@
 #include "aizalib.h"
 namespace poly_ext {
-/**
- * 位运算卷积 / 快速沃尔什变换 (FWT) / 子集卷积
- * 算法介绍:
- *     在大小为 n = 2^K 的数组上做位运算卷积:
- *         C[k] = sum_{i op j = k} A[i] * B[j]
- *     四个位运算 op = {OR, AND, XOR, XNOR} 都通过 FWT (线性变换 + 点乘 + 逆变换) 实现。
- *     子集卷积 (subset convolution): C[k] = sum_{i|j=k, i&j=0} A[i] * B[j]
- *     利用 popcount 分层 + 子集 Zeta 变换实现 O(K^2 * 2^K)。
+/*
+ * Fast Walsh-Hadamard Transform & Subset Convolution (快速沃尔什变换与子集卷积)
  *
- *     与 SOS DP / Zeta 变换 / Moebius 变换 的等价命名:
- *         子集 Zeta    (a[mask] = sum_{sub ⊆ mask} a[sub])   == fwt_or(a, 1)
- *         子集 Moebius (子集 Zeta 的逆, 容斥还原)              == fwt_or(a, -1)
- *         超集 Zeta    (a[mask] = sum_{sup ⊇ mask} a[sup])   == fwt_and(a, 1)
- *         超集 Moebius (超集 Zeta 的逆)                       == fwt_and(a, -1)
+ * Overview:
+ *      在大小为 n = 2^K 的数组上计算位运算卷积：
+ *      C[k] = sum_{i op j = k} A[i] * B[j]，其中 op in {OR, AND, XOR, XNOR}。
+ *      通过 FWT 线性变换将位运算卷积映射为点值乘积再逆变换，复杂度 O(n log n)。
+ *      对于子集卷积 (要求 i | j = k 且 i & j = 0)，通过 popcount 分层配合高维前缀和
+ *      (Fwt OR) 实现 O(K^2 * 2^K) 的快速不相交并集卷积。
  *
- * Interface:
- *     // 低层变换 (原位, type = 1 正变换, type = -1 逆变换)
- *     fwt_or(a, type)            — OR   FWT     O(n log n)
- *     fwt_and(a, type)           — AND  FWT     O(n log n)
- *     fwt_xor(a, type)           — XOR  FWT     O(n log n)
- *     fwt_xnor(a, type) XNOR FWT — O(n log n)
+ * API:
+ *     fwt_or(a, type)          — 原地 OR 变换 (type = 1 正变换/子集和, -1
+ *                                 逆变换/容斥)。
+ *     fwt_and(a, type)         — 原地 AND 变换 (type = 1 正变换/超集和, -1
+ *                                 逆变换/超集反演)。
+ *     fwt_xor(a, type)         — 原地 XOR 变换 (type = 1 正变换, -1 逆变换)。
+ *     fwt_xnor(a, type)        — 原地 XNOR 变换 (type = 1 正变换, -1 逆变换)。
+ *     or_convolution(a, b)     — 计算 OR 卷积 C[k] = sum_{i|j=k} A[i]*B[j]，复杂度
+ *                                 O(n log n)。
+ *     and_convolution(a, b)    — 计算 AND 卷积 C[k] = sum_{i&j=k} A[i]*B[j]，
+ *                                 复杂度 O(n log n)。
+ *     xor_convolution(a, b)    — 计算 XOR 卷积 C[k] = sum_{i^j=k} A[i]*B[j]，
+ *                                 复杂度 O(n log n)。
+ *     subset_convolution(a, b) — 计算子集卷积 C[k] = sum_{i|j=k, i&j=0} A[i]*B[j]，
+ *                                 复杂度 O(K^2 * 2^K)。
  *
- *     // 高层卷积闭包 (返回新 vector, 不修改输入)
- *     or_convolution(a, b)    — OR  卷积     O(n log n)
- *     and_convolution(a, b)   — AND 卷积     O(n log n)
- *     xor_convolution(a, b)   — XOR 卷积     O(n log n)
- *     subset_convolution(a,b) — 子集卷积 (disjoint union) O(K^2 * 2^K)
+ * Notes:
+ *      1. 数组长度 n 必须为 2 的幂。
+ *      2. 所有运算均在模 md (998244353) 下进行。
  *
- * Usage ( — 低层):
- *     fwt_xxx(a, 1); fwt_xxx(b, 1);
- *     rep(i, 0, n - 1) a[i] = mul(a[i], b[i]);
- *     fwt_xxx(a, -1);
- *
- * Note:
- *     1. 数组长度 n 必须是 2 的幂 (索引为 [0, n) 的 bitmask)
- *     2. 所有运算在 aizalib.h 提供的模 md 下进行
- *     3. FWT 是线性变换: fwt(A + B) = fwt(A) + fwt(B), fwt(c * A) = c * fwt(A)
- *     4. XOR/XNOR 逆变换涉及除以 2, 用 inv(2)
- *     5. 索引 i | len | j 等价于 i + len + j (无进位, 因为 len 是单一位且 j < len)
- *        统一用 | 写法以强调 bitmask 语义
- *     6. subset_convolution 内部需要 O(K) 个长度 n 的数组, K 通常不超过 20
+ * Related:
+ *      数学/多项式/1-卷积与变换/DirichletPrefixSum·狄利克雷前缀和.cpp:
+ *      质数维度的类似 SOS DP。
  */
-
 void fwt_or(std::vector<int>& a, int type) {
     int n = (int)a.size();
     for (int len = 1; len < n; len <<= 1) {
@@ -104,7 +95,9 @@ void fwt_xnor(std::vector<int>& a, int type) {
     }
 }
 
-std::vector<int> or_convolution(const std::vector<int>& a, const std::vector<int>& b) {
+std::vector<int> or_convolution(
+    const std::vector<int>& a, const std::vector<int>& b
+) {
     int n = (int)a.size();
     auto fa = a, fb = b;
     fwt_or(fa, 1);
@@ -114,7 +107,9 @@ std::vector<int> or_convolution(const std::vector<int>& a, const std::vector<int
     return fa;
 }
 
-std::vector<int> and_convolution(const std::vector<int>& a, const std::vector<int>& b) {
+std::vector<int> and_convolution(
+    const std::vector<int>& a, const std::vector<int>& b
+) {
     int n = (int)a.size();
     auto fa = a, fb = b;
     fwt_and(fa, 1);
@@ -124,7 +119,9 @@ std::vector<int> and_convolution(const std::vector<int>& a, const std::vector<in
     return fa;
 }
 
-std::vector<int> xor_convolution(const std::vector<int>& a, const std::vector<int>& b) {
+std::vector<int> xor_convolution(
+    const std::vector<int>& a, const std::vector<int>& b
+) {
     int n = (int)a.size();
     auto fa = a, fb = b;
     fwt_xor(fa, 1);
@@ -141,7 +138,9 @@ std::vector<int> xor_convolution(const std::vector<int>& a, const std::vector<in
  * 对每层做 fwt_or, 在变换域做卷积 (h[c] = sum_{d} f[d] * g[c-d]), 再 fwt_or 逆变换
  * 取 res[mask] = h[popcount(mask)][mask] 即筛掉 i & j != 0 的贡献
  */
-std::vector<int> subset_convolution(const std::vector<int>& a, const std::vector<int>& b) {
+std::vector<int> subset_convolution(
+    const std::vector<int>& a, const std::vector<int>& b
+) {
     int n = (int)a.size();
     int K = 0;
     while ((1 << K) < n) ++K;

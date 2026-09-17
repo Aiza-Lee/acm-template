@@ -8,16 +8,18 @@
  *  提供三角形外心与内心的直接计算。
  *
  * API:
- *  circum_center(a, b, c) -> Point<T> — 外接圆圆心。O(1)。
- *  in_center(a, b, c) -> Point<T>     — 角平分线交点。O(1)。
+ *     circum_center(a, b, c) -> Point<T> — 外接圆圆心。O(1)。
+ *     in_center(a, b, c) -> Point<T>     — 角平分线交点。O(1)。
  *
  * Notes:
  *  仅支持浮点坐标。
  *  circum_center: 三顶点共线或三角形退化为线段时返回 (NaN, NaN)。
- *  in_center: 任两边退化（面积为 0）时公式仍返回某点，但无几何意义，勿用于非三角形输入。
+ *  in_center: 任两边退化（面积为 0）时公式仍返回某点，但无几何意义，
+ *  勿用于非三角形输入。
  *
  * Related:
- *  MinEnclosingCircle·最小圆覆盖.hpp::smallest_enclosing_circle: 当前 circum_center 的已知消费者之一。
+ *  MinEnclosingCircle·最小圆覆盖.hpp::smallest_enclosing_circle: 当前
+ *  circum_center 的已知消费者之一。
  */
 namespace Geo2D {
 

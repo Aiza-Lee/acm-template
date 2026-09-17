@@ -1,21 +1,26 @@
 #include "aizalib.h"
-/**
- * 可持久化文艺平衡树
- * 算法介绍: 用隐式 Treap 维护序列，每次 split / merge 时按需拷贝结点，从而支持区间翻转与区间和查询。
- * 模板参数: None
- * Interface:
- *      PersistentWenyiTreap(m), init(m) — 初始化，预留 m 个线性版本
- *      insert_after(ver, k, v)          — 在 ver 版本中第 k 个元素后插入 v，生成新版本；k=0 表示插到最前
- *      erase_at(ver, k)                 — 删除 ver 版本中的第 k 个元素，生成新版本
- *      flip_seg(ver, l, r)              — 翻转 ver 版本中的区间 [l, r]，生成新版本
- *      query_seg_sum(ver, l, r)         — 查询 ver 版本中区间 [l, r] 的元素和
- *      get_inorder(ver)                 — 按当前序列顺序导出 ver 版本的所有元素
- * Note:
- *      1. Time: 修改均摊 O(log N)，查询 O(log N)，导出 O(N)
- *      2. Space: O(修改次数 log N)
- *      3. 版本号采用 0-based；0 号版本为空序列
- *      4. 用法/技巧: query_seg_sum/get_inorder 不生成新版本
- *      5. 用法/技巧: 结点池采用 reserve + push_back，超出预留后交给 vector 自动扩容
+/*
+ * Persistent Literary Balanced Tree (可持久化文艺平衡树)
+ *
+ * Overview:
+ *     基于隐式 Treap（以子树大小作为键值）与路径复制实现的可持久化序列平衡树。
+ *     在下推区间翻转懒标记（rev）以及按排名 split / merge 过程中，
+ *     对历史版本节点进行克隆拷贝，支持在任意历史序列版本上执行区间翻转与区间和查询。
+ *
+ * API:
+ *     PersistentWenyiTreap(m), init(m) — 初始化，预留 m 个线性版本
+ *     insert_after(ver, k, v)          — 在 ver 版本中第 k 个元素后插入 v，
+ *                                         生成新版本；k=0 表示插到最前
+ *     erase_at(ver, k)                 — 删除 ver 版本中的第 k 个元素，生成新版本
+ *     flip_seg(ver, l, r)              — 翻转 ver 版本中的区间 [l, r]，生成新版本
+ *     query_seg_sum(ver, l, r)         — 查询 ver 版本中区间 [l, r] 的元素和
+ *     get_inorder(ver)                 — 按当前序列顺序导出 ver 版本的所有元素
+ *
+
+ * Notes:
+ *     1. 时间复杂度: 单次修改与查询期望 O(log N)，导出 O(N)；空间复杂度 O(M log N)。
+ *     2. 索引约定: 版本号 0-based，序列位置 1-based（insert_after 允许 k=0）。
+ *     3. 标记克隆: 下推懒标记时必须先克隆子节点，以避免原历史树被就地修改污染。
  */
 struct PersistentWenyiTreap {
     struct Node {

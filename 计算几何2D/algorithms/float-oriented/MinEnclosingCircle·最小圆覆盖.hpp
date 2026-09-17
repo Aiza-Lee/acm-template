@@ -9,10 +9,11 @@
  *  Welzl 随机增量法求覆盖所有给定点的最小圆。
  *
  * API:
- *  smallest_enclosing_circle(pts) -> Circle<T> — 包含 pts 的最小圆。Time 期望 O(N), Space O(N)。
+ *     smallest_enclosing_circle(pts) — 包含 pts 的最小圆。Time 期望 O(N)。
  *
  * Notes:
- *  模板参数 T: 浮点数类型，requires std::is_floating_point_v<T>。三点定圆严重依赖圆心测算，必须为浮点类型。
+ *  模板参数 T: 浮点数类型，requires std::is_floating_point_v<T>。
+ *  三点定圆严重依赖圆心测算，必须为浮点类型。
  *  空输入返回 Circle((0, 0), 0)；单点输入返回 Circle(p, 0)。
  *  内部使用 std::mt19937 洗牌，需要 random 头文件。
  *

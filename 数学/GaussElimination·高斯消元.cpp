@@ -1,17 +1,23 @@
 #include "aizalib.h"
 /*
- * GaussElimination·高斯消元
+ * Gaussian Elimination (高斯消元 / 浮点与整数解)
  *
  * Overview:
- *     高斯消元法，用于求解实数域上的线性方程组 Ax = B，采用列主元消元法保证数值稳定性。
+ *     求解实数域与整数域线性方程组 Ax = B 的消元算法框架。
+ *     实数域采用列主元高斯-约当消元法以抑制浮点舍入误差，判定无解、
+ *     唯一解或无穷多解；整数域基于辗转相除法（Euclidean Elimination）消去子对角元，
+ *     避免大整数溢出并精确求解整数特解或判定整数无解。
  *
  * API:
- *     Gauss::solve(a, ans) — 求解线性方程组，返回值: 0-无解, 1-唯一解, 2-无穷多解，复杂度 O(n^3)
+ *     Gauss::solve(a, ans)        — 实数高斯消元，返回值 0-无解, 1-唯一解,
+ *                                    2-无穷多解
+ *     IntegerGauss::solve(a, ans) — 整数高斯消元，返回值 0-无整数解, 1-有解
  *
  * Notes:
- *     1. 输入增广矩阵 a 大小为 n * (m + 1)，每行最后一个元素为常数项 b_i。
- *     2. 若有唯一解，解向量存入 ans 中（大小为 m）。
- *     3. 复杂度: 时间 O(n * m * min(n, m))，空间 O(n * m)。
+ *     1. 时间复杂度: 实数消元 O(N * M * min(N, M))，整数消元 O(N^2 * (N + log
+ *        MaxVal))。
+ *     2. 空间复杂度: O(N * M)。
+ *     3. 输入格式: 增广矩阵 a 尺寸为 N * (M + 1)，最后一列为常数向量 B。
  */
 
 struct Gauss {
@@ -22,7 +28,9 @@ struct Gauss {
         std::vector<int> pos(m, -1);
         rep(col, 0, m - 1) {
             int pivot = row;
-            rep(i, row + 1, n - 1) if (std::abs(a[i][col]) > std::abs(a[pivot][col])) pivot = i;
+            rep(i, row + 1, n - 1) {
+                if (std::abs(a[i][col]) > std::abs(a[pivot][col])) pivot = i;
+            }
             if (std::abs(a[pivot][col]) < EPS) continue;
             std::swap(a[pivot], a[row]); pos[col] = row;
             rep(i, row + 1, n - 1) if (std::abs(a[i][col]) > EPS) {
@@ -43,23 +51,6 @@ struct Gauss {
     }
 };
 
-/**
- * 整数高斯消元 (Integer Gauss Elimination)
- * 算法介绍:
- *      用于求解线性方程组 Ax = B 的整数解。
- *      使用辗转相除法 (欧几里得算法) 进行消元，避免浮点误差，通过 GCD 性质化简系数。
- * 
- * 模板参数:
- *      None
- * 
- * Interface:
- *      int solve(std::vector<std::vector<i64>>& a, std::vector<i64>& ans)
- * 
- * Note:
- *      1. Time: O(N^2 (N + log(MaxVal)))
- *      2. Space: O(N^2)
- *      3. 返回值: 0-无整数解, 1-有解 (如果存在自由变元，此代码将其视为0求特解)
- */
 struct IntegerGauss {
     // 1-Has solution, 0-No solution
     static int solve(std::vector<std::vector<i64>>& a, std::vector<i64>& ans) {

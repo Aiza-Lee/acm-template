@@ -1,20 +1,25 @@
 #include "aizalib.h"
 /*
- * Postorder DFS Order (后序 DFS 序)
+ * 后序 DFS 序 (Postorder DFS Order)
  *
  * Overview:
- *     处理完全部子节点后记录时间戳 post[u]，保证任意后代节点的离开时间戳均早于其祖先。
+ *     在遍历完节点 u 的所有子树后记录其离开时间戳 post[u]，
+ *     建立满足自底向上依赖关系的拓扑时序。
+ *     - 拓扑依赖性质：对于树上的任意节点 u 及其真后代 v，必有 post[v] < post[u]。
+ *       这保证了在按 post[u] 升序遍历时，子树的所有信息均已被前置计算完毕。
+ *     - 树形 DP 与自底向上规约：适用于无需递归的循环式树形 DP、
+ *       拓扑推导与消除深层递归栈溢出的后序遍历重构。
+ *     - 工具：PostorderDFS 求解器，包含 post、fa 等树结构属性。
  *
  * API:
- *     PostorderDFS(g, root = 1) — 构造后序 DFS 序，以 root 为根预处理
- *     dfs(u, p)                 — 内部 DFS 遍历函数
+ *     PostorderDFS(g, root = 1) — 以 root 为根预处理树的后序遍历 DFS 序。
+ *     dfs(u, p)                 — 内部后序遍历推进函数。
  *
  * Notes:
- *     1. 1-based indexing；输入 g 为树的邻接表，默认根为 1。
+ *     1. 下标统一为 1-based；输入 g 为树的邻接表，默认以 1 为根。
  *     2. Time: O(N)；Space: O(N)。
- *     3. 性质: 若 v 是 u 的真后代，则 post[v] < post[u]。
- *     4. 用法: 适合按子树后序遍历进行自底向上的树形 DP 或拓扑推导。
  */
+
 struct PostorderDFS {
     const std::vector<std::vector<int>>& g;
     int n, timer = 0;

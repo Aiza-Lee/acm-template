@@ -1,22 +1,47 @@
 #include "aizalib.h"
-/**
- * 线性基
- * 算法介绍: 维护 GF(2) 上的向量空间，支持插入向量、查询异或最大值，以及保留原向量表示。
- * 模板参数: N (bitset 长度)
- * Interface:
- *      LinearBasis<N>::insert(x)    — 尝试插入 x，成功表示线性无关
- *      LinearBasis<N>::get_max()    — 返回当前张成空间中的最大字典序/数值 bitset
- *      RawLinearBasis<N>::insert(x) — 插入原始向量
- *      RawLinearBasis<N>::solve(v)  — 查询 v 是否可由已选原始基向量异或表示
- * Note:
- *      1. Time: 每次插入/查询 O(N^2 / word_bits)
- *      2. Space: O(N^2 / word_bits)
- *      3. 0-based bit indexing；第 i 位表示 bitset[i]。
- *      4. 用法/技巧: RawLinearBasis 的返回 bitset 中第 j 位为 1 表示使用 basis[j]。
+/*
+ * 线性基 (Linear Basis)
+ *
+ * Overview:
+ *     在有限域 GF(2) 上维护向量空间的极大线性无关组（高斯消元阶梯形基底），
+ *     支持动态插入、张成空间最大异或值查询、原基向量线性组合重构与带时间戳区间查询。
+ *     - 阶梯基底结构：以主元最高位 i 建立数组 p[i]，满足每个位置至多有一个最高位为
+ *       i 的向量，非零基向量集合构成该向量空间的一组基，张成空间大小为 2^rank。
+ *     - 原向量重构（RawLinearBasis）：维护消元主元的同时维护系数掩码 param[i]，
+ *       追踪每个基向量是由哪些原始输入向量异或而成，
+ *       进而求出任意目标向量的原始基组合。
+ *     - 时间戳与贪心置换（TimedLinearBasis）：插入冲突时优先保留时间戳更大的向量，
+ *       将旧向量消去该位后继续向下插入，使每个主元位的存活寿命最大化，
+ *       支持前缀插入与区间查询。
+ *     - 工具：LinearBasis、RawLinearBasis、TimedLinearBasis。
+ *
+ * API:
+ *     LinearBasis<N>::insert(x)             — 尝试插入向量 x，成功插入 (线性无关)
+ *                                              返回 true
+ *     LinearBasis<N>::get_max()             — 返回张成空间内可达到的最大数值/字典序
+ *                                              bitset
+ *     RawLinearBasis<N>::insert(x)          — 插入原始向量，保留原向量序列 basis
+ *     RawLinearBasis<N>::solve(v)           — 查询向量 v 是否可由基生成，
+ *                                              返回是否可行及所需基的下标集合
+ *     TimedLinearBasis<N>::insert(x, t)     — 插入带时间戳 t 的向量 x，
+ *                                              高位优先保留大时间戳
+ *     TimedLinearBasis<N>::get_max(limit_t) — 查询使用时间戳 <= limit_t
+ *                                              的基向量所能达到的最大异或值
+ *     TimedLinearBasis<N>::get_min(limit_t) — 查询使用时间戳 <= limit_t
+ *                                              的基向量构成的最小非零异或值
+ *
+ * Notes:
+ *     1. Time: 每次单向量插入与查询均为 O(N^2 / word_bits)。
+ *     2. Space: O(N^2 / word_bits)。
+ *     3. 位索引遵循 0-based，第 i 位对应 bitset[i]。
+ *     4. 区间查询技巧：若求区间 [l, r] 的基，可在按右端点 r
+ *        升序插入时将下标作为时间戳，查询时筛选时间戳 >= l 的基向量即可。
  */
+
 template <size_t N>
 struct LinearBasis {
-    std::bitset<N> p[N];  // p[i]: 当前基中最高位为i的向量
+    std::bitset<N> p[N];  // p[i]: 当前基中最高位为 i 的向量
+
     bool insert(std::bitset<N> x) {
         per(i, N - 1, 0) {
             if (x[i]) {
@@ -29,6 +54,7 @@ struct LinearBasis {
         }
         return false;
     }
+
     std::bitset<N> get_max() {
         std::bitset<N> res;
         per(i, N - 1, 0) {
@@ -38,15 +64,12 @@ struct LinearBasis {
     }
 };
 
-/**
- * 维护原始输入的基向量（不进行消元变形），仅做极大线性无关组筛选
- * 同时支持查询任意向量由原始基向量如何表示
- */
+// 维护原始输入的基向量（不进行消元变形），仅做极大线性无关组筛选并追踪原向量表示
 template <size_t N>
 struct RawLinearBasis {
-    std::vector<std::bitset<N>> basis; // 存储原始的基向量
-    std::bitset<N> p[N]; // 内部维护的消元基，用于辅助判断线性无关性
-    std::bitset<N> param[N]; // param[i] 记录 p[i] 是由 basis 中哪些下标的向量异或得到
+    std::vector<std::bitset<N>> basis;   // 存储原始的基向量
+    std::bitset<N> p[N];                 // 内部消元基，用于辅助判断线性无关性
+    std::bitset<N> param[N]; // 记录 p[i] 是由 basis 中哪些下标异或得到
 
     bool insert(std::bitset<N> x) {
         std::bitset<N> t = x;
@@ -84,22 +107,7 @@ struct RawLinearBasis {
     }
 };
 
-/**
- * 带时间戳的线性基
- * 算法介绍: 在标准线性基上附加时间戳，支持按时间限制查询最大/最小异或值。
- * 插入时若高位冲突，保留时间戳更大的基向量，将旧的消去高位后继续尝试插入低位，
- * 保证每个位置的基向量在所有候选中有最大的时间戳。
- * Interface:
- *     TimedLinearBasis<N>::insert(x, t): 插入向量 x，时间戳为 t
- *     TimedLinearBasis<N>::get_max(limit): 查询使用时间戳 <= limit 的基向量的最大异或值
- *     TimedLinearBasis<N>::get_min(limit): 查询使用时间戳 <= limit 的基向量的最小非零异或值
- * Note:
- *     1. Time: 每次 insert/get_max/get_min O(N^2 / word_bits)
- *     2. Space: O(N^2 / word_bits)
- *     3. 常用于离线区间线性基查询（如 CF 1100F）：将元素按下标作为时间戳依次插入，
- *        查询 [l, r] 时调用 get_max(r) 并额外检查基向量对应时间戳 >= l
- *     4. insert 中 swap 操作与普通线性基的差异：if (time[i] < t) swap(p[i], x), swap(time[i], t);
- */
+// 带时间戳的线性基：高位冲突时保留时间戳更大的基向量
 template <size_t N>
 struct TimedLinearBasis {
     std::bitset<N> p[N];

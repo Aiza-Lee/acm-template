@@ -1,9 +1,13 @@
 #include "aizalib.h"
 /*
- * PowerfulNumberSieve·PowerfulNumber筛
+ * Powerful Number Sieve (Powerful Number 筛)
  *
  * Overview:
- *     亚线性强数筛 (Powerful Number 筛)，用于在 O(√n) 复杂度内计算满足特定积性条件的数论函数前缀和。
+ *     基于 Powerful Number（所有质因子幂次 >= 2 的数）性质求解积性函数前缀和。
+ *     构造辅助积性函数 g 使得其前缀和 G 可快速计算（如杜教筛），且在所有质数处满足
+ *     g(p) = f(p)。此时由狄利克雷卷积 f = g * h 导出的函数 h 在所有质数处 h(p) = 0，
+ *     故非零 h 仅存在于 Powerful Number 上（不超过 2*sqrt(n) 个）。
+ *     通过杜教筛预处理 G 并 DFS 枚举强数，实现亚线性前缀和求解。
  *
  * API:
  *     PNSieve(int limit = 4000005) — 构造函数，按需动态分配并预处理质数表
@@ -11,10 +15,12 @@
  *     user_G                       — 拟合积性函数 G 的前缀和回调
  *     user_h                       — 强数质数幂卷积系数 h(p, e) 回调
  *
+
  * Notes:
- *     1. 适用于 f = g * h，其中 g 在素数处取值与 f 相同，使得 h 在素数处取值为 0。
- *     2. 内部数组均采用 std::vector 动态分配，避免大数组造成对象栈溢出 (Segfault)。
- *     3. 复杂度主要取决于 G 的前缀和计算与 DFS 强数枚举量，通常在 O(√n) ~ O(n^(2/3))。
+ *     1. 时间复杂度: 整体复杂度取决于 G 的前缀和计算与 DFS 遍历，通常为
+ *        O(sqrt(N)) ~ O(N^(2/3))。
+ *     2. 空间复杂度: 线性筛与记忆化哈希表占用 O(N^(2/3))。
+ *     3. 适用条件: f 必须能找到素数处取值完全相同的拟合函数 g。
  */
 
 class PNSieve {

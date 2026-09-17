@@ -1,20 +1,26 @@
 #include "aizalib.h"
-/**
- * 二维树状数组
- * 算法介绍: 维护 1-based 二维前缀和，支持单点加、矩形前缀和与子矩形求和。
- * 模板参数: T
- * Interface:
- *      BitTree2D<T>(n, m), init(n, m) — 初始化 n * m 的二维树状数组
- *      BitTree2D<T>(a), init(a)       — 用 1-based 矩阵 a 线性建树
- *      add(x, y, v)                   — 令 a[x][y] += v
- *      sum_prefix(x, y)               — 查询子矩形 [1, x] * [1, y] 的和
- *      sum(x1, y1, x2, y2)            — 查询子矩形 [x1, x2] * [y1, y2] 的和
- *      all_sum()                      — 查询整体 [1, n] * [1, m] 的和
- * Note:
- *      1. Time: 单次 add / sum_prefix / sum O(log N log M)，线性建树 O(NM)
- *      2. Space: O(NM)
- *      3. 下标从 1 开始；若传入矩阵建树，则要求 a[1..n][1..m] 有效，0 行/列留空
- *      4. 用法/技巧: 若题目是矩形加 + 矩形和，可再套差分或四棵树状数组。
+/*
+ * BIT2D·二维树状数组
+ *
+ * Overview:
+ *      二维树状数组，在二维网格上双重嵌套 lowbit 结构维护二维前缀和。
+ *      支持单点增加、矩形前缀和与任意子矩形容斥求和。
+ *
+ * API:
+ *     BitTree2D<T>(n, m) / init(n, m) — 初始化 n * m 的网格，初始全 0。
+ *     BitTree2D<T>(a) / init(a)       — 用 1-based 二维矩阵 a 线性 O(n*m) 建树。
+ *     add(x, y, v)                    — 将位置 (x, y) 增加 v，O(log n log m)。
+ *     sum_prefix(x, y)                — 查询左上角子矩形 [1, x] * [1, y] 的前缀和，
+ *                                        O(log n log m)。
+ *     sum(x1, y1, x2, y2)             — 二维容斥查询子矩形 [x1, x2] * [y1, y2]
+ *                                        的和，O(log n log m)。
+ *     all_sum()                       — 查询全局矩形 [1, n] * [1, m] 的总和，O(log
+ *                                        n log m)。
+ *
+ * Notes:
+ *      1. 1-based indexing；有效坐标 1..n, 1..m。传入二维数组时第 0 行/列留空。
+ *      2. Time: 单次 add/sum 均为 O(log n log m)，建树 O(nm)；Space: O(nm)。
+ *      3. 若需要支持矩形批量加与矩形和，参见 BIT2DRectAddRectSum·矩形加矩形和.cpp。
  */
 template<typename T = i64>
 struct BitTree2D {
@@ -70,7 +76,8 @@ struct BitTree2D {
     T sum(int x1, int y1, int x2, int y2) const {
         AST(1 <= x1 && x1 <= x2 && x2 <= n);
         AST(1 <= y1 && y1 <= y2 && y2 <= m);
-        return sum_prefix(x2, y2) - sum_prefix(x1 - 1, y2) - sum_prefix(x2, y1 - 1) + sum_prefix(x1 - 1, y1 - 1);
+        return sum_prefix(x2, y2) - sum_prefix(x1 - 1, y2)
+             - sum_prefix(x2, y1 - 1) + sum_prefix(x1 - 1, y1 - 1);
     }
     T all_sum() const { return sum_prefix(n, m); }
 };

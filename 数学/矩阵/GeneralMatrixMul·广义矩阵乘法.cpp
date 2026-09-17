@@ -1,21 +1,27 @@
 #include "aizalib.h"
 /*
- * GeneralMatrixMul·广义矩阵乘法
+ * General Matrix Multiplication (半环广义矩阵乘法)
  *
  * Overview:
- *     基于半环 (Semiring) 抽象的广义矩阵类，支持标准乘法、Max-Plus (最长路)、Min-Plus (最短路)、AND-OR、OR-AND 等代数结构。
+ *     基于代数半环（Semiring）抽象的通用矩阵乘法框架。支持标准矩阵乘法 (+, *)、
+ *     最长路 Max-Plus (max, +)、最短路 Min-Plus (min, +)、连通性可达闭包 Or-And (|,
+ *     &) 等丰富代数结构，并为布尔可达性提供 64 位整数压位（bitset）乘法特化加速。
  *
  * API:
- *     GeneralMatrix<Semiring>(r, c) — 构造基于指定半环的 r 行 c 列矩阵
- *     StandardSemiring<T>           — (+, *) 普通加乘代数
- *     MaxPlusSemiring<T>            — (max, +) 最长路 / 动态规划转移
- *     MinPlusSemiring<T>            — (min, +) 最短路 (Floyd / Bellman-Ford)
- *     AndOrSemiring                 — (&, |) 位与或半环
- *     OrAndSemiring                 — (|, &) 位或与半环
+ *     GMatrix<Semiring>(r, c) — 构造基于指定半环的 r 行 c 列矩阵
+ *     StandardSemiring<T>     — 普通加乘半环 (+, *) MaxPlusSemiring<T>: 最长路 /
+ *                                动态规划半环 (max, +) MinPlusSemiring<T>:
+ *                                最短路半环 (min, +)
+ *     OrAndSemiring<T>        — 连通性半环 (|, &) MaxMinSemiring<T>: 瓶颈路半环
+ *                                (max,
+ *     min) MaxMulSemiring<T>  — 最大概率半环 (max, *)
  *
  * Notes:
- *     1. 半环要求加法满足交换律、结合律且有单位元 zero()，乘法满足结合律且分配于加法。
- *     2. 复杂度: 矩阵乘法 O(n^3)，广义矩阵快速幂 O(n^3 log k)。
+ *     1. 半环性质: 加法满足交换律结合律且具有零元 zero()，
+ *        乘法满足结合律且对加法具有分配律。
+ *     2. 时间复杂度: 通用乘法 O(n^3)，快速幂 O(n^3 log k)；压位布尔乘法 O(n^3 /
+ *        64)。
+ *     3. 空间复杂度: O(r * c)。
  */
 
 // --- Semiring Policies ---
@@ -40,7 +46,11 @@ struct MaxPlusSemiring {
         if (a == zero() || b == zero()) return zero();
         return a + b;
     }
-    static T zero() { return std::numeric_limits<T>::has_infinity ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::lowest(); }
+    static T zero() {
+        return std::numeric_limits<T>::has_infinity
+                   ? -std::numeric_limits<T>::infinity()
+                   : std::numeric_limits<T>::lowest();
+    }
     static T one()  { return T(0); }
 };
 
@@ -73,7 +83,11 @@ struct MaxMinSemiring {
     using value_type = T;
     static T add(T a, T b) { return std::max(a, b); }
     static T mul(T a, T b) { return std::min(a, b); }
-    static T zero() { return std::numeric_limits<T>::has_infinity ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::lowest(); }
+    static T zero() {
+        return std::numeric_limits<T>::has_infinity
+                   ? -std::numeric_limits<T>::infinity()
+                   : std::numeric_limits<T>::lowest();
+    }
     static T one()  { return std::numeric_limits<T>::max(); }
 };
 
@@ -187,7 +201,8 @@ struct GMatrix<OrAndSemiring<bool>> {
     int words;  // (n + 63) / 64
     std::vector<std::vector<u64>> row;
 
-    GMatrix(int n) : n(n), words((n + 63) / 64), row(n, std::vector<u64>(words, 0)) {}
+    GMatrix(int n)
+        : n(n), words((n + 63) / 64), row(n, std::vector<u64>(words, 0)) {}
 
     bool get(int i, int j) const {
         return (row[i][j >> 6] >> (j & 63)) & 1;
@@ -205,7 +220,9 @@ struct GMatrix<OrAndSemiring<bool>> {
 
     GMatrix operator+(const GMatrix& rhv) const {
         GMatrix res(n);
-        rep(i, 0, n - 1) rep(w, 0, words - 1) res.row[i][w] = row[i][w] | rhv.row[i][w];
+        rep(i, 0, n - 1) {
+            rep(w, 0, words - 1) res.row[i][w] = row[i][w] | rhv.row[i][w];
+        }
         return res;
     }
 

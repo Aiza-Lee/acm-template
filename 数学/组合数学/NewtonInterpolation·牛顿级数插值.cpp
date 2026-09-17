@@ -1,17 +1,20 @@
 #include "aizalib.h"
 /*
- * NewtonInterpolation·牛顿级数插值
+ * Newton Interpolation (牛顿级数插值)
  *
  * Overview:
- *     利用高阶前向差分还原多项式函数，相当于离散形式的泰勒展开：f(x) = ∑_{k=0}^n binom(x, k) Δ^k f(0)。
+ *     利用高阶前向差分还原多项式函数，相当于离散形式的泰勒展开：
+ *     f(x) = sum_{k=0}^n binom(x, k) * Delta^k f(0)。
+ *     适用于已知等距连续整数点值时的高效差分插值与大坐标单点求值。
  *
  * API:
- *     NewtonInterpolation(y) — 输入连续整数点值 f(0)...f(n-1) 预处理高阶差分，复杂度 O(n^2)
- *     int query(i64 x)       — 计算目标点 f(x) mod 998244353，复杂度 O(n)
+ *     NewtonInterpolation(y) — 输入连续整数点值 f(0)..f(n-1) 预处理高阶差分
+ *     query(x)               — 计算目标点 f(x) mod md
  *
  * Notes:
- *     1. 要求已知点为连续整数 0, 1, ..., n-1。
- *     2. 空间复杂度 O(n)，适合插值点数较少但需多次大坐标查询的场景。
+ *     1. 时间复杂度: 预处理差分 O(N^2)，单次查询 O(N)。
+ *     2. 空间复杂度: O(N)。
+ *     3. 输入条件: 必须给定自变量为 0, 1, ..., n-1 处的连续整数点值。
  */
 
 struct NewtonInterpolation {

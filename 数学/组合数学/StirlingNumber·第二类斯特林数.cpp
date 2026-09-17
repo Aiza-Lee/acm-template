@@ -1,18 +1,22 @@
 #include "aizalib.h"
 /*
- * StirlingNumber·第二类斯特林数
+ * Stirling Numbers of the Second Kind (第二类斯特林数)
  *
  * Overview:
- *     第二类斯特林数 {n over k}，表示将 n 个不同元素划分为 k 个互不相交非空子集的方案数，并支持离散幂和计算。
+ *     第二类斯特林数 {n over k}，表示将 n 个不同元素划分为 k
+ *     个互不相交非空子集的方案数。
+ *     提供离散自然数幂和计算 sum_{i=0}^n i^k，以及普通多项式与下降幂多项式基底转换。
  *
  * API:
- *     StirlingS2<N>()          — 编译期/构造时 O(N^2) 递推预处理第二类斯特林数表
- *     int get(n, k)            — 获取 {n over k} mod 998244353，复杂度 O(1)
- *     int sum_powers(i64 n, k) — 利用斯特林数展开计算 ∑_{i=0}^n i^k mod 998244353，复杂度 O(k)
+ *     StirlingS2<N>() — 编译期/构造时 O(N^2) 递推预处理第二类斯特林数表
+ *     get(n, k)       — 获取第二类斯特林数 {n over k} mod md sum_powers(n, k): 
+ *                        利用斯特林数展开在 O(k) 时间内计算 sum_{i=0}^n i^k mod md
+ * 
+ *     ordinary_to_falling(a) — 普通多项式转下降幂多项式系数
  *
  * Notes:
  *     1. 递推式: S2(i, j) = S2(i-1, j-1) + j * S2(i-1, j)。
- *     2. 幂和展开公式: i^k = ∑_{j=0}^k S2(k, j) * j! * binom(i, j)。
+ *     2. 幂和展开公式: i^k = sum_{j=0}^k S2(k, j) * j! * binom(i, j)。
  */
 
 template<int N>
@@ -45,7 +49,7 @@ struct StirlingS2 {
 
     // 普通多项式转下降幂多项式 (O(k^2))
     // F(x) = sum_{i=0}^k a[i] * x^i
-    //      => sum_{j=0}^{k-1} b[j] * x^{\underline{j}}
+    // => sum_{j=0}^{k-1} b[j] * x^{\underline{j}}
     std::vector<int> ordinary_to_falling(const std::vector<int>& a) {
         int k = a.size();
         std::vector<int> b(k, 0);

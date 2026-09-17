@@ -1,19 +1,25 @@
 #include "aizalib.h"
 #include "0-base/Poly·多项式全家桶.hpp"
 
-/**
- * 多项式平移 (Taylor Shift)
- * 算法介绍:
- *      计算平移多项式 g(x) = f(x+c)。
- *      利用差卷积求解: g[i] = sum_{j=i}^{n-1} f[j] * C(j, i) * c^{j-i}
- * 模板参数:
- * 
- * Interface:
- *      Poly taylor_shift(const Poly& f, i64 c);
- * 
- * Note:
- *      1. Time: O(n log n)
- *      2. Space: O(n)
+/*
+ * Taylor Shift (多项式泰勒平移)
+ *
+ * Overview:
+ *      计算多项式平移 g(x) = f(x + c)。
+ *      根据泰勒展开 g_i = sum_{j=i}^{n-1} f_j * C(j, i) * c^{j-i}，整理得 i! * g_i
+ *      = sum_{j=i}^{n-1} (j! * f_j) * (c^{j-i} / (j-i)!)。
+ *      此式为标准下标差卷积，令 A_{n-1-j} = j! * f_j 与 B_k = c^k / k! 卷积，即可在
+ *      O(n log n) 时间内求出 g(x)。
+ *
+ * API:
+ *     taylor_shift(f, c) — 计算多项式 f(x + c)，返回与 f 同长的多项式。复杂度 O(n
+ *                           log n) 时间，O(n) 空间。
+ *
+ * Notes:
+ *      1. c 可为任意整数，内部自动对模数取模。
+ *
+ * Related:
+ *      数学/多项式/1-卷积与变换/Convolution·卷积.cpp: 差卷积。
  */
 
 namespace poly_ext {

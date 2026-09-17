@@ -1,20 +1,32 @@
 #pragma once
 #include "aizalib.h"
 
-/**
- * PolyCore (NTT Based Polynomial Core)
- * 
- * [ Dependency Graph ]
- * 
- *             deriv   integral
- *                 ^   ^
- *                 |  /
- *         sqrt -> inv <- ln <- exp 
- *                         ^     ^
- *                          \   /
- *                           pow
- * 
- * * Note: mul, inv, ln, exp, sqrt universally depend on _ntt
+/*
+ * Polynomial Core (NTT 多项式底层计算核心)
+ *
+ * Overview:
+ *      基于数论变换 (NTT) 实现的多项式低层算子集合，支持指定模数 MD 与原根 G。
+ *      内建基于静态数组指针的轻量 RAII 内存池 Arr，规避高频动态内存分配开销。
+ *      提供多项式乘法、牛顿迭代求逆、求导、积分、Ln、Exp、Sqrt 与快速幂 Pow。
+ *
+ * API:
+ *     PolyCore<MD, G>::mul(a, n, b, m, res) — 卷积 a (长 n) 和 b (长 m)，结果写入
+ *                                              res (长 n+m-1)。
+ *     PolyCore<MD, G>::inv_impl(a, n, res)  — 模 x^n 求逆，要求 a[0] != 0。
+ *     PolyCore<MD, G>::deriv(a, n, res)     — 求导，长度为 n-1。
+ *     PolyCore<MD, G>::integral(a, n, res)  — 不定积分，长度为 n+1。
+ *     PolyCore<MD, G>::ln(a, n, res)        — 模 x^n 求对数 Ln，要求 a[0] = 1。
+ *     PolyCore<MD, G>::exp(a, n, res)       — 模 x^n 求指数 Exp，要求 a[0] = 0。
+ *     PolyCore<MD, G>::sqrt(a, n, res)      — 模 x^n 求开方 Sqrt，要求 a[0] = 1。
+ *     PolyCore<MD, G>::pow(a, n, k, res)    — 模 x^n 求快速幂 A^k，支持首项系数非
+ *                                              1 与低位为 0。
+ *
+ * Notes:
+ *      1. 内存池 Arr 分配空间需满足 _POOL_SIZE 约束，支持并发递归。
+ *      2. 所有多项式截断长度均为 n，运算复杂度均为 O(n log n)。
+ *
+ * Related:
+ *      数学/多项式/0-base/Poly·多项式全家桶.hpp: 上层面向对象的现代多项式封装。
  */
 template<int MD, int G>
 struct PolyCore {
@@ -83,8 +95,7 @@ struct PolyCore {
 
     // Public Implementations
 
-    // 多项式乘法
-    // res 数组大小至少为 n + m - 1
+    // 多项式乘法 res 数组大小至少为 n + m - 1
     static void mul(const int* a, int n, const int* b, int m, int* res) {
         int limit = 1; while (limit < n + m - 1) limit <<= 1;
         Arr ta(limit), tb(limit);

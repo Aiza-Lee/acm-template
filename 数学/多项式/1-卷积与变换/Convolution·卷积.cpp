@@ -1,4 +1,27 @@
+#include "aizalib.h"
 #include "0-base/Poly·多项式全家桶.hpp"
+/*
+ * Polynomial Convolutions (多项式普通卷积与差卷积)
+ *
+ * Overview:
+ *      提供普通加法卷积与差卷积（下标差卷积）。
+ *      加法卷积 res[k] = sum_{i+j=k} a[i] * b[j] 直接映射为多项式乘法；差卷积
+ *      res[k] = sum_{i-j=k} a[i] * b[j] 通过反转序列 b 转化为标准加法卷积，卷积第 p
+ *      项对应差值 k = p - (|b| - 1)。
+ *
+ * API:
+ *     convolution(a, b)            — 计算普通加法卷积 a * b，复杂度 O((n+m)
+ *                                     log(n+m))。
+ *     difference_convolution(a, b) — 计算差卷积，返回 a 与 reverse(b) 的卷积结果。
+ *                                     复杂度 O((n+m) log(n+m))。
+ *
+ * Notes:
+ *      1. 差卷积结果中，下标 |b| - 1 对应 i - j = 0，下标 |b| - 1 + d 对应 i - j =
+ *         d。
+ *
+ * Related:
+ *      数学/多项式/0-base/Poly·多项式全家桶.hpp: 底层多项式类。
+ */
 
 namespace poly_ext {
 

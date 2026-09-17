@@ -1,9 +1,10 @@
 #include "aizalib.h"
 /*
- * DynamicMatrix·动态矩阵
+ * Dynamic Matrix (动态矩阵)
  *
  * Overview:
- *     动态大小矩阵类，支持任意域类型 T（浮点数、模数类等）的基础矩阵代数运算、转置、行列式与逆矩阵。
+ *     动态大小矩阵模板类，支持任意域类型 T（浮点数、模数类等）的基础矩阵加减乘法、
+ *     矩阵转置、高斯消元求方阵行列式（det）与逆矩阵（inverse）。
  *
  * API:
  *     Matrix(r, c, val = 0) — 构造 r 行 c 列的矩阵
@@ -14,8 +15,11 @@
  *     inverse()             — 计算方阵逆矩阵，复杂度 O(n^3)
  *
  * Notes:
- *     1. 乘法采用 i-k-j 循环序优化缓存局部性。
- *     2. det() 与 inverse() 要求元素类型 T 为域类型（浮点数或带逆元模数类）。
+ *     1. 时间复杂度: 加减法 O(r*c)，乘法 O(r*c*rhv.c)，行列式与求逆 O(n^3)。
+ *     2. 空间复杂度: O(r*c)。
+ *     3. 乘法优化: 采用 i-k-j 循环展开优化 CPU 缓存命中率。
+ *     4. 域要求: det() 与 inverse() 严格要求元素类型 T
+ *        为域（支持加减乘及除法逆元）。
  */
 template<typename T>
 struct Matrix {
@@ -81,7 +85,9 @@ struct Matrix {
 
     T det() const {
         AST(r == c);
-        static_assert(std::is_floating_point_v<T> || !std::is_integral_v<T>, "det/inverse need a field (floating point or modular type)");
+        static_assert(
+            std::is_floating_point_v<T> || !std::is_integral_v<T>,
+            "det/inverse need a field (floating point or modular type)");
         Matrix tmp = *this;
         T res = 1;
         rep(i, 0, r - 1) {
@@ -110,7 +116,9 @@ struct Matrix {
 
     Matrix inverse() const {
         AST(r == c);
-        static_assert(std::is_floating_point_v<T> || !std::is_integral_v<T>, "det/inverse need a field (floating point or modular type)");
+        static_assert(
+            std::is_floating_point_v<T> || !std::is_integral_v<T>,
+            "det/inverse need a field (floating point or modular type)");
         int n = r;
         Matrix tmp(n, 2 * n);
         rep(i, 0, n - 1) {

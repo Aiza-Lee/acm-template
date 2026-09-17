@@ -1,18 +1,25 @@
 #include "aizalib.h"
 
-/**
- * Floor Sum (整除分块)
- * 算法介绍: 利用 ⌊n/i⌋ 取值只有 O(√n) 种的性质，将求和按值分块计算。
- * Interface:
- *      FloorSum::sum(n)            — ∑_{i=1}^{n} ⌊n/i⌋
- *      FloorSum::sum(n, k)         — ∑_{i=1}^{n} ⌊k/i⌋
- *      FloorSum::sum_w(n, k, pref) — ∑_{i=1}^{n} f(i)⋅⌊k/i⌋ (pref 为 f 前缀和)
- *      FloorSum::sum2(n, m)        — ∑_{i=1}^{min(n,m)} ⌊n/i⌋⋅⌊m/i⌋
- * Note:
- *      1. Time: O(√n) per call
- *      2. Space: O(1)
- *      3. 核心思想：对于 i ∈ [l, r], ⌊n/l⌋ = ⌊n/r⌋, 其中 r = n / (n / l)
- *      4. 原理: floor_sum_w 需要 f 的前缀和数组 (1-indexed), pref[0] = 0
+/*
+ * Floor Sum (整除分块 / 数论分块)
+ *
+ * Overview:
+ *      利用 floor(n / i) 在 i in [1, n] 范围内只有至多 2*sqrt(n) 种取值的性质，
+ *      将连续相同的商合并为区间 [l, r] 计算，其中右端点 r = floor(n / floor(n /
+ *      l))。
+ *      支持带权重前缀和乘积和双变量整除分块。
+ *
+ * API:
+ *     sum(n)            — 计算 sum_{i=1..n} floor(n / i)。复杂度 O(sqrt(n))。
+ *     sum(n, k)         — 计算 sum_{i=1..n} floor(k / i)。复杂度 O(sqrt(k))。
+ *     sum_w(n, k, pref) — 计算 sum_{i=1..n} f(i) * floor(k / i)，其中 pref 为 f 的
+ *                          1-based 前缀和。复杂度 O(sqrt(k))。
+ *     sum2(n, m)        — 计算 sum_{i=1..min(n, m)} floor(n / i) * floor(m / i)。
+ *                          复杂度 O(sqrt(n) + sqrt(m))。
+ *
+ * Notes:
+ *      1. 要求 n, m, k >= 0。当 i > k 时 floor(k / i) = 0 可提前 break。
+ *      2. sum_w 要求 pref 至少有 min(n, k) + 1 的长度且 pref[0] = 0。
  */
 struct FloorSum {
     static i64 sum(i64 n) {

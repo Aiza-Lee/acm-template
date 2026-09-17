@@ -1,16 +1,24 @@
 #include "aizalib.h"
 
-/**
- * Miller-Rabin (素数测试)
- * 算法介绍: 用固定底数集合在 64 位范围内做确定性素性判定。
- * 模板参数: None
- * Interface:
- *      MillerRabin::is_prime(n) — 判定 n 是否为素数，Time: O(log^3 n)
- * Note:
- *      1. Time: O(log^3 n)
- *      2. Space: O(1)
- *      3. 适用于正 64 位整数判素
- *      4. 用法/技巧: 若还要分解质因数，可直接改用 PollardRho
+/*
+ * Miller-Rabin Primality Test (Miller-Rabin 素数测试)
+ *
+ * Overview:
+ *      基于费马小定理与二次探测定理的确定性快速素性测试。
+ *      对于 64 位整数范围内的 n，选用固定的 7 个优质测试基底 {2, 325, 9375, 28178,
+ *      450775, 9780504, 1795265022}，配合小质数预筛，可在 100% 确定性下判定 n
+ *      是否为素数，无需随机化。
+ *
+ * API:
+ *     is_prime(n) — 判定 64 位整数 n 是否为素数。复杂度 O(k log n) 时间，其中 k=7
+ *                    为底数个数。
+ *
+ * Notes:
+ *      1. 若 n < 2 返回 false。
+ *      2. 内部使用 i128 处理模乘防止溢出。
+ *
+ * Related:
+ *      数学/数论/PollardSRho·寻找质因数.cpp: 基于 Miller-Rabin 的大数质因数分解。
  */
 struct MillerRabin {
     static i64 _mul_mod(i64 a, i64 b, i64 mod) {
@@ -37,12 +45,14 @@ struct MillerRabin {
 
     static bool is_prime(i64 n) {
         if (n < 2) return false;
-        for (i64 p : {2LL, 3LL, 5LL, 7LL, 11LL, 13LL, 17LL, 19LL, 23LL, 29LL, 31LL, 37LL}) {
+        for (i64 p : {2LL, 3LL, 5LL, 7LL, 11LL, 13LL, 17LL, 19LL, 23LL, 29LL,
+                      31LL, 37LL}) {
             if (n % p == 0) return n == p;
         }
         i64 d = n - 1, s = 0;
         while (!(d & 1)) d >>= 1, ++s;
-        for (i64 a : {2LL, 325LL, 9375LL, 28178LL, 450775LL, 9780504LL, 1795265022LL}) {
+        for (i64 a : {2LL, 325LL, 9375LL, 28178LL, 450775LL, 9780504LL,
+                      1795265022LL}) {
             if (!_check(a, s, d, n)) return false;
         }
         return true;

@@ -1,18 +1,32 @@
 #include "aizalib.h"
 
-/**
- * Primitive Root (原根)
- * 算法介绍: 判定模数是否存在原根，并求一个最小原根。
- * 模板参数: None
- * Interface:
- *      PrimitiveRoot::has_primitive_root(mod)   — 判断 mod 是否存在原根，Time: 试除版约 O(sqrt(mod))
- *      PrimitiveRoot::is_primitive_root(g, mod) — 判断 g 是否为 mod 的原根，Time: 试除版约 O(sqrt(mod))
- *      PrimitiveRoot::find(mod)                 — 求最小原根，无原根返回 -1；时间取决于试除分解 + 枚举
- * Note:
- *      1. Time: 试除分解版本约为 O(sqrt(mod))
- *      2. Space: O(因子个数(phi(mod)))
- *      3. 无原根时 find 返回 -1；约定 mod=1 时返回 0
- *      4. 用法/技巧: 若模数很大，可把内部试除分解替换成 PollardRho
+/*
+ * Primitive Root (原根判定与求解)
+ *
+ * Overview:
+ *      判定模数 m 是否存在原根，并求出其最小原根。
+ *      由数论基本定理，模 m 存在原根当且仅当 m in {1, 2, 4, p^k, 2*p^k}，其中 p
+ *      为奇素数。
+ *      g 为模 m 的原根当且仅当 gcd(g, m) = 1 且对 phi(m) 的每个互异质因子 p，均有
+ *      g^(phi(m) / p) != 1 (mod m)。最小原根通常很小（O(m^(1/4))），
+ *      通过枚举测试即可快速找到。
+ *
+ * API:
+ *     has_primitive_root(mod)   — 判断模数 mod 是否存在原根。复杂度 O(sqrt(mod))
+ *                                  时间。
+ *     is_primitive_root(g, mod) — 判断整数 g 是否为模 mod 的原根。复杂度
+ *                                  O(sqrt(mod) + log(mod) * 质因子数) 时间。
+ *     find(mod)                 — 求模 mod 的最小正原根。若不存在返回 -1；特别地
+ *                                  mod=1 时返回 0。复杂度 O(sqrt(mod) + g_min *
+ *                                  质因子数 * log mod) 时间。
+ *
+ * Notes:
+ *      1. 要求 mod >= 1。
+ *      2. 大模数时可将内部试除分解替换为 PollardRho。
+ *
+ * Related:
+ *      数学/数论/MultiplicativeOrder·乘法阶.cpp: 元素阶的定义与计算。
+ *      数学/数论/ModMultiplicativeGroup·模乘法群.cpp: 一般模数下的群结构与正交基底分解。
  */
 struct PrimitiveRoot {
     static i64 _pow_mod(i64 a, i64 b, i64 mod) {

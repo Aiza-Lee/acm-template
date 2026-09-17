@@ -1,31 +1,28 @@
 #include "aizalib.h"
-/**
- * Link-Cut Tree — 路径最小值版
- * 算法介绍: 与 LCT·动态树.cpp 功能一致，但 _push_up 维护路径最小值而非路径和。
- * 模板参数: None
- * Interface:
- *      LCTPathMin(n), init(n)
- *      set_val(x, v) — 把点 x 的值改为 v
- *      make_root(x), find_root(x), split(x, y)
- *      link(x, y), cut(x, y), connected(x, y)
- *      query_min(x, y)  — 查询路径 x -> y 上的最小值
- *      query_size(x, y) — 查询路径 x -> y 上的点数
- *      query_component_size(x), query_subtree_size(root, x)
- *      lca(x, y)
- * Internal Methods:
- *      字段访问器、内部分析同 LCT·动态树.cpp
- *      mint(p): 访问路径最小值聚合字段（注意：val/mint 均为 int）
- * Note:
- *      1. Time: 单次均摊 O(log N)
- *      2. Space: O(N)
- *      3. 结点编号 1-based，先 init(n)
- *      4. AoS: 节点紧凑存储（~32B），cache 友好
- *      5. ⚠【取值约束】本版 val/mint 均为 int，点权绝对值不超过 2e9
- *          （mint[0] = 2e9 作为哨兵）；若题面点权更大，请改用 i64
- *      6. 自定义指南:
- *          路径最小值 → 路径最大值: min → max，初始值改为 -INF
- *          路径最小值 → 路径异或: mint 改为 xsum，min 改为 ^
- *          加懒标记: 参考 LCTPathAdd·路径加.cpp
+/*
+ * Link-Cut Tree with Path Minimum (维护路径最小值的动态树)
+ *
+ * Overview:
+ *     在标准 LCT 基础上将路径聚合操作定制为求路径最小值（RMQ）。通过 split(x, y)
+ *     将实路径提取至 Splay 根节点后，直接读取辅助树根维护的 mint[root]
+ *     得到路径最小值，支持动态连边、断边、单点修改与路径最小值查询。
+ *
+ * API:
+ *     LCTPathMin(n), init(n)                  — 初始化 1...n 个点的动态森林
+ *     set_val(x, v)                           — 把点 x 的点权改为 v
+ *     make_root(x), find_root(x), split(x, y) — 换根、找根、提取路径为辅助树
+ *     link(x, y), cut(x, y), connected(x, y)  — 动态加边、删边与连通性判断
+ *     query_min(x, y)                         — 查询路径 x -> y 上的最小值
+ *     query_size(x, y)                        — 查询路径 x -> y 上的点数
+ *     query_component_size(x)                 — 返回 x 所在连通块的点数
+ *     query_subtree_size(root, x)             — 返回以 root 为根时 x 子树的点数
+ *     lca(x, y)                               — 查询以当前根为准的最近公共祖先
+ *
+
+ * Notes:
+ *     1. 时间复杂度: 各项操作均摊 O(log N)；空间复杂度 O(N)。
+ *     2. 索引约定: 节点编号采用 1-based (1..n)。
+ *     3. 空哨兵设定: 0 号虚节点的 mint 初始化为 2e9 作为求最小值的无穷大边界。
  */
 struct LCTPathMin {
 private:

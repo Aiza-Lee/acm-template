@@ -1,20 +1,25 @@
 #include "aizalib.h"
-/**
- * 可持久化左偏树
- * 算法介绍: merge 时沿递归链复制结点，保留旧版本结构；默认维护小根堆。
- * 模板参数: VT
- * Interface:
- *      PLT(cap), init(cap) — 初始化，可选预留 cap 个结点
- *      merge(x, y)         — 合并两棵堆，返回新根；原根保持不变
- *      push(rt, v)         — 在 rt 版本基础上插入 v，返回新根
- *      pop(rt)             — 删除 rt 版本堆顶，返回新根
- *      top(rt)             — 返回 rt 版本堆顶元素
- *      empty(rt)           — 判断 rt 是否为空堆
- * Note:
- *      1. Time: 所有操作均摊 O(log N)
- *      2. Space: 每次操作新建 O(log N) 个结点
- *      3. 0 号结点为空堆；本模板不内置线性版本数组
- *      4. 用法/技巧: 适合 K 短路、可并堆 DP 等需要保留历史堆形态的场景
+/*
+ * Persistent Leftist Tree (可持久化左偏树)
+ *
+ * Overview:
+ *     利用路径复制实现的可持久化可并堆（小根堆）。利用左偏性质（左儿子零距离 dist
+ *     不小于右儿子零距离），使合并操作始终沿右脊（Right Spine）递归，
+ *     右脊长度严格满足 O(log N)。合并时克隆递归经过的节点，实现多版本共存。
+ *
+ * API:
+ *     PLT(cap), init(cap) — 初始化，可选预留 cap 个结点
+ *     merge(x, y)         — 合并两棵堆，返回新根；原根保持不变
+ *     push(rt, v)         — 在 rt 版本基础上插入 v，返回新根
+ *     pop(rt)             — 删除 rt 版本堆顶，返回新根
+ *     top(rt)             — 返回 rt 版本堆顶元素
+ *     empty(rt)           — 判断 rt 是否为空堆
+ *
+
+ * Notes:
+ *     1. 时间复杂度: push、pop、merge 均为最坏 O(log N)；空间复杂度单次 O(log N)。
+ *     2. 节点编号: 0 号节点为哨兵空节点，空堆以根指针 0 表示。
+ *     3. 典型应用: K 短路算法（Eppstein 算法）、函数式优先队列。
  */
 template<class VT>
 struct PLT {

@@ -1,21 +1,22 @@
 #include "aizalib.h"
-/**
- * 树状数组套线段树 (Fenwick Tree of Segment Trees / BIT套线段树)
- * 算法介绍: 外层树状数组维护位置前缀，内层动态开点线段树维护值域上的频数分布。
- *           支持按位置插入值并查询任意区间内的第k小值（静态建树 + 动态增量插入）。
- * Interface:
- *   BITSegTree(int n, const std::vector<i64>& a) — 传入1-based数组a建树并自动值域离散化
- *   add(pos, val)                                — 在位置pos处插入一个值为val的元素（val必须在建树时值集合中）
- *   query(l, r, k)                               — 查询区间[l, r]内第k小的原始值（1 <= k <= 区间元素总数）
- * Note:
- *   1. Time: add O(log n * log V), query O(log n * log V), 建树 O(n * log n * log V)
- *   2. Space: O(n * log n * log V)，其中V为离散化后的值域大小；n较大时空间开销显著
- *   3. 所有值须在建树时给定以进行坐标压缩；add仅允许插入已压缩的值
- *   4. 1-based indexing，k从1开始计数（第1小即为最小值）
- *   5. 用法/技巧:
- *      5.1 静态区间第k小常用主席树（空间O(n log n)），BIT套线段树的优势在于支持在线插入/修改
- *      5.2 删除操作可调用 add(pos, val) 传入 delta = -1（需自行扩展接口或修改 _bit_add 可见性）
- *      5.3 可额外提供 query_count(l, r, x) 查询区间内 <=x 的元素个数（遍历BIT前缀，累加线段树前缀计数）
+/*
+ * BIT of Segment Trees (树状数组套线段树)
+ *
+ * Overview:
+ *     外层以树状数组维护序列位置前缀，内层以动态开点权值线段树维护值域频数分布的两层
+ *     树形数据结构。通过外层树状数组的 O(log N) 个前缀节点在内层值域线段树上同步二分
+ *     走动，支持动态单点修改（插入/修改/删除）与在线任意区间第 k 小查询。
+ *
+ * API:
+ *     BITSegTree(n, a) — 传入1-based数组a建树并自动值域离散化
+ *     add(pos, val)    — 在位置pos处插入一个值为val的元素（val必须在建树时值集合中）
+ *     query(l, r, k)   — 查询区间[l, r]内第k小的原始值（1 <= k <= 区间元素总数）
+ *
+ * Notes:
+ *     1. 时间复杂度: 单次 add 与 query 均为 O(log N log V)；空间复杂度 O(N log N
+ *        log V)。
+ *     2. 索引约定: 外部输入位置与第 k 小位次均采用 1-based。
+ *     3. 值域说明: 须在建树时确定候选值域以完成离散化，V 为不重复元素数。
  */
 struct BITSegTree {
     struct _Node {
@@ -62,7 +63,8 @@ struct BITSegTree {
     }
 
     int _compress(i64 x) const {
-        return (int)(std::lower_bound(_vals.begin() + 1, _vals.end(), x) - _vals.begin());
+        auto it = std::lower_bound(_vals.begin() + 1, _vals.end(), x);
+        return (int)(it - _vals.begin());
     }
 
     // Add delta occurrences of compressed value c at BIT position pos
@@ -72,7 +74,8 @@ struct BITSegTree {
     }
 
     // Dynamic segment tree: add delta at leaf pos in value range [l, r]
-    // Returns (possibly new) node id; handles node allocation safely via pass-by-value
+    // Returns (possibly new) node id; handles node allocation safely via
+    // pass-by-value
     int _seg_add(int p, int l, int r, int pos, int delta) {
         if (!p) p = _new_node();
         pool[p].cnt += delta;

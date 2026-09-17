@@ -1,30 +1,39 @@
 #include "aizalib.h"
-
 /*
- * Tree Diameter (树直径，两次 DFS)
+ * 树直径（两次 DFS） (Tree Diameter - Two DFS)
  *
  * Overview:
- *     在带权树上任取起点找最远点 a，再从 a 找最远点 b，a-b 即为一条直径。
- *     适用于非负边权树。
+ *     在非负边权无向树上利用两阶段最远点搜索快速求出树的直径（最长简单路径）。
+ *     - 几何贪心性质：在非负权树中，从任意起点出发能够到达的最远节点必定是某条直径的
+ *       端点之一。
+ *     - 两阶段遍历结构：
+ *       1. 第一阶段：从任意起点 s 出发遍历，找到距离 s 最远的节点 a。
+ *       2. 第二阶段：从节点 a 出发再次遍历，找到距离 a 最远的节点 b。
+ *       3. 则路径 a -> b 即为树上的一条直径，其长度为 dis(a, b)。
+ *     - 工具：Graph 结构、TreeDiameterTwoDFS 求解器、solve。
  *
  * API:
- *     struct Graph<T>(n)               — 建无向树，1-based，边权需非负
- *     Graph::add_edge(u, v, w = 1)     — 添加无向边 (u, v, w)
- *     struct TreeDiameterTwoDFS<T>(G)  — 树直径求解器
- *     TreeDiameterTwoDFS::solve(s = 1) — 求直径，返回 Result {len, u, v, edges}
+ *     struct Graph<T>(n)           — 树的带权邻接表表示（1-based，边权需非负）。
+ *     Graph::add_edge(u, v, w = 1) — 添加非负权无向边 (u, v, w)。
+ *     TreeDiameterTwoDFS<T>(G)     — 构造树直径求解器。
+ *     solve(s = 1)                 — 从 s 出发两阶段求解直径，返回 Result {len, u,
+ *                                     v, edges}。
  *
  * Notes:
- *     1. 1-based indexing，边权必须非负（若存在负权边需使用树形 DP）。
- *     2. Time: O(N)；Space: O(N)。
+ *     1. 下标统一为 1-based。
+ *     2. 边权必须非负；若存在负边权，必须改用树形 DP 算法。
+ *     3. Time: O(N)；Space: O(N)。
  */
 
 template<typename T>
-concept TreeDiameterWeight = std::default_initializable<T> && std::totally_ordered<T> && requires(T a, T b) {
-    { a + b } -> std::convertible_to<T>;
-};
+concept TreeDiameterWeight =
+    std::default_initializable<T> && std::totally_ordered<T> &&
+    requires(T a, T b) {
+        { a + b } -> std::convertible_to<T>;
+    };
 
 template<typename T = i64>
-requires TreeDiameterWeight<T>
+    requires TreeDiameterWeight<T>
 struct Graph {
     struct Edge { int v; T w; };
     int n;
@@ -41,7 +50,7 @@ struct Graph {
 };
 
 template<typename T = i64>
-requires TreeDiameterWeight<T>
+    requires TreeDiameterWeight<T>
 struct TreeDiameterTwoDFS {
     struct Result {
         T len{};
@@ -79,7 +88,9 @@ private:
         while (!stk.empty()) {
             int u = stk.back();
             stk.pop_back();
-            if (_better_far(u, dis[u], dep[u], best)) best = {u, dep[u], dis[u]};
+            if (_better_far(u, dis[u], dep[u], best)) {
+                best = {u, dep[u], dis[u]};
+            }
             for (auto [v, w] : G.adj[u]) if (v != fa[u]) {
                 fa[v] = u;
                 dep[v] = dep[u] + 1;

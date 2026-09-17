@@ -1,30 +1,40 @@
 #include "aizalib.h"
-
 /*
- * Tree Diameter (树直径，树形 DP)
+ * 树直径（树形 DP） (Tree Diameter - Tree DP)
  *
  * Overview:
- *     以 root 定根，在每个点合并两条最长向下链更新直径。
- *     支持包含任意正负权边的带权树。
+ *     利用树形动态规划自底向上合并最长向下链求解树的直径，
+ *     天然支持任意包含正负边权的带权树。
+ *     - 状态设计与链拼合结构：
+ *       1. 向下最长链：以 root 定根，对于节点 u，维护其子树内从 u 出发向下的最长链
+ *          mx1 与次长链 mx2（必须属于不同的子树分支）。
+ *       2. 全局拼合更新：在每个节点 u 处，通过 mx1 + mx2 拼接成以 u
+ *          为折返点的树上简单路径，并松弛全局最优直径。
+ *       3. 拓扑与迭代优化：基于 BFS 序倒序自底向上转移，无需递归栈，
+ *          具备极高的运行速度且防止深度递归爆栈。
+ *     - 工具：Graph 结构、TreeDiameterDP 求解器、solve。
  *
  * API:
- *     struct Graph<T>(n)              — 建无向树，1-based
- *     Graph::add_edge(u, v, w = 1)    — 添加无向边 (u, v, w)
- *     struct TreeDiameterDP<T>(G)     — 树形 DP 直径求解器
- *     TreeDiameterDP::solve(root = 1) — 求直径，返回 Result {len, u, v, edges}
+ *     struct Graph<T>(n)           — 树的带权邻接表表示（1-based）。
+ *     Graph::add_edge(u, v, w = 1) — 添加无向边 (u, v, w)。
+ *     TreeDiameterDP<T>(G)         — 构造树形 DP 直径求解器。
+ *     solve(root = 1)              — 以 root 为定根求解树直径，返回 Result {len, u,
+ *                                     v, edges}。
  *
  * Notes:
- *     1. 1-based indexing。
+ *     1. 下标统一为 1-based。
  *     2. Time: O(N)；Space: O(N)。
  */
 
 template<typename T>
-concept TreeDiameterWeight = std::default_initializable<T> && std::totally_ordered<T> && requires(T a, T b) {
-    { a + b } -> std::convertible_to<T>;
-};
+concept TreeDiameterWeight =
+    std::default_initializable<T> && std::totally_ordered<T> &&
+    requires(T a, T b) {
+        { a + b } -> std::convertible_to<T>;
+    };
 
 template<typename T = i64>
-requires TreeDiameterWeight<T>
+    requires TreeDiameterWeight<T>
 struct Graph {
     struct Edge { int v; T w; };
     int n;
@@ -41,7 +51,7 @@ struct Graph {
 };
 
 template<typename T = i64>
-requires TreeDiameterWeight<T>
+    requires TreeDiameterWeight<T>
 struct TreeDiameterDP {
     struct Result {
         T len{};
@@ -98,17 +108,19 @@ private:
         return a.end < b.end;
     }
 
-    static bool _better_result(T len, int u, int v, int edges, const Result& ans) {
-        if (ans.len < len) return true;
-        if (len < ans.len) return false;
-        if (edges != ans.edges) return edges > ans.edges;
-        if (u > v) std::swap(u, v);
-        int a = ans.u, b = ans.v;
-        if (a > b) std::swap(a, b);
-        return std::pair(u, v) < std::pair(a, b);
-    }
-
-    void _relax(Result& ans, T len, int u, int v, int edges) const {
-        if (_better_result(len, u, v, edges, ans)) ans = {len, u, v, edges};
+    static void _relax(Result& ans, T len, int u, int v, int edges) {
+        if (v < u) std::swap(u, v);
+        if (ans.len < len) {
+            ans = {len, u, v, edges};
+            return;
+        }
+        if (len < ans.len) return;
+        if (edges != ans.edges) {
+            if (edges > ans.edges) ans = {len, u, v, edges};
+            return;
+        }
+        if (std::pair{u, v} < std::pair{ans.u, ans.v}) {
+            ans = {len, u, v, edges};
+        }
     }
 };

@@ -10,14 +10,17 @@
  *  提供点和矩阵两种返回值的形式;附欧拉角 ZYX 顺序互转矩阵。
  *
  * API:
- *  rodrigues_rotate(p, axis, angle) -> Point<ld>                     — 绕单位轴 axis 旋转 angle 后 p 的新坐标。浮点。O(1)。
- *  rotation_matrix_about_axis(axis, angle) -> array<array<ld, 3>, 3> — 绕单位轴旋转的 3×3 矩阵。浮点。O(1)。
- *  euler_zyx_to_matrix(yaw, pitch, roll) -> array<array<ld, 3>, 3>   — ZYX 顺序 (先 yaw 后 pitch 后 roll) 的合成旋转矩阵。浮点。O(1)。
- *  matrix_to_euler_zyx(m) -> tuple<ld, ld, ld> -> (yaw, pitch, roll) — 反解;奇异时 pitch = ±π/2,任选 yaw 0。浮点。O(1)。
- *  matrix_apply(m, p) -> Point<ld>                                   — 用 3×3 矩阵对向量 p 作线性变换。浮点。O(1)。
+ *     rodrigues_rotate(p, axis, angle)        — 绕单位轴 axis 旋转 angle 弧度后 p
+ *                                                的新坐标
+ *     rotation_matrix_about_axis(axis, angle) — 绕单位轴旋转的 3×3 旋转矩阵
+ *     euler_zyx_to_matrix(yaw, pitch, roll)   — ZYX 欧拉角对应的 3×3 旋转矩阵
+ *     matrix_to_euler_zyx(m)                  — 旋转矩阵反解为 ZYX 欧拉角 (yaw,
+ *                                                pitch, roll)
+ *     matrix_apply(m, p)                      — 用 3×3 矩阵对点/向量 p 作线性变换
  *
  * Notes:
- *  axis 必须为单位向量;非单位向量应先调用 PointFP::normalize(注释强调,不在内部自动归一)。
+ *  axis 必须为单位向量;非单位向量应先调用 PointFP::normalize(注释强调,
+ *  不在内部自动归一)。
  *  rotate 角度约定:右手定则,从 axis 正方向看,逆时针旋转 angle > 0。
  *  欧拉角采用 ZYX 内旋约定 (与 Tait-Bryan 顺序对应);定义见 rotation_zyx.pdf 文档。
  *
@@ -30,7 +33,8 @@ namespace Geo3D {
 template<typename T>
 requires std::is_floating_point_v<T>
 Point<T> rodrigues_rotate(Point<T> p, Point<T> axis, T angle) {
-    AST(is_zero(axis.len2() - (T)1));                            // 假设 axis 已归一:AST 确保不归一就报错
+    // 假设 axis 已归一: AST 确保不归一就报错
+    AST(is_zero(axis.len2() - (T)1));
     T c = std::cos(angle);
     T s = std::sin(angle);
     T dot = axis.dot(p);
@@ -38,20 +42,27 @@ Point<T> rodrigues_rotate(Point<T> p, Point<T> axis, T angle) {
     return p * c + cross * s + axis * (dot * ((T)1 - c));
 }
 
-// 旋转矩阵 R = I cos + (1 - cos) axis.axisᵀ + sin [axis]×
-// [axis]× 是叉积的反对称矩阵:[[0, -az, ay], [az, 0, -ax], [-ay, ax, 0]]
+// 旋转矩阵 R = I cos + (1 - cos) axis.axisᵀ + sin [axis]× [axis]×
+// 是叉积的反对称矩阵:[[0, -az, ay], [az, 0, -ax], [-ay, ax, 0]]
 template<typename T>
 requires std::is_floating_point_v<T>
-std::array<std::array<T, 3>, 3> rotation_matrix_about_axis(Point<T> axis, T angle) {
+std::array<std::array<T, 3>, 3> rotation_matrix_about_axis(
+    Point<T> axis, T angle) {
     AST(is_zero(axis.len2() - (T)1));
     T c = std::cos(angle);
     T s = std::sin(angle);
     T omc = (T)1 - c;
     T ax = axis.x, ay = axis.y, az = axis.z;
     std::array<std::array<T, 3>, 3> R = {{
-        { c + omc * ax * ax,        omc * ax * ay - s * az,  omc * ax * az + s * ay },
-        { omc * ay * ax + s * az,  c + omc * ay * ay,        omc * ay * az - s * ax },
-        { omc * az * ax - s * ay,  omc * az * ay + s * ax,  c + omc * az * az       }
+        { c + omc * ax * ax,
+          omc * ax * ay - s * az,
+          omc * ax * az + s * ay },
+        { omc * ay * ax + s * az,
+          c + omc * ay * ay,
+          omc * ay * az - s * ax },
+        { omc * az * ax - s * ay,
+          omc * az * ay + s * ax,
+          c + omc * az * az }
     }};
     return R;
 }

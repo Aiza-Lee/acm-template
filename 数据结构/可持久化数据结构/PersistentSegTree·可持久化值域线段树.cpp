@@ -1,22 +1,25 @@
 #include "aizalib.h"
-/**
- * 可持久化值域线段树
- * 算法介绍: 每个版本维护序列前缀在值域上的计数与权值和，查询时用两棵前缀树做差。
- * 模板参数: None
- * Interface:
- *      PersistentSeg(n, M), init(n, M) — 初始化，值域为 [1, M]，预留 n 个前缀版本
- *      append(v)                       — 在最新版本末尾追加一个值 v，生成新版本
- *      query_kth(l, r, k)              — 查询区间 [l, r] 的第 k 小
- *      query_min_cnt(l, r, H)          — 在区间 [l, r] 内选若干数，使和至少为 H，返回所需最少数量
- * Note:
- *      1. Time: 单次追加 / 查询 O(log M)
- *      2. Space: O(版本数 log M)
- *      3. 第 i 个版本表示原序列前 i 个元素；0 号版本为空前缀
- *      4. 用法/技巧:
- *          4.1 主席树最常见用法之一是区间第 k 小，即 query_kth(l, r, k)。
- *          4.2 若原值过大或不连续，先离散化到 [1, M]；此时第 k 小返回离散后下标，需自行映射回原值。
- *          4.3 当前 query_min_cnt 按“尽量取大值”贪心；若做过离散化且想按原值求和，需把叶子权值改成原值。
- *      5. 用法/技巧: 结点池采用 reserve + push_back，超出预留后交给 vector 自动扩容
+/*
+ * Persistent Value Segment Tree (主席树 / 可持久化值域线段树)
+ *
+ * Overview:
+ *     基于前缀可加性与路径复制的值域线段树集合。每个前缀版本 i 维护原序列前 i
+ *     个元素在值域 [1, M] 上的频数与数值和；由于相邻前缀版本仅有一条链差异，只需
+ *     O(log M) 个新建节点。查询区间 [l, r] 时通过版本 r 与版本 l-1
+ *     对应节点的频数/权值差，在值域二分查询区间第 k 小或贪心前缀和。
+ *
+ * API:
+ *     PersistentSeg(n, M), init(n, M) — 初始化，值域为 [1, M]，预留 n 个前缀版本
+ *     append(v)                       — 在最新版本末尾追加一个值 v，生成新版本
+ *     query_kth(l, r, k)              — 查询区间 [l, r] 的第 k 小
+ *     query_min_cnt(l, r, H)          — 在区间 [l, r] 内选若干数，使和至少为 H，
+ *                                        返回所需最少数量
+ *
+
+ * Notes:
+ *     1. 时间复杂度: append 与单次查询均为 O(log M)；空间复杂度 O(N log M)。
+ *     2. 索引约定: 序列前缀版本 1-based，版本 0 为初始空树。
+ *     3. 离散化: 若值域范围过大或为负，需先离散化到 [1, M]。
  */
 struct PersistentSeg {
     struct Node {
@@ -76,7 +79,8 @@ private:
         int mid = (l + r) >> 1;
         i64 rs = tr[tr[R].r].sum - tr[tr[L].r].sum;
         if (rs >= H) return _query_min_cnt(tr[L].r, tr[R].r, H, mid + 1, r);
-        return tr[tr[R].r].cnt - tr[tr[L].r].cnt + _query_min_cnt(tr[L].l, tr[R].l, H - rs, l, mid);
+        return tr[tr[R].r].cnt - tr[tr[L].r].cnt +
+               _query_min_cnt(tr[L].l, tr[R].l, H - rs, l, mid);
     }
 
 public:

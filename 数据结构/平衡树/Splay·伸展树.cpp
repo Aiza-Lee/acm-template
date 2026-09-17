@@ -1,22 +1,27 @@
 #include "aizalib.h"
-
-/**
- * Splay Tree (伸展树)
- * 算法介绍: 维护序列的文艺平衡树版 splay，使用双哨兵配合按排名定位区间。
- * 模板参数: T
- * Interface:
- *      Splay(n), init(n)          — 初始化，可选预留 n 个结点
- *      size(), empty(), clear()   — 常用辅助接口
- *      insert(pos, v), erase(pos) — 按位置插入 / 删除
- *      reverse(l, r)              — 区间翻转
- *      kth(k)                     — 查询第 k 个元素
- *      build(a)                   — 按给定顺序 O(N) 建树
- *      traverse(func)             — 中序遍历全部实际元素
- * Note:
- *      1. Time: 所有操作均摊 O(log N)，build O(N)
- *      2. Space: O(N)
- *      3. 外部位置统一为 1-based；插入位置 pos 表示插到前 pos 个元素之后
- *      4. 用法/技巧: 用双哨兵隔离区间，_range(l, r) 返回目标区间子树根
+/*
+ * Splay·伸展树
+ *
+ * Overview:
+ *      基于双旋（Zig-Zig / Zig-Zag）自调整特性的序列伸展树（文艺平衡树）。
+ *      通过在首尾设置双哨兵节点，将任意目标区间 [l, r] 提取为唯一的孤立子树（l-1
+ *      伸展至根，r+1 伸展为根的右儿子，则 r+1 的左子树恰为区间 [l, r]）。
+ *      提供了区间翻转、按排名插入删除、区间分裂与重排工具。
+ *
+ * API:
+ *     Splay(n) / init(n)         — 初始化结构，可选预留 n 个节点。
+ *     insert(pos, v)             — 在前 pos 个元素之后插入数值 v，均摊 O(log n)。
+ *     erase(pos)                 — 删除第 pos 个元素，均摊 O(log n)。
+ *     reverse(l, r)              — 翻转闭区间 [l, r] 的元素次序，均摊 O(log n)。
+ *     kth(k)                     — 查询排名第 k 个元素的数值，均摊 O(log n)。
+ *     build(a)                   — 使用数组 a 递归建树，严格 O(n)。
+ *     traverse(func)             — 按中序遍历当前全部实际数据节点。
+ *     size() / empty() / clear() — 基础状态查询与清空。
+ *
+ * Notes:
+ *      1. 1-based indexing；pos=0 表示插入到序列最前端。
+ *      2. Time: 单次操作均摊 O(log n)，建树严格 O(n)；Space: O(n)。
+ *      3. 树中维护两个哨兵节点；内含垃圾回收列表保障节点空间复用。
  */
 template<typename T>
 struct Splay {

@@ -1,21 +1,32 @@
 #include "aizalib.h"
-/**
- * 李超线段树
- * 算法介绍: 维护离散整数值域 [lb, rb] 上的多条一次函数线段，支持区间插入与单点最大值查询
- * 模板参数: T: 坐标/函数值类型，默认 i64
- * Interface:
- *      LiChaoSeg(lb, rb, line_cap = 0) — 初始化值域，line_cap 为可选预留线段数
- * 
- *      init(lb, rb, line_cap = 0)      — 重置结构
- *      add_line(k, b, id = 0)          — 插入整段直线 y = kx + b，覆盖整个值域；返回实际 id
- *      add_segment(l, r, k, b, id = 0) — 插入定义域为 [l, r] 的线段；返回实际 id，完全越界则返回 0
- *      query_line(x)                   — 查询 x 处最优线段，返回 Line；id = 0 表示不存在
- *      query(x)                        — 查询 x 处最大值；不存在返回 lowest()
- * Note:
- *      1. Time: 单次插入/查询 O(log V)，V = rb - lb + 1
- *      2. Space: O(插入线段数 * log V)，动态开点
- *      3. 仅适用于离散整数值域；若要求最小值，可将 k/b 同时取反或改比较器
- *      4. 用法/技巧: 相同函数值时按 id 较小者优先；若未传 id，则自动分配递增 id
+/*
+ * Li Chao Segment Tree (李超线段树)
+ *
+ * Overview:
+ *     维护离散整数值域 [lb, rb] 上的一次函数线段集合，
+ *     支持动态插入线段/直线与单点极值（默认最大值）查询。
+ *     每个线段树节点维护在当前区间中点 mid 处取值最大的“优势线段”；
+ *     新插入线段通过比较中点取值决定保留哪条，并将劣势线段递归下推到有交点的子区间
+ *     中，构建动态凸包的上凸壳/下凸壳包络结构。
+ *
+ * API:
+ *     LiChaoSeg(lb, rb, line_cap = 0) — 初始化值域，line_cap 为可选预留线段数
+ *     init(lb, rb, line_cap = 0)      — 重置结构
+ *     add_line(k, b, id = 0)          — 插入整段直线 y = kx + b，覆盖整个值域；
+ *                                        返回实际 id
+ *     add_segment(l, r, k, b, id = 0) — 插入定义域为 [l, r] 的线段；返回实际 id，
+ *                                        完全越界则返回 0
+ *     query_line(x)                   — 查询 x 处最优线段，返回 Line；id = 0
+ *                                        表示不存在
+ *     query(x)                        — 查询 x 处最大值；不存在返回 lowest()
+ *
+
+ * Notes:
+ *     1. 时间复杂度: 插入直线 O(log V)，插入线段 O(log^2 V)，单点查询 O(log V)。
+ *     2. 空间复杂度: 动态开点，每插入一条线段至多开辟 O(log V) 个节点。
+ *     3. 值域约束: 仅适用于离散整数值域；如需查询最小值，可将 (k, b) 取反或修改
+ *        _better。
+ *     4. 并列规则: 相同函数值优先选择编号 id 较小的线段。
  */
 template<typename T = i64>
 struct LiChaoSeg {
@@ -64,7 +75,9 @@ struct LiChaoSeg {
         if (lv != rv) return lv > rv;
         return lhs.id < rhs.id;
     }
-    bool _better(int lhs, int rhs, T x) const { return _better(lines[lhs], lines[rhs], x); }
+    bool _better(int lhs, int rhs, T x) const {
+        return _better(lines[lhs], lines[rhs], x);
+    }
 
     bool _clip(Line& line) const {
         if (line.l > line.r) std::swap(line.l, line.r);
@@ -122,7 +135,8 @@ struct LiChaoSeg {
         int res = tr[u].line;
         if (l == r) return res;
         T mid = l + (r - l) / 2;
-        int sub = (x <= mid) ? _query_line(tr[u].ls, x, l, mid) : _query_line(tr[u].rs, x, mid + 1, r);
+        int sub = (x <= mid) ? _query_line(tr[u].ls, x, l, mid)
+                             : _query_line(tr[u].rs, x, mid + 1, r);
         return _better(sub, res, x) ? sub : res;
     }
 

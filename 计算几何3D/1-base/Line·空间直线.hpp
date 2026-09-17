@@ -9,22 +9,23 @@
  *  参数式空间直线 p0 + t·d,以及三维线段类型;含点 / 线段 / 异面直线相关运算。
  *
  * API:
- *  Line<T>(p0, dir)                                           — 由一点和方向向量构造（dir 非零）。
- *  Line<T>::from_points(p1, p2)                               — 由两点构造,方向 = p2 - p1。
- *  Segment<T>(a, b)                                           — 三维线段类型。
- *  closest_point_on_line(line, p) -> Point<T>                 — p 到直线的最近点(无 t 范围约束)。浮点。O(1)。
- *  distance_point_to_line(line, p) -> T                       — 点到直线的距离。浮点。O(1)。
- *  distance_line_to_line(l1, l2) -> T                         — 两线最短距离;平行时降级为点到线距离。浮点。O(1)。
- *  on_segment(p, seg) -> bool                                 — 点是否在线段上（含端点）。O(1)。
- *  closest_point_on_segment(p, seg) -> Point<T>               — 点到线段的最近点（钳至端点）。浮点。O(1)。
- *  distance_point_to_segment(p, seg) -> T                     — 点到线段的最短距离。浮点。O(1)。
- *  line_plane_intersection(line, plane) -> optional<Point<T>> — 直线与平面交点;平行时 nullopt。浮点。O(1)。
- *  LineFP / SegmentFP                                         — 浮点常用别名。
+ *     Line<T>(p0, dir)                     — 由一点和方向向量构造（dir非零）。
+ *     Line<T>::from_points(p1, p2)         — 由两点构造,方向 = p2 - p1。
+ *     Segment<T>(a, b)                     — 三维线段类型。
+ *     closest_point_on_line(line, p)       — p 到直线的最近点。浮点。O(1)。
+ *     distance_point_to_line(line, p)      — 点到直线的距离。浮点。O(1)。
+ *     distance_line_to_line(l1, l2)        — 两线最短距离;平行降级为点到线。O(1)。
+ *     on_segment(p, seg)                   — 点是否在线段上（含端点）。O(1)。
+ *     closest_point_on_segment(p, seg)     — 点到线段最近点。浮点。O(1)。
+ *     distance_point_to_segment(p, seg)    — 点到线段最短距离。浮点。O(1)。
+ *     line_plane_intersection(line, plane) — 直线与平面交点。O(1)。
+ *     LineFP / SegmentFP                   — 浮点常用别名。
  *
  * Notes:
  *  closest_point_on_line 返回的最近点对应 t 可能为负（落在直线反向延长线）。
- *  distance_line_to_line:两线平行 (cross = 0) 降级为 distance_point_to_line(l1, l2.p0)。
- *  line_plane_intersection:|dir · normal| < EPS 时直线与平面平行,返回 nullopt。
+ *  distance_line_to_line: 两线平行 (cross = 0) 降级为 distance_point_to_line(l1,
+ *  l2.p0)。
+ *  line_plane_intersection: |dir · normal| < EPS 时直线与平面平行, 返回 nullopt。
  *
  * Related:
  *  Plane·平面.hpp::eval / side: line_plane_intersection 的辅助判定。
@@ -66,7 +67,8 @@ T distance_point_to_line(const Line<T>& l, Point<T> p) {
     return std::sqrt(cross.len2()) / std::sqrt(l.dir.len2());
 }
 
-// 两线最短距离:异面情形 = | (q - p) · (d1 × d2) | / |d1 × d2|;平行时降级为点到线。
+// 两线最短距离:异面情形 = | (q - p) · (d1 × d2) | / |d1 × d2|;
+// 平行时降级为点到线。
 template<typename T>
 requires std::is_floating_point_v<T>
 T distance_line_to_line(const Line<T>& l1, const Line<T>& l2) {
@@ -111,7 +113,8 @@ T distance_point_to_segment(Point<T> p, Segment<T> s) {
 // 直线与平面交点:dir 与 normal 不平行时 t = -eval(p0) / (dir · normal)
 template<typename T>
 requires std::is_floating_point_v<T>
-std::optional<Point<T>> line_plane_intersection(const Line<T>& l, const Plane<T>& pl) {
+std::optional<Point<T>> line_plane_intersection(
+    const Line<T>& l, const Plane<T>& pl) {
     T den = l.dir.x * pl.a + l.dir.y * pl.b + l.dir.z * pl.c;
     if (is_zero(den)) return std::nullopt;             // 平行
     T num = -(pl.a * l.p0.x + pl.b * l.p0.y + pl.c * l.p0.z + pl.d);

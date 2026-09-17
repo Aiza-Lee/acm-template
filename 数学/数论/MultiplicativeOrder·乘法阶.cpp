@@ -1,16 +1,27 @@
 #include "aizalib.h"
 
-/**
+/*
  * Multiplicative Order (乘法阶)
- * 算法介绍: 在 gcd(a, mod) = 1 时求 a 在模 mod 意义下的最小正阶。
- * 模板参数: None
- * Interface:
- *      MultiplicativeOrder::order(a, mod) — 求最小正整数 k 使 a^k = 1 (mod mod)；若不存在返回 -1
- * Note:
- *      1. Time: 试除版约 O(sqrt(mod) + sqrt(phi(mod)) log mod)
- *      2. Space: O(质因子个数)
- *      3. 阶一定整除 phi(mod)
- *      4. 用法/技巧: 若 mod 很大，可把内部试除分解替换成 PollardRho
+ *
+ * Overview:
+ *      在 gcd(a, mod) = 1 时求 a 在模 mod 意义下的乘法阶 ord_m(a)，即满足 a^k = 1
+ *      (mod mod) 的最小正整数 k。
+ *      由欧拉定理可知阶必整除 phi(mod)。首先通过试除分解求出 phi(mod)，再分解
+ *      phi(mod) 的质因子，从当前可能阶中贪心试除多余质因子，直至无法继续整除。
+ *
+ * API:
+ *     order(a, mod) — 求 a 模 mod 的最小正阶。若 mod <= 1 或 gcd(a, mod) != 1
+ *                      则返回 -1。复杂度 O(sqrt(mod) + log(mod) * 质因子个数) 时间，
+ *                      O(1) 空间。
+ *
+ * Notes:
+ *      1. 要求 gcd(a, mod) = 1 否则阶不存在。
+ *      2. 模数极大时可将试除法替换为 PollardRho 分解。
+ *
+ * Related:
+ *      数学/数论/EulerPhi·单点欧拉函数.cpp: 计算欧拉函数 phi(n)。
+ *      数学/数论/PrimitiveRoot·原根.cpp: 原根定义为阶等于 phi(m) 的元素。
+ *      数学/数论/ModMultiplicativeGroup·模乘法群.cpp: 任意模数乘法群基底与坐标化求阶。
  */
 struct MultiplicativeOrder {
     static i64 _norm(i64 x, i64 mod) {

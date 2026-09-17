@@ -1,21 +1,24 @@
 #include "aizalib.h"
-/**
- * 区间加区间和树状数组
- * 算法介绍: 用两棵 1-based 树状数组维护差分，支持区间加、前缀和与区间和。
- * 模板参数: T
- * Interface:
- *      RangeBitTree<T>(n), init(n) — 初始化长度为 n 的结构
- *      RangeBitTree<T>(a), init(a) — 用 1-based 数组 a 建树
- *      add(l, r, v)                — 令 a[l..r] += v
- *      sum_prefix(p)               — 查询前缀 [1, p] 的和
- *      sum(l, r)                   — 查询区间 [l, r] 的和
- *      all_sum()                   — 查询整体 [1, n] 的和
- * Note:
- *      1. Time: 单次 add / sum_prefix / sum O(log N)，建树 O(N)
- *      2. Space: O(N)
- *      3. 下标从 1 开始；若传入数组建树，则要求 a[1..n] 有效、a[0] 留空
- *      4. 用法/技巧:
- *          4.1 维护差分 d[i] = a[i] - a[i - 1]，前缀和可写成 (p + 1) * sum(d) - sum(i * d[i])。
+/*
+ * BITRangeAddRangeSum·区间加区间和
+ *
+ * Overview:
+ *      利用两棵树状数组分别维护一阶差分 d[i] 与加权差分 i * d[i]。
+ *      由恒等式 sum_{k=1}^p a[k] = (p + 1) * sum(d) - sum(i * d[i])
+ *      将区间修改转化为差分修改，支持 O(log n) 的区间加与区间求和。
+ *
+ * API:
+ *     RangeBitTree<T>(n) / init(n) — 初始化长度为 n 的结构，初始全 0。
+ *     RangeBitTree<T>(a) / init(a) — 用 1-based 数组 a 线性 O(n) 建树。
+ *     add(l, r, v)                 — 区间 [l, r] 所有元素增加 v，O(log n)。
+ *     sum_prefix(p)                — 查询前缀区间 [1, p] 的和，O(log n)。
+ *     sum(l, r)                    — 查询闭区间 [l, r] 的和，O(log n)。
+ *     all_sum()                    — 查询全局总和 [1, n]，O(log n)。
+ *
+ * Notes:
+ *      1. 1-based indexing；下标 1..n。传入数组 a 时 a[0] 留空。
+ *      2. Time: 单次 add/sum 均为 O(log n)，建树 O(n)；Space: O(n)。
+ *      3. 常数极小，实现轻量，是区间加+区间和问题在线段树之外的高性能替代方案。
  */
 template<typename T = i64>
 struct RangeBitTree {

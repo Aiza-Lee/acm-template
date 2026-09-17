@@ -1,24 +1,31 @@
 #include "aizalib.h"
 
-/**
- * 线段树分裂 (Segment Tree Split)
- * 算法介绍: 维护值域 [1, N] 上的动态开点线段树，支持单点加、区间求和、线段树分裂与合并。
- * Interface:
- *      reserve(cap)                  — 可选预留 cap 个结点容量
- *      reset_pool()                  — 清空共享结点池, 旧节点编号全部失效
- *      SegTreeSplit(int n)           — 初始化值域 [1, n] 的空线段树
- *      void insert(int pos, i64 val) — 在位置 pos 增加 val
- *      i64 query(int l, int r)       — 查询区间 [l, r] 的和
- *      static void split(SegTreeSplit& a, SegTreeSplit& b, int k)
- *                                      // 将 a 在 k 处分裂, [1, k] 保留在 a, (k, N] 分入 b
- *      void merge(SegTreeSplit& other) — 将 other 合并入 *this, other 被消耗 (root 置空)
- * Note:
- *      1. Time: insert / query O(log N); split O(log N); merge O(重叠结点数)
- *      2. Space: O(操作涉及结点数); split 只创建 O(log N) 个新结点, 原有子树通过指针转移
- *      3. 所有实例共享一个类级结点池, split 后 b 与 a 自动同池, merge 无需额外校验
- *      4. 多组数据若需复用共享池, 在旧根全部作废后调用 reset_pool()
- *      5. 若已知总插入次数, 可先 reserve(cap) 减少扩容次数
- *      6. 值域固定为 [1, N], 1-based 索引; cnt 存储该区间内的值之和
+/*
+ * Segment Tree Split (线段树分裂)
+ *
+ * Overview:
+ *     动态开点权值线段树的分裂与合并算法。给定分割键值 k，沿着到 k
+ *     的路径将原线段树拆分为两棵独立的线段树：一棵覆盖 [1, k]，另一棵覆盖 (k, N]。
+ *     分裂过程中未被边界截断的整棵子树直接复用指针转移，仅在路径上新建 O(log N)
+ *     个节点。配合线段树合并可替代平衡树完成动态序列排序、区间分裂与合并。
+ *
+ * API:
+ *     reserve(cap)                    — 可选预留 cap 个结点容量
+ *     reset_pool()                    — 清空共享结点池, 旧节点编号全部失效
+ *     SegTreeSplit(int n)             — 初始化值域 [1, n] 的空线段树
+ *     void insert(int pos, i64 val)   — 在位置 pos 增加 val
+ *     i64 query(int l, int r)         — 查询区间 [l, r] 的和 static void
+ *                                        split(SegTreeSplit& a, SegTreeSplit& b,
+ *                                        int k) // 将 a 在 k 处分裂, [1, k] 保留在
+ *                                        a, (k, N] 分入 b
+ *     void merge(SegTreeSplit& other) — 将 other 合并入 *this, other 被消耗 (root
+ *                                        置空)
+ *
+ * Notes:
+ *     1. 时间复杂度: insert/query/split 均为 O(log N)；merge
+ *        复杂度与重叠节点数成正比。
+ *     2. 空间复杂度: 节点池共享，单次 split 仅开辟 O(log N) 个新节点。
+ *     3. 索引约定: 值域范围为 [1, N]，采用 1-based 索引。
  */
 struct SegTreeSplit {
     struct Node {

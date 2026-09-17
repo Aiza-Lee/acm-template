@@ -9,18 +9,22 @@
  *  提供四面体体积、质心与点内 / 外判定。
  *
  * API:
- *  tet_centroid(a, b, c, d) -> Point<T>     — 四面体几何质心(顶点均值)。任意 T。O(1)。
- *  point_in_tet(p, a, b, c, d) -> int       — +1 ( 严格内部) / -1 (严格外部) / 0 (在面上、共面退化)。
- *      借助四个朝向面的 signed_volume_x6_tetrahedron 符号比较。浮点。O(1)。
- *  signed_volume_x6_tetrahedron(a, b, c, d) — 见 Triangle·空间三角形.hpp。
- *  tetrahedron_volume(a, b, c, d)           — 见 Triangle·空间三角形.hpp。
+ *     tet_centroid(a, b, c, d)    — 四面体几何质心(顶点均值)。任意 T。O(1)。
+ *     point_in_tet(p, a, b, c, d) — +1 ( 严格内部) / -1 (严格外部) /0 (在面上、
+ *                                    共面退化)。借助四个朝向面的
+ *                                    signed_volume_x6_tetrahedron符号比较。浮点。
+ *                                    O(1)。
+ *
+ *     signed_volume_x6_tetrahedron(a, b, c, d) — 见 Triangle·空间三角形.hpp。
+ *     tetrahedron_volume(a, b, c, d)           — 见 Triangle·空间三角形.hpp。
  *
  * Notes:
  *  point_in_tet 要求四面体顶点 CCW 朝外(各面法向量指向外部);否则内 / 外翻转。
  *  四点共面时返回 0;坐标精度边界请用 is_zero 容差。
  *
  * Related:
- *  Triangle·空间三角形.hpp: signed_volume_x6_tetrahedron / tetrahedron_volume 来源。
+ *  Triangle·空间三角形.hpp: signed_volume_x6_tetrahedron / tetrahedron_volume
+ *  来源。
  */
 namespace Geo3D {
 
@@ -34,8 +38,8 @@ Point<T> tet_centroid(Point<T> a, Point<T> b, Point<T> c, Point<T> d) {
     );
 }
 
-// 点是否在四面体内:重心坐标法 — 解 (p - a) = β(b - a) + γ(c - a) + δ(d - a);
-// α = 1 - β - γ - δ。α,β,γ,δ ≥ 0 → 内;任一 = 0 → 面上;否则外。
+// 点是否在四面体内:重心坐标法 — 解 (p - a) = β(b - a) + γ(c - a) + δ(d - a); α =
+// 1 - β - γ - δ。α,β,γ,δ ≥ 0 → 内;任一 = 0 → 面上;否则外。
 // 与顶点顺序无关:比"4 体积符号"法更稳健。
 template<typename T>
 requires std::is_floating_point_v<T>

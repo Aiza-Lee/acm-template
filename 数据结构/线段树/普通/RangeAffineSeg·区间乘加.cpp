@@ -1,16 +1,21 @@
+#include "aizalib.h"
 #include "SegTreeBase·通用线段树基类.hpp"
+/*
+ * Range Affine Segment Tree (区间乘加线段树)
+ *
+ * Overview:
+ *     基于通用懒标记线段树 SegTreeBase 实现的区间仿射变换实例。
+ *     支持区间元素统一变换 x -> x * mul + add 以及模意义下的区间和查询。
+ *
+ * API:
+ *     using SegAffine = SegTree<Info, Tag> — 类型别名：区间乘加线段树
+ *     modify(l, r, {mul, add})             — 对区间应用仿射变换
+ *     query(l, r).sum                      — 查询区间和
+ *
 
-/**
- * 区间乘加线段树 (Range Affine Transformation)
- * 算法介绍: 基于通用懒标记线段树维护区间仿射变换 x -> x * mul + add 与区间和。
- * 模板参数: 无
- * Interface:
- *      using SegAffine = SegTree<Info, Tag>
- *      modify(l, r, {mul, add}) — 对区间应用仿射变换
- *      query(l, r).sum          — 查询区间和
- * Note:
- *      1. Time: 单次修改/查询 O(log N)
- *      2. Space: O(N)
+ * Notes:
+ *     1. 时间复杂度: 单次修改与查询均为 O(log N)；空间复杂度 O(N)。
+ *     2. 复合顺序: 标记复合满足 (x * mul + add) * t.mul + t.add。
  */
 
 constexpr int MOD = 998244353;

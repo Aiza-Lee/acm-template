@@ -1,27 +1,25 @@
 #include "aizalib.h"
 
-/**
- * 猫树 (Cat Tree)
- * 算法介绍:
- *      一种支持 O(1) 静态区间查询的离线数据结构。
- *      适用于满足结合律的有序区间合并（RMQ、区间和、矩阵乘法、最大子段和等）。
- *      本质是分治，在每一层预处理经过中点的后缀/前缀摘要。
+/*
+ * Cat Tree (猫树)
  *
- * 模板参数:
- *      T: 区间摘要类型
- *      Merge: 合并函数对象，需满足 Merge(const T&, const T&) -> T
+ * Overview:
+ *     支持 O(1) 静态区间查询的树形分治数据结构。
+ *     适用于满足半群结合律的有序区间合并（如 RMQ、区间和、矩阵乘法、最大子段和等，
+ *     不要求可重复贡献性与交换律）。
+ *     结构上将序列补齐至 2 的幂建立满二叉树，各层预处理跨越中点的左右前/ 后缀聚合，
+ *     查询时利用最高不同位（LCA 对应树高）快速索引，单次 O(1) 取出左右片段合并。
  *
- * Interface:
- *      CatTree(a, merge, id) — 传入 1-based 数组构建
- *      build(a)              — 重建
- *      query(l, r)           — 查询闭区间 [l, r]
+ * API:
+ *     CatTree(a, merge, id) — 传入 1-based 数组构建
+ *     build(a)              — 重建
+ *     query(l, r)           — 查询闭区间 [l, r]
  *
- * Note:
- *      1. Time: Build O(N log N), Query O(1)
- *      2. Space: O(N log N)
- *      3. 1-based indexing, a[0] 预留不用
- *      4. 因内部会补齐到 2 的幂，id 必须是 merge 的单位元
- *      5. merge 不要求交换律，但必须保持顺序: merge(left, right)
+
+ * Notes:
+ *     1. 时间复杂度: 建树 O(N log N)，单次查询 O(1)；空间复杂度 O(N log N)。
+ *     2. 索引约定: 外部输入统一为 1-based，a[0] 预留不用。
+ *     3. 代数性质: 补齐空位需填入单位元 id；merge 必须保持 left-to-right 结合顺序。
  */
 
 template<typename Merge, typename T>
@@ -38,7 +36,10 @@ struct CatTree {
     T id;
 
     CatTree() = default;
-    CatTree(const std::vector<T>& a, Merge merge, T id) : merge(merge), id(id) { build(a); }
+    CatTree(const std::vector<T>& a, Merge merge, T id)
+        : merge(merge), id(id) {
+        build(a);
+    }
     CatTree(int n, Merge merge, T id) : merge(merge), id(id) { init(n); }
 
     void init(int _n) {
@@ -62,9 +63,8 @@ struct CatTree {
             if (l == r) return;
             int mid = (l + r) >> 1;
 
-            // st[dep][i]:
-            // i <= mid: [i, mid] 的后缀合并值
-            // i > mid : [mid + 1, i] 的前缀合并值
+            // st[dep][i]: i <= mid: [i, mid] 的后缀合并值 i > mid : [mid + 1, i]
+            // 的前缀合并值
             st[dep][mid] = st[0][mid];
             per(i, mid - 1, l) st[dep][i] = merge(st[0][i], st[dep][i + 1]);
 

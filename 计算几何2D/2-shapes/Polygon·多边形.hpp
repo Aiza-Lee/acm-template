@@ -14,19 +14,25 @@ using Polygon = std::vector<Point<T>>;
  *  提供多边形基本度量、点包含判定、凸性、重心、多边形核和最远点对。
  *
  * API:
- *  Polygon<T>                                              — 点序列别名，等价于 std::vector<Point<T>>。
- *  point_in_polygon(p, poly) -> int                        — 射线法 / winding number；边上 2，内部 1，外部 0。O(N)。
- *  polygon_area_2(poly) -> T                               — 两倍有向面积；逆时针为正，顺时针为负；空多边形返回 0。O(N)。
- *  polygon_area(poly) -> ld                                — 有向面积，逆时针为正，顺时针为负。O(N)。
- *  polygon_perimeter(poly) -> ld                           — 闭合路径周长；空 / 单点返回 0；两点返回 2×距离。O(N)。
- *  is_convex(poly) -> bool                                 — 顶点数 < 3 或全共线返回 false；CCW 严格凸返回 true。O(N)。
- *  polygon_centroid(poly) -> Point<ld>                     — 面积加权质心；area=0 时返回首顶点。O(N)。
- *  polygon_kernel(poly) -> Polygon<T>                      — 多边形核（仅支持浮点坐标）。O(N log N)。
- *  farthest_point_pair(convex) -> pair<Point<T>, Point<T>> — 凸多边形直径；n<=1 返回 ({0,0}, {0,0})，n=2 返回两端点。O(N)。
+ *     Polygon<T>                  — 点序列别名，等价于std::vector<Point<T>>。
+ *     point_in_polygon(p, poly)   — 射线法 / winding number；边上 2，内部 1，外部
+ *                                    0。O(N)。
+ *     polygon_area_2(poly)        — 两倍有向面积；逆时针为正，顺时针为负；
+ *                                    空多边形返回 0。O(N)。
+ *     polygon_area(poly)          — 有向面积，逆时针为正，顺时针为负。O(N)。
+ *     polygon_perimeter(poly)     — 闭合路径周长；空 /单点返回 0；两点返回
+ *                                    2×距离。O(N)。
+ *     is_convex(poly)             — 顶点数 < 3或全共线返回false；CCW严格凸返回
+ *                                    true。O(N)。
+ *     polygon_centroid(poly)      — 面积加权质心；area=0 时返回首顶点。O(N)。
+ *     polygon_kernel(poly)        — 多边形核（仅支持浮点坐标）。O(N logN)。
+ *     farthest_point_pair(convex) — 凸多边形直径；n<=1返回 ({0,0}, {0,0})，n=2
+ *                                    返回两端点。O(N)。
  *
  * Notes:
  *  面积符号约定：逆时针为正、顺时针为负。
- *  polygon_kernel 要求输入为逆时针；CW 输入会得到错误方向的半平面。退化为空 / 单点 / 两点 / 全共线多边形时核为空。
+ *  polygon_kernel 要求输入为逆时针；CW 输入会得到错误方向的半平面。退化为空 / 单点
+ *  / 两点 / 全共线多边形时核为空。
  *
  * Related:
  *  HalfPlane·半平面交.hpp::half_plane_intersection: polygon_kernel 的底层实现。
@@ -146,7 +152,8 @@ std::pair<Point<T>, Point<T>> farthest_point_pair(const Polygon<T>& convex) {
     // 旋转卡尺
     for (int i = 0; i < n; i++) {
         int curr = left, next = (left + 1) % n;
-        while (sgn((convex[next] - convex[curr]).cross(convex[(right + 1) % n] - convex[right])) > 0) {
+        while (sgn((convex[next] - convex[curr]).cross(
+                   convex[(right + 1) % n] - convex[right])) > 0) {
             right = (right + 1) % n;
         }
 

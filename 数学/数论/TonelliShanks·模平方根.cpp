@@ -1,17 +1,28 @@
 #include "aizalib.h"
 
-/**
- * Tonelli-Shanks (模平方根)
- * 算法介绍: 在奇素数模 p 下求 x^2 = a (mod p) 的解。
- * 模板参数: None
- * Interface:
- *      TonelliShanks::legendre(a, p) — 求勒让德符号；返回 0 / 1 / -1，Time: O(log p)
- *      TonelliShanks::solve(a, p)    — 返回两个平方根 {x, y}，无解返回 {-1, -1}，Time: O(log^2 p)
- * Note:
- *      1. Time: solve 为 O(log^2 p)
- *      2. Space: O(1)
- *      3. 仅适用于奇素数模；p = 2 时单独处理
- *      4. 用法/技巧: 若得到一个解 x，另一个解就是 p - x；返回值会按从小到大排好
+/*
+ * Tonelli-Shanks Algorithm (二次剩余与模平方根)
+ *
+ * Overview:
+ *      在奇素数模 p 下求解二次同余方程 x^2 = a (mod p)。
+ *      利用欧拉判别准则 (勒让德符号 a^((p-1)/2) mod p) 判断 a 是否为模 p
+ *      的二次剩余。
+ *      若 p = 3 (mod 4)，解为直接公式 a^((p+1)/4) mod p；对于一般奇素数，分解 p - 1
+ *      = q * 2^s，寻找二次非剩余 z，在 2-Sylow 子群上不断折半消去误差项，
+ *      快速逼近精确根。
+ *
+ * API:
+ *     legendre(a, p) — 计算勒让德符号 (a/p)，返回 1 (二次剩余)、-1 (二次非剩余) 或
+ *                       0 (a = 0 mod p)。复杂度 O(log p) 时间。
+ *     solve(a, p)    — 求解 x^2 = a (mod p)，返回从小到大排序的解对 {x1, x2}。
+ *                       无解返回 {-1, -1}。复杂度 O(log^2 p) 时间，O(1) 空间。
+ *
+ * Notes:
+ *      1. 要求 p 为素数。若 p = 2 单独处理；若 a = 0 (mod p) 返回 {0, 0}。
+ *      2. 若存在解 x，则另一解为 (p - x) mod p。
+ *
+ * Related:
+ *      数学/数论/DiscreteRoot·离散开根.cpp: 一般高次同余方程求解。
  */
 struct TonelliShanks {
     static i64 _norm(i64 x, i64 mod) {

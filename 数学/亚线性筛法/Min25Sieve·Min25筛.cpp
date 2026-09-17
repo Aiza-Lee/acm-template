@@ -1,19 +1,26 @@
 #include "aizalib.h"
 /*
- * Min25Sieve·Min25筛
+ * Min_25 Sieve (Min25 筛)
  *
  * Overview:
- *     Min_25 筛法，用于在亚线性时间内计算积性函数前缀和 F(n) = ∑_{i=1}^n f(i)，要求 f(p) 在质数处可表示为多项式 ∑ coeff[k] * p^k。
+ *     亚线性时间内求解积性函数前缀和 F(n) = sum_{i=1}^n f(i) 的筛法。
+ *     要求 f(p) 在质数处可拟合为低阶多项式 sum coeff[k] * p^k，且 f(p^c)
+ *     易快速计算。
+ *     第一阶段通过动态规划提取所有形如 floor(n/x) 位置的质数幂和（类似埃氏筛转移），
+ *     第二阶段按最小质因子分治递归统计合数与质数贡献。
  *
  * API:
  *     Min25(n, factors, f_p_c) — 构造函数，初始化并预处理质数前缀和
- *     int solve()              — 计算积性函数前缀和 ∑_{i=1}^n f(i)，复杂度 O(n^(3/4) / log n)
+ *     int solve()              — 计算积性函数前缀和 ∑_{i=1}^n f(i)，复杂度
+ *                                 O(n^(3/4) / log n)
  *     int solve_prime_sum()    — 计算质数处函数和 ∑_{p <= n} f(p)
  *
+
  * Notes:
- *     1. factors 中每一项 (k, s) 表示 f(p) 累加 s * p^k，支持 0 <= k <= 4。
- *     2. f(p^c) 的取值通过回调函数 f_p_c(p, c) 传入。
- *     3. 空间复杂度 O(√n)，支持对相同 n 重复查询不同积性函数。
+ *     1. 时间复杂度: 整体复杂度 O(n^(3/4) / log n)；空间复杂度 O(sqrt(n))。
+ *     2. 参数格式: factors 为 (k, s) 列表，表示 f(p) 包含 s * p^k（支持 0 <= k <=
+ *        4）。
+ *     3. 回调函数: f_p_c(p, c) 计算质数幂 f(p^c)。
  */
 class Min25 {
 private:
@@ -123,8 +130,9 @@ private:
             if ((i64)p * p > n) break;
             i64 p_pow = p;
             for (int c = 1; p_pow <= n / p; ++c) {
-                inc(res, add(mul(f_p_c(p, c), cal_F(i + 1, n / p_pow)), f_p_c(p, c + 1)));
-                if (p_pow > n / p) break;
+                int term = add(mul(f_p_c(p, c), cal_F(i + 1, n / p_pow)),
+                               f_p_c(p, c + 1));
+                inc(res, term);
                 p_pow *= p;
             }
         }

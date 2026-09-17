@@ -1,29 +1,26 @@
 #include "aizalib.h"
-/**
- * Link-Cut Tree — 精简版
- * 算法介绍: 仅保留 LCT 核心结构操作，不维护任何路径聚合信息。
- *          适合只需动态连通性 / LCA 的题目。
- * 模板参数: None
- * Interface:
- *      LCTCore(n), init(n) — 初始化
- *      make_root(x)        — 换根
- *      find_root(x)        — 查根
- *      link(x, y)          — 连边（不连通则连边返回 1，否则返回 0）
- *      cut(x, y)           — 断边（存在则断边返回 1，否则返回 0）
- *      connected(x, y)     — 判断连通
- *      lca(x, y)           — LCA ，不连通时返回 0
- * Internal Methods:
- *      fa(p) / ch(p) / rev(p): 内联访问器，返回对应字段的引用，
- *          使用访问器而非直接 t[p].field，使外部代码看起来仍是
- *          "方法调用"风格，与 SoA 写法兼容
- *      其他说明同 LCT·动态树.cpp
- * Note:
- *      1. Time: 单次均摊 O(log N)
- *      2. Space: O(N)
- *      3. 结点编号 1-based，先 init(n)
- *      4. AoS: 节点紧凑存储（~16B），cache 友好
- *      5. 本版仅维护结构，没有任何 val / sum / cnt 等数值字段
- *      6. 如需维护路径聚合，参考 LCT·动态树.cpp 添加 _push_up、val、sum 等
+/*
+ * Link-Cut Tree Core (动态树精简版)
+ *
+ * Overview:
+ *     移除了路径权重聚合信息的轻量级动态树结构。仅保留 Splay 旋转、access、换根
+ *     make_root、连边 link 与断边 cut 等拓扑维护能力，常数极小，内存占用紧凑，
+ *     专门用于动态图连通性判断与动态 LCA 查询。
+ *
+ * API:
+ *     LCTCore(n), init(n) — 初始化
+ *     make_root(x)        — 换根
+ *     find_root(x)        — 查根
+ *     link(x, y)          — 连边（不连通则连边返回 1，否则返回 0）
+ *     cut(x, y)           — 断边（存在则断边返回 1，否则返回 0）
+ *     connected(x, y)     — 判断连通
+ *     lca(x, y)           — LCA ，不连通时返回 0
+ *
+
+ * Notes:
+ *     1. 时间复杂度: 连边、断边、查询等单次均摊 O(log N)；空间复杂度 O(N)。
+ *     2. 索引约定: 节点编号采用 1-based (1..n)。
+ *     3. 内存布局: 单个节点仅约 16 字节，缓存命中率高。
  */
 struct LCTCore {
 private:

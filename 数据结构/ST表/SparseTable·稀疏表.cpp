@@ -1,27 +1,23 @@
 #include "aizalib.h"
 #include <bit>
-
-/**
- * Sparse Table
- * 算法介绍:
- *      基于倍增预处理静态区间信息，适用于 RMQ、GCD 等可重复贡献问题。
+/*
+ * SparseTable·稀疏表
  *
- * 模板参数:
- *      T: 值类型
- *      Merge: 合并函数对象，需满足 Merge(const T&, const T&) -> T
+ * Overview:
+ *      基于二进制倍增的一维静态区间幂等信息预处理结构。
+ *      利用两块长度为 2^k 的重叠区间在 O(1) 内覆盖任意查询闭区间，提供静态 RMQ、
+ *      区间 GCD 等可重复贡献信息的超常数查询工具。
  *
- * Interface:
- *      SparseTable(a, merge) — 传入 1-based 数组构建
- *      build(a)              — 重建
- *      query(l, r)           — 查询闭区间 [l, r]
+ * API:
+ *     SparseTable(a, merge) — 使用 1-based 数组 a 与二元合并函数 merge 构建 ST 表。
+ *     build(a)              — 重新由数组 a 构建 ST 表，O(n log n)。
+ *     query(l, r)           — 查询闭区间 [l, r] 的合并结果，O(1)。
  *
- * Note:
- *      1. Time: Build O(N log N), Query O(1)
- *      2. Space: O(N log N)
- *      3. 1-based indexing, a[0] 预留不用
- *      4. 用法/技巧:
- *          4.1 要求 merge 满足幂等性，如 min / max / gcd；普通求和不适用 O(1) 双块查询。
- *          4.2 merge 建议传无状态 lambda / functor，避免 std::function 常数。
+ * Notes:
+ *      1. 1-based indexing；有效下标 1..n，a[0] 预留不用。
+ *      2. Time: 预处理 O(n log n)，单次查询严格 O(1)；Space: O(n log n)。
+ *      3. merge 必须满足幂等律（如 min, max, gcd, bitwise or/and）；
+ *         普通加法求和不适用。
  */
 template<typename Merge, typename T>
 concept STMerge = requires(Merge merge, const T& x, const T& y) {

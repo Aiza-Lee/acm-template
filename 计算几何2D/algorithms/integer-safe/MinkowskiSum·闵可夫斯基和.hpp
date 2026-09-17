@@ -8,8 +8,8 @@
  *  计算两个凸多边形的闵可夫斯基和 P ⊕ Q（位积），以及差 P ⊖ Q = P ⊕ (-Q)。
  *
  * API:
- *  minkowski_sum(P, Q) -> Polygon<T>        — 闵可夫斯基和。Time O(N + M), Space O(N + M)。
- *  minkowski_difference(P, Q) -> Polygon<T> — 闵可夫斯基差，用于凸体碰撞判定。
+ *     minkowski_sum(P, Q)        — 闵可夫斯基和。Time O(N + M), Space O(N + M)。
+ *     minkowski_difference(P, Q) — 闵可夫斯基差，用于凸体碰撞判定。
  *
  * Notes:
  *  模板参数 T: 坐标类型。
@@ -33,8 +33,11 @@ Polygon<T> minkowski_sum(const Polygon<T>& P, const Polygon<T>& Q) {
     auto reorder = [](Polygon<T> poly) {
         int pos = 0;
         rep(i, 1, (int)poly.size() - 1) {
-            if (cmp(poly[i].y, poly[pos].y) < 0 || (cmp(poly[i].y, poly[pos].y) == 0 && cmp(poly[i].x, poly[pos].x) < 0))
+            if (cmp(poly[i].y, poly[pos].y) < 0 ||
+                (cmp(poly[i].y, poly[pos].y) == 0 &&
+                 cmp(poly[i].x, poly[pos].x) < 0)) {
                 pos = i;
+            }
         }
         std::rotate(poly.begin(), poly.begin() + pos, poly.end());
         return poly;

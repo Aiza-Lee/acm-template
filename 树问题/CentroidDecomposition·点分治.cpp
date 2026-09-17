@@ -1,22 +1,32 @@
 #include "aizalib.h"
 /*
- * Centroid Decomposition (点分治框架)
+ * 点分治 (Centroid Decomposition)
  *
  * Overview:
- *     树上点分治通用框架。递归寻找当前连通块重心，通过回调函数统计跨重心的路径/子树贡献，
- *     随后标记重心已访问并递归分治各个子连通块。
+ *     基于树重心的分治算法框架，用于解决与无向树上路径或距离相关的离线统计问题。
+ *     - 树重心与深度保证：对于大小为 S 的无向连通块，其重心 c 满足删除 c
+ *       后产生的所有子连通块大小均不超过 S / 2。每次递归选取重心可保证分治树最大深度
+ *       严格不超过 log2(N)。
+ *     - 路径划分与容斥结构：任意树上路径要么完全落在某个子连通块内部（子问题），
+ *       要么跨越当前层重心 c（以 c 为端点或经过 c）。框架通过外部传入的回调函数
+ *       calc(c) 统计跨越 c 的贡献，然后将 c 标记为已删除（done[c] =
+ *       true）并递归分治所有相邻子块。
+ *     - 工具：CentroidDecomposition 结构、solve 分治驱动、get_size 与
+ *       get_centroid。
  *
  * API:
- *     CentroidDecomposition(n)   — 初始化包含 n 个节点的点分治结构体 (1-based)
- *     add_edge(u, v)             — 添加无向边 (u, v)
- *     solve(root, calc)          — 从 root 出发执行点分治，对每层重心调用 calc(c)
- *     get_size(u, fa = 0)        — 计算 u 所在未删除连通块大小
- *     get_centroid(u, fa, total) — 获取包含 u 的连通块重心
+ *     CentroidDecomposition(n)   — 初始化包含 n 个节点的点分治结构体（1-based）。
+ *     add_edge(u, v)             — 添加树上的无向边 (u, v)。
+ *     solve(root, calc)          — 从 root 出发执行分治，对每个分治重心调用
+ *                                   calc(c)。
+ *     get_size(u, fa = 0)        — 计算包含 u 的未删除连通块大小。
+ *     get_centroid(u, fa, total) — 寻找包含 u 且大小为 total 的连通块重心。
  *
  * Notes:
- *     1. 1-based indexing。
- *     2. Time: 框架分治深度 O(log N)，总框架开销 O(N log N)；Space: O(N)。
- *     3. 回调函数 calc(int c) 中可遍历 c 的出边访问未删除邻点（!done[v]），统计跨越 c 的答案。
+ *     1. 下标统一为 1-based。
+ *     2. Time: 分治树深度 O(log N)，框架总时间开销为 O(N log N)；Space: O(N)。
+ *     3. 回调函数 calc(int c) 中遍历 c 的邻接表时需检查 !done[v]，
+ *        避免跨越已分治节点。
  */
 
 struct CentroidDecomposition {
@@ -25,7 +35,8 @@ struct CentroidDecomposition {
     std::vector<int> siz;
     std::vector<bool> done;
 
-    CentroidDecomposition(int n) : n(n), adj(n + 1), siz(n + 1, 0), done(n + 1, false) {}
+    CentroidDecomposition(int n)
+        : n(n), adj(n + 1), siz(n + 1, 0), done(n + 1, false) {}
 
     void add_edge(int u, int v) {
         adj[u].push_back(v);

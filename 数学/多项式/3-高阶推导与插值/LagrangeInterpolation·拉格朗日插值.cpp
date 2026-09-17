@@ -1,9 +1,34 @@
+#include "aizalib.h"
 #include "0-base/Poly·多项式全家桶.hpp"
+/*
+ * Lagrange Interpolation (拉格朗日插值多项式与连续点单点求值)
+ *
+ * Overview:
+ *      求解过给定点集的拉格朗日插值。
+ *      1. lagrange_interpolation: 给定任意离散点集 (x_i, y_i)，通过多项式综合除法在
+ *         O(n^2) 时间内求出插值多项式的显式系数表示。
+ *      2. lagrange_consecutive: 当横坐标连续为 x_i = 0, 1, ..., n 时，
+ *         通过预处理前后缀积与阶乘逆元，在 O(n) 时间内求出多项式在任意远点 xi
+ *         处的单点点值。
+ *
+ * API:
+ *     lagrange_interpolation(x, y) — 给定离散点集，返回插值多项式 Poly，复杂度
+ *                                     O(n^2)。
+ *     lagrange_consecutive(y, xi)  — 给定 x=0..n 的点值，O(n) 求 P(xi)。
+ *
+ * Notes:
+ *      1. lagrange_consecutive 广泛用于自然数幂和、高阶差分序列的 O(k) 远项求值。
+ *
+ * Related:
+ *      数学/多项式/3-高阶推导与插值/FastInterpolation·多项式快速插值.cpp: O(n
+ *      log^2 n) 快速多项式插值。
+ */
+
 namespace poly_ext {
-// Lagrange Interpolation
-// Given points (x_i, y_i), return P(x)
-// O(n^2)
-inline Poly lagrange_interpolation(const std::vector<int>& x, const std::vector<int>& y) {
+
+inline Poly lagrange_interpolation(
+    const std::vector<int>& x, const std::vector<int>& y
+) {
     int n = x.size();
     Poly res(n);
 

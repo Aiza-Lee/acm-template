@@ -1,17 +1,25 @@
 #include "aizalib.h"
 
-/**
- * Euler Phi (单点欧拉函数)
- * 算法介绍: 通过试除分解求单个 n 的 phi(n)。
- * 模板参数: None
- * Interface:
- *      EulerPhi::phi(n) — 求 phi(n)，Time: O(sqrt(n))
- * Note:
- *      1. Time: O(sqrt(n))
- *      2. Space: O(1)
- *      3. 公式: phi(n) = n * product((p - 1) / p)，其中 p 枚举 n 的不同质因子
- *      4. 用法/技巧: 若要同时求很多数的 phi，请改用线性筛
- */
+/*
+ * Euler's Totient Function (单点欧拉函数)
+ *
+ * Overview:
+ *      计算正整数 n 的欧拉函数 phi(n)，即不超过 n 且与 n 互质的正整数个数。
+ *      利用算术基本定理 n = prod(p_i^{k_i})，根据积性性质得计算公式 phi(n) = n *
+ *      prod(1 - 1 / p_i) = prod(p_i^{k_i - 1} * (p_i - 1))。
+ *      采用试除法在 O(sqrt(n)) 时间内找出全部互异质因子。
+ *
+ * API:
+ *     phi(n) — 计算单个整数 n 的欧拉函数 phi(n)。复杂度 O(sqrt(n)) 时间，O(1)
+ *               空间。
+ *
+ * Notes:
+ *      1. 要求 n >= 1。特别地 phi(1) = 1。
+ *      2. 多次查询或批量计算请使用线性筛 EulerSieve。
+ *
+ * Related:
+ *      数学/数论/EulerSieve·线性筛.cpp: O(N) 批量预处理积性函数。
+  */
 struct EulerPhi {
     static i64 phi(i64 n) {
         AST(n >= 1);

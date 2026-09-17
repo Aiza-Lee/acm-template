@@ -1,4 +1,28 @@
 #include "aizalib.h"
+/*
+ * FFT Polynomial Multiplication (快速傅里叶变换多项式乘法)
+ *
+ * Overview:
+ *      基于复数域单位根的快速傅里叶变换 (Cooley-Tukey FFT) 算法。
+ *      实现双精度复数自定义结构体 comp，通过蝴蝶变换加速高精度/整数多项式卷积，
+ *      适用于无模数或实数域多项式乘法，结果四舍五入转为整型。
+ *
+ * API:
+ *     struct comp                           — 自定义复数结构体，支持复数加、减、乘。
+ *     FFT(tmp, n, type)                     — 长度为 n (2 的幂) 的原地 FFT / IFFT
+ *                                              (type = 1 为 DFT，-1 为 IDFT)。
+ *                                              复杂度 O(n log n)。
+ *     multiply_fft(a, b, deg_a, deg_b, res) — 对次数界为 deg_a, deg_b
+ *                                              的整型多项式进行 FFT 乘法，结果存入
+ *                                              res。复杂度 O(n log n)。
+ *
+ * Notes:
+ *      1. 数组长度需预留足够上限 N。
+ *      2. 浮点精度在数值极大（卷积结果超 10^14）时可能产生精度误差，大整数请用 MTT。
+ *
+ * Related:
+ *      数学/多项式/0-base/MTT·任意模数NTT.cpp: 任意模数防精度误差多项式乘法。
+ */
 
 const double pi = acos(-1.0);
 
@@ -7,7 +31,9 @@ struct comp {
     comp(double a = 0, double b = 0) : re(a), im(b) {}
     comp operator + (const comp& t) const { return {re + t.re, im + t.im}; }
     comp operator - (const comp& t) const { return {re - t.re, im - t.im}; }
-    comp operator * (const comp& t) const { return {re * t.re - im * t.im, re * t.im + im * t.re}; }
+    comp operator * (const comp& t) const {
+        return {re * t.re - im * t.im, re * t.im + im * t.re};
+    }
 };
 
 namespace Poly {
