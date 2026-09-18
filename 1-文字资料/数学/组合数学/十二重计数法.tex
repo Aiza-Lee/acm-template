@@ -1,0 +1,105 @@
+\textbf{十二重计数法 (The Twelvefold Way)}
+
+\textbf{术语与符号}
+\begin{itemize}
+	\item $n$：小球数（定义域集合 $N$，$|N|=n$）。
+	\item $m$：盒子数（陪域集合 $X$，$|X|=m$）。
+	\item $m^{\underline{n}} = \frac{m!}{(m-n)!}$：下降阶乘幂（排列数 $P(m, n)$），$n > m$ 时为 $0$。
+	\item $\binom{n}{m} = \frac{n!}{m!(n-m)!}$：组合数，约定 $n < m$ 或 $m < 0$ 时为 $0$。
+	\item $\left\{ \begin{matrix} n \\ m \end{matrix} \right\}$：第二类斯特林数 $S(n, m)$，将 $n$ 个不同元素划分为 $m$ 个非空无序子集的方案数。
+	\item $B_n = \sum_{k=0}^n \left\{ \begin{matrix} n \\ k \end{matrix} \right\}$：贝尔数（Bell number）。
+	\item $p(n)$：整数拆分数；$p_k(n)$：拆分成恰好 $k$ 个正整数的方案数；$p_{\le m}(n)$：拆分成不超过 $m$ 个正整数（或最大部不超过 $m$）的方案数。
+	\item Iverson 括号：$[P]$，命题 $P$ 为真时为 $1$，否则为 $0$。
+\end{itemize}
+
+\textbf{速查总表}
+
+计数映射 $f: N \to X$ 的方案数（$|N|=n, |X|=m$）：
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+球 ($N$) & 盒 ($X$) & 任意映射 (Any) & 至多一个 / 单射 ($\le 1$) & 至少一个 / 满射 ($\ge 1$) \\
+\hline
+不同 & 不同 & $m^n$ & $m^{\underline{n}}$ & $m! \left\{ \begin{matrix} n \\ m \end{matrix} \right\}$ \\
+\hline
+相同 & 不同 & $\binom{n+m-1}{m-1}$ & $\binom{m}{n}$ & $\binom{n-1}{m-1}$ \\
+\hline
+不同 & 相同 & $\sum_{k=1}^m \left\{ \begin{matrix} n \\ k \end{matrix} \right\}$ & $[n \le m]$ & $\left\{ \begin{matrix} n \\ m \end{matrix} \right\}$ \\
+\hline
+相同 & 相同 & $p_{\le m}(n)$ & $[n \le m]$ & $p_m(n) = p_{\le m}(n-m)$ \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{各情形详解与计算}
+
+\textbf{1. 球不同，盒不同}
+\begin{itemize}
+	\item \textbf{任意}：每个球独立选盒，方案数 $m^n$。快速幂 $O(\log n)$。
+	\item \textbf{至多一个 ($\le 1$)}：单射。从 $m$ 个盒中依次选出 $n$ 个分配给各球，方案数 $m^{\underline{n}} = \frac{m!}{(m-n)!}$（$n \le m$ 时）；$n > m$ 时为 $0$。预处理阶乘后 $O(1)$。
+	\item \textbf{至少一个 ($\ge 1$)}：满射。先划分为 $m$ 个非空集合再给盒标号，方案数 $m! \left\{ \begin{matrix} n \\ m \end{matrix} \right\}$（$n \ge m$ 时）；$n < m$ 时为 $0$。容斥公式展开为
+	\[
+	\sum_{j=0}^m (-1)^{m-j} \binom{m}{j} j^n
+	\]
+	单项计算 $O(m \log n)$；整行卷积计算 $O(m \log m)$。
+\end{itemize}
+
+\textbf{2. 球相同，盒不同}
+\begin{itemize}
+	\item \textbf{任意}：不定方程 $\sum_{i=1}^m x_i = n$ ($x_i \ge 0$) 的解数。隔板法，方案数 $\binom{n+m-1}{m-1} = \binom{n+m-1}{n}$。$O(1)$。
+	\item \textbf{至多一个 ($\le 1$)}：单射。从 $m$ 个不同盒中选取 $n$ 个放球，方案数 $\binom{m}{n}$（$n \le m$ 时）；$n > m$ 时为 $0$。$O(1)$。
+	\item \textbf{至少一个 ($\ge 1$)}：满射。不定方程 $\sum_{i=1}^m x_i = n$ ($x_i \ge 1$) 的解数。先每盒放 1 球或直接在 $n-1$ 个间隙插板，方案数 $\binom{n-1}{m-1}$（$n \ge m$ 时）；$n < m$ 时为 $0$。$O(1)$。
+\end{itemize}
+
+\textbf{3. 球不同，盒相同}
+\begin{itemize}
+	\item \textbf{任意}：枚举非空盒数 $k$ ($1 \le k \le m$)，方案数 $\sum_{k=1}^m \left\{ \begin{matrix} n \\ k \end{matrix} \right\}$（$n=0$ 时为 $1$；若 $m \ge n$ 则等于贝尔数 $B_n$）。NTT 卷积求第二类斯特林数行后前缀和，$O(m \log m)$。
+	\item \textbf{至多一个 ($\le 1$)}：单射。盒无标号，$n$ 个非空盒与 $m-n$ 个空盒不可区分，方案数 $[n \le m]$。$O(1)$。
+	\item \textbf{至少一个 ($\ge 1$)}：满射。即第二类斯特林数定义，方案数 $\left\{ \begin{matrix} n \\ m \end{matrix} \right\}$（$n \ge m$ 时）；$n < m$ 时为 $0$。容斥 $O(m \log n)$ 或 NTT 卷积 $O(m \log m)$。
+\end{itemize}
+
+\textbf{4. 球相同，盒相同}
+\begin{itemize}
+	\item \textbf{任意}：等价于将 $n$ 拆分成不超过 $m$ 个正整数之和，记为 $p_{\le m}(n)$。通过 Ferrers 图像共轭，亦等价于拆分中最大数不超过 $m$。等价于每盒预放 1 球：$p_{\le m}(n) = p_m(n+m)$。
+	\item \textbf{至多一个 ($\le 1$)}：单射。方案数 $[n \le m]$。$O(1)$。
+	\item \textbf{至少一个 ($\ge 1$)}：满射。等价于将 $n$ 拆分成恰好 $m$ 个正整数之和，记为 $p_m(n)$。每盒先放 1 球，剩余转为至多 $m$ 盒：$p_m(n) = p_{\le m}(n-m)$（$n \ge m$ 时）；$n < m$ 时为 $0$。
+\end{itemize}
+
+\textbf{整数拆分的递推与多项式加速}
+\begin{itemize}
+	\item \textbf{二维 DP 递推}：设 $f(n, m) = p_{\le m}(n)$ 表示 $n$ 个球放入至多 $m$ 个无标号盒（允许空盒）：
+	\[
+	f(n, m) = f(n, m-1) + f(n-m, m) \qquad (n \ge m)
+	\]
+	边界：$f(0, m) = 1$；当 $n < m$ 时，$f(n, m) = f(n, n)$。转移分别对应“至少有一个空盒”与“所有 $m$ 个盒均非空”。时空复杂度 $O(nm)$。
+	\item 恰好划分递推：$p_m(n) = p_{m-1}(n-1) + p_m(n-m)$（对应划分中最小数为 1 或大于 1）。
+	\item \textbf{生成函数与多项式 $\exp$}：
+	\[
+	F(x) = \sum_{n \ge 0} p_{\le m}(n) x^n = \prod_{i=1}^m \frac{1}{1-x^i}
+	\]
+	两边取对数展开：
+	\[
+	\ln F(x) = \sum_{i=1}^m -\ln(1-x^i) = \sum_{i=1}^m \sum_{k=1}^{\lfloor n/i \rfloor} \frac{x^{ik}}{k}
+	\]
+	调和级数累加系数用时 $O(n \ln m)$，再进行一次多项式 $\exp$，可在 $O(n \log n)$ 时间内求出 $p_{\le m}(0 \dots n)$。
+	\item \textbf{无限制拆分数 ($m \ge n$)}：$p_{\le m}(n) = p(n)$，生成函数为欧拉函数倒数 $\prod_{i=1}^\infty \frac{1}{1-x^i}$。由五边形数定理：
+	\[
+	\prod_{i=1}^\infty (1-x^i) = 1 + \sum_{k=1}^\infty (-1)^k \left(x^{k(3k-1)/2} + x^{k(3k+1)/2}\right)
+	\]
+	稀疏多项式求逆 $O(n \log n)$，或直接代入五边形数递推式 $O(n\sqrt{n})$。
+\end{itemize}
+
+\textbf{特例与边界}
+\begin{itemize}
+	\item $n = 0$：空映射 $f: \emptyset \to X$。任意与 $\le 1$ 均为 $1$；$\ge 1$ 在 $m=0$ 时为 $1$，$m>0$ 时为 $0$。
+	\item $m = 0$：当且仅当 $n = 0$ 时为 $1$，其余均为 $0$。
+	\item 鸽巢原理（Pigeonhole）：$n > m$ 时单射方案数必为 $0$；$n < m$ 时满射方案数必为 $0$。
+\end{itemize}
+
+\textbf{典型等价模型速查}
+\begin{itemize}
+	\item 映射计数：$f: N \to X$，单射对应至多 1 球，满射对应至少 1 球。
+	\item 不定方程整数解：$\sum_{i=1}^m x_i = n$，非负整数解对应球同盒异无限制，正整数解对应球同盒异非空。
+	\item 集合划分：将 $n$ 元集合划分为 $m$ 个非空块对应球异盒同非空（第二类斯特林数）。
+	\item 整数拆分：将正整数 $n$ 拆分为正整数之和对应球同盒同。
+\end{itemize}

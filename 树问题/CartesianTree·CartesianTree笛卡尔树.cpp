@@ -30,7 +30,7 @@
  */
 
 template<class T, class Compare>
-concept CartesianCompare = requires(Compare cmp, const T& a, const T& b) {
+concept CartesianCompare = requires(const Compare& cmp, const T& a, const T& b) {
     { cmp(a, b) } -> std::convertible_to<bool>;
 };
 
