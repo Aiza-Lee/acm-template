@@ -1,0 +1,53 @@
+\textbf{生成函数系数提取速查}
+
+\textbf{约定}
+普通生成函数（OGF）：$A(x)=\sum_{n\ge0}a_nx^n$。
+指数生成函数（EGF）：$\widehat A(x)=\sum_{n\ge0}a_nx^n/n!$。
+$[x^n]A(x)$ 表示 $x^n$ 的系数，$a_j=0$（$j<0$）。
+以下等式作为形式幂级数成立；含 $1/k$、$1/n!$ 的式子要求相应分母可逆
+（例如有理数域，或只截取到次数小于模素数 $p$ 的系数）。
+
+\textbf{常用级数（$n\ge0$）}
+\[
+[x^n]\frac1{1-cx}=c^n,\qquad
+[x^n](1+x)^\alpha=\binom{\alpha}{n}.
+\]
+若整数 $r\ge1$，
+\[
+[x^n](1-x)^{-r}=\binom{n+r-1}{r-1},\qquad
+[x^n]\frac{x}{(1-x)^2}=n.
+\]
+另有 $[x^0]\log\frac1{1-x}=0$，
+$[x^n]\log\frac1{1-x}=1/n$（$n\ge1$），
+$[x^n]e^{cx}=c^n/n!$。
+
+\textbf{OGF 的直接变换}
+设 $B(x)=\sum_{n\ge0}b_nx^n$，$s\ge0$：
+\[
+\begin{aligned}
+\relax[x^n]x^s A(x)&=a_{n-s},\\
+[x^n]A'(x)&=(n+1)a_{n+1},\qquad
+[x^n]xA'(x)=na_n,\\
+[x^n]A(x)B(x)&=\sum_{k=0}^n a_kb_{n-k},\\
+[x^n]\frac{A(x)}{1-x}&=\sum_{k=0}^n a_k.
+\end{aligned}
+\]
+二项式变换 $b_n=\sum_{k=0}^n\binom nk a_k$ 对应
+\[
+B(x)=\frac1{1-x}A\!\left(\frac{x}{1-x}\right).
+\]
+这些关系分别对应移位、乘以下标、卷积、前缀和与二项式变换。
+
+\textbf{EGF：有标号对象的乘积}
+若 $\widehat C(x)=\widehat A(x)\widehat B(x)$，则
+\[
+c_n=\sum_{k=0}^n\binom nk a_kb_{n-k}.
+\]
+若 $\widehat A(0)=0$，有标号集合构造对应 $\exp(\widehat A(x))$，
+有标号序列构造对应 $1/(1-\widehat A(x))$。
+读取 EGF 系数时须乘回 $n!$：$a_n=n![x^n]\widehat A(x)$。
+
+\textbf{选用提示}
+无标号对象做有序拼接时先考虑 OGF；拆分 $n$ 个不同标号到两个部件时
+出现 $\binom nk$，先考虑 EGF。遇到大下标常系数递推，
+先化为有理生成函数，再参见 \texttt{数学/多项式/Bostan-Mori.tex}。

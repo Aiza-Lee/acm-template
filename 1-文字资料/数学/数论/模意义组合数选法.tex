@@ -1,0 +1,42 @@
+\textbf{模意义组合数选法}
+
+\textbf{输入与边界}
+求 $\binom nk\bmod M$，其中 $n,k\ge0$、$M\ge1$。
+$k>n$ 时结果为 $0$；$M=1$ 时结果为 $0$。
+以下默认 $0\le k\le n$，可先令 $k\leftarrow\min(k,n-k)$。
+
+\textbf{模素数 $p$}
+\begin{itemize}
+    \item 若 $n<p$ 且要回答多次查询：预处理 $0,\ldots,n$ 的阶乘和逆阶乘，
+    单次 $\binom nk=n!/(k!(n-k)!)\pmod p$ 可在 $O(1)$ 求得。
+    \item 若 $n\ge p$：使用 Lucas 定理。写
+    $n=\sum_i n_ip^i$、$k=\sum_i k_ip^i$，则
+    $\binom nk\equiv\prod_i\binom{n_i}{k_i}\pmod p$；
+    某位 $k_i>n_i$ 即为 $0$。
+    \item 若 $k<p$ 且 $k$ 很小，也可直接计算
+    $\prod_{j=0}^{k-1}(n-j)/(k-j)\pmod p$；
+    分母均与 $p$ 互质。一般 $k\ge p$ 时不能这样逐项取逆。
+\end{itemize}
+Lucas 的位数为 $O(\log_p n)$；每位组合数可用长度 $p$ 的阶乘表，
+或按较小下指标逐项相乘。若 $p$ 很大，预处理整张表未必可行。
+
+\textbf{模合数 $M$}
+分解 $M=\prod_i p_i^{e_i}$，先分别计算
+$\binom nk\bmod p_i^{e_i}$，再用中国剩余定理合并。
+计算模 $p^e$ 时先求
+\[
+v_p\!\left(\binom nk\right)
+=\sum_{j\ge1}\left(
+\left\lfloor\frac n{p^j}\right\rfloor
+-\left\lfloor\frac k{p^j}\right\rfloor
+-\left\lfloor\frac{n-k}{p^j}\right\rfloor\right).
+\]
+若此值 $\ge e$，结果为 $0$；否则剥离阶乘中的所有 $p$ 因子，
+只对剩余的可逆部分求逆，最后乘回 $p^{v_p}$。
+可参见 \texttt{数学/数论/ExLucas·扩展Lucas.cpp}；
+该实现按各质数幂大小预处理，质数幂很大时不适合直接套用。
+
+\textbf{常见误用}
+模合数时，即使 $n<M$，$k!$ 也可能没有模逆元；
+模素数但 $n\ge p$ 时，直接套阶乘逆元公式同样会遇到 $n!\equiv0\pmod p$。
+先检查分母是否可逆，再决定是否使用阶乘公式。

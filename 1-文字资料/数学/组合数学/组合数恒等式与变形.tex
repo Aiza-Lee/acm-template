@@ -1,0 +1,283 @@
+\textbf{组合数恒等式与变形 (Binomial Identities and Transformations)}
+
+\textbf{术语与符号约定}
+\begin{itemize}
+    \item 普通组合数：$\binom{n}{k} = \frac{n!}{k!(n-k)!}$（$n,k$ 为非负整数，$0\le k\le n$）。约定 $k < 0$ 或 $k > n$ 时 $\binom{n}{k} = 0$。
+    \item 广义二项式系数（下降阶乘幂形式）：对任意实数/复数 $r$ 及整数 $k \ge 0$：
+    \[
+    \binom{r}{k} = \frac{r^{\underline{k}}}{k!} = \frac{r(r-1)\cdots(r-k+1)}{k!}, \quad k < 0 \text{ 时约定为 } 0.
+    \]
+    \item 对称性：$\binom{n}{k} = \binom{n}{n-k}$（仅在非负整数 $n \ge 0$ 时成立；上指标非整数/负数时不成立）。
+    \item Iverson 括号：$[P]$，命题 $P$ 为真时为 $1$，否则为 $0$。
+\end{itemize}
+
+\textbf{一、核心单项与吸收恒等式 (Absorption \& Extraction)}
+\begin{enumerate}
+    \item \textbf{吸收恒等式 (提因子)}：
+    \[
+    \binom{r}{k} = \frac{r}{k} \binom{r-1}{k-1} \quad (k \neq 0) \iff k \binom{r}{k} = r \binom{r-1}{k-1}
+    \]
+    用于将多项式系数 $k$ 吸收进组合数，或从组合数中提取标量。
+    \item \textbf{伴随吸收律}：
+    \[
+    (r-k) \binom{r}{k} = r \binom{r-1}{k}
+    \]
+    \item \textbf{分母吸收律}：
+    \[
+    \frac{1}{k+1} \binom{r}{k} = \frac{1}{r+1} \binom{r+1}{k+1}
+    \]
+    其中 $k\ge0$ 且 $r\ne-1$；模意义使用时还须保证分母可逆。
+    \item \textbf{交叉乘积展开 / 双项吸收 (Trinomial Revision)}：
+    \[
+    \binom{r}{m} \binom{m}{k} = \binom{r}{k} \binom{r-k}{m-k}
+    \]
+    特别地，当 $n, m, k$ 为整数时：
+    \[
+    \binom{n}{m} \binom{m}{k} = \binom{n}{k} \binom{n-k}{n-m}
+    \]
+    \textbf{解题技巧}：在双重和式 $\sum_m \binom{n}{m} \binom{m}{k} f(m)$ 中，指标 $m$ 出现在两个组合数中；应用此式可将 $m$ 隔离到单个组合数 $\binom{n-k}{m-k}$ 内，使 $\binom{n}{k}$ 提到外层，解耦求和。
+\end{enumerate}
+
+\textbf{二、加法递推与基本求和 (Addition \& Summations)}
+\begin{enumerate}
+    \item \textbf{帕斯卡公式 (Pascal's Recurrence)}：
+    \[
+    \binom{r}{k} = \binom{r-1}{k} + \binom{r-1}{k-1}
+    \]
+    \item \textbf{上指标求和 (朱世杰恒等式 / 曲棍球棒恒等式)}：
+    \[
+    \sum_{i=0}^n \binom{i}{k} = \sum_{i=k}^n \binom{i}{k} = \binom{n+1}{k+1} \quad (k \ge 0)
+    \]
+    区间形式：$\sum_{i=l}^n \binom{i}{k} = \binom{n+1}{k+1} - \binom{l}{k+1}$。
+    \item \textbf{对角线求和 (平移求和)}：
+    \[
+    \sum_{k=0}^m \binom{n+k}{k} = \sum_{k=0}^m \binom{n+k}{n} = \binom{n+m+1}{m}
+    \]
+    \item \textbf{行和与奇偶行和}：
+    \[
+    \sum_{k=0}^n \binom{n}{k} = 2^n, \qquad \sum_{k=0}^n (-1)^k \binom{n}{k} = [n = 0]
+    \]
+    \[
+    \sum_{k \text{ 偶}} \binom{n}{k} = \sum_{k \text{ 奇}} \binom{n}{k} = 2^{n-1} \quad (n \ge 1)
+    \]
+    \item \textbf{交错前缀和}：
+    \[
+    \sum_{k=0}^m (-1)^k \binom{n}{k} = (-1)^m \binom{n-1}{m} \quad (n \ge 1)
+    \]
+\end{enumerate}
+
+\textbf{三、上指标翻转 (Negating the Upper Index)}
+\begin{enumerate}
+    \item \textbf{翻转恒等式}：
+    \[
+    \binom{-r}{k} = (-1)^k \binom{r+k-1}{k}
+    \]
+    等价形式：
+    \[
+    \binom{r}{k} = (-1)^k \binom{k-r-1}{k}
+    \]
+    \textbf{解题技巧}：
+    \begin{itemize}
+        \item 消除交错符号：$(-1)^k \binom{n}{k} = \binom{k-n-1}{k}$。
+        \item 指标对齐：当求和式中 $k$ 同时作为上指标与下指标（如 $\binom{m-k}{k}$ 或 $\binom{n+k}{k}$）时，翻转可使上指标变为常数，转化为单指标求和。
+    \end{itemize}
+\end{enumerate}
+
+\textbf{四、多项式加权行和 (Polynomial-Weighted Sums)}
+\begin{enumerate}
+    \item \textbf{下降阶乘幂加权}：
+    \[
+    \sum_{k=0}^n k^{\underline{m}} \binom{n}{k} = n^{\underline{m}} 2^{n-m} \quad (n \ge m)
+    \]
+    交错形式：
+    \[
+    \sum_{k=0}^n (-1)^k k^{\underline{m}} \binom{n}{k} = (-1)^n n! [n = m]
+    \]
+    \item \textbf{普通幂加权（结合第二类斯特林数）}：
+    将普通幂化为下降幂：
+    \[
+    k^p = \sum_{j=0}^p \left\{ \begin{matrix} p \\ j \end{matrix} \right\} k^{\underline{j}}
+    \]
+    \[
+    \sum_{k=0}^n k^p \binom{n}{k} = \sum_{j=0}^{\min(n, p)} \left\{ \begin{matrix} p \\ j \end{matrix} \right\} n^{\underline{j}} 2^{n-j}
+    \]
+    常见低阶形式：
+    \[
+    \sum_{k=0}^n k \binom{n}{k} = n 2^{n-1}, \qquad \sum_{k=0}^n k^2 \binom{n}{k} = n(n+1) 2^{n-2}
+    \]
+    \item \textbf{交错普通幂行和 (斯特林反演/容斥本质)}：
+    \[
+    \sum_{k=0}^n (-1)^{n-k} \binom{n}{k} k^p = n! \left\{ \begin{matrix} p \\ n \end{matrix} \right\}
+    \]
+    当 $p < n$ 时和为 $0$；当 $p = n$ 时为 $n!$；当 $p = n+1$ 时为 $\binom{n+1}{2} n!$。
+\end{enumerate}
+
+\textbf{五、范德蒙德卷积及其各种变形 (Vandermonde's Convolution)}
+\begin{enumerate}
+    \item \textbf{标准范德蒙德卷积}：
+    \[
+    \sum_{k} \binom{r}{k} \binom{s}{n-k} = \binom{r+s}{n}
+    \]
+    其中 $r,s$ 为复数，$n$ 为非负整数；求和遍历使两项下指标非负的整数 $k$。
+    \item \textbf{变体 1：下指标差为定值}：
+    \[
+    \sum_{k} \binom{r}{k} \binom{s}{k+m} = \binom{r+s}{r+m} = \binom{r+s}{s-m}
+    \]
+    其中 $r,s$ 为非负整数，$m$ 为整数。
+    \item \textbf{变体 2：平方和与乘积和}：
+    \[
+    \sum_{k=0}^n \binom{n}{k}^2 = \binom{2n}{n}, \qquad \sum_{k=0}^n \binom{n}{k} \binom{n}{k+d} = \binom{2n}{n-d}
+    \]
+    \item \textbf{变体 3：交错平方和}：
+    \[
+    \sum_{k=0}^{2n} (-1)^k \binom{2n}{k}^2 = (-1)^n \binom{2n}{n}, \qquad \sum_{k=0}^{2n+1} (-1)^k \binom{2n+1}{k}^2 = 0
+    \]
+    \item \textbf{变体 4：旋转范德蒙德 (上指标自变量求和)}：
+    \[
+    \sum_{k=0}^{n-a} \binom{n-k}{a} \binom{s+k}{k} = \binom{n+s+1}{n-a}
+    \quad (n,s\ge 0,\ 0\le a\le n)
+    \]
+    等价紧凑形式：
+    \[
+    \sum_{k=0}^{m} \binom{r-k}{m-k} \binom{s+k}{k} = \binom{r+s+1}{m}
+    \quad (r,s\ge 0,\ 0\le m\le r)
+    \]
+    \item \textbf{变体 5：带权范德蒙德卷积}：
+    利用吸收律消去线性项：
+    \[
+    \sum_{k=0}^n k \binom{r}{k} \binom{s}{n-k} = r \binom{r+s-1}{n-1}
+    \]
+    \[
+    \sum_{k=0}^n (ak + b) \binom{r}{k} \binom{s}{n-k} = a r \binom{r+s-1}{n-1} + b \binom{r+s}{n}
+    \]
+\end{enumerate}
+
+\textbf{六、罕见与高阶恒等式 (Rare \& Advanced Identities)}
+\begin{enumerate}
+    \item \textbf{狄克松恒等式 (Dixon's Identity)}：
+    对非负整数 $a,b,c$，三个二项式系数对称交错求和：
+    \[
+    \sum_{k=-a}^a (-1)^k \binom{2a}{a+k} \binom{2b}{b+k} \binom{2c}{c+k} = \frac{(a+b+c)! (2a)! (2b)! (2c)!}{a! b! c! (a+b)! (b+c)! (c+a)!}
+    \]
+    \textbf{特例：立方交错和} ($a = b = c = n$)：
+    \[
+    \sum_{k=0}^{2n} (-1)^k \binom{2n}{k}^3 = (-1)^n \frac{(3n)!}{(n!)^3}
+    \]
+    奇数阶交错和恒为 $0$：$\sum_{k=0}^{2n+1} (-1)^k \binom{2n+1}{k}^3 = 0$。
+    \item \textbf{阿贝尔二项式定理 (Abel's Binomial Theorem)}：
+    处理带有内部平移因子的卷积；下式要求 $n\ge0$、$x\ne0$：
+    \[
+    \sum_{k=0}^n \binom{n}{k} (x + kz)^{k-1} (y + (n-k)z)^{n-k} = \frac{(x+y+nz)^n}{x}
+    \]
+    对称形式（Hurwitz 恒等式）要求 $x,y\ne0$：
+    \[
+    \sum_{k=0}^n \binom{n}{k} x (x+kz)^{k-1} y (y+(n-k)z)^{n-k-1} = (x+y) (x+y+nz)^{n-1}
+    \]
+    \textbf{Cayley 树计数应用}：带标号有根树森林卷积（$n\ge2$）：
+    \[
+    \sum_{k=1}^{n-1} \binom{n}{k} k^{k-1} (n-k)^{n-k-1} = 2(n-1)n^{n-2}
+    \]
+    \item \textbf{普法夫-萨尔舒茨恒等式 (Pfaff-Saalschütz Theorem)}：
+    终止平衡超几何级数 $_3F_2$ 的闭形式。令 $(x)_k=x(x+1)\cdots(x+k-1)$、$(x)_0=1$，则
+    \[
+    \sum_{k=0}^n \frac{(-n)_k (a)_k (b)_k}{k! (c)_k (1+a+b-c-n)_k} = \frac{(c-a)_n (c-b)_n}{(c)_n (c-a-b)_n}
+    \]
+    其中 $n\ge 0$，所有出现的分母均须非零；不满足时不能直接代入。
+    \item \textbf{分母含二项式系数的倒数求和 (Reciprocal Binomial Sums)}：
+    \begin{itemize}
+        \item 倒数前缀和：
+        \[
+        \sum_{k=0}^n \frac{1}{\binom{n}{k}} = \frac{n+1}{2^{n+1}} \sum_{i=1}^{n+1} \frac{2^i}{i}
+        \]
+        \item 交错倒数和：
+        \[
+        \sum_{k=0}^n \frac{(-1)^k}{\binom{n}{k}} = \frac{n+1}{n+2} (1 + (-1)^n)
+        \]
+        \item \textbf{Beta 积分变换 (核心化简工具)}：
+        \[
+        \frac{1}{\binom{n}{k}} = (n+1) \int_0^1 t^k (1-t)^{n-k} \, dt
+        \]
+        其中 $n\ge0$、$0\le k\le n$。
+        遇到形如 $\sum_k f(k) / \binom{n}{k}$ 的和式时，将上式代入并交换积分与求和符号，离散和式立即转化为连续函数的定积分或等比级数积分。
+    \end{itemize}
+    \item \textbf{高斯二项式系数 ($q$-Binomial Coefficients / $q$-模拟)}：
+    将 $q$ 视为形式变量，$n\ge0$、$0\le k\le n$。定义
+    $q$-整数 $[n]_q = \frac{1-q^n}{1-q}$，$q$-阶乘
+    $[n]!_q = \prod_{i=1}^n [i]_q$：
+    \[
+    \binom{n}{k}_q = \frac{[n]!_q}{[k]!_q [n-k]!_q} = \frac{\prod_{i=1}^n (1-q^i)}{\prod_{i=1}^k (1-q^i) \prod_{i=1}^{n-k} (1-q^i)}
+    \]
+    $q$-Pascal 递推（两种不对称形式）：
+    \[
+    \binom{n}{k}_q = q^k \binom{n-1}{k}_q + \binom{n-1}{k-1}_q = \binom{n-1}{k}_q + q^{n-k} \binom{n-1}{k-1}_q
+    \]
+    $q$-二项式定理：
+    \[
+    \prod_{i=0}^{n-1} (1 + q^i x) = \sum_{k=0}^n q^{\binom{k}{2}} \binom{n}{k}_q x^k, \qquad \prod_{i=0}^\infty \frac{1}{1 - q^i x} = \sum_{k=0}^\infty \frac{x^k}{(q; q)_k}
+    \]
+    其中 $(q; q)_k = \prod_{j=1}^k (1-q^j)$。
+    组合意义：$q$ 为素数幂时，$q$ 元有限域的 $n$ 维向量空间中
+    $k$ 维子空间的数目；网格路径反序对计数。代入 $q=1$ 时取极限，得到普通组合数。
+\end{enumerate}
+
+\textbf{七、单位根滤波与多步长采样 (Roots of Unity Filter)}
+\begin{enumerate}
+    \item \textbf{单位根滤波通式}：
+    设 $m\ge1$、$n\ge0$、$r$ 为整数，$\omega = e^{2\pi i / m}$ 为
+    $m$ 次本原单位根，提取下指标模 $m$ 余 $r$ 的项：
+    \[
+    \sum_{k \equiv r \pmod m} \binom{n}{k} = \frac{1}{m} \sum_{j=0}^{m-1} \omega^{-j r} (1 + \omega^j)^n
+    \]
+    \item \textbf{常用低阶实数封闭形式}：
+    \begin{itemize}
+        \item $m=2$：$\sum_{k} \binom{n}{2k} = 2^{n-1}$ ($n \ge 1$)。
+        \item $m=3$：
+        \[
+        \sum_{k} \binom{n}{3k} = \frac{1}{3} \left[ 2^n + 2 \cos\left(\frac{n\pi}{3}\right) \right]
+        \]
+        \item $m=4$：
+        \[
+        \sum_{k} \binom{n}{4k} = \frac{1}{4} \left[ 2^n + 2^{(n+2)/2} \cos\left(\frac{n\pi}{4}\right) \right]\quad(n\ge1)
+        \]
+    \end{itemize}
+\end{enumerate}
+
+\textbf{八、斐波那契数与组合数恒等式}
+设 $F_0=0$、$F_1=1$，$F_{i+2}=F_{i+1}+F_i$。
+\begin{enumerate}
+    \item \textbf{斜向对角求和}：
+    \[
+    \sum_{k=0}^{\lfloor n/2 \rfloor} \binom{n-k}{k} = F_{n+1}
+    \]
+    \item \textbf{二项加权和}：
+    \[
+    \sum_{k=0}^n \binom{n}{k} F_k = F_{2n}, \qquad \sum_{k=0}^n \binom{n}{k} 2^k F_k = F_{3n}
+    \]
+    通项形式：$\sum_{k=0}^n \binom{n}{k} F_{m-1}^{n-k} F_m^k F_{k+r} = F_{mn+r}$（$m\ge1$、$n,r\ge0$，空幂按 $u^0=1$）。
+\end{enumerate}
+
+\textbf{九、数论性质速查 (Number Theoretic Properties)}
+\begin{enumerate}
+    \item \textbf{卢卡斯定理 (Lucas' Theorem)}：
+    设质数 $p$，$n, k$ 的 $p$ 进制展开为 $n = \sum a_i p^i, k = \sum b_i p^i$：
+    \[
+    \binom{n}{k} \equiv \prod_{i} \binom{a_i}{b_i} \pmod p
+    \]
+    \item \textbf{奇偶性判据 ($p=2$)}：
+    \[
+    \binom{n}{k} \equiv 1 \pmod 2 \iff (k \text{ AND } n) = k
+    \]
+    即 $\binom{n}{k}$ 为奇数当且仅当 $k$ 在二进制下的非零位是 $n$ 的子集。
+    \item \textbf{库默尔定理 (Kummer's Theorem)}：
+    质数 $p$ 在 $\binom{n}{k}$ 中的素因子次数 $\nu_p\left(\binom{n}{k}\right)$ 等于计算 $k + (n-k)$ 在 $p$ 进制加法下的\textbf{进位次数}。
+\end{enumerate}
+
+\textbf{十、解题化简模式速查字典 (Reduction Paradigms)}
+\begin{itemize}
+    \item \textbf{模式 1：消去多项式系数} $\to$ 用斯特林数将多项式转为下降幂，再用 $k^{\underline{m}} \binom{n}{k} = n^{\underline{m}} \binom{n-m}{k-m}$ 吸收变量。
+    \item \textbf{模式 2：双指标交织} $\to$ 用交叉吸收 $\binom{n}{m} \binom{m}{k} = \binom{n}{k} \binom{n-k}{m-k}$ 提取与内层求和无关的组合数。
+    \item \textbf{模式 3：上下指标同向变动} $\to$ 用上指标翻转 $\binom{r}{k} = (-1)^k \binom{k-r-1}{k}$ 将变化指标固定到同一侧，套用范德蒙德卷积。
+    \item \textbf{模式 4：分母组合数} $\to$ 代入 Beta 积分 $\frac{1}{\binom{n}{k}} = (n+1) \int_0^1 t^k (1-t)^{n-k} \, dt$ 交换和号与积分号。
+    \item \textbf{模式 5：大跨步周期求和} $\to$ 利用单位根滤波构造本原单位根的幂次多项式线性组合。
+    \item \textbf{模式 6：生成函数系数提取} $\to$ 无法直接化简时化为 $\binom{n}{k} = [x^k] (1+x)^n$ 或 $\binom{n+k}{k} = [x^k] (1-x)^{-n-1}$，转为多项式封闭运算。
+\end{itemize}

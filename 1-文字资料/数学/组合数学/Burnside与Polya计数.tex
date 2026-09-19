@@ -1,0 +1,48 @@
+\textbf{Burnside 引理与 Pólya 计数}
+
+\textbf{术语与适用条件}
+有限群 $G$ 作用于有限集合 $X$；等价类（轨道）是对称操作下可互相变换的对象。
+$\operatorname{Fix}(g)=\{x\in X:g\cdot x=x\}$。
+先明确允许的对称操作：只允许旋转得到项链；旋转和翻转都允许得到手镯。
+
+\textbf{Burnside 引理}
+\[
+|X/G|=\frac{1}{|G|}\sum_{g\in G}|\operatorname{Fix}(g)|.
+\]
+若位置可独立使用 $q$ 种颜色，置换 $g$ 分成 $c(g)$ 个循环，则
+$|\operatorname{Fix}(g)|=q^{c(g)}$；同一循环上的所有位置必须同色。
+
+\textbf{长度 $n$ 的环染色（$n\ge 1$）}
+仅将旋转视为相同。旋转 $j$ 格有 $\gcd(n,j)$ 个循环，因此
+\[
+N_{\mathrm{rot}}(n,q)
+=\frac{1}{n}\sum_{j=0}^{n-1}q^{\gcd(n,j)}
+=\frac{1}{n}\sum_{d\mid n}\varphi(d)q^{n/d}.
+\]
+若翻转也视为相同，再加入 $n$ 个反射并除以 $2n$：
+\[
+N_{\mathrm{dihedral}}(n,q)=
+\begin{cases}
+\displaystyle\frac{1}{2n}\left(\sum_{d\mid n}\varphi(d)q^{n/d}
+ nq^{(n+1)/2}\right),&n\text{ 为奇数},\\[6pt]
+\displaystyle\frac{1}{2n}\left(\sum_{d\mid n}\varphi(d)q^{n/d}
+ \frac n2 q^{n/2+1}+\frac n2 q^{n/2}\right),&n\text{ 为偶数}.
+\end{cases}
+\]
+偶数长度的两类反射分别经过一对对顶位置、经过一对对边。
+
+\textbf{颜色用量固定时}
+设颜色 $i$ 恰用 $m_i$ 次，$\sum_i m_i=n$。若置换 $g$ 的循环长度为
+$\ell_1,\ldots,\ell_t$，则固定染色数为
+\[
+\left[\prod_i z_i^{m_i}\right]
+\prod_{j=1}^{t}\left(\sum_i z_i^{\ell_j}\right).
+\]
+将这个固定染色数代入 Burnside 公式；不能再直接使用 $q^{c(g)}$。
+
+\textbf{速查提醒}
+\begin{itemize}
+    \item 有标号位置、不允许对称识别：直接计数；允许哪些变换必须由题意指定。
+    \item 模 $M$ 计算时，若 $\gcd(M,|G|)>1$，不能直接用模逆元除以 $|G|$。
+    可先算整数和；或先求固定染色数之和模 $M|G|$，再整除 $|G|$ 得到模 $M$ 的答案。
+\end{itemize}

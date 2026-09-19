@@ -1,0 +1,53 @@
+\textbf{概率与期望速查}
+
+\textbf{适用条件}
+除特别说明外，随机变量可积；涉及方差时要求二阶矩有限。
+$[P]$ 为事件 $P$ 的指示变量。独立性只在明确写出时使用。
+
+\textbf{指示变量与线性性}
+\[
+\operatorname{E}[X]=\sum_i\operatorname{E}[X_i]\quad(X=\sum_iX_i),\qquad
+\operatorname{E}[[P]]=\Pr(P).
+\]
+求“满足某性质的对象个数”时，给每个候选对象建指示变量再求和；
+各事件无须独立。
+例如均匀随机排列 $n\ge1$ 个元素，固定点期望为
+$n\cdot(1/n)=1$；逆序对期望为 $\binom n2/2$。
+
+\textbf{整数等待时间的尾和公式}
+若 $T$ 为非负整数值随机变量，
+\[
+\operatorname{E}[T]=\sum_{k\ge1}\Pr(T\ge k)
+=\sum_{k\ge0}\Pr(T>k),
+\]
+右侧允许取 $+\infty$。几何等待时间 $T\in\{1,2,\ldots\}$，
+每轮独立成功概率 $p\in(0,1]$ 时，
+$\Pr(T>k)=(1-p)^k$，故 $\operatorname{E}[T]=1/p$。
+
+\textbf{条件期望与方差}
+若 $A_1,\ldots,A_m$ 是概率为正的有限划分，则
+\[
+\operatorname{E}[X]=\sum_{i=1}^m\Pr(A_i)\operatorname{E}[X\mid A_i].
+\]
+\[
+\begin{aligned}
+\operatorname{Var}(X)&=\operatorname{E}[X^2]-\operatorname{E}[X]^2,\\
+\operatorname{Var}\!\left(\sum_iX_i\right)
+&=\sum_i\operatorname{Var}(X_i)
++2\sum_{i<j}\operatorname{Cov}(X_i,X_j).
+\end{aligned}
+\]
+相互独立或两两协方差为 $0$ 时，方差可直接相加；一般需保留协方差项。
+
+\textbf{集齐所有种类的期望时间}
+每次独立抽取 $n\ge1$ 种之一，均匀分布时，
+\[
+\operatorname{E}[T]=nH_n=n\sum_{k=1}^{n}\frac1k.
+\]
+若第 $i$ 种概率 $p_i>0$，$\sum_i p_i=1$，则容斥给出
+\[
+\operatorname{E}[T]=
+\sum_{\emptyset\ne S\subseteq[n]}
+(-1)^{|S|+1}\frac1{\sum_{i\in S}p_i}.
+\]
+该式枚举 $2^n-1$ 个非空子集；概率为 $0$ 的必需种类会使期望无穷大。
