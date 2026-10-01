@@ -1,0 +1,71 @@
+\textbf{分数的最大公约数与最小公倍数}
+
+\textbf{符号与前提}
+设 $x = \frac{a}{b}, y = \frac{c}{d} \in \mathbb{Q}_{>0}$ 为正有理数。
+\begin{itemize}
+\item \textbf{强制前提}：所有分数在计算前必须化为\textbf{既约分数}（最简分数），即
+\[
+\gcd(a, b) = 1,\quad \gcd(c, d) = 1,\quad b > 0,\; d > 0.
+\]
+若未化简直接代入公式会导致公因数偏小或公倍数偏大。
+\end{itemize}
+
+\textbf{整除定义}
+对有理数 $u, v \in \mathbb{Q}_{>0}$，称 $v$ 整除 $u$（记作 $v \mid u$），当且仅当
+\[
+\frac{u}{v} \in \mathbb{Z}^+.
+\]
+\begin{itemize}
+\item \textbf{最大公约数 $\gcd(x, y)$}：满足 $g \mid x$ 且 $g \mid y$ 的最大正有理数 $g$。
+\item \textbf{最小公倍数 $\operatorname{lcm}(x, y)$}：满足 $x \mid L$ 且 $y \mid L$ 的最小正有理数 $L$。
+\end{itemize}
+
+\textbf{核心公式}
+\begin{itemize}
+\item \textbf{两数计算}：
+\[
+\gcd\left(\frac{a}{b}, \frac{c}{d}\right) = \frac{\gcd(a, c)}{\operatorname{lcm}(b, d)}
+\]
+\[
+\operatorname{lcm}\left(\frac{a}{b}, \frac{c}{d}\right) = \frac{\operatorname{lcm}(a, c)}{\gcd(b, d)}
+\]
+\item \textbf{多元推广}：对既约分数 $\frac{a_1}{b_1}, \frac{a_2}{b_2}, \dots, \frac{a_k}{b_k}$，
+\[
+\gcd\left(\frac{a_1}{b_1}, \dots, \frac{a_k}{b_k}\right) = \frac{\gcd(a_1, \dots, a_k)}{\operatorname{lcm}(b_1, \dots, b_k)}
+\]
+\[
+\operatorname{lcm}\left(\frac{a_1}{b_1}, \dots, \frac{a_k}{b_k}\right) = \frac{\operatorname{lcm}(a_1, \dots, a_k)}{\gcd(b_1, \dots, b_k)}
+\]
+\end{itemize}
+
+\textbf{核心性质与等价刻画}
+\begin{itemize}
+\item \textbf{乘积恒等式}：
+\[
+\gcd(x, y) \cdot \operatorname{lcm}(x, y) = x \cdot y.
+\]
+\item \textbf{$p$ 进赋值视角 ($p$-adic valuation)}：
+对素数 $p$，定义有理数的赋值 $v_p\left(\frac{a}{b}\right) = v_p(a) - v_p(b) \in \mathbb{Z}$。则
+\[
+v_p(\gcd(x, y)) = \min(v_p(x), v_p(y)),\qquad v_p(\operatorname{lcm}(x, y)) = \max(v_p(x), v_p(y)).
+\]
+\item \textbf{有理数格与裴蜀定理 (Additive Group / Lattice)}：
+在 $\mathbb{Q}$ 的加法群中，由 $\frac{a}{b}, \frac{c}{d}$ 生成的离散 $\mathbb{Z}$-模满足
+\[
+\mathbb{Z}\frac{a}{b} + \mathbb{Z}\frac{c}{d} = \mathbb{Z}\cdot \gcd\left(\frac{a}{b}, \frac{c}{d}\right).
+\]
+即存在整数 $u, v \in \mathbb{Z}$ 使得 $u\frac{a}{b} + v\frac{c}{d} = \gcd\left(\frac{a}{b}, \frac{c}{d}\right)$，且该式右端为非平凡线性组合生成的最小正有理数。
+\item \textbf{通分转化法}：
+令分母的最小公倍数 $M = \operatorname{lcm}(b, d)$，将各数化为同分母：
+\[
+\gcd\left(\frac{a}{b}, \frac{c}{d}\right) = \frac{\gcd\left(a \cdot \frac{M}{b},\; c \cdot \frac{M}{d}\right)}{M}.
+\]
+\end{itemize}
+
+\textbf{快记与常见场景}
+\begin{itemize}
+\item \textbf{口诀}：求公约数，分子求 $\gcd$ 分母求 $\operatorname{lcm}$；求公倍数，分子求 $\operatorname{lcm}$ 分母求 $\gcd$。
+\item \textbf{常见场景 1（同相重合周期）}：多个质点沿环形轨道以有理速度/周期运动，全系统同相重合周期为各运动周期的 $\operatorname{lcm}$。
+\item \textbf{常见场景 2（有理步长对齐）}：在实数轴或网格上使用多种有理步长移动，所能精确到达的点集构成的网格步长恰为各步长的 $\gcd$。
+\item \textbf{易错警示}：务必先约分！例：$\frac{2}{4}$ 与 $\frac{3}{6}$ 若不约分算得 $\frac{\gcd(2,3)}{\operatorname{lcm}(4,6)} = \frac{1}{12}$，而实际约分后均为 $\frac{1}{2}$，其 $\gcd = \frac{1}{2}$。
+\end{itemize}
