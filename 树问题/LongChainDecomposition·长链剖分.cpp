@@ -70,7 +70,7 @@ struct LongChainDecomposition {
     LongChainDecomposition(const Graph& G, int root = 1)
         : G(G), n(G.n), root(root),
           LOG(std::bit_width((unsigned)std::max(1, G.n))),
-          up(n + 1, std::vector<int>(LOG)), up_nodes(n + 1),
+          up(LOG, std::vector<int>(n + 1)), up_nodes(n + 1),
           down_nodes(n + 1), fa(n + 1), dep(n + 1), len(n + 1),
           heavy(n + 1), top(n + 1), pos(n + 1) {
         _dfs(root, 0);
@@ -80,8 +80,8 @@ struct LongChainDecomposition {
 
     void _dfs(int u, int p) {
         fa[u] = p;
-        up[u][0] = p;
-        rep(i, 1, LOG - 1) up[u][i] = up[up[u][i - 1]][i - 1];
+        up[0][u] = p;
+        rep(i, 1, LOG - 1) up[i][u] = up[i - 1][up[i - 1][u]];
         len[u] = 1;
         heavy[u] = 0;
         for (int v : G.adj[u]) {
@@ -118,7 +118,9 @@ struct LongChainDecomposition {
     }
 
     int _lift(int u, int k) const {
-        rep(i, 0, LOG - 1) if ((k >> i) & 1) u = up[u][i];
+        rep(i, 0, LOG - 1) {
+            if ((k >> i) & 1) u = up[i][u];
+        }
         return u;
     }
 
@@ -126,7 +128,7 @@ struct LongChainDecomposition {
         if (k < 0 || k > dep[u]) return 0;
         if (k == 0) return u;
         int t = std::bit_width((unsigned)k) - 1;
-        int x = up[u][t];
+        int x = up[t][u];
         int rem = k - (1 << t);
         int h = top[x];
         int d = pos[x];
@@ -139,9 +141,11 @@ struct LongChainDecomposition {
         if (dep[u] < dep[v]) std::swap(u, v);
         u = _lift(u, dep[u] - dep[v]);
         if (u == v) return u;
-        per(i, LOG - 1, 0) if (up[u][i] != up[v][i]) {
-            u = up[u][i];
-            v = up[v][i];
+        per(i, LOG - 1, 0) {
+            if (up[i][u] != up[i][v]) {
+                u = up[i][u];
+                v = up[i][v];
+            }
         }
         return fa[u];
     }

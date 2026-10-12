@@ -25,6 +25,7 @@
  *         sub_cnt        — 从该状态出发可形成的本质不同子串数 (含自身空串)
  *         first_pos      — 该类子串在原串中首次出现的结束位置 (1-based)
  *         is_clone       — 是否为分裂产生的克隆状态
+ *         operator[](c)  — 快捷访问 next[c]，支持 node[c] 单步转移
  *     SAM(n)              — 构造函数，预分配 2n+2 个节点的状态空间
  *     extend(c)           — 在原串末尾增量追加单个字符 c，更新自动机结构，
  *                            O(|Sigma|)
@@ -40,6 +41,7 @@
  *                            O(|s|)
  *     calc_total_length() — 沿所有状态统计原串所有本质不同子串的总长度之和，
  *                            O(|nodes|)
+ *     operator[](u)       — 快捷访问 nodes[u]，支持 sam[u] 直接读取节点状态
  *
  * Notes:
  *     1. Time: 构建 O(|S| * |Sigma|)，单次字符插入均摊 O(|Sigma|)。
@@ -56,20 +58,21 @@ struct SAM {
     static constexpr char MIN_CHAR = 'a';
 
     struct Node {
-        int len;            // 该等价类中最长子串的长度 (DAG深度)
+        int len = 0;            // 该等价类中最长子串的长度 (DAG深度)
         // 后缀链接 (Parent Tree中的父节点), 指向最长后缀所属等价类; 0 为无 link (根)
-        int link;
-        int next[ALPHABET]; // 转移边: next[c]表示字符c转移到的状态; 0 表示无转移
-        i64 size;           // endpos集合大小 (该等价类中子串在原串中的出现次数)
-        i64 sub_cnt;        // 该状态出发能构成的本质不同子串数 (用于求第k小)
-        int first_pos;      // 该等价类中子串第一次出现的结束位置 (1-based)
-        bool is_clone;      // 是否为克隆状态 (只有克隆状态的size初始为0)
+        int link = 0;
+        std::array<int, ALPHABET> next{}; // 转移边: next[c]表示字符c转移到的状态
+        i64 size = 0;           // endpos集合大小 (该等价类中子串在原串中的出现次数)
+        i64 sub_cnt = 0;        // 该状态出发能构成的本质不同子串数 (用于求第k小)
+        int first_pos = 0;      // 该等价类中子串第一次出现的结束位置 (1-based)
+        bool is_clone = false;  // 是否为克隆状态 (只有克隆状态的size初始为0)
 
         Node(int len = 0, int link = 0, int first = 0, bool clone = false)
             : len(len), link(link), size(0), sub_cnt(0),
-              first_pos(first), is_clone(clone) {
-            memset(next, 0, sizeof(next));
-        }
+              first_pos(first), is_clone(clone) {}
+
+        int& operator[](int c) { return next[c]; }
+        const int& operator[](int c) const { return next[c]; }
     };
 
     std::vector<Node> nodes;
@@ -84,6 +87,9 @@ struct SAM {
         nodes.emplace_back(); // Node 1: root (len=0, link=0)
     }
 
+    Node& operator[](int u) { return nodes[u]; }
+    const Node& operator[](int u) const { return nodes[u]; }
+
     void extend(char c) {
         int c_idx = c - MIN_CHAR;
         int cur = (int)nodes.size();
@@ -91,15 +97,15 @@ struct SAM {
         nodes[cur].size = 1;
 
         int p = last;
-        while (p != 0 && !nodes[p].next[c_idx]) {
-            nodes[p].next[c_idx] = cur;
+        while (p != 0 && !nodes[p][c_idx]) {
+            nodes[p][c_idx] = cur;
             p = nodes[p].link;
         }
 
         if (p == 0) {
             nodes[cur].link = 1;
         } else {
-            int q = nodes[p].next[c_idx];
+            int q = nodes[p][c_idx];
             if (nodes[p].len + 1 == nodes[q].len) {
                 nodes[cur].link = q;
             } else {
@@ -110,8 +116,8 @@ struct SAM {
                 clone_node.is_clone = true;
                 nodes.push_back(clone_node);
 
-                while (p != 0 && nodes[p].next[c_idx] == q) {
-                    nodes[p].next[c_idx] = clone;
+                while (p != 0 && nodes[p][c_idx] == q) {
+                    nodes[p][c_idx] = clone;
                     p = nodes[p].link;
                 }
                 nodes[q].link = nodes[cur].link = clone;
@@ -139,8 +145,8 @@ struct SAM {
         auto sorted = get_sorted_nodes();
         per(i, (int)sorted.size() - 1, 1) {
             int u = sorted[i];
-            if (nodes[u].link != 0) {
-                nodes[nodes[u].link].size += nodes[u].size;
+            if (int p = nodes[u].link; p != 0) {
+                nodes[p].size += nodes[u].size;
             }
         }
     }
@@ -151,7 +157,7 @@ struct SAM {
             int u = sorted[i];
             nodes[u].sub_cnt = 1;
             rep(c, 0, ALPHABET - 1) {
-                if (int v = nodes[u].next[c]) {
+                if (int v = nodes[u][c]) {
                     nodes[u].sub_cnt += nodes[v].sub_cnt;
                 }
             }
@@ -164,7 +170,7 @@ struct SAM {
         int u = 1;
         while (k > 0) {
             rep(c, 0, ALPHABET - 1) {
-                int v = nodes[u].next[c];
+                int v = nodes[u][c];
                 if (!v) continue;
                 if (k <= nodes[v].sub_cnt) {
                     res.push_back(char(c + MIN_CHAR));
@@ -183,12 +189,12 @@ struct SAM {
         int u = 1, l = 0, max_len = 0;
         for (char c : s) {
             int c_idx = c - MIN_CHAR;
-            while (u != 1 && !nodes[u].next[c_idx]) {
+            while (u != 1 && !nodes[u][c_idx]) {
                 u = nodes[u].link;
                 l = nodes[u].len;
             }
-            if (nodes[u].next[c_idx]) {
-                u = nodes[u].next[c_idx];
+            if (nodes[u][c_idx]) {
+                u = nodes[u][c_idx];
                 l++;
             }
             max_len = std::max(max_len, l);
@@ -199,7 +205,8 @@ struct SAM {
     i64 calc_total_length() const {
         i64 ans = 0;
         rep(i, 2, (int)nodes.size() - 1) {
-            i64 l = nodes[nodes[i].link].len + 1, r = nodes[i].len;
+            int p = nodes[i].link;
+            i64 l = nodes[p].len + 1, r = nodes[i].len;
             ans += (l + r) * (r - l + 1) / 2;
         }
         return ans;

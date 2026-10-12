@@ -1,14 +1,15 @@
 #pragma once
 
+#include <bit>
 #include "aizalib.h"
 #include "SegTreeBase·通用线段树基类.hpp"
 /*
  * Zkw Segment Tree (zkw 线段树)
  *
  * Overview:
- *     基于完全二叉树存储的非递归迭代式线段树。将长度 n 补齐至 2 的幂 N，
- *     叶子节点连续排布在 [N, N+n-1]，支持自底向上更新与开区间 (l-1, r+1)
- *     双指针自底向上迭代查询。常数极小、无需函数递归栈开销，并支持懒标记与树上二分。
+ *     基于完全二叉树存储的非递归延迟标记线段树（ACL 风格）。将区间长度向上补齐至 2
+ *     的幂，叶节点排布在 [sz, sz + n - 1]，支持自底向上更新与双指针区间操作。
+ *     单次操作严格 O(1) 辅助空间、0 堆内存分配，常数极小且无递归栈开销。
  *
  * API:
  *     ZkwSegTree(n)                 — 初始化长度为 n 的空线段树
@@ -17,95 +18,67 @@
  *     Info query(ql, qr)            — 查询区间信息
  *     Info all_info()               — 返回整棵树信息
  *     void set(pos, value)          — 单点赋值
- *     find_first(ql, qr, Pred pred) — 在线段树上二分第一个满足条件的位置
- *     find_last(ql, qr, Pred pred)  — 在线段树上二分最后一个满足条件的位置
+ *     find_first(ql, qr, Pred pred) — 二分首个满足 pred(info) 为 true 的叶子位置
+ *     find_last(ql, qr, Pred pred)  — 二分末个满足 pred(info) 为 true 的叶子位置
  *
  * Notes:
  *     1. 时间复杂度: 建树 O(N)，单次 modify / query / set / find 均为 O(log N)。
- *     2. 空间复杂度: 补齐至 2 的幂开辟 2N 空间，空间常数优于传统 4N 线段树。
- *     3. 索引约定: 外部输入统一为 1-based；padding 叶节点以 Info() 填充且需为幺元。
+ *     2. 空间复杂度: 补齐至 2 的幂开辟 2*sz 空间，tag 仅需开辟 sz 空间，
+ *        空间优于传统 4N 线段树。
+ *     3. 索引约定: 外部统一采用 1-based 索引 [1, n]。
+ *     4. 概念要求: Info 需支持默认构造和加法半群 operator+；Tag 需支持 has_value、
+ *        merge 与 apply_to。
+ *     5. 树上二分谓词 (Pred): 签名需满足 bool(const Info&)，
+ *        语义为“判断该子树代表的区间内是否包含目标”（如 info.mx >= V 或 info.cnt
+ *        > 0）。若为 false 则整棵子树直接剪枝；若为 true 则单向深入定位叶子。
+ *
+ * Related:
+ *     ZkwSegTreePoint·单点zkw线段树.hpp::ZkwSegTreePoint —无懒标记的纯单点赋值轻量
+ *     版本
  */
 template<SegInfo Info, class Tag>
     requires SegTag<Tag, Info>
 struct ZkwSegTree {
-    int n;                  // 区间长度
-    int N;                  // 向上取整到 2 的幂后的叶子层大小
-    std::vector<Info> info; // info[p]: 节点 p 维护的区间信息
-    std::vector<Tag> tag;   // tag[p]: 节点 p 的懒标记
-    std::vector<int> _stk;  // 复用的栈缓冲（modify / query / find 用）
+    int n, sz, H;
+    std::vector<Info> info;
+    std::vector<Tag> tag;
 
-    ZkwSegTree() : n(0), N(0) {}
+    ZkwSegTree() : n(0), sz(0), H(0) {}
 
-    ZkwSegTree(int n) : n(n) {
+    ZkwSegTree(int n) : n(n), sz(1), H(0) {
         AST(n >= 1);
-        N = 1;
-        while (N < n) N <<= 1;
-        info.assign(2 * N, Info());
-        tag.assign(2 * N, Tag());
-        _stk.reserve(4 * N);
+        while (sz < n) sz <<= 1, ++H;
+        info.assign(2 * sz, Info());
+        tag.assign(sz, Tag());
+        per(i, sz - 1, 1) _pull(i);
     }
 
-    ZkwSegTree(const std::vector<Info>& init) : n((int)init.size() - 1) {
+    ZkwSegTree(const std::vector<Info>& init) : ZkwSegTree((int)init.size() - 1) {
         AST((int)init.size() >= 2);
-        N = 1;
-        while (N < n) N <<= 1;
-        info.assign(2 * N, Info());
-        tag.assign(2 * N, Tag());
-        _stk.reserve(4 * N);
         _build(init);
     }
 
     void modify(int ql, int qr, const Tag& v) {
         AST(1 <= ql && ql <= qr && qr <= n);
-        struct Frame { int p, l, r; };
-        _stk.clear();
-        _stk.push_back(1);
-        _stk.push_back(1);
-        _stk.push_back(N);
-        std::vector<std::tuple<int, int, int, bool>> work;
-        work.reserve(4 * N);
-        work.emplace_back(1, 1, N, false);
-        while (!work.empty()) {
-            auto [p, l, r, visited] = work.back();
-            work.pop_back();
-            if (r < ql || l > qr) continue;
-            if (ql <= l && r <= qr) {
-                _apply_node(p, v);
-                continue;
-            }
-            if (visited) {
-                info[p] = info[p << 1] + info[p << 1 | 1];
-                continue;
-            }
-            _push(p);
-            int mid = (l + r) >> 1;
-            work.emplace_back(p, l, r, true);
-            work.emplace_back(p << 1 | 1, mid + 1, r, false);
-            work.emplace_back(p << 1, l, mid, false);
+        int l = ql + sz - 1, r = qr + sz;
+        _push_range(l, r);
+        for (int a = l, b = r; a < b; a >>= 1, b >>= 1) {
+            if (a & 1) _apply(a++, v);
+            if (b & 1) _apply(--b, v);
         }
-        (void)_stk;
+        _pull_range(l, r);
     }
 
     Info query(int ql, int qr) {
         AST(1 <= ql && ql <= qr && qr <= n);
-        Info res = Info();
-        std::vector<std::tuple<int, int, int>> work;
-        work.reserve(4 * N);
-        work.emplace_back(1, 1, N);
-        while (!work.empty()) {
-            auto [p, l, r] = work.back();
-            work.pop_back();
-            if (r < ql || l > qr) continue;
-            if (ql <= l && r <= qr) {
-                res = res + info[p];
-                continue;
-            }
-            _push(p);
-            int mid = (l + r) >> 1;
-            work.emplace_back(p << 1, l, mid);
-            work.emplace_back(p << 1 | 1, mid + 1, r);
+        int l = ql + sz - 1, r = qr + sz;
+        _push_range(l, r);
+        Info sml = Info(), smr = Info();
+        for (; l < r; l >>= 1, r >>= 1) {
+            if (l & 1) sml = sml + info[l++];
+            if (r & 1) smr = info[--r] + smr;
         }
-        return res;
+        return sml + smr;
     }
 
     Info all_info() const {
@@ -115,97 +88,106 @@ struct ZkwSegTree {
 
     void set(int pos, const Info& v) {
         AST(1 <= pos && pos <= n);
-        int p = N + pos - 1;
-        std::vector<int> path;
-        for (int x = p; x > 1; x >>= 1) path.push_back(x);
-        for (int i = (int)path.size() - 1; i >= 0; --i) _push(path[i]);
+        int p = pos + sz - 1;
+        for (int i = H; i >= 1; --i) _push(p >> i);
         info[p] = v;
-        tag[p] = Tag();
-        for (p >>= 1; p; p >>= 1) info[p] = info[p << 1] + info[p << 1 | 1];
+        for (int i = 1; i <= H; ++i) _pull(p >> i);
     }
 
-    template<class Pred>
+    template<SegPred<Info> Pred>
     int find_first(int ql, int qr, Pred pred) {
         AST(1 <= ql && ql <= qr && qr <= n);
-        if (!pred(info[1])) return -1;
-        int p = 1, l = 1, r = N;
-        while (p < N) {
-            _push(p);
-            p <<= 1;
-            int mid = (l + r) >> 1;
-            bool lc_in = (ql <= mid && l <= qr);
-            bool lc_full = (ql <= l && mid <= qr);
-            if (lc_in && (lc_full ? pred(info[p]) : true)) {
-                r = mid;
-            } else {
-                p |= 1; l = mid + 1;
+        int l = ql + sz - 1, r = qr + sz;
+        _push_range(l, r);
+        auto find_leaf = [&](int u) {
+            while (u < sz) {
+                _push(u);
+                if (pred(info[u << 1])) u = u << 1;
+                else u = u << 1 | 1;
             }
+            return u - sz + 1;
+        };
+        int buf[32], cnt = 0;
+        for (; l < r; l >>= 1, r >>= 1) {
+            if (l & 1) {
+                if (pred(info[l])) return find_leaf(l);
+                ++l;
+            }
+            if (r & 1) buf[cnt++] = --r;
         }
-        int pos = p - N + 1;
-        if (pos < ql || pos > qr) return -1;
-        if (!pred(info[p])) return -1;
-        return pos;
+        for (int i = cnt - 1; i >= 0; --i) {
+            if (pred(info[buf[i]])) return find_leaf(buf[i]);
+        }
+        return -1;
     }
 
-    template<class Pred>
+    template<SegPred<Info> Pred>
     int find_last(int ql, int qr, Pred pred) {
         AST(1 <= ql && ql <= qr && qr <= n);
-        if (!pred(info[1])) return -1;
-        int p = 1, l = 1, r = N;
-        while (p < N) {
-            _push(p);
-            p = p << 1 | 1;
-            int mid = (l + r) >> 1;
-            bool rc_in = (ql <= r && mid + 1 <= qr);
-            bool rc_full = (ql <= mid + 1 && r <= qr);
-            if (rc_in && (rc_full ? pred(info[p]) : true)) {
-                l = mid + 1;
-            } else {
-                p ^= 1; r = mid;
+        int l = ql + sz - 1, r = qr + sz;
+        _push_range(l, r);
+        auto find_leaf = [&](int u) {
+            while (u < sz) {
+                _push(u);
+                if (pred(info[u << 1 | 1])) u = u << 1 | 1;
+                else u = u << 1;
             }
+            return u - sz + 1;
+        };
+        int buf[32], cnt = 0;
+        for (; l < r; l >>= 1, r >>= 1) {
+            if (r & 1) {
+                --r;
+                if (pred(info[r])) return find_leaf(r);
+            }
+            if (l & 1) buf[cnt++] = l++;
         }
-        int pos = p - N + 1;
-        if (pos < ql || pos > qr) return -1;
-        if (!pred(info[p])) return -1;
-        return pos;
+        for (int i = cnt - 1; i >= 0; --i) {
+            if (pred(info[buf[i]])) return find_leaf(buf[i]);
+        }
+        return -1;
     }
 
-    void _build(const std::vector<Info>& init) {
-        rep(i, 1, n) info[i + N - 1] = init[i];
-        per(i, N - 1, 1) info[i] = info[i << 1] + info[i << 1 | 1];
+    std::pair<int, int> _range(int p) const {
+        int k = H - std::bit_width((u32)p) + 1;
+        int l = (p << k) - sz + 1;
+        return {l, l + (1 << k) - 1};
     }
 
-    int _seg_size(int p) const {
-        if (p >= N) return 1;
-        return N >> (31 - __builtin_clz(p));
-    }
-
-    int _leaf_l(int p) const {
-        if (p >= N) return p - N + 1;
-        int d = 31 - __builtin_clz(p);
-        int sz = N >> d;
-        return ((p - (1 << d)) * sz) + 1;
-    }
-
-    int _leaf_r(int p) const {
-        if (p >= N) return std::min(p - N + 1, n);
-        int d = 31 - __builtin_clz(p);
-        int sz = N >> d;
-        int l = ((p - (1 << d)) * sz) + 1;
-        return std::min(l + sz - 1, n);
-    }
-
-    void _apply_node(int p, const Tag& v) {
-        v.apply_to(info[p], _leaf_l(p), _leaf_r(p));
-        tag[p].merge(v);
+    void _apply(int p, const Tag& v) {
+        auto [l, r] = _range(p);
+        v.apply_to(info[p], l, r);
+        if (p < sz) tag[p].merge(v);
     }
 
     void _push(int p) {
-        if (p >= N) return;
         if (!tag[p].has_value()) return;
-        _apply_node(p << 1, tag[p]);
-        _apply_node(p << 1 | 1, tag[p]);
+        _apply(p << 1, tag[p]);
+        _apply(p << 1 | 1, tag[p]);
         tag[p] = Tag();
+    }
+
+    void _pull(int p) {
+        info[p] = info[p << 1] + info[p << 1 | 1];
+    }
+
+    void _push_range(int l, int r) {
+        for (int i = H; i >= 1; --i) {
+            if (((l >> i) << i) != l) _push(l >> i);
+            if (((r >> i) << i) != r) _push((r - 1) >> i);
+        }
+    }
+
+    void _pull_range(int l, int r) {
+        for (int i = 1; i <= H; ++i) {
+            if (((l >> i) << i) != l) _pull(l >> i);
+            if (((r >> i) << i) != r) _pull((r - 1) >> i);
+        }
+    }
+
+    void _build(const std::vector<Info>& init) {
+        rep(i, 1, n) info[i + sz - 1] = init[i];
+        per(i, sz - 1, 1) _pull(i);
     }
 };
 
@@ -227,6 +209,7 @@ struct Tag {
 
     bool has_value() const {
         return false;
+        // return add != 0 || mul != 1;
     }
 
     void merge(const Tag& rhs) {

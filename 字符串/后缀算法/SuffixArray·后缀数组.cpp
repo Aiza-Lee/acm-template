@@ -47,7 +47,6 @@ struct SuffixArray {
     std::vector<int> cnt;
     std::string str;
     std::vector<std::vector<int>> st;
-    std::vector<int> lg;
 
     void _radix_pass(const std::vector<int>& keys,
                      const std::vector<int>& items, int limit) {
@@ -109,17 +108,18 @@ struct SuffixArray {
     }
 
     void _init_st() {
-        lg.assign(n + 1, 0);
-        rep(i, 2, n) lg[i] = lg[i >> 1] + 1;
-        
-        int K = lg[n];
+        if (n <= 0) return;
+        int K = std::bit_width((unsigned int)n) - 1;
         st.assign(K + 1, std::vector<int>(n + 1));
         
         rep(i, 1, n) st[0][i] = height[i];
         
         rep(j, 1, K) {
+            auto& pre = st[j - 1];
+            auto& cur = st[j];
+            int half = 1 << (j - 1);
             rep(i, 1, n - (1 << j) + 1) {
-                st[j][i] = std::min(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
+                cur[i] = std::min(pre[i], pre[i + half]);
             }
         }
     }
@@ -128,7 +128,7 @@ struct SuffixArray {
         if (x == y) return n - sa[x] + 1;
         if (x > y) std::swap(x, y);
         ++x; 
-        int k = lg[y - x + 1];
+        int k = std::bit_width((unsigned int)(y - x + 1)) - 1;
         return std::min(st[k][x], st[k][y - (1 << k) + 1]);
     }
 

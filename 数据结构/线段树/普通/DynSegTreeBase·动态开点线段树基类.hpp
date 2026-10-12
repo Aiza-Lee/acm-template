@@ -46,6 +46,9 @@ concept DynSegTag =
         { rhs.apply_to(info, l, r) } -> std::same_as<void>;
     };
 
+template<class Pred, class Info>
+concept DynSegPred = std::predicate<Pred, const Info&>;
+
 template<DynSegInfo Info, class Tag>
     requires DynSegTag<Tag, Info>
 struct DynSegTree {
@@ -101,13 +104,13 @@ struct DynSegTree {
         root = _set(root, pos, v, lb, rb);
     }
 
-    template<class Pred>
+    template<DynSegPred<Info> Pred>
     int find_first(int ql, int qr, Pred pred) {
         AST(lb <= ql && ql <= qr && qr <= rb);
         return _find_first(root, ql, qr, pred, lb, rb);
     }
 
-    template<class Pred>
+    template<DynSegPred<Info> Pred>
     int find_last(int ql, int qr, Pred pred) {
         AST(lb <= ql && ql <= qr && qr <= rb);
         return _find_last(root, ql, qr, pred, lb, rb);
@@ -180,7 +183,7 @@ struct DynSegTree {
                _query(p ? tr[p].rs : 0, ql, qr, mid + 1, r);
     }
 
-    template<class Pred>
+    template<DynSegPred<Info> Pred>
     int _find_first(int p, int ql, int qr, Pred pred, int l, int r) {
         if (ql <= l && r <= qr && !pred(_get_info(p, l, r))) return -1;
         if (l == r) return l;
@@ -194,7 +197,7 @@ struct DynSegTree {
         return -1;
     }
 
-    template<class Pred>
+    template<DynSegPred<Info> Pred>
     int _find_last(int p, int ql, int qr, Pred pred, int l, int r) {
         if (ql <= l && r <= qr && !pred(_get_info(p, l, r))) return -1;
         if (l == r) return l;

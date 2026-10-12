@@ -17,18 +17,20 @@
  *     Info query(int ql, int qr)                  — 查询区间信息
  *     Info all_info()                             — 返回整棵树信息
  *     void set(int pos, const Info& value)        — 单点赋值
- *     int find_first(int ql, int qr, Pred pred)   — 在线段树上二分第一个满足条件的
- *                                                    位置
- *     int find_last(int ql, int qr, Pred pred)    — 在线段树上二分最后一个满足条件
- *                                                    的位置
+ *     int find_first(int ql, int qr, Pred pred)   — 二分首个满足 pred(info) 为
+ *                                                    true 的叶子位置
+ *     int find_last(int ql, int qr, Pred pred)    — 二分末个满足 pred(info) 为
+ *                                                    true 的叶子位置
  *
-
  * Notes:
  *     1. 时间复杂度: 建树 O(N)，单次 modify / query / set / find 均为 O(log N)。
  *     2. 空间复杂度: 4N 数组实现，空间占用 O(N)。
  *     3. 索引约定: 外部统一采用 1-based 索引。
  *     4. 概念要求: Info 需支持默认构造和加法半群 operator+；Tag 需支持 has_value、
  *        merge 与 apply_to。
+ *     5. 树上二分谓词 (Pred): 签名需满足 bool(const Info&)，
+ *        语义为“判断该子树代表的区间内是否包含目标”（如 info.mx >= V 或 info.cnt
+ *        > 0）。若为 false 则整棵子树直接剪枝；若为 true 则递归深入定位叶子。
  */
 
 template<class Info>
@@ -46,6 +48,9 @@ concept SegTag =
         { tag.merge(rhs) } -> std::same_as<void>;
         { rhs.apply_to(info, l, r) } -> std::same_as<void>;
     };
+
+template<class Pred, class Info>
+concept SegPred = std::predicate<Pred, const Info&>;
 
 template<class Info>
 struct SegNullTag {
@@ -96,13 +101,13 @@ struct SegTree {
         _set(pos, v, 1, 1, n);
     }
 
-    template<class Pred>
+    template<SegPred<Info> Pred>
     int find_first(int ql, int qr, Pred pred) {
         AST(1 <= ql && ql <= qr && qr <= n);
         return _find_first(ql, qr, pred, 1, 1, n);
     }
 
-    template<class Pred>
+    template<SegPred<Info> Pred>
     int find_last(int ql, int qr, Pred pred) {
         AST(1 <= ql && ql <= qr && qr <= n);
         return _find_last(ql, qr, pred, 1, 1, n);
@@ -170,7 +175,7 @@ struct SegTree {
         return _query(ql, qr, LS) + _query(ql, qr, RS);
     }
 
-    template<class Pred>
+    template<SegPred<Info> Pred>
     int _find_first(int ql, int qr, Pred pred, int p, int l, int r) {
         if (ql <= l && r <= qr && !pred(info[p])) return -1;
         if (l == r) return l;
@@ -184,7 +189,7 @@ struct SegTree {
         return -1;
     }
 
-    template<class Pred>
+    template<SegPred<Info> Pred>
     int _find_last(int ql, int qr, Pred pred, int p, int l, int r) {
         if (ql <= l && r <= qr && !pred(info[p])) return -1;
         if (l == r) return l;

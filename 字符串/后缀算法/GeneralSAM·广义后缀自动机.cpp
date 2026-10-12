@@ -15,12 +15,14 @@
  *
  * API:
  *     struct Node:
- *         len  — 该等价类中最长子串的长度 (DAG 深度)
- *         link — 后缀链接 (Parent Tree 父节点)，0 为无 link (仅根节点)
- *         next — 字符转移数组，next[c] 为转移到的状态编号 (0 为无转移)
+ *         len           — 该等价类中最长子串的长度 (DAG 深度)
+ *         link          — 后缀链接 (Parent Tree 父节点)，0 为无 link (仅根节点)
+ *         next          — 字符转移数组，next[c] 为转移到的状态编号 (0 为无转移)
+ *         operator[](c) — 快捷访问 next[c]，支持 node[c] 单步转移
  *     GeneralSAM(n) — 构造函数，预分配 2n+2 个节点的状态空间
  *     insert(s)     — 增量插入字符串 s，维护自动机与 Parent 树结构，O(|s| *
  *                      |Sigma|)
+ *     operator[](u) — 快捷访问 nodes[u]，支持 gsam[u] 直接读取节点状态
  *
  * Notes:
  *     1. Time: 构建总时间 O(sum|S| * |Sigma|)，单字符插入均摊 O(|Sigma|)。
@@ -43,6 +45,9 @@ struct GeneralSAM {
         Node() : len(0), link(0) {
             next.fill(0);
         }
+
+        int& operator[](int c) { return next[c]; }
+        const int& operator[](int c) const { return next[c]; }
     };
 
     std::vector<Node> nodes;
@@ -53,6 +58,9 @@ struct GeneralSAM {
         nodes.emplace_back(); // Node 1: root (len=0, link=0)
     }
 
+    Node& operator[](int u) { return nodes[u]; }
+    const Node& operator[](int u) const { return nodes[u]; }
+
     // 插入一个字符串
     void insert(const std::string& s) {
         int last = 1; // 每次从根开始 (节点 1)
@@ -60,9 +68,9 @@ struct GeneralSAM {
             int c_idx = c - MIN_CHAR;
 
             // 如果当前节点已经有该字符的转移
-            if (nodes[last].next[c_idx]) {
+            if (nodes[last][c_idx]) {
                 int p = last;
-                int q = nodes[p].next[c_idx];
+                int q = nodes[p][c_idx];
 
                 // 如果满足 len 连续条件，直接复用该节点
                 if (nodes[p].len + 1 == nodes[q].len) {
@@ -75,8 +83,8 @@ struct GeneralSAM {
                     nodes[clone].next = nodes[q].next; // 复制转移
                     nodes[clone].link = nodes[q].link;
 
-                    while (p != 0 && nodes[p].next[c_idx] == q) {
-                        nodes[p].next[c_idx] = clone;
+                    while (p != 0 && nodes[p][c_idx] == q) {
+                        nodes[p][c_idx] = clone;
                         p = nodes[p].link;
                     }
                     nodes[q].link = clone;
@@ -89,15 +97,15 @@ struct GeneralSAM {
                 nodes[cur].len = nodes[last].len + 1;
 
                 int p = last;
-                while (p != 0 && !nodes[p].next[c_idx]) {
-                    nodes[p].next[c_idx] = cur;
+                while (p != 0 && !nodes[p][c_idx]) {
+                    nodes[p][c_idx] = cur;
                     p = nodes[p].link;
                 }
 
                 if (p == 0) {
                     nodes[cur].link = 1; // 无 link 时指向 root (节点 1)
                 } else {
-                    int q = nodes[p].next[c_idx];
+                    int q = nodes[p][c_idx];
                     if (nodes[p].len + 1 == nodes[q].len) {
                         nodes[cur].link = q;
                     } else {
@@ -107,8 +115,8 @@ struct GeneralSAM {
                         nodes[clone].next = nodes[q].next;
                         nodes[clone].link = nodes[q].link;
 
-                        while (p != 0 && nodes[p].next[c_idx] == q) {
-                            nodes[p].next[c_idx] = clone;
+                        while (p != 0 && nodes[p][c_idx] == q) {
+                            nodes[p][c_idx] = clone;
                             p = nodes[p].link;
                         }
                         nodes[q].link = nodes[cur].link = clone;

@@ -25,6 +25,8 @@
  * Notes:
  *     1. 下标统一为 1-based，根节点 root 的深度定义为 0。
  *     2. Time: 预处理 O(N log N)，单次查询 O(1)；Space: O(N log N)。
+ *     3. ST 表第一维为 log 层（st[LOG][2N - 1]），行内连续访问提升缓存局部性；
+ *        表中直接维护树节点编号，查询时无需反查欧拉序。
  */
 
 struct Graph {
@@ -42,7 +44,7 @@ struct RMQLCA {
     std::vector<int> first;           // 节点在欧拉序中首次出现的位置
     std::vector<int> euler;           // 欧拉序序列
     std::vector<int> dep;             // 节点深度
-    std::vector<std::vector<int>> st; // ST 表
+    std::vector<std::vector<int>> st; // ST 表：st[k][i] 为区间 [i, i + 2^k - 1] 深度最小的节点编号
     int LOG;                          // ST 表层数
 
     RMQLCA(const Graph& G, int root = 1)
@@ -54,15 +56,17 @@ struct RMQLCA {
         int m = euler.size();
         if (m == 0) return;
         LOG = std::bit_width((unsigned)m);
-        st.assign(m, std::vector<int>(LOG));
-
-        rep(i, 0, m - 1) st[i][0] = i;
+        st.assign(LOG, std::vector<int>(m));
+        st[0] = euler;
 
         rep(j, 1, LOG - 1) {
+            auto& pre = st[j - 1];
+            auto& cur = st[j];
+            int half = 1 << (j - 1);
             rep(i, 0, m - (1 << j)) {
-                int l = st[i][j - 1];
-                int r = st[i + (1 << (j - 1))][j - 1];
-                st[i][j] = dep[euler[l]] < dep[euler[r]] ? l : r;
+                int u = pre[i];
+                int v = pre[i + half];
+                cur[i] = dep[u] < dep[v] ? u : v;
             }
         }
     }
@@ -85,9 +89,9 @@ struct RMQLCA {
         int len = r - l + 1;
         int k = std::bit_width((unsigned)len) - 1;
 
-        int x = st[l][k];
-        int y = st[r - (1 << k) + 1][k];
-        return dep[euler[x]] < dep[euler[y]] ? euler[x] : euler[y];
+        int x = st[k][l];
+        int y = st[k][r - (1 << k) + 1];
+        return dep[x] < dep[y] ? x : y;
     }
 
     int dist(int u, int v) {

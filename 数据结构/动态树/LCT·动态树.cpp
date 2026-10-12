@@ -7,12 +7,13 @@
  *     每个 Splay 对应原树中一条深度严格递增的实路径，
  *     其根节点的父指针指向原树上该链顶节点的父节点（虚边，父认子而子不认父）。
  *     通过 access 操作可打通任意点到根的实链；结合 Splay
- *     翻转打标实现换根（make_root），从而支持动态连边、断边、
- *     路径信息维护与子树/连通块信息统计。
+ *     翻转打标实现换根（make_root），从而支持动态连边、断边、路径加与求和、
+ *     以及原树子树/连通块信息统计。
  *
  * API:
  *     LCT(n), init(n)             — 初始化 1...n 个点的动态森林
- *     set_val(x, v)               — 把点 x 的点权改为 v
+ *     set_val(x, v)               — 将点 x 的点权改为 v
+ *     modify_add(x, y, v)         — 将路径 x -> y 上所有点的点权累加 v
  *     make_root(x)                — 将 x 所在树改为以 x 为根
  *     find_root(x)                — 返回 x 所在树当前实义下的树根编号
  *     split(x, y)                 — 提取 x 到 y 的路径，使 y 成为该辅助树根
@@ -25,20 +26,31 @@
  *     query_subtree_size(root, x) — 以 root 为整棵树的根时，返回 x 的子树大小
  *     lca(x, y)                   — 返回 x, y 的最近公共祖先，若不连通则返回 0
  *
-
  * Notes:
- *     1. 时间复杂度: 各类动态树操作均摊 O(log N)；空间复杂度 O(N)。
+ *     1. 时间复杂度: 各类动态树操作单次均摊 O(log N)；空间复杂度 O(N)。
  *     2. 索引约定: 节点编号采用 1-based (1..n)。
- *     3. 虚子树维护: 节点维护 virt_siz 以支持原树子树大小与连通块大小统计。
- *     4. 换根副作用: query_component_size 与 query_subtree_size 内部会调用
- *        make_root。
+ *     3. 三处统一修改点（业务扩展三板斧）:
+ *        - Node: 增删业务字段（如 val, sum, min_val, add_tag 等）。
+ *        - _push_up: 向上聚合（左右儿子 + 自身 + 虚子树）。
+ *        - _apply_tag / _push_down: 向下打标（铁律: 永远先传 rev，再传业务标记）。
+ *     4. 常用业务变形速查:
+ *        - 改为 Min/Max/Xor: 把 sum 改为 min_val，_push_up 改为 min，设置
+ *          t[0].min_val = INF。
+ *        - 维护边权（化边为点）: 严禁直接在边上存权！原树边 (u, v, w) 拆为虚拟节点
+ *          n + e，令 val(n + e) = w，原点权赋为单位元（如 sum 为 0，min 为 INF），
+ *          连边 link(u, n + e), link(v, n + e)。
+ *        - 维护虚子树（进出平衡）: 仅支持代数可逆信息（如大小、和）。access
+ *          虚实切换时加旧减新，link 时加虚儿子，cut 时仅涉及实边无需改动。
+ *
+ * Related:
+ *     LCTCore·精简版.cpp — 仅维护树拓扑连通性与动态 LCA 的超轻量版本（16字节/点）
  */
 struct LCT {
 private:
     struct Node {
         int fa = 0, siz = 1, cnt = 1, virt_siz = 0;
         std::array<int, 2> ch{0, 0};
-        i64 val = 0, sum = 0;
+        i64 val = 0, sum = 0, add_tag = 0;
         char rev = 0;
         char _pad[7] = {};
     };
@@ -61,6 +73,7 @@ private:
     FIELD(virt_siz)
     FIELD(val)
     FIELD(sum)
+    FIELD(add_tag)
     FIELD(rev)
     #undef FIELD
 
@@ -70,10 +83,11 @@ private:
         const auto& pc = ch(fa(p));
         return pc[0] != p && pc[1] != p;
     }
-    /** _push_up: 用左右孩子和自身值更新 p 的 siz, cnt, sum
-     *  ⚠【自定义指南】改这里对应不同聚合:
-     *    路径最小值: sum[l] + sum[r] + val → min({mint[l], mint[r], val})
-     *    路径异或:   sum[l] + sum[r] + val → xsum[l] ^ xsum[r] ^ val
+    /**
+     * _push_up: 用左右孩子和自身值更新 p 的 siz, cnt, sum
+     * ⚠【聚合修改指南】:
+     *   路径最小值: sum(p) = min({mint(l), mint(r), val(p)}) (注意 t[0].mint = INF)
+     *   路径异或:   sum(p) = sum(l) ^ sum(r) ^ val(p)
      */
     void _push_up(int p) {
         int l = ch(p)[0], r = ch(p)[1];
@@ -86,16 +100,28 @@ private:
         rev(p) ^= 1;
         std::swap(ch(p)[0], ch(p)[1]);
     }
-    /** _push_down: 下传 p 的 rev 到左右孩子
-     *  ⚠【自定义指南】如需加法懒标记:
-     *    if (add_tag[p]) { apply_add(l, add_tag[p]); ...; add_tag[p] = 0; }
-     *    注意先下传 rev 再下传 add（add 不依赖左右方向）
+    void _apply_add(int p, i64 v) {
+        if (!p) return;
+        val(p) += v;
+        sum(p) += v * cnt(p);
+        add_tag(p) += v;
+    }
+    /**
+     * _push_down: 下传 p 的标记到左右孩子
+     * ⚠【标记下传铁律】:
+     *   永远先下传翻转标记 rev，再下传业务标记（加法、乘法、赋值等）。
      */
     void _push_down(int p) {
-        if (!rev(p)) return;
-        _apply_rev(ch(p)[0]);
-        _apply_rev(ch(p)[1]);
-        rev(p) = 0;
+        if (rev(p)) {
+            _apply_rev(ch(p)[0]);
+            _apply_rev(ch(p)[1]);
+            rev(p) = 0;
+        }
+        if (add_tag(p)) {
+            _apply_add(ch(p)[0], add_tag(p));
+            _apply_add(ch(p)[1], add_tag(p));
+            add_tag(p) = 0;
+        }
     }
     void _push_all(int p) {
         stk.clear();
@@ -201,6 +227,12 @@ public:
         _splay(p);
         val(p) = v;
         _push_up(p);
+    }
+    /** modify_add: 路径 x -> y 上所有点的点权增加 v */
+    void modify_add(int x, int y, i64 v) {
+        AST(connected(x, y));
+        split(x, y);
+        _apply_add(y, v);
     }
     i64 query_sum(int x, int y) {
         AST(connected(x, y));

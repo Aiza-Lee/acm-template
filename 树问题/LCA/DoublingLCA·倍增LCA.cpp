@@ -27,6 +27,7 @@
  * Notes:
  *     1. 下标统一为 1-based，根节点 root 的深度定义为 0。
  *     2. Time: 预处理 O(N log N)，单次查询 O(log N)；Space: O(N log N)。
+ *     3. 倍增表第一维为 log 层（up[LOG][N + 1]），避免 N 次小 vector 堆内存分配与碎片化。
  */
 
 struct Graph {
@@ -41,20 +42,20 @@ struct Graph {
 
 struct DoublingLCA {
     const Graph& G;                   // 图引用
-    std::vector<std::vector<int>> up; // up[u][i]: u 的第 2^i 个祖先
+    std::vector<std::vector<int>> up; // up[i][u]: u 的第 2^i 个祖先
     std::vector<int> dep;             // 节点深度
     int LOG;                          // 最大倍增层数
 
     DoublingLCA(const Graph& G, int root = 1) : G(G), dep(G.n + 1) {
         LOG = std::bit_width((unsigned)G.n);
-        up.assign(G.n + 1, std::vector<int>(LOG));
+        up.assign(LOG, std::vector<int>(G.n + 1));
         dfs(root, 0, 0);
     }
 
     void dfs(int u, int p, int d) {
         dep[u] = d;
-        up[u][0] = p;
-        rep(i, 1, LOG - 1) up[u][i] = up[up[u][i - 1]][i - 1];
+        up[0][u] = p;
+        rep(i, 1, LOG - 1) up[i][u] = up[i - 1][up[i - 1][u]];
         for (int v : G.adj[u]) {
             if (v != p) dfs(v, u, d + 1);
         }
@@ -63,16 +64,16 @@ struct DoublingLCA {
     int lca(int u, int v) {
         if (dep[u] < dep[v]) std::swap(u, v);
         per(i, LOG - 1, 0) {
-            if (dep[u] - (1 << i) >= dep[v]) u = up[u][i];
+            if (dep[u] - (1 << i) >= dep[v]) u = up[i][u];
         }
         if (u == v) return u;
         per(i, LOG - 1, 0) {
-            if (up[u][i] != up[v][i]) {
-                u = up[u][i];
-                v = up[v][i];
+            if (up[i][u] != up[i][v]) {
+                u = up[i][u];
+                v = up[i][v];
             }
         }
-        return up[u][0];
+        return up[0][u];
     }
 
     int dist(int u, int v) {
@@ -82,7 +83,7 @@ struct DoublingLCA {
     int kth_ancestor(int u, int k) {
         if (k < 0 || k > dep[u]) return 0;
         rep(i, 0, LOG - 1) {
-            if ((k >> i) & 1) u = up[u][i];
+            if ((k >> i) & 1) u = up[i][u];
         }
         return u;
     }

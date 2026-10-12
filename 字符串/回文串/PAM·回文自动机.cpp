@@ -24,6 +24,7 @@
  *         cnt            — 出现次数统计 (调用 count_occurrences 前为后缀命中数，
  *                           调用后为全局出现次数)
  *         num            — 该节点包含的回文后缀链长度 (含自身)
+ *         operator[](c)  — 快捷访问 next[c]，支持 node[c] 单步转移
  *     PAM(n) / init(m)      — 构造/初始化自动机，预分配空间并建立偶根(0)与奇根 (1)
  *     extend(c)             — 串末尾增量插入单个字符 c，返回当前串的最长回文后缀节
  *                              点 ID，均摊 O(1)
@@ -33,6 +34,7 @@
  *     distinct()            — 返回原串中本质不同回文子串的总个数
  *     longest_suffix_len()  — 查询当前串的最长回文后缀长度
  *     longest_suffix_node() — 查询当前串的最长回文后缀所对应的节点 ID
+ *     operator[](u)         — 快捷访问 tr[u]，支持 pam[u] 直接读取节点状态
  *
  * Notes:
  *     1. Time: 单字符 extend 均摊 O(1) (仅考虑字符集常数)，count_occurrences O(N)。
@@ -48,6 +50,9 @@ struct PAM {
         int fail = 0; // 最长真回文后缀
         int cnt = 0;  // 作为当前后缀出现次数
         int num = 0;  // 回文后缀链长度
+
+        int& operator[](int c) { return next[c]; }
+        const int& operator[](int c) const { return next[c]; }
     };
 
     std::vector<Node> tr;
@@ -64,19 +69,22 @@ struct PAM {
         tr[0].fail = tr[1].fail = 1;
     }
 
+    Node& operator[](int u) { return tr[u]; }
+    const Node& operator[](int u) const { return tr[u]; }
+
     int extend(char c) {
         int d = c - BASE_CHAR;
         AST(0 <= d && d < ALPHABET);
         s += c, ++n;
 
         int p = _get_fail(last);
-        if (!tr[p].next[d]) {
+        if (!tr[p][d]) {
             int u = _new_node(tr[p].len + 2), q = _get_fail(tr[p].fail);
-            tr[u].fail = tr[q].next[d];
-            tr[u].num = tr[tr[u].fail].num + 1;
-            tr[p].next[d] = u;
+            int f = tr[u].fail = tr[q][d];
+            tr[u].num = tr[f].num + 1;
+            tr[p][d] = u;
         }
-        last = tr[p].next[d], ++tr[last].cnt;
+        last = tr[p][d], ++tr[last].cnt;
         return last;
     }
 
@@ -86,7 +94,10 @@ struct PAM {
     }
 
     void count_occurrences() {
-        per(i, (int)tr.size() - 1, 2) tr[tr[i].fail].cnt += tr[i].cnt;
+        per(i, (int)tr.size() - 1, 2) {
+            int f = tr[i].fail;
+            tr[f].cnt += tr[i].cnt;
+        }
     }
 
     int distinct() const {

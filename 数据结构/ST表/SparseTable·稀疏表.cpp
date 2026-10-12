@@ -18,6 +18,7 @@
  *      2. Time: 预处理 O(n log n)，单次查询严格 O(1)；Space: O(n log n)。
  *      3. merge 必须满足幂等律（如 min, max, gcd, bitwise or/and）；
  *         普通加法求和不适用。
+ *      4. 查询利用 std::bit_width 硬件指令计算 log，无需额外 O(n) 内存查表。
  */
 template<typename Merge, typename T>
 concept STMerge = requires(Merge merge, const T& x, const T& y) {
@@ -28,7 +29,6 @@ template<typename T, typename Merge>
 requires STMerge<Merge, T>
 struct SparseTable {
     int n = 0, lg = 0;
-    std::vector<int> lo;
     std::vector<std::vector<T>> st;
     Merge merge;
 
@@ -39,15 +39,11 @@ struct SparseTable {
         n = (int)a.size() - 1;
         if (n <= 0) {
             lg = 0;
-            lo.assign(1, 0);
             st.clear();
             return;
         }
 
         lg = std::bit_width((unsigned int)n) - 1;
-        lo.assign(n + 1, 0);
-        rep(i, 2, n) lo[i] = lo[i >> 1] + 1;
-
         st.assign(lg + 1, std::vector<T>(n + 1));
         rep(i, 1, n) st[0][i] = a[i];
 
@@ -61,7 +57,7 @@ struct SparseTable {
 
     T query(int l, int r) const {
         AST(1 <= l && l <= r && r <= n);
-        int k = lo[r - l + 1];
+        int k = std::bit_width((unsigned int)(r - l + 1)) - 1;
         return merge(st[k][l], st[k][r - (1 << k) + 1]);
     }
 };

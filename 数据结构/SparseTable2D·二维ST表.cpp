@@ -17,12 +17,12 @@
  *      1. 1-based indexing；有效坐标 1..n, 1..m。grid[0][*] 和 grid[*][0] 留空。
  *      2. Time: 预处理 O(nm log n log m)，单次查询 O(1)；Space: O(nm log n log m)。
  *      3. 连续一维扁平化存储以提升缓存命中率与内存紧凑度。
+ *      4. 查询利用 std::bit_width 硬件指令计算 log，无需额外内存查表。
  */
 template<typename T>
 struct SparseTable2D {
     int n = 0, m = 0;
     int log_n = 0, log_m = 0;
-    std::vector<int> lo;
     std::vector<T> st;
 
     SparseTable2D() = default;
@@ -36,24 +36,18 @@ struct SparseTable2D {
         n = (int)grid.size() - 1;
         if (n <= 0) {
             log_n = log_m = m = 0;
-            lo.assign(1, 0);
             st.clear();
             return;
         }
         m = (int)grid[0].size() - 1;
         if (m <= 0) {
             log_n = log_m = n = 0;
-            lo.assign(1, 0);
             st.clear();
             return;
         }
 
         log_n = std::bit_width((unsigned int)n) - 1;
         log_m = std::bit_width((unsigned int)m) - 1;
-
-        int max_dim = std::max(n, m);
-        lo.assign(max_dim + 1, 0);
-        rep(i, 2, max_dim) lo[i] = lo[i >> 1] + 1;
 
         st.assign((log_n + 1) * (log_m + 1) * n * m, T{});
 
@@ -88,8 +82,8 @@ struct SparseTable2D {
     T query(int r1, int c1, int r2, int c2) const {
         AST(1 <= r1 && r1 <= r2 && r2 <= n);
         AST(1 <= c1 && c1 <= c2 && c2 <= m);
-        int k1 = lo[r2 - r1 + 1];
-        int k2 = lo[c2 - c1 + 1];
+        int k1 = std::bit_width((unsigned int)(r2 - r1 + 1)) - 1;
+        int k2 = std::bit_width((unsigned int)(c2 - c1 + 1)) - 1;
         int r3 = r2 - (1 << k1) + 1;
         int c3 = c2 - (1 << k2) + 1;
         return std::min({
