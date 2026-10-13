@@ -1,0 +1,41 @@
+\textbf{线性规划 / 两阶段单纯形速查}
+
+\textbf{求解器标准形}
+\[
+\max_{\mathbf{x}\in\mathbb R^n}\ \mathbf{c}^{\mathsf T}\mathbf{x},
+\qquad A\mathbf{x}\le\mathbf{b},\qquad \mathbf{x}\ge\mathbf{0}.
+\]
+$A$ 为 $m\times n$，不等式逐分量成立；代码 \texttt{Simplex::solve(A,b,c)} 使用 0-based 行列。
+
+\textbf{输入转换}
+\begin{itemize}
+    \item 最小化：目标系数取 $-\mathbf{c}$，最优目标值最后取负。
+    \item $\mathbf{a}^{\mathsf T}\mathbf{x}\ge b$：整行乘 $-1$ 后改为 $\le$。
+    \item 等式：$\mathbf{a}^{\mathsf T}\mathbf{x}=b$ 拆成两条反向不等式。
+    \item 自由变量：$x_j=x_j^+-x_j^-$，其中 $x_j^+,x_j^-\ge0$。
+    \item 下界 $x_j\ge l_j$：令 $x_j=l_j+z_j$，$z_j\ge0$；同步平移右端项和目标常数。
+\end{itemize}
+
+\textbf{返回状态}
+\begin{itemize}
+    \item \texttt{Optimal}：返回最优值及一个最优解。
+    \item \texttt{Infeasible}：可行域为空，目标值为 $-\infty$，解为空。
+    \item \texttt{Unbounded}：可行且最大化目标无上界，值为 $+\infty$；返回一个可行解。
+\end{itemize}
+第一阶段消去人工变量以寻找可行基，第二阶段优化原目标；负右端项不等于无解。
+
+\textbf{对偶标准形}
+\[
+\min_{\boldsymbol{\lambda}\in\mathbb R^m}\ \mathbf{b}^{\mathsf T}\boldsymbol{\lambda},
+\qquad A^{\mathsf T}\boldsymbol{\lambda}\ge\mathbf{c},
+\qquad \boldsymbol{\lambda}\ge\mathbf{0}.
+\]
+原问题有有限最优值时，对偶有相同最优值；互补松弛为
+\[
+\lambda_i\bigl(b_i-(A\mathbf{x})_i\bigr)=0,
+\qquad x_j\bigl((A^{\mathsf T}\boldsymbol{\lambda})_j-c_j\bigr)=0.
+\]
+
+\textbf{注意}
+数据有限且应先缩放；实现容差为 $10^{-10}$，数值跨度很大时不能保证稳定。
+每次换基 $O((m+1)(n+1))$，最坏换基次数为指数级；不用于整数规划。

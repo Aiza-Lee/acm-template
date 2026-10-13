@@ -1,0 +1,29 @@
+\textbf{功能图 / 大步数跳转速查}
+
+\textbf{结构与记号}
+每点恰有一个后继 $f(u)$；每个弱连通块含一个有向环及指向环的树尾。
+记 $d_u$ 为到环的步数，$e_u=f^{d_u}(u)$ 为入环点，$c_u$ 为环编号。
+环按后继顺序存放，长度为 $L$，环内位置 $p_v\in[0,L-1]$。
+
+\textbf{跳转 $k$ 步}
+\[
+f^k(u)=
+\begin{cases}
+\text{倍增跳转}(u,k),&k<d_u,\\
+\text{环}\bigl[(p_{e_u}+(k-d_u)\bmod L)\bmod L\bigr],&k\ge d_u.
+\end{cases}
+\]
+倍增仅需 $O(\log n)$ 层；环上取模支持完整 64 位无符号步数，无需存 64 层倍增表。
+
+\textbf{从 $u$ 到 $v$ 的最少步数}
+\begin{itemize}
+    \item $c_u\ne c_v$：不可达。
+    \item $d_v>0$：需 $d_u\ge d_v$ 且 $f^{d_u-d_v}(u)=v$，答案为 $d_u-d_v$；否则不可达。
+    \item $d_v=0$：答案为 $d_u+(p_v-p_{e_u})\bmod L$，取模结果取 $0\sim L-1$。
+\end{itemize}
+
+\textbf{实现与边界}
+\texttt{FunctionalGraph(next)}：入度剥叶分离环，反向处理剥离顺序填树尾信息；
+预处理时间与空间 $O(n\log(n+1))$，跳转/可达距离查询 $O(\log(n+1))$。
+点和环编号 1-based，环内位置 0-based；自环长度为 1，$k=0$ 返回原点。
+同一环的不同树尾分支未必互相可达；修改后继须重建。
