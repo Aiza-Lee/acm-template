@@ -8,19 +8,22 @@
  *     优化持续增广。
  *
  * API:
- *     ISAP(int n, int m = 0)                   — 初始化 n 个点、预估 m
- *                                                 条原图边的网络
- *     void add_edge(int u, int v, Cap w)       — 添加一条容量为 w 的有向边
+ *     ISAP(int n, int m = 0)                   — 初始化 n 个点、预估 m 条原图边的网络
+ *     int add_edge(int u, int v, Cap w)        — 添加一条容量为 w 的有向边，返回正向边编号 id (从 2 开始)
  *     Cap solve(int s, int t, Cap limit = INF) — 返回至多增广 limit 流量后的最大流
+ *     Cap edge_flow(int id) const              — 读取正向边 id 的实际流量 (等于反向边当前残量)
  *
  * Notes:
  *     模板参数: Cap (容量类型)
  *     1. Time: O(V^2E)，实战中常数通常优于朴素 Dinic
  *     2. Space: O(V + E)
- *     3. 1-based indexing.
- *     4. 用法/技巧: 4.1 GAP 优化可在某层节点数清零时直接判定源点后续不可达。4.2
- *        若只需发送部分流量，可直接传入 solve(s, t, limit)。4.3 反向 BFS
- *        依赖残量网络中的反向可达性，因此建图时仍按常规有向边添加即可。
+ *     3. 1-based indexing (点编号 1~n).
+ *     4. 方案构造与最小割:
+ *        4.1 流量方案: add_edge 返回正向边编号 id (偶数，从 2 开始)；调用 solve 后
+ *            可通过 edge_flow(id) 读取该边实际推流值 (底层即 g.e[id ^ 1].w)。
+ *        4.2 最小割方案: solve 结束后从源点 s 在残量网络 (e.w > 0) 上跑 BFS 可达的点集
+ *            即为源割集 S；跨越 S 与 V\S 的正向边即为最小割割边。
+ *     5. 用法/技巧: GAP 优化在某层节点数归零时提前终止；支持 limit 限额流。
  */
 
 template<typename Cap>
@@ -38,7 +41,7 @@ struct Graph {
     Graph(int n, int m = 0)
         : n(n), head(n + 1, 0), e(std::max(2 * m + 2, 2)), ec(1) {}
 
-    void add_edge(int u, int v, Cap w) {
+    int add_edge(int u, int v, Cap w) {
         AST(1 <= u && u <= n);
         AST(1 <= v && v <= n);
         if (ec + 2 >= (int)e.size()) e.resize(std::max((int)e.size() * 2, ec + 3));
@@ -46,6 +49,7 @@ struct Graph {
         head[u] = ec;
         e[++ec] = {u, head[v], 0};
         head[v] = ec;
+        return ec - 1;
     }
 };
 
@@ -63,8 +67,12 @@ struct ISAP {
     ISAP(int n, int m = 0)
         : g(n, m), dep(n + 2), gap(n + 2), cur(n + 1), n(n), s(0), t(0) {}
 
-    void add_edge(int u, int v, Cap w) {
-        g.add_edge(u, v, w);
+    int add_edge(int u, int v, Cap w) {
+        return g.add_edge(u, v, w);
+    }
+
+    Cap edge_flow(int id) const {
+        return g.e[id ^ 1].w;
     }
 
     void bfs() {

@@ -8,20 +8,23 @@
  *     DFS 多路增广。
  *
  * API:
- *     Dinic(int n, int m = 0)                  — 初始化 n 个点、预估 m
- *                                                 条原图边的网络
- *     void add_edge(int u, int v, Cap w)       — 添加一条容量为 w 的有向边
+ *     Dinic(int n, int m = 0)                  — 初始化 n 个点、预估 m 条原图边的网络
+ *     int add_edge(int u, int v, Cap w)        — 添加一条容量为 w 的有向边，返回正向边编号 id (从 2 开始)
  *     Cap solve(int s, int t, Cap limit = INF) — 返回至多增广 limit 流量后的最大流
+ *     Cap edge_flow(int id) const              — 读取正向边 id 的实际流量 (等于反向边当前残量)
  *
  * Notes:
  *     模板参数: Cap (容量类型)
  *     1. Time: 一般图 O(V^2E)；单位容量网络 O(min(V^(2/3), E^(1/2))E)；二分图匹配
  *        O(E\sqrt{V})
  *     2. Space: O(V + E)
- *     3. 1-based indexing.
- *     4. 用法/技巧: 4.1 二分图最大匹配可直接按网络流建模，用 Dinic 求最大流。4.2
- *        若只需发送部分流量，可直接传入 solve(s, t, limit)。4.3 dep[u] = 0
- *        的剪枝能减少本轮分层图中的无效搜索。
+ *     3. 1-based indexing (点编号 1~n).
+ *     4. 方案构造与最小割:
+ *        4.1 流量方案: add_edge 返回正向边编号 id (偶数，从 2 开始)；调用 solve 后
+ *            可通过 edge_flow(id) 读取该边实际推流值 (底层即 g.e[id ^ 1].w)。
+ *        4.2 最小割方案: solve 结束后残量网络中 dep[u] > 0 的点属于源割集 S；
+ *            若正向边满足 dep[u] > 0 且 dep[v] == 0，则该边为最小割的饱和割边。
+ *     5. 用法/技巧: 二分图最大匹配可直接建模求解；部分流量限制可传入 solve(s, t, limit)。
  */
 
 template<typename Cap>
@@ -39,7 +42,7 @@ struct Graph {
     Graph(int n, int m = 0)
         : n(n), head(n + 1, 0), e(std::max(2 * m + 2, 2)), ec(1) {}
 
-    void add_edge(int u, int v, Cap w) {
+    int add_edge(int u, int v, Cap w) {
         AST(1 <= u && u <= n);
         AST(1 <= v && v <= n);
         if (ec + 2 >= (int)e.size()) e.resize(std::max((int)e.size() * 2, ec + 3));
@@ -47,6 +50,7 @@ struct Graph {
         head[u] = ec;
         e[++ec] = {u, head[v], 0};
         head[v] = ec;
+        return ec - 1;
     }
 };
 
@@ -61,8 +65,12 @@ struct Dinic {
 
     Dinic(int n, int m = 0) : g(n, m), dep(n + 1), cur(n + 1), n(n) {}
 
-    void add_edge(int u, int v, Cap w) {
-        g.add_edge(u, v, w);
+    int add_edge(int u, int v, Cap w) {
+        return g.add_edge(u, v, w);
+    }
+
+    Cap edge_flow(int id) const {
+        return g.e[id ^ 1].w;
     }
 
     bool bfs(int s, int t) {
