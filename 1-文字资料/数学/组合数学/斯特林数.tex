@@ -1,69 +1,129 @@
-\textbf{斯特林数 (Stirling Numbers)}
+\textbf{斯特林数 (Stirling Numbers) 与阶乘幂代数}
 
-斯特林数分为两类，分别对应不同的组合意义和多项式基底转换性质。
-
-\textbf{第一类斯特林数}
-
-\textbf{定义}
-无符号第一类斯特林数 $\left[ \begin{matrix} n \\ k \end{matrix} \right]$ (或 $c(n, k)$) 表示将 $n$ 个不同元素排成 $k$ 个轮换（Cycle）的方案数。
-有符号第一类斯特林数 $s(n, k)$ 定义为 $s(n, k) = (-1)^{n-k} \left[ \begin{matrix} n \\ k \end{matrix} \right]$。
-
-\textbf{递推式}
-\[
-\left[ \begin{matrix} n \\ k \end{matrix} \right] = \left[ \begin{matrix} n-1 \\ k-1 \end{matrix} \right] + (n-1) \left[ \begin{matrix} n-1 \\ k \end{matrix} \right]
-\]
-边界：$\left[ \begin{matrix} n \\ n \end{matrix} \right] = 1, \left[ \begin{matrix} n \\ 0 \end{matrix} \right] = 0 (n \ge 1)$。
-
-\textbf{性质（多项式基底转换）}
-第一类斯特林数是上升/下降阶乘幂展开为普通幂的系数：
+\textbf{定义与组合意义}
 \begin{itemize}
-    \item 上升阶乘幂：$x^{\overline{n}} = \sum_{k=0}^n \left[ \begin{matrix} n \\ k \end{matrix} \right] x^k$
-    \item 下降阶乘幂：$x^{\underline{n}} = \sum_{k=0}^n (-1)^{n-k} \left[ \begin{matrix} n \\ k \end{matrix} \right] x^k = \sum_{k=0}^n s(n, k) x^k$
+    \item \textbf{无符号第一类斯特林数} $\left[ \begin{matrix} n \\ k \end{matrix} \right]$：将 $n$ 个不同元素划分为 $k$ 个互不相交非空轮换（圆排列/轮换）的方案数。
+    \item \textbf{有符号第一类斯特林数} $s(n, k) = (-1)^{n-k} \left[ \begin{matrix} n \\ k \end{matrix} \right]$。
+    \item \textbf{第二类斯特林数} $\left\{ \begin{matrix} n \\ k \end{matrix} \right\}$：将 $n$ 个不同元素划分为 $k$ 个互不相交非空无标号子集的方案数。
+    \item \textbf{递推式与边界}（$n, k \ge 1$）：
+    \[
+    \left[ \begin{matrix} n \\ k \end{matrix} \right] = \left[ \begin{matrix} n-1 \\ k-1 \end{matrix} \right] + (n-1) \left[ \begin{matrix} n-1 \\ k \end{matrix} \right], \qquad
+    \left\{ \begin{matrix} n \\ k \end{matrix} \right\} = \left\{ \begin{matrix} n-1 \\ k-1 \end{matrix} \right\} + k \left\{ \begin{matrix} n-1 \\ k \end{matrix} \right\}
+    \]
+    边界：$\left[ \begin{matrix} 0 \\ 0 \end{matrix} \right] = \left\{ \begin{matrix} 0 \\ 0 \end{matrix} \right\} = 1$；当 $n > 0$ 时 $\left[ \begin{matrix} n \\ 0 \end{matrix} \right] = \left\{ \begin{matrix} n \\ 0 \end{matrix} \right\} = 0$；$k > n$ 时均为 $0$。
 \end{itemize}
 
-\textbf{生成函数}
+\textbf{基底转换表 (普通幂 $\leftrightarrow$ 阶乘幂 $\leftrightarrow$ 组合数)}
+阶乘幂记号：下降幂 $x^{\underline{n}} = x(x-1)\cdots(x-n+1)$；上升幂 $x^{\overline{n}} = x(x+1)\cdots(x+n-1)$。
+互换关系：$x^{\overline{n}} = (-1)^n (-x)^{\underline{n}} = (x+n-1)^{\underline{n}}$。
 \begin{itemize}
-    \item 行生成函数：即上述阶乘幂多项式。
-    \item 列生成函数 (EGF)：
+    \item \textbf{下降幂 $\to$ 普通幂}：$x^{\underline{n}} = \sum_{k=0}^n (-1)^{n-k} \left[ \begin{matrix} n \\ k \end{matrix} \right] x^k = \sum_{k=0}^n s(n, k) x^k$
+    \item \textbf{上升幂 $\to$ 普通幂}：$x^{\overline{n}} = \sum_{k=0}^n \left[ \begin{matrix} n \\ k \end{matrix} \right] x^k$
+    \item \textbf{普通幂 $\to$ 下降幂}：$x^n = \sum_{k=0}^n \left\{ \begin{matrix} n \\ k \end{matrix} \right\} x^{\underline{k}}$
+    \item \textbf{普通幂 $\to$ 上升幂}：$x^n = \sum_{k=0}^n (-1)^{n-k} \left\{ \begin{matrix} n \\ k \end{matrix} \right\} x^{\overline{k}}$
+    \item \textbf{普通幂 $\to$ 组合数 (计数核心)}：$x^n = \sum_{k=0}^n \left\{ \begin{matrix} n \\ k \end{matrix} \right\} k! \binom{x}{k}$
+\end{itemize}
+
+\textbf{核心化简与求和技巧}
+\begin{itemize}
+    \item \textbf{自然数幂和 ($O(k)$ 算法)}：当 $n$ 极大而 $k$ 较小时，通过组合数展开累加：
     \[
-    \sum_{n=k}^{\infty} \left[ \begin{matrix} n \\ k \end{matrix} \right] \frac{x^n}{n!} = \frac{(-\ln(1-x))^k}{k!}
+    \sum_{i=0}^n i^k = \sum_{j=0}^k \left\{ \begin{matrix} k \\ j \end{matrix} \right\} j! \sum_{i=0}^n \binom{i}{j} = \sum_{j=0}^k \left\{ \begin{matrix} k \\ j \end{matrix} \right\} j! \binom{n+1}{j+1} = \sum_{j=0}^k \left\{ \begin{matrix} k \\ j \end{matrix} \right\} \frac{(n+1)^{\underline{j+1}}}{j+1}
+    \]
+    \item \textbf{树上/图上距离 $k$ 次方和}：将 $\operatorname{dist}(u, v)^k$ 展开为 $\sum_{j=0}^k \left\{ \begin{matrix} k \\ j \end{matrix} \right\} j! \binom{\operatorname{dist}(u, v)}{j}$。组合意义转化为“在路径上选择 $j$ 条互不相同的边”，从而将高次幂转化为普通的点/边连通连通块或虚树 DP。
+    \item \textbf{第二类斯特林数容斥通项}：
+    \[
+    \left\{ \begin{matrix} n \\ k \end{matrix} \right\} = \frac{1}{k!} \sum_{j=0}^k (-1)^{k-j} \binom{k}{j} j^n = \sum_{j=0}^k \frac{(-1)^{k-j}}{(k-j)!} \frac{j^n}{j!}
     \]
 \end{itemize}
 
-\textbf{第二类斯特林数}
-
-\textbf{定义}
-第二类斯特林数 $\left\{ \begin{matrix} n \\ k \end{matrix} \right\}$ (或 $S(n, k)$) 表示将 $n$ 个不同元素划分为 $k$ 个非空子集的方案数。
-
-\textbf{递推式}
+\textbf{正交性与斯特林反演}
+两类斯特林数的方阵互为逆矩阵，满足正交关系：
 \[
-\left\{ \begin{matrix} n \\ k \end{matrix} \right\} = \left\{ \begin{matrix} n-1 \\ k-1 \end{matrix} \right\} + k \left\{ \begin{matrix} n-1 \\ k \end{matrix} \right\}
+\sum_{k=m}^n (-1)^{n-k} \left[ \begin{matrix} n \\ k \end{matrix} \right] \left\{ \begin{matrix} k \\ m \end{matrix} \right\} = [n = m], \qquad
+\sum_{k=m}^n (-1)^{k-m} \left\{ \begin{matrix} n \\ k \end{matrix} \right\} \left[ \begin{matrix} k \\ m \end{matrix} \right] = [n = m]
 \]
-
-\textbf{通项公式}
-利用容斥原理可得：
-\[
-\left\{ \begin{matrix} n \\ k \end{matrix} \right\} = \frac{1}{k!} \sum_{j=0}^{k} (-1)^{k-j} \binom{k}{j} j^n
-\]
-该公式可用于卷积计算一行斯特林数。
-
-\textbf{性质（多项式基底转换）}
-第二类斯特林数是普通幂展开为下降阶乘幂的系数：
-\[
-x^n = \sum_{k=0}^n \left\{ \begin{matrix} n \\ k \end{matrix} \right\} x^{\underline{k}}
-\]
-
-\textbf{生成函数}
+由此导出两类反演形式：
 \begin{itemize}
-    \item 行生成函数：即上述普通幂多项式。
-    \item 列生成函数 (EGF)：
+    \item \textbf{下三角形式}：
     \[
-    \sum_{n=k}^{\infty} \left\{ \begin{matrix} n \\ k \end{matrix} \right\} \frac{x^n}{n!} = \frac{(e^x-1)^k}{k!}
+    f(n) = \sum_{k=0}^n \left\{ \begin{matrix} n \\ k \end{matrix} \right\} g(k) \iff g(n) = \sum_{k=0}^n (-1)^{n-k} \left[ \begin{matrix} n \\ k \end{matrix} \right] f(k)
+    \]
+    \item \textbf{上三角形式 (反向/容斥形式)}：
+    \[
+    f(n) = \sum_{k=n}^N \left\{ \begin{matrix} k \\ n \end{matrix} \right\} g(k) \iff g(n) = \sum_{k=n}^N (-1)^{k-n} \left[ \begin{matrix} k \\ n \end{matrix} \right] f(k)
     \]
 \end{itemize}
 
-\textbf{斯特林反演}
-两类斯特林数互为反演矩阵：
-\[
-f(n) = \sum_{k=0}^n \left\{ \begin{matrix} n \\ k \end{matrix} \right\} g(k) \iff g(n) = \sum_{k=0}^n s(n, k) f(k)
-\]
+\textbf{生成函数与多项式快速计算}
+\begin{itemize}
+    \item \textbf{行生成函数}：
+    $\sum_{k=0}^n \left[ \begin{matrix} n \\ k \end{matrix} \right] x^k = x^{\overline{n}} = \prod_{i=0}^{n-1} (x+i)$；
+    $\sum_{k=0}^n \left\{ \begin{matrix} n \\ k \end{matrix} \right\} x^{\underline{k}} = x^n$。
+    \item \textbf{列指数生成函数 (EGF)}：
+    \[
+    \sum_{n=k}^\infty \left[ \begin{matrix} n \\ k \end{matrix} \right] \frac{x^n}{n!} = \frac{1}{k!} \left( \ln \frac{1}{1-x} \right)^k, \qquad
+    \sum_{n=k}^\infty \left\{ \begin{matrix} n \\ k \end{matrix} \right\} \frac{x^n}{n!} = \frac{1}{k!} (e^x - 1)^k
+    \]
+    \item \textbf{列普通生成函数 (OGF)}：
+    \[
+    \sum_{n=k}^\infty \left[ \begin{matrix} n \\ k \end{matrix} \right] x^n = \frac{x^k}{\prod_{i=0}^{k-1} (1 - ix)}, \qquad
+    \sum_{n=k}^\infty \left\{ \begin{matrix} n \\ k \end{matrix} \right\} x^n = \frac{x^k}{\prod_{i=1}^k (1 - ix)}
+    \]
+    \item \textbf{4 种多项式快速计算路径}：
+    \begin{enumerate}
+        \item \textbf{第二类整行} ($O(n \log n)$)：卷积 $A_i = \frac{(-1)^i}{i!}$ 与 $B_i = \frac{i^n}{i!}$，截断到 $n+1$ 项。
+        \item \textbf{第一类整行} ($O(n \log n)$)：求 $F_n(x) = \prod_{i=0}^{n-1} (x+i)$。分治 NTT 为 $O(n \log^2 n)$；倍增平移 $F_{2m}(x) = F_m(x) F_m(x+m)$，其中平移用 Taylor 展开 $F_m(x+m) = \sum_{j} x^j \sum_{i \ge j} [x^i]F_m(x) \binom{i}{j} m^{i-j}$ 经一次二项式反向卷积完成，总复杂度 $O(n \log n)$。
+        \item \textbf{第一类整列} ($O(N \log N)$)：多项式求 $\ln \frac{1}{1-x}$ 后求 $k$ 次幂，乘上 $n!/k!$。
+        \item \textbf{第二类整列} ($O(N \log N)$)：多项式求 $e^x - 1$ 后求 $k$ 次幂，乘上 $n!/k!$。
+    \end{enumerate}
+\end{itemize}
+
+\textbf{特殊值与贝尔数 (Bell Numbers)}
+\begin{itemize}
+    \item \textbf{特殊单项值}：
+    $\left[ \begin{matrix} n \\ 1 \end{matrix} \right] = (n-1)!$；
+    $\left[ \begin{matrix} n \\ 2 \end{matrix} \right] = (n-1)! H_{n-1}$（$H_n = \sum_{i=1}^n \frac{1}{i}$ 为调和数）；
+    $\left[ \begin{matrix} n \\ n-1 \end{matrix} \right] = \left\{ \begin{matrix} n \\ n-1 \end{matrix} \right\} = \binom{n}{2}$；
+    $\left\{ \begin{matrix} n \\ 1 \end{matrix} \right\} = 1$；
+    $\left\{ \begin{matrix} n \\ 2 \end{matrix} \right\} = 2^{n-1} - 1$。
+    \item \textbf{第一类行和}：$\sum_{k=0}^n \left[ \begin{matrix} n \\ k \end{matrix} \right] = n!$（对应置换群 $S_n$ 的轮换分解总数）。
+    \item \textbf{第二类行和（贝尔数 $B_n$）}：$B_n = \sum_{k=0}^n \left\{ \begin{matrix} n \\ k \end{matrix} \right\}$，表示 $n$ 元集合的划分总数。
+    \begin{itemize}
+        \item 递推式：$B_{n+1} = \sum_{k=0}^n \binom{n}{k} B_k$
+        \item EGF：$\sum_{n=0}^\infty B_n \frac{x^n}{n!} = e^{e^x - 1}$
+        \item Touchard 同余（模素数 $p$ 周期性）：$B_{n+p} \equiv B_n + B_{n+1} \pmod p$。
+    \end{itemize}
+\end{itemize}
+
+\textbf{高阶/冷门拓展}
+\begin{itemize}
+    \item \textbf{拉赫数 (Lah Numbers / 第三类斯特林数)}：记作 $L(n, k)$，表示将 $n$ 个不同元素划分为 $k$ 个非空有序列表（有序块/线性链）的方案数。
+    \[
+    L(n, k) = \binom{n-1}{k-1} \frac{n!}{k!} = \frac{n!}{k!} \binom{n}{k} \frac{1}{n-k+1}
+    \]
+    上升幂与下降幂直接互换的连接系数（矩阵形式 $L = |s| \cdot S$）：
+    \[
+    x^{\overline{n}} = \sum_{k=1}^n L(n, k) x^{\underline{k}}, \qquad
+    x^{\underline{n}} = \sum_{k=1}^n (-1)^{n-k} L(n, k) x^{\overline{k}}
+    \]
+    Lah 反演：$f(n) = \sum_{k=1}^n L(n, k) g(k) \iff g(n) = \sum_{k=1}^n (-1)^{n-k} L(n, k) f(k)$。
+    \item \textbf{$r$-斯特林数 ($r$-Stirling Numbers)}：要求元素 $1, 2, \dots, r$ 必须属于不同轮换（记作 $\left[ \begin{matrix} n \\ k \end{matrix} \right]_r$）或不同子集（记作 $\left\{ \begin{matrix} n \\ k \end{matrix} \right\}_r$）。
+    递推式（$n > r$）：
+    \[
+    \left[ \begin{matrix} n \\ k \end{matrix} \right]_r = \left[ \begin{matrix} n-1 \\ k-1 \end{matrix} \right]_r + (n-1) \left[ \begin{matrix} n-1 \\ k \end{matrix} \right]_r, \qquad
+    \left\{ \begin{matrix} n \\ k \end{matrix} \right\}_r = \left\{ \begin{matrix} n-1 \\ k-1 \end{matrix} \right\}_r + k \left\{ \begin{matrix} n-1 \\ k \end{matrix} \right\}_r
+    \]
+    边界为 $\left[ \begin{matrix} r \\ r \end{matrix} \right]_r = \left\{ \begin{matrix} r \\ r \end{matrix} \right\}_r = 1$。
+    广义基底转换：$(x+r)^n = \sum_{k} \left\{ \begin{matrix} n+r \\ k+r \end{matrix} \right\}_r x^{\underline{k}}$。
+    \item \textbf{2-伴随第二类斯特林数 (Ward 斯特林数)}：要求每个集合大小至少为 $2$。
+    EGF 为 $\frac{1}{k!} (e^x - 1 - x)^k$。常用于完全不可区分、无孤立点的块划分计数。
+    \item \textbf{差分算子与离散 Taylor 展开}：
+    定义前向差分 $\Delta f(x) = f(x+1) - f(x)$，则 $\Delta x^{\underline{k}} = k x^{\underline{k-1}}$。
+    多项式差分满足 $\Delta^k f(0) = \sum_{j=0}^k (-1)^{k-j} \binom{k}{j} f(j)$。
+    特别地，单项式在原点的差分为：$\Delta^k (0^n) = k! \left\{ \begin{matrix} n \\ k \end{matrix} \right\}$。
+    离散 Taylor 公式：
+    \[
+    f(x) = \sum_{k \ge 0} \frac{\Delta^k f(0)}{k!} x^{\underline{k}} = \sum_{k \ge 0} \Delta^k f(0) \binom{x}{k}
+    \]
+\end{itemize}

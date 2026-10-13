@@ -8,14 +8,17 @@
  *     下降幂多项式与普通多项式之间的基底转换。
  *
  * API:
- *     StirlingS1<N>() — 编译期/构造时 O(N^2) 递推预处理第一类斯特林数表 get(n,
- *     k)              — 获取无符号第一类斯特林数 [n over k] mod md
- *                        falling_to_ordinary(b): 下降幂多项式转普通多项式系数
+ *     StirlingS1<N>()        — 编译期/构造时 O(N^2) 递推预处理第一类斯特林数表
+ *     get(n, k)              — 获取无符号第一类斯特林数 [n over k] mod md
+ *     falling_to_ordinary(b) — 下降幂多项式转普通多项式系数
  *
  * Notes:
  *     1. 递推式: S1(i, j) = S1(i-1, j-1) + (i-1) * S1(i-1, j)。
  *     2. 边界条件: S1(0, 0) = 1，其余 S1(i, 0) = S1(0, j) = 0。
  *     3. 多项式转换: x^{\underline{i}} = sum_{j=0}^i (-1)^(i-j) * S1(i, j) * x^j。
+ *
+ * Related:
+ *     斯特林数.tex — 斯特林数理论、基底转换、EGF/OGF 与 Lah 数等高级拓展
  */
 
 template<int N>

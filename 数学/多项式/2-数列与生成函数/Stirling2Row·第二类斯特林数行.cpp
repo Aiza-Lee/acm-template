@@ -19,7 +19,8 @@
  *      2. 特别地 S(0, 0) = 1。
  *
  * Related:
- *      数学/多项式/0-base/Poly·多项式全家桶.hpp: 底层 NTT 卷积。
+ *     数学/多项式/0-base/Poly·多项式全家桶.hpp: 底层 NTT 卷积。
+ *     斯特林数.tex                          — 斯特林数理论、基底转换与多项式计算路径
  */
 
 namespace poly_ext {
