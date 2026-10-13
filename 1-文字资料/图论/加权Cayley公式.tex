@@ -1,0 +1,68 @@
+\textbf{加权 Cayley 公式与 Prüfer 序列树计数}
+
+\textbf{定义与记号}
+设带标号无向树 $T$ 的顶点集为 $V=\{1,2,\dots,n\}$，记 $d_i$ 为顶点 $i$ 在 $T$ 中的度数。
+$n$ 阶带标号无根树 $T$ 与长度为 $n-2$、元素取自 $\{1,2,\dots,n\}$ 的 Prüfer 序列 $P=(p_1,p_2,\dots,p_{n-2})$ 存在一一双射。
+\textbf{双射性质}：顶点 $i$ 在 Prüfer 序列中出现的次数恰为 $d_i - 1$。
+度数满足自然约束：$d_i \ge 1$ 且 $\sum_{i=1}^n d_i = 2n - 2$（即 $\sum_{i=1}^n (d_i - 1) = n - 2$）。
+
+\textbf{加权 Cayley 公式 (Cayley's Tree Enumerator)}
+为每个顶点 $i$ 赋予形式变量（权值）$x_i$。定义树 $T$ 的权值为 $\prod_{i=1}^n x_i^{d_i-1}$，则全体 $n$ 阶带标号无根树集合 $\mathcal{T}_n$ 的生成函数为：
+\[
+\sum_{T\in\mathcal{T}_n} \prod_{i=1}^n x_i^{d_i-1} = \sum_{p_1,\dots,p_{n-2}=1}^n x_{p_1}x_{p_2}\cdots x_{p_{n-2}} = (x_1 + x_2 + \dots + x_n)^{n-2}
+\]
+两边同乘 $\prod_{i=1}^n x_i$，得度数权值积形式：
+\[
+\sum_{T\in\mathcal{T}_n} \prod_{i=1}^n x_i^{d_i} = x_1 x_2 \cdots x_n (x_1 + x_2 + \dots + x_n)^{n-2}
+\]
+\textbf{经典 Cayley 公式}：令 $x_1 = x_2 = \dots = x_n = 1$，得 $n$ 阶完全图生成树总数为 $n^{n-2}$。
+
+\textbf{推论 1：度数限制下的生成树计数}
+\begin{itemize}
+    \item \textbf{全体顶点度数确定}：给定每个点的度数 $d_1, d_2, \dots, d_n$（需满足 $d_i \ge 1$ 且 $\sum d_i = 2n - 2$），生成树数量由多重组合数给出：
+    \[
+    \binom{n-2}{d_1-1, d_2-1, \dots, d_n-1} = \frac{(n-2)!}{\prod_{i=1}^n (d_i - 1)!}
+    \]
+    若度数和不为 $2n-2$ 或存在 $d_i \le 0$，方案数为 $0$。
+    \item \textbf{部分顶点度数确定}：前 $m$ 个点度数固定为 $d_1, \dots, d_m$，其余 $n-m$ 个点度数任意。记 $S = \sum_{i=1}^m (d_i - 1)$，需满足 $S \le n - 2$：
+    \[
+    \text{Ans} = \binom{n-2}{d_1-1, \dots, d_m-1, n-2-S} (n-m)^{n-2-S} = \frac{(n-2)!}{(n-2-S)! \prod_{i=1}^m (d_i-1)!} (n-m)^{n-2-S}
+    \]
+    其中多项式系数分配受限点在 Prüfer 序列中的位置，剩余 $n-2-S$ 个位置可任意选取 $n-m$ 个未受限点。
+\end{itemize}
+
+\textbf{推论 2：连通块加边连通方案数 (加权 Cayley 推广)}
+\textbf{问题}：给定 $n$ 个点、$k$ 个连通块的无向图，连通块大小分别为 $s_1, s_2, \dots, s_k$（满足 $\sum_{i=1}^k s_i = n$）。添加 $k-1$ 条边使得全图连通的方案数。
+\textbf{结论}：
+\[
+\text{Ans} =
+\begin{cases}
+1, & k = 1,\\
+n^{k-2} \prod_{i=1}^k s_i, & k \ge 2.
+\end{cases}
+\]
+\textbf{推导}：将每个连通块缩为超点，添边形成 $k$ 个超点的树。设超点 $i$ 的度数为 $d_i$，块内任选连接端点方案为 $s_i^{d_i}$。由加权 Cayley 公式：
+\[
+\sum_{\sum d_i=2k-2} \frac{(k-2)!}{\prod_{i=1}^k (d_i-1)!} \prod_{i=1}^k s_i^{d_i} = \left(\prod_{i=1}^k s_i\right) \sum_{\sum c_i=k-2} \frac{(k-2)!}{\prod_{i=1}^k c_i!} \prod_{i=1}^k s_i^{c_i} = \left(\prod_{i=1}^k s_i\right) (s_1 + \dots + s_k)^{k-2} = n^{k-2} \prod_{i=1}^k s_i
+\]
+
+\textbf{推论 3：边权为点权积的生成树总权和}
+完全图中每条边 $(u, v)$ 赋权 $w(u, v) = a_u a_v$。定义生成树 $T$ 的权值为其所有边权的乘积 $\prod_{e\in T} w(e) = \prod_{i=1}^n a_i^{d_i}$。
+则所有生成树的权值积之和为：
+\[
+\sum_{T\in\mathcal{T}_n} \prod_{e\in T} w(e) = \left(\prod_{i=1}^n a_i\right) \left(\sum_{i=1}^n a_i\right)^{n-2}
+\]
+
+\textbf{推论 4：指定根的有根森林}
+$n$ 个带标号顶点构成包含 $k$ 棵有根树的森林，且指定顶点 $1, 2, \dots, k$ 分别作为各树的根，总方案数为：
+\[
+k n^{n-k-1}
+\]
+
+\textbf{速查与易错点}
+\begin{itemize}
+    \item $k=1$ 边界：已连通时无需加边，方案数为 $1$；若盲目套用 $n^{k-2}$ 会出现 $n^{-1}$。
+    \item $k=2$ 边界：$n^{2-2} = n^0 = 1$，方案数即为两块乘积 $s_1 s_2$。
+    \item 模数限制：计算 $\frac{(n-2)!}{\prod (d_i-1)!}$ 时，若模数非质数不能直接求逆元，应通过质因数分解或递推二项式系数约分。
+    \item 单点树：$n=1$ 时无 Prüfer 序列（定义域 $n \ge 2$），生成树数量约定为 $1$。
+\end{itemize}
