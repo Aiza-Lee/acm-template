@@ -17,6 +17,7 @@
  *                                               复杂度同 integrate。
  *
  * Notes:
+ *     模板参数: T (浮点数类型，默认为 double)
  *     1. 区间与方向：a > b 返回反向积分，a = b 时直接返回 0 且不调用 f。
  *     2. 参数约束：端点 a, b 与精度 eps 须有限且 eps > 0；0 <= min_depth <=
  *        max_depth <= 60。
@@ -27,48 +28,51 @@
  *        振荡或间断应先预分段。
  *     6. 被积函数：f 须在采样点良定义且可重复求值；端点可去奇点须显式取极限。
  */
+template<typename T = double>
 struct AdaptiveSimpson {
+    using CalcT = std::conditional_t<std::is_same_v<T, float>, double, long double>;
+
     template<typename F>
-    static double simpson(const F& f, double a, double b) {
+    static T simpson(const F& f, T a, T b) {
         _check(a, b);
         if (a == b) return 0;
         int cnt = 0;
-        double fa = _eval(f, a, cnt);
-        double fc = _eval(f, std::midpoint(a, b), cnt);
-        double fb = _eval(f, b, cnt);
+        T fa = _eval(f, a, cnt);
+        T fc = _eval(f, std::midpoint(a, b), cnt);
+        T fb = _eval(f, b, cnt);
         return _simpson(a, b, fa, fc, fb);
     }
 
     template<typename F>
-    static double integrate(const F& f, double a, double b, double eps = 1e-7,
-                            int min_depth = 3, int max_depth = 50) {
+    static T integrate(const F& f, T a, T b, T eps = T(1e-7),
+                       int min_depth = 3, int max_depth = 50) {
         _check(a, b, eps, min_depth, max_depth);
         if (a == b) return 0;
         int cnt = 0;
-        double fa = _eval(f, a, cnt);
-        double fc = _eval(f, std::midpoint(a, b), cnt);
-        double fb = _eval(f, b, cnt);
-        double s = _simpson(a, b, fa, fc, fb);
+        T fa = _eval(f, a, cnt);
+        T fc = _eval(f, std::midpoint(a, b), cnt);
+        T fb = _eval(f, b, cnt);
+        T s = _simpson(a, b, fa, fc, fb);
         return _solve(f, a, b, fa, fc, fb, s, eps, min_depth, max_depth, cnt);
     }
 
     template<typename F>
-    static double adaptive_simpson(const F& f, double a, double b, double eps,
-                                   double s, int min_depth = 0, int max_depth = 50) {
+    static T adaptive_simpson(const F& f, T a, T b, T eps,
+                              T s, int min_depth = 0, int max_depth = 50) {
         _check(a, b, eps, min_depth, max_depth);
         if (!std::isfinite(s)) {
             throw std::invalid_argument("nonfinite Simpson estimate");
         }
         if (a == b) return 0;
         int cnt = 0;
-        double fa = _eval(f, a, cnt);
-        double fc = _eval(f, std::midpoint(a, b), cnt);
-        double fb = _eval(f, b, cnt);
+        T fa = _eval(f, a, cnt);
+        T fc = _eval(f, std::midpoint(a, b), cnt);
+        T fb = _eval(f, b, cnt);
         return _solve(f, a, b, fa, fc, fb, s, eps, min_depth, max_depth, cnt);
     }
 
 private:
-    static void _check(double a, double b, double eps = 1, int lo = 0, int hi = 50) {
+    static void _check(T a, T b, T eps = 1, int lo = 0, int hi = 50) {
         if (!std::isfinite(a) || !std::isfinite(b) || !std::isfinite(eps) ||
             eps <= 0 || lo < 0 || lo > hi || hi > 60) {
             throw std::invalid_argument("invalid adaptive Simpson parameters");
@@ -76,54 +80,57 @@ private:
     }
 
     template<typename F>
-    static double _eval(const F& f, double x, int& cnt) {
+    static T _eval(const F& f, T x, int& cnt) {
         if (cnt == 1000000) {
             throw std::runtime_error("Simpson evaluation limit reached");
         }
         ++cnt;
-        double y = f(x);
+        T y = f(x);
         if (!std::isfinite(y)) {
             throw std::domain_error("nonfinite integrand value");
         }
         return y;
     }
 
-    static double _simpson(double a, double b, double fa, double fc, double fb) {
-        double s = ((ld)b - a) * ((ld)fa + 4 * (ld)fc + fb) / 6;
-        if (!std::isfinite(s)) {
+    static T _simpson(T a, T b, T fa, T fc, T fb) {
+        CalcT s = ((CalcT)b - a) * ((CalcT)fa + 4 * (CalcT)fc + fb) / 6;
+        T res = (T)s;
+        if (!std::isfinite(s) || !std::isfinite(res)) {
             throw std::domain_error("nonfinite Simpson estimate");
         }
-        return s;
+        return res;
     }
 
     template<typename F>
-    static double _solve(const F& f, double a, double b, double fa, double fc,
-                         double fb, double s, double eps, int lo, int hi, int& cnt) {
-        double c = std::midpoint(a, b);
-        double fl = _eval(f, std::midpoint(a, c), cnt);
-        double fr = _eval(f, std::midpoint(c, b), cnt);
-        double l = _simpson(a, c, fa, fl, fc);
-        double r = _simpson(c, b, fc, fr, fb);
-        ld sum = (ld)l + r;
-        ld delta = sum - s;
+    static T _solve(const F& f, T a, T b, T fa, T fc,
+                    T fb, T s, T eps, int lo, int hi, int& cnt) {
+        T c = std::midpoint(a, b);
+        T fl = _eval(f, std::midpoint(a, c), cnt);
+        T fr = _eval(f, std::midpoint(c, b), cnt);
+        T l = _simpson(a, c, fa, fl, fc);
+        T r = _simpson(c, b, fc, fr, fb);
+        CalcT sum = (CalcT)l + r;
+        CalcT delta = sum - s;
         bool stuck = (c == a || c == b);
-        if ((lo <= 0 || stuck) && std::abs(delta) <= 15 * (ld)eps) {
-            double ans = sum + delta / 15;
-            if (!std::isfinite(ans)) {
+        if ((lo <= 0 || stuck) && std::abs(delta) <= 15 * (CalcT)eps) {
+            CalcT ans = sum + delta / 15;
+            T res = (T)ans;
+            if (!std::isfinite(ans) || !std::isfinite(res)) {
                 throw std::domain_error("nonfinite integral estimate");
             }
-            return ans;
+            return res;
         }
-        double half = eps * 0.5;
+        T half = eps * T(0.5);
         if (stuck || hi == 0 || half == 0) {
             throw std::runtime_error("Simpson tolerance cannot be reached");
         }
-        double left = _solve(f, a, c, fa, fl, fc, l, half, lo - 1, hi - 1, cnt);
-        double right = _solve(f, c, b, fc, fr, fb, r, half, lo - 1, hi - 1, cnt);
-        double ans = (ld)left + right;
-        if (!std::isfinite(ans)) {
+        T left = _solve(f, a, c, fa, fl, fc, l, half, lo - 1, hi - 1, cnt);
+        T right = _solve(f, c, b, fc, fr, fb, r, half, lo - 1, hi - 1, cnt);
+        CalcT ans = (CalcT)left + right;
+        T res = (T)ans;
+        if (!std::isfinite(ans) || !std::isfinite(res)) {
             throw std::domain_error("nonfinite integral estimate");
         }
-        return ans;
+        return res;
     }
 };

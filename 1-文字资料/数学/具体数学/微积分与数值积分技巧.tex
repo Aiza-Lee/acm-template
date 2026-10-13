@@ -1,0 +1,63 @@
+\textbf{微积分与数值积分技巧速查}
+
+\textbf{反常积分判敛准则}
+\begin{itemize}
+    \item \textbf{无穷积分}：$\int_a^{+\infty} \frac{1}{x^p} \, dx$ ($a > 0$) 在 $p > 1$ 时收敛，在 $p \le 1$ 时发散。
+    \item \textbf{瑕积分}：$\int_0^a \frac{1}{x^p} \, dx$ ($a > 0$) 在 $p < 1$ 时收敛，在 $p \ge 1$ 时发散。
+    \item \textbf{幂指函数审敛}：遇 $x^{g(x)}$ 转化为 $\exp(g(x) \ln x)$ 分析 $x \to 0^+$ 或 $x \to +\infty$ 处的极限。例如 $x^{\frac{a}{x}-x}$ 在 $a < 0$ 时 $x \to 0^+$ 严重发散输出无解，在 $a \ge 0$ 时可积。
+\end{itemize}
+
+\textbf{区间折叠与变换 (消除无穷区间)}
+\begin{itemize}
+    \item \textbf{半无穷区间折叠至 $[0, 1]$}（倒数代换）：
+    \[
+    \int_0^{+\infty} f(x) \, dx = \int_0^1 \left( f(x) + \frac{1}{x^2} f\!\left(\frac{1}{x}\right) \right) dx.
+    \]
+    将全半轴反常积分紧凑化，完全规避无穷截断上界的选择与慢衰减误差。
+    \item \textbf{全实轴三角压缩}：
+    \[
+    \int_{-\infty}^{+\infty} f(x) \, dx = \int_{-\frac{\pi}{2}}^{\frac{\pi}{2}} f(\tan t) \sec^2 t \, dt.
+    \]
+    \item \textbf{对称区间折叠 (King's Property)}：
+    \[
+    \int_a^b f(x) \, dx = \int_a^b f(a+b-x) \, dx = \frac{1}{2} \int_a^b \bigl[f(x) + f(a+b-x)\bigr] dx.
+    \]
+    常用于被积式分母含有互补三角函数或指数对称项（如 $\frac{1}{1 + e^x}$），相加直接消去变元。
+\end{itemize}
+
+\textbf{弱奇点消除 (正则化代换)}
+\begin{itemize}
+    \item \textbf{根号分母消奇}：
+    \[
+    \int_0^a \frac{g(x)}{\sqrt{x}} \, dx \xrightarrow{x = u^2} \int_0^{\sqrt{a}} 2 g(u^2) \, du.
+    \]
+    原式导数在原点趋向无穷导致辛普森收敛迟缓；代换后雅可比项 $2u$ 抵消分母，全区间光滑良态。
+    \item \textbf{分数幂弱奇点 ($\alpha \in (0, 1)$)}：
+    \[
+    \int_0^a \frac{g(x)}{x^\alpha} \, dx \xrightarrow{x = u^{\frac{1}{1-\alpha}}} \int_0^{a^{1-\alpha}} \frac{1}{1-\alpha} g\!\left(u^{\frac{1}{1-\alpha}}\right) du.
+    \]
+\end{itemize}
+
+\textbf{几何量与物理量积分公式}
+\begin{itemize}
+    \item \textbf{曲线弧长 $L$}：
+    \[
+    L = \int_a^b \sqrt{1 + [y'(x)]^2} \, dx = \int_{t_1}^{t_2} \sqrt{[x'(t)]^2 + [y'(t)]^2} \, dt = \int_\alpha^\beta \sqrt{[r(\theta)]^2 + [r'(\theta)]^2} \, d\theta.
+    \]
+    \item \textbf{截面体积 (祖暅原理 / Cavalieri 积分)}：
+    \[
+    V = \int_{z_{\min}}^{z_{\max}} S(z) \, dz.
+    \]
+    $S(z)$ 为高度 $z$ 处的截面面积，常结合一维扫描线求交区间并计算。
+    \item \textbf{旋转体侧面积}（绕 $x$ 轴）：
+    \[
+    A = 2\pi \int_a^b |y(x)| \sqrt{1 + [y'(x)]^2} \, dx.
+    \]
+\end{itemize}
+
+\textbf{数值积分实战要点}
+\begin{itemize}
+    \item \textbf{假收敛防范}：被积函数含狭窄尖峰时，必须在已知极值点处手动分段，或配置最小细分深度 $\ge 3$。
+    \item \textbf{衰减速率与截断}：超指数衰减（$x^{-x}, e^{-x^2}$）截断至 $R \in [15, 25]$ 即达机精度极限；多项式慢衰减（$\sim x^{-p}$）严禁直接大区间截断，应结合倒数代换折叠。
+    \item \textbf{端点保护}：可去奇点（如 $x=0$ 处的 $\frac{\sin x}{x}=1$、$x^{-x}=1$）应在求值函数内显式特判延拓，或将下界平移至 $10^{-9}$ 防除零 NaN。
+\end{itemize}
