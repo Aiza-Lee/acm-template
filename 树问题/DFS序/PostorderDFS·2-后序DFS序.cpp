@@ -12,8 +12,8 @@
  *     - 工具：PostorderDFS 求解器，包含 post、fa 等树结构属性。
  *
  * API:
- *     PostorderDFS(g, root = 1) — 以 root 为根预处理树的后序遍历 DFS 序。
- *     dfs(u, p)                 — 内部后序遍历推进函数。
+ *     PostorderDFS(g, root) — 以 root 为根预处理树的后序遍历 DFS 序。
+ *     dfs(u, p)             — 内部后序遍历推进函数。
  *
  * Notes:
  *     1. 下标统一为 1-based；输入 g 为树的邻接表，默认以 1 为根。

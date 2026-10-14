@@ -14,9 +14,12 @@ namespace poly_ext {
  *      结合多项式 Exp 与求逆在 O(n log n) 时间内完成三者互化。
  *
  * API:
- *     p_to_e(p, n) — 幂和 p_1..p_n 转化为初等对称多项式 e_0..e_n，复杂度 O(n log n)。
- *     e_to_p(e, m) — 初等对称多项式 e 转化为前 m 项幂和 p_0..p_m，复杂度 O(m log m)。
- *     p_to_f(p, n) — 幂和 p 转化为特征多项式 f(x) = prod(x - a_i)，复杂度 O(n log n)。
+ *     p_to_e(p, n) — 幂和 p_1..p_n 转化为初等对称多项式 e_0..e_n，复杂度 O(n log
+ *                     n)。
+ *     e_to_p(e, m) — 初等对称多项式 e 转化为前 m 项幂和 p_0..p_m，复杂度 O(m log
+ *                     m)。
+ *     p_to_f(p, n) — 幂和 p 转化为特征多项式 f(x) = prod(x - a_i)，复杂度 O(n log
+ *                     n)。
  *     f_to_p(f, m) — 特征多项式 f 转化为前 m 项幂和 p_0..p_m，复杂度 O(m log m)。
  *
  * Notes:

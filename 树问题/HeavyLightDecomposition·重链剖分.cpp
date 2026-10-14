@@ -19,15 +19,16 @@
  *       deal_path_vertex、deal_path_edge、deal_subtree、heuristic_dfs。
  *
  * API:
- *     struct Graph(n)                     — 树的邻接表表示（1-based）。
- *     Graph::add_edge(u, v)               — 添加无向树边 (u, v)。
- *     HeavyPathDecomposition(G, root = 1) — 预处理重链剖分与 DFN 序列。
- * 
- *     lca(u, v)                 — 查询节点 u 和 v 的最近公共祖先，时间复杂度 O(log N)。
- *     kth_ancestor(u, k)        — 查询节点 u 的第 k 级祖先，越界返回 0，
- *                                   复杂度 O(log N)。
+ *     struct Graph(n)                 — 树的邻接表表示（1-based）。
+ *     Graph::add_edge(u, v)           — 添加无向树边 (u, v)。
+ *     HeavyPathDecomposition(G, root) — 预处理重链剖分与 DFN 序列。
+ *
+ *     lca(u, v)                 — 查询节点 u 和 v 的最近公共祖先，时间复杂度 O(log
+ *                                  N)。
+ *     kth_ancestor(u, k)        — 查询节点 u 的第 k 级祖先，越界返回 0，复杂度
+ *                                  O(log N)。
  *     jump(u, v, k)             — 返回路径 u -> v 上从 u 出发第 k 步到达的节点，
- *                                   越界返回 0。
+ *                                  越界返回 0。
  *     deal_path_vertex(u, v, f) — 将点路径拆为若干连续 DFN 区间并依次调用 f(l, r)。
  *     deal_path_edge(u, v, f)   — 将边路径拆为若干连续 DFN 区间并跳过 LCA。
  *     deal_subtree(u, f)        — 对节点 u 的子树连续 DFN 区间调用一次 f(l, r)。

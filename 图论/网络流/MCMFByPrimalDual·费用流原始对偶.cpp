@@ -8,23 +8,22 @@
  *     在非负化边权上反复寻找最短增广路。
  *
  * API:
- *     MCMF_PrimalDual(int n, int m = 0)                   — 初始化 n 个点、预估 m 条原图边的网络
- *     int add_edge(int u, int v, Cap w, Cost c)           — 添加一条容量为 w、费用为 c 的有向边，返回正向边编号 id (从 2 开始)
- *     std::pair<Cap, Cost> solve(int s, int t, Cap limit) — 返回至多增广 limit 流量后的 {flow, cost}
- *     Cap edge_flow(int id) const                         — 读取正向边 id 的实际流量 (等于反向边当前残量)
+ *     MCMF_PrimalDual(n, m) — 初始化 n 个点、预估 m 条原图边的网络
+ *     add_edge(u, v, w, c)  — 添加一条容量为 w、费用为 c 的有向边，返回正向边编号
+ *                              id (从 2 开始)
+ *     solve(s, t, limit)    — 返回至多增广 limit 流量后的 {flow, cost}
+ *     edge_flow(id)         — 读取正向边 id 的实际流量 (等于反向边当前残量)
  *
  * Notes:
  *     模板参数: Cap (容量类型), Cost (费用类型)
  *     1. Time: O(FE log V)，通常比纯 SPFA 版更稳
  *     2. Space: O(V + E)
  *     3. 1-based indexing (点编号 1~n). 支持负费用边，但要求不存在从源点可达的负环。
- *     4. 方案构造与流量提取:
- *        add_edge 返回正向边编号 id (偶数，从 2 开始)；调用 solve 后可通过 edge_flow(id)
- *        读取该边实际流经流量 (底层即 g.e[id ^ 1].w)。
- *     5. 用法/技巧:
- *        5.1 若只需发送部分流量，可直接传入 solve(s, t, limit)。
- *        5.2 若要求最大费用最大流，可将边权费用取反，答案费用再取反。
- *        5.3 当费用流规模较大或需要更稳定的复杂度时，优先使用本模板。
+ *     4. 方案构造与流量提取: add_edge 返回正向边编号 id (偶数，从 2 开始)；调用
+ *        solve 后可通过 edge_flow(id) 读取该边实际流经流量 (底层即 g.e[id ^ 1].w)。
+ *     5. 用法/技巧: 5.1 若只需发送部分流量，可直接传入 solve(s, t, limit)。5.2
+ *        若要求最大费用最大流，可将边权费用取反，答案费用再取反。5.3
+ *        当费用流规模较大或需要更稳定的复杂度时，优先使用本模板。
  */
 
 template<typename Cap, typename Cost>

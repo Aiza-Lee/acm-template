@@ -13,12 +13,10 @@
  *       多米诺骨牌覆盖与正交划分的高效搜索底座。
  *
  * API:
- *     DancingLinks(n, m, max_nodes = 0) — 初始化 n 行 m 列的 DLX 链表，
- *                                          支持预分配容量
- *     add(r, c)                         — 在第 r 行第 c 列添加一个 1 (1-based)，
- *                                          O(1)
- *     solve(callback)                   — 深度优先搜索所有精确覆盖解，每组解以
- *                                          vector<int> 传入 callback
+ *     DancingLinks(n, m, max_nodes) — 初始化 n 行 m 列的 DLX 链表，支持预分配容量
+ *     add(r, c)                     — 在第 r 行第 c 列添加一个 1 (1-based)，O(1)
+ *     solve(callback)               — 深度优先搜索所有精确覆盖解，每组解以
+ *                                      vector<int> 传入 callback
  *
  * Notes:
  *     1. Time: 指数级回溯，由于十字双向链表 O(1) 摘除与恢复节点，常数极小。

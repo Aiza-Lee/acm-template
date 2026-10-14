@@ -6,18 +6,15 @@
  *     建立蕴含图并用 Kosaraju 求强连通分量，判断 2-SAT 可满足性并恢复一组解。
  *
  * API:
- *     TwoSAT(int n)                                   — 初始化 n 个布尔变量 x1...xn
- *     add_implication(int u, bool fu, int v, bool fv) — 加入 (xu = fu) => (xv = fv)
- *     add_or(int u, bool fu, int v, bool fv)          — 加入 (xu = fu) or (xv = fv)
- *     add_true(int u, bool fu = true)                 — 强制 (xu = fu)
- *     add_false(int u)                                — 强制 xu = false
- *     add_equal(int u, bool fu, int v, bool fv)       — 强制 (xu = fu) == (xv = fv)
- *     add_xor(int u, bool fu, int v, bool fv)         — 强制 (xu = fu) xor (xv =
- *                                                        fv)
- *     bool solve()                                    — 判断是否可满足，并在
- *                                                        assignment 中恢复一组解
- *     bool value(int u) const                         — 读取 solve() 后变量 u
- *                                                        的取值
+ *     TwoSAT(n)                     — 初始化 n 个布尔变量 x1...xn
+ *     add_implication(u, fu, v, fv) — 加入 (xu = fu) => (xv = fv)
+ *     add_or(u, fu, v, fv)          — 加入 (xu = fu) or (xv = fv)
+ *     add_true(u, fu)               — 强制 (xu = fu)
+ *     add_false(u)                  — 强制 xu = false
+ *     add_equal(u, fu, v, fv)       — 强制 (xu = fu) == (xv = fv)
+ *     add_xor(u, fu, v, fv)         — 强制 (xu = fu) xor (xv = fv)
+ *     solve()                       — 判断是否可满足，并在 assignment 中恢复一组解
+ *     value(u)                      — 读取 solve() 后变量 u 的取值
  *
  * Notes:
  *     模板参数: 无

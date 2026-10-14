@@ -6,14 +6,20 @@
  *     提供连分数展开与还原、渐近分数生成以及有界分母最佳有理逼近。
  *
  * API:
- *     to_continued_fraction(p, q)       — 展开 p/q 为连分数系数向量 [a0; a1, ..., ak]，复杂度 O(log(max(p, q)))
- *     from_continued_fraction(cf)       — 由连分数系数向量还原既约分数 (num, den)，复杂度 O(|cf|)
- *     convergents(p, q)                 — 返回 p/q 的全部渐近分数 (h_i, k_i)，复杂度 O(log(max(p, q)))
- *     best_approximation(p, q, max_den) — 有界分母最佳逼近，返回分母 <= max_den 且使 |p/q - a/b| 最小的既约分数，复杂度 O(log(max(p, q)))
+ *     to_continued_fraction(p, q)       — 展开 p/q 为连分数系数向量 [a0; a1, ...,
+ *                                          ak]，复杂度 O(log(max(p, q)))
+ *     from_continued_fraction(cf)       — 由连分数系数向量还原既约分数 (num, den)，
+ *                                          复杂度 O(|cf|)
+ *     convergents(p, q)                 — 返回 p/q 的全部渐近分数 (h_i, k_i)，
+ *                                          复杂度 O(log(max(p, q)))
+ *     best_approximation(p, q, max_den) — 有界分母最佳逼近，返回分母 <= max_den
+ *                                          且使 |p/q - a/b| 最小的既约分数，复杂度
+ *                                          O(log(max(p, q)))
  *
  * Notes:
  *     1. 要求 p >= 0, q > 0。
- *     2. best_approximation 当 max_den <= 0 时返回 (0, 1)；当 max_den >= q 时直接返回原既约分数。
+ *     2. best_approximation 当 max_den <= 0 时返回 (0, 1)；当 max_den >= q
+ *        时直接返回原既约分数。
  *     3. 渐近分数满足单模性质 h_i * k_{i-1} - h_{i-1} * k_i = (-1)^{i-1}。
  *
  * Related:

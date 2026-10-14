@@ -13,11 +13,11 @@
  *     - 工具：Graph 结构、TreeDiameterTwoDFS 求解器、solve。
  *
  * API:
- *     struct Graph<T>(n)           — 树的带权邻接表表示（1-based，边权需非负）。
- *     Graph::add_edge(u, v, w = 1) — 添加非负权无向边 (u, v, w)。
- *     TreeDiameterTwoDFS<T>(G)     — 构造树直径求解器。
- *     solve(s = 1)                 — 从 s 出发两阶段求解直径，返回 Result {len, u,
- *                                     v, edges}。
+ *     struct Graph<T>(n)       — 树的带权邻接表表示（1-based，边权需非负）。
+ *     Graph::add_edge(u, v, w) — 添加非负权无向边 (u, v, w)。
+ *     TreeDiameterTwoDFS<T>(G) — 构造树直径求解器。
+ *     solve(s)                 — 从 s 出发两阶段求解直径，返回 Result {len, u, v,
+ *                                 edges}。
  *
  * Notes:
  *     1. 下标统一为 1-based。

@@ -11,7 +11,8 @@
  *     求解 MST。坐标与权值使用 i128 杜绝极值溢出。
  *
  * API:
- *     Point              — i64 坐标 x,y；Edge — {u,v,w}，w 为 i128。
+ *     Point              — i64 坐标 x, y。
+ *     Edge               — 边三元组 {u, v, w}，w 为 i128。
  *     candidate_edges(p) — 1-based 点表，O(n log n) 返回保证含 MST 的候选边。
  *     solve(p)           — 返回 MST 总权，i128；空/单点为 0；O(n log n)。
  *

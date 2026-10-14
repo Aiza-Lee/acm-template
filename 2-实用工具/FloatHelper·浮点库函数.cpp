@@ -11,10 +11,10 @@
  *     - 工具：sgn、feq、clamp_unit、float_examples 示范。
  *
  * API:
- *     sgn(x, eps = EPS)    — 浮点三态符号函数，返回 -1、0、1。
- *     feq(a, b, eps = EPS) — 浮点近似相等比较。
- *     clamp_unit(x)        — 将浮点数安全截断至闭区间 [-1, 1]。
- *     float_examples()     — 常用 <cmath> 指令与小量计算示范函数。
+ *     sgn(x, eps)      — 浮点三态符号函数，返回 -1、0、1。
+ *     feq(a, b, eps)   — 浮点近似相等比较。
+ *     clamp_unit(x)    — 将浮点数安全截断至闭区间 [-1, 1]。
+ *     float_examples() — 常用 <cmath> 指令与小量计算示范函数。
  *
  * Notes:
  *     1. 三角函数默认采用弧度制；反三角函数计算前建议调用 clamp_unit 防越界 NaN。

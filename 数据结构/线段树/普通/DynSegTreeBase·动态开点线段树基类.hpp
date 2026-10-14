@@ -11,15 +11,15 @@
  *     未分配的空节点默认代表初始零状态区间，按需递归开辟子节点以优化空间。
  *
  * API:
- *     DynSegTree(n, reserve_nodes = 0) — 初始化定义域为 [1, n] 的空线段树
- *     DynSegTree(l, r, reserve_nodes)  — 初始化定义域为 [l, r] 的空线段树
- *     reserve(reserve_nodes)           — 预留节点池空间
- *     modify(ql, qr, tag)              — 对区间 [ql, qr] 应用懒标记 tag
- *     query(ql, qr)                    — 查询区间 [ql, qr] 的聚合信息 Info
- *     all_info()                       — 返回整棵树全局聚合信息
- *     set(pos, value)                  — 单点 pos 赋值为 value
- *     find_first(ql, qr, pred)         — 在 [ql, qr] 上二分首个满足 pred 的位置
- *     find_last(ql, qr, pred)          — 在 [ql, qr] 上二分末个满足 pred 的位置
+ *     DynSegTree(n, reserve_nodes)    — 初始化定义域为 [1, n] 的空线段树
+ *     DynSegTree(l, r, reserve_nodes) — 初始化定义域为 [l, r] 的空线段树
+ *     reserve(reserve_nodes)          — 预留节点池空间
+ *     modify(ql, qr, tag)             — 对区间 [ql, qr] 应用懒标记 tag
+ *     query(ql, qr)                   — 查询区间 [ql, qr] 的聚合信息 Info
+ *     all_info()                      — 返回整棵树全局聚合信息
+ *     set(pos, value)                 — 单点 pos 赋值为 value
+ *     find_first(ql, qr, pred)        — 在 [ql, qr] 上二分首个满足 pred 的位置
+ *     find_last(ql, qr, pred)         — 在 [ql, qr] 上二分末个满足 pred 的位置
  *
  * Notes:
  *     1. 时间复杂度: 单次 modify / query / set / find 均为 O(log V)，V = r - l + 1。

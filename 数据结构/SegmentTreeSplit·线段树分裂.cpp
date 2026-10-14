@@ -10,16 +10,14 @@
  *     个节点。配合线段树合并可替代平衡树完成动态序列排序、区间分裂与合并。
  *
  * API:
- *     reserve(cap)                    — 可选预留 cap 个结点容量
- *     reset_pool()                    — 清空共享结点池, 旧节点编号全部失效
- *     SegTreeSplit(int n)             — 初始化值域 [1, n] 的空线段树
- *     void insert(int pos, i64 val)   — 在位置 pos 增加 val
- *     i64 query(int l, int r)         — 查询区间 [l, r] 的和 static void
- *                                        split(SegTreeSplit& a, SegTreeSplit& b,
- *                                        int k) // 将 a 在 k 处分裂, [1, k] 保留在
- *                                        a, (k, N] 分入 b
- *     void merge(SegTreeSplit& other) — 将 other 合并入 *this, other 被消耗 (root
- *                                        置空)
+ *     reserve(cap)     — 可选预留 cap 个结点容量
+ *     reset_pool()     — 清空共享结点池, 旧节点编号全部失效
+ *     SegTreeSplit(n)  — 初始化值域 [1, n] 的空线段树
+ *     insert(pos, val) — 在位置 pos 增加 val
+ *     query(l, r)      — 查询区间 [l, r] 的和 static void split(SegTreeSplit& a,
+ *                         SegTreeSplit& b, int k) // 将 a 在 k 处分裂, [1, k]
+ *                         保留在 a, (k, N] 分入 b
+ *     merge(other)     — 将 other 合并入 *this, other 被消耗 (root 置空)
  *
  * Notes:
  *     1. 时间复杂度: insert/query/split 均为 O(log N)；merge

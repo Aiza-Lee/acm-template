@@ -8,8 +8,8 @@
  *     通过寻找增广路的方式不断增加匹配数。
  *
  * API:
- *     void add_edge(int u, int v) — 添加无向边 u-v
- *     int solve()                 — 求解并返回最大匹配数（即匹配边的数量）
+ *     add_edge(u, v) — 添加无向边 u-v
+ *     solve()        — 求解并返回最大匹配数（即匹配边的数量）
  *
  * Notes:
  *     1. Time: O(VE)

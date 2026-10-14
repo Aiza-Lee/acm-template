@@ -3,18 +3,27 @@
  * Stern-Brocot Tree (Stern-Brocot 树)
  *
  * Overview:
- *     提供基于 Stern-Brocot 树的有界分母最佳有理逼近、紧包围祖先搜索以及开区间最简分数求解。
+ *     提供基于 Stern-Brocot 树的有界分母最佳有理逼近、
+ *     紧包围祖先搜索以及开区间最简分数求解。
  *
  * API:
- *     find(p, q, max_den)                  — 有界分母最佳逼近，返回分母 <= max_den 且使 |p/q - a/b| 最小的既约分数，复杂度 O(log(max(p, q)))
- *     enclose(p, q)                        — 返回树上紧包围 p/q 的两个祖先分数 (L, R)，满足 L < p/q < R 且 L.num+R.num=p, L.den+R.den=q，复杂度 O(log(max(p, q)))
- *     simplest_in_interval(p1, q1, p2, q2) — 返回开区间 (p1/q1, p2/q2) 内分母最小的最简既约分数，复杂度 O(log)
+ *     find(p, q, max_den)                  — 有界分母最佳逼近，返回分母 <= max_den
+ *                                             且使 |p/q - a/b| 最小的既约分数，
+ *                                             复杂度 O(log(max(p, q)))
+ *     enclose(p, q)                        — 返回树上紧包围 p/q 的两个祖先分数 (L,
+ *                                             R)，满足 L < p/q < R 且 L.num+R.num=p,
+ *                                             L.den+R.den=q，复杂度 O(log(max(p,
+ *                                             q)))
+ *     simplest_in_interval(p1, q1, p2, q2) — 返回开区间 (p1/q1, p2/q2)
+ *                                             内分母最小的最简既约分数，复杂度
+ *                                             O(log)
  *
  * Notes:
  *     1. 要求 p, q 均为正整数且 gcd(p, q) = 1。
- *     2. enclose 返回的 (L, R) 满足单模性质 R.num * L.den - L.num * R.den = 1；
- *        对于 1/1 特例返回 (0/1, 1/0)；对于整数 p/1 返回 ((p-1)/1, 1/0)。
- *     3. simplest_in_interval 要求 0 <= p1/q1 < p2/q2，内部采用欧几里得加速与 i128 交叉运算防止溢出。
+ *     2. enclose 返回的 (L, R) 满足单模性质 R.num * L.den - L.num * R.den = 1；对于
+ *        1/1 特例返回 (0/1, 1/0)；对于整数 p/1 返回 ((p-1)/1, 1/0)。
+ *     3. simplest_in_interval 要求 0 <= p1/q1 < p2/q2，内部采用欧几里得加速与 i128
+ *        交叉运算防止溢出。
  *
  * Related:
  *     数学/数论/ContinuedFraction·连分数.cpp: 连分数展开与渐近分数。

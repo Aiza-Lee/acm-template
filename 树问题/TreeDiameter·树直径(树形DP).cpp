@@ -15,11 +15,11 @@
  *     - 工具：Graph 结构、TreeDiameterDP 求解器、solve。
  *
  * API:
- *     struct Graph<T>(n)           — 树的带权邻接表表示（1-based）。
- *     Graph::add_edge(u, v, w = 1) — 添加无向边 (u, v, w)。
- *     TreeDiameterDP<T>(G)         — 构造树形 DP 直径求解器。
- *     solve(root = 1)              — 以 root 为定根求解树直径，返回 Result {len, u,
- *                                     v, edges}。
+ *     struct Graph<T>(n)       — 树的带权邻接表表示（1-based）。
+ *     Graph::add_edge(u, v, w) — 添加无向边 (u, v, w)。
+ *     TreeDiameterDP<T>(G)     — 构造树形 DP 直径求解器。
+ *     solve(root)              — 以 root 为定根求解树直径，返回 Result {len, u, v,
+ *                                 edges}。
  *
  * Notes:
  *     1. 下标统一为 1-based。

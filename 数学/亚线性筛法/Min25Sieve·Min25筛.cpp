@@ -11,9 +11,9 @@
  *
  * API:
  *     Min25(n, factors, f_p_c) — 构造函数，初始化并预处理质数前缀和
- *     int solve()              — 计算积性函数前缀和 ∑_{i=1}^n f(i)，复杂度
+ *     solve()                  — 计算积性函数前缀和 ∑_{i=1}^n f(i)，复杂度
  *                                 O(n^(3/4) / log n)
- *     int solve_prime_sum()    — 计算质数处函数和 ∑_{p <= n} f(p)
+ *     solve_prime_sum()        — 计算质数处函数和 ∑_{p <= n} f(p)
  *
 
  * Notes:

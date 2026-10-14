@@ -10,8 +10,8 @@
  *     数组以 O(1) 转移子区间边界，单次 O(log N) 快速定位区间第 k 小。
  *
  * API:
- *     PartitionTree(const std::vector<T>& a) — 用 1-based 数组 a 建树
- *     T query(int l, int r, int k)           — 查询区间 [l, r] 的第 k 小值
+ *     PartitionTree(a) — 用 1-based 数组 a 建树
+ *     query(l, r, k)   — 查询区间 [l, r] 的第 k 小值
  *
 
  * Notes:

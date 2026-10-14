@@ -14,13 +14,12 @@
  *       插入时，从右链底端向上弹出优先级劣于 i 的节点，被弹出的最后一个节点转为 i
  *       的左儿子，栈顶保留节点以 i 为右儿子。每个节点进出栈一次，构造复杂度为严格
  *       O(N)。
- *     - 工具：CartesianTree 构造器、重构接口 rebuild、树结构拓扑 root, fa, ls,
- *       rs。
+ *     - 工具：CartesianTree 构造器、重构接口 rebuild、树结构拓扑 root, fa, ls, rs。
  *
  * API:
- *     CartesianTree()                   — 默认构造空树。
- *     CartesianTree(a, cmp = Compare()) — 用 1-based 序列 a 构造笛卡尔树。
- *     rebuild(a, cmp = Compare())       — 传入新序列重构笛卡尔树。
+ *     CartesianTree()       — 默认构造空树。
+ *     CartesianTree(a, cmp) — 用 1-based 序列 a 构造笛卡尔树。
+ *     rebuild(a, cmp)       — 传入新序列重构笛卡尔树。
  *
  * Notes:
  *     1. 输入序列要求 1-based，a[0] 仅作占位；支持 n = 0（空序列，构造后 root =

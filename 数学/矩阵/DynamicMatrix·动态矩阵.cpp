@@ -7,12 +7,12 @@
  *     矩阵转置、高斯消元求方阵行列式（det）与逆矩阵（inverse）。
  *
  * API:
- *     Matrix(r, c, val = 0) — 构造 r 行 c 列的矩阵
- *     Matrix(r, c, data)    — 从数组构造矩阵
- *     Matrix::Identity(n)   — 返回 n*n 单位矩阵
- *     transpose()           — 矩阵转置
- *     det()                 — 计算方阵行列式，复杂度 O(n^3)
- *     inverse()             — 计算方阵逆矩阵，复杂度 O(n^3)
+ *     Matrix(r, c, val)   — 构造 r 行 c 列的矩阵
+ *     Matrix(r, c, data)  — 从数组构造矩阵
+ *     Matrix::Identity(n) — 返回 n*n 单位矩阵
+ *     transpose()         — 矩阵转置
+ *     det()               — 计算方阵行列式，复杂度 O(n^3)
+ *     inverse()           — 计算方阵逆矩阵，复杂度 O(n^3)
  *
  * Notes:
  *     1. 时间复杂度: 加减法 O(r*c)，乘法 O(r*c*rhv.c)，行列式与求逆 O(n^3)。

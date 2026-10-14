@@ -15,8 +15,7 @@ using namespace __gnu_pbds;
  *       2. cc_hash_table：碰撞拉链法，插入开销更平缓。
  *       3. Anti-Hash 安全防御：结合 splitmix64 与高精度启动时钟动态加盐，
  *          防御针对单调递增或特殊测试数据的卡 Hash Hack。
- *     - 工具：custom_hash、hash_set、hash_map、chain_hash_map、
- *       safe_hash_table。
+ *     - 工具：custom_hash、hash_set、hash_map、chain_hash_map、safe_hash_table。
  *
  * API:
  *     insert({k, v})  — 插入键值对；键已存在时不覆盖，返回 pair<iterator, bool>。

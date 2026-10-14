@@ -7,26 +7,26 @@
  *     最小流、最大流。
  *
  * API:
- *     LowerUpperBoundFlow(int n)                       — 初始化 1~n 点的网络
- *     int add_edge(int u, int v, Cap low, Cap high)    — 添加边 [low, high]，返回原图边编号 id (0-based)
- *     bool feasible_circulation()                      — 判断是否存在满足所有上下界的一组环流
- *     std::pair<bool, Cap> feasible_flow(int s, int t) — 返回一组可行 s->t 流及其流量
- *     std::pair<bool, Cap> min_flow(int s, int t)      — 返回最小可行 s->t 流
- *     std::pair<bool, Cap> max_flow(int s, int t)      — 返回最大可行 s->t 流
- *     Cap edge_flow(int id) const                      — 读取成功求解后原图第 id 条边 (0-based) 的实际流量
+ *     LowerUpperBoundFlow(n)    — 初始化 1~n 点的网络
+ *     add_edge(u, v, low, high) — 添加边 [low, high]，返回原图边编号 id (0-based)
+ *     feasible_circulation()    — 判断是否存在满足所有上下界的一组环流
+ *     feasible_flow(s, t)       — 返回一组可行 s->t 流及其流量
+ *     min_flow(s, t)            — 返回最小可行 s->t 流
+ *     max_flow(s, t)            — 返回最大可行 s->t 流
+ *     edge_flow(id)             — 读取成功求解后原图第 id 条边 (0-based) 的实际流量
  *
  * Notes:
  *     模板参数: Cap (容量类型)
  *     1. Time: 单次求解约为一次或两次 Dinic，O(V^2E) 量级
  *     2. Space: O(V + E)
  *     3. 1-based indexing (点编号 1~n). 所有边容量非负，要求 0 <= low <= high。
- *     4. 方案构造与流量提取:
- *        4.1 add_edge 返回从 0 开始自增的边编号 id；成功求解后调用 edge_flow(id)
- *            可直接读取该边的真实流量 f，保证满足 low <= f <= high。
- *        4.2 feasible_flow / min_flow / max_flow / feasible_circulation 成功时均会更新
- *            各边流量；若求解失败则流量数组置 0。
+ *     4. 方案构造与流量提取: 4.1 add_edge 返回从 0 开始自增的边编号 id；
+ *        成功求解后调用 edge_flow(id) 可直接读取该边的真实流量 f，保证满足 low <= f
+ *        <= high。4.2 feasible_flow / min_flow / max_flow / feasible_circulation
+ *        成功时均会更新各边流量；若求解失败则流量数组置 0。
  *     5. 用法/技巧: 无源汇时直接调用 feasible_circulation()；带源汇时按需调用
- *        feasible_flow / min_flow / max_flow。若题目带费用，需在残量网络基础上扩展费用流。
+ *        feasible_flow / min_flow / max_flow。若题目带费用，
+ *        需在残量网络基础上扩展费用流。
  */
 template<typename Cap = i64>
 struct LowerUpperBoundFlow {

@@ -6,11 +6,10 @@
  *     对显式二分图分层后批量寻找最短增广路，求最大匹配。
  *
  * API:
- *     HopcroftKarp(int n, int m)  — 初始化左部 1~n、右部 1~m 的二分图
- *     void add_edge(int u, int v) — 添加左部点 u 到右部点 v 的边
- *     int solve()                 — 返回最大匹配数，并在 match_l / match_r
- *                                    中恢复匹配
- *     min_vertex_cover()          — 在 solve() 后返回一组最小点覆盖的左右部点集
+ *     HopcroftKarp(n, m) — 初始化左部 1~n、右部 1~m 的二分图
+ *     add_edge(u, v)     — 添加左部点 u 到右部点 v 的边
+ *     solve()            — 返回最大匹配数，并在 match_l / match_r 中恢复匹配
+ *     min_vertex_cover() — 在 solve() 后返回一组最小点覆盖的左右部点集
  *
  * Notes:
  *     模板参数: 无

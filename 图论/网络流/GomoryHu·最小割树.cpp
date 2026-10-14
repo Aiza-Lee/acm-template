@@ -5,19 +5,20 @@
  *
  * Overview:
  *     无向带权图的 Gomory-Hu 最小割树（Gusfield 简易算法实现）。
- *     构造一棵包含原图全部顶点的带权树，满足原图中任意两点 u, v 的最小割容量
- *     恰好等于树上 u 到 v 路径上的最小边权。
+ *     构造一棵包含原图全部顶点的带权树，满足原图中任意两点 u, v
+ *     的最小割容量恰好等于树上 u 到 v 路径上的最小边权。
  *     仅需在原图上调用 n - 1 次 Dinic 最大流即可完成构建；树上预处理倍增 RMQ，
  *     支持全源点对最小割单次 O(log n) 查询。
  *     常用于全点对网络可靠性分析、最小割聚类与多点对瓶颈连通度判定。
  *
  * API:
- *     GomoryHu(n)     — 初始化 1..n 的图，O(n)。
- *     add_edge(u,v,w) — 无向容量，允许重边/零容量，忽略自环；均摊 O(1)。
- *     build()         — 重建割树与倍增表；O(n*T_flow + n^2 + n log(n+1))，
- *         空间 O(n + m + n log(n+1))。
- *     parent/cut/tree — 根 1，parent[1]=0；cut[v] 为父边容量，tree 为邻接表。
- *     min_cut(u,v)    — build 后 O(log(n+1)) 查询；u=v 返回 i64 最大值（空路径）。
+ *     GomoryHu(n)         — 初始化 1..n 的图，O(n)。
+ *     add_edge(u, v, w)   — 无向容量，允许重边/零容量，忽略自环；均摊 O(1)。
+ *     build()             — 重建割树与倍增表；O(n*T_flow + n^2 + n log(n+1))，空间
+ *                            O(n + m + n log(n+1))。
+ *     parent / cut / tree — 根 1，parent[1]=0；cut[v] 为父边容量，tree 为邻接表。
+ *     min_cut(u, v)       — build 后 O(log(n+1)) 查询；u=v 返回 i64
+ *                            最大值（空路径）。
  *
  * Notes:
  *     1. 每轮新建残量图；添加边后必须重新 build，重复 build 不改变原容量。

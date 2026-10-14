@@ -8,7 +8,7 @@
  *     以及快速查询任意子区间的哈希值，用于动态字符串匹配、回文判定与序列比对。
  *
  * API:
- *     H_init(n, base=13331)   — 预处理基数幂次表与等比数列前缀和 using SegHash =
+ *     H_init(n, base)         — 预处理基数幂次表与等比数列前缀和 using SegHash =
  *     SegTree<Info, Tag> Info — 结构体，维护区间哈希值 hash 与区间长度 len Tag:
  *                                结构体，维护区间加法标记 add modify(l, r, {add}):
  *                                对区间 [l, r] 内所有字符/数值加上 add query(l, r):

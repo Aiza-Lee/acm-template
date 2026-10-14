@@ -7,11 +7,10 @@
  *     求连接图中指定的 k 个关键点的最小代价树 (NP-hard，k 较小时使用状压 DP 求解)。
  *
  * API:
- *     SteinerTree(int n)                               — 初始化 1..n 个点的图
- *     void add_edge(int u, int v, T w)                 — 添加一条无向带权边 (u, v)
- *     void set_key_nodes(const std::vector<int>& keys) — 设置关键点集合
- *     T solve()                                        — 求解连接所有关键点的最小代
- *                                                         价
+ *     SteinerTree(n)      — 初始化 1..n 个点的图
+ *     add_edge(u, v, w)   — 添加一条无向带权边 (u, v)
+ *     set_key_nodes(keys) — 设置关键点集合
+ *     solve()             — 求解连接所有关键点的最小代价
  *
  * Notes:
  *     1. 状态定义: dp[mask][u] 为以 u 为根连接关键点集合 mask 的最小代价。

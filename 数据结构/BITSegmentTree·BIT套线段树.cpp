@@ -9,7 +9,8 @@
  *
  * API:
  *     BITSegTree(n, a) — 传入1-based数组a建树并自动值域离散化
- *     add(pos, val)    — 在位置pos处插入一个值为val的元素（val必须在建树时值集合中）
+ *     add(pos, val)    — 在位置pos处插入一个值为val的元素（val必须在建树时值集合
+ *                         中）
  *     query(l, r, k)   — 查询区间[l, r]内第k小的原始值（1 <= k <= 区间元素总数）
  *
  * Notes:

@@ -10,15 +10,17 @@
  *
  * API:
  *     FHQ<T>(n) / init(n) — 初始化，可选预留 n 个节点。
- * 
+ *
  *     insert_val(v) — 插入一个数值 v，期望 O(log n)。
  *     erase_val(v)  — 删除单个数值为 v 的节点（若有多个仅删一个），期望 O(log n)。
- *     rank(v)       — 查询 v 在集合中的排名（严格小于 v 的元素个数 + 1），
- *                      期望 O(log n)。
+ *     rank(v)       — 查询 v 在集合中的排名（严格小于 v 的元素个数 + 1），期望
+ *                      O(log n)。
  *     kth(k)        — 查询集合中排名第 k 小的元素值，期望 O(log n)。
- *     prev(v)       — 查询严格小于 v 的最大前驱，不存在返回 nullopt，期望 O(log n)。
- *     next(v)       — 查询严格大于 v 的最小后继，不存在返回 nullopt，期望 O(log n)。
- * 
+ *     prev(v)       — 查询严格小于 v 的最大前驱，不存在返回 nullopt，期望 O(log
+ *                      n)。
+ *     next(v)       — 查询严格大于 v 的最小后继，不存在返回 nullopt，期望 O(log
+ *                      n)。
+ *
  *     size() / empty() / clear() — 基础状态查询与清空。
  *
  * Notes:

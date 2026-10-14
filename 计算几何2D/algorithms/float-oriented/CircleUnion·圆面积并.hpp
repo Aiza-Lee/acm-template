@@ -12,8 +12,9 @@
  *     常用于多基站覆盖面积计算、圆盘重叠区域统计与连续几何规划。
  *
  * API:
- *     CircleUnion::area(circles,eps=1e-12) — CircleFP 普通列表，返回面积并；
- *         空表/零半径面积 0，O(n^2 log(n+1)) 时间，O(n) 额外空间。
+ *     CircleUnion::area(circles, eps) — CircleFP 普通列表，返回面积并；
+ *                                        空表/零半径面积 0，O(n^2 log(n+1)) 时间，
+ *                                        O(n) 额外空间。
  *
  * Notes:
  *     1. 半径非负，输入有限；长度判定容差 eps*max(1,r_i,r_j,d)，近重合圆按索引去重。

@@ -7,8 +7,8 @@
  *     使用 Tarjan 算法在线求有向图的强连通分量。
  *
  * API:
- *     SCC(Graph& g)        — 构造时完成求解
- *     int scc_cnt          — 强连通分量个数
+ *     SCC(g)               — 构造时完成求解
+ *     scc_cnt              — 强连通分量个数
  *     std::vector<int> scc — scc[u] 为点 u 所属的强连通分量编号
  *
  * Notes:

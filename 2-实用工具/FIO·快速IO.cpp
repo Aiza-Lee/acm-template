@@ -13,15 +13,15 @@
  *       2. 浮点解析：分别累加整数部分与小数部分；写出时按指定精度固定四舍五入。
  *
  * API:
- *     read(x)              — 快速读入整数，返回 bool 表示是否成功读入（EOF 返回
- *                             false）。
- *     readFloat(x)         — 快速读入浮点数，返回 bool 表示是否成功读入。
- *     write(x)             — 快速写出整数。
- *     writeFloat(x, p = 6) — 快速写出浮点数，p 为保留小数位数。
- *     readWord()           — 读入下一个非空白字符串，返回 std::string。
- *     writeStr(s)          — 写出 std::string 或 const char* 字符串。
- *     nl()                 — 输出换行符 '\n'。
- *     flush()              — 主动刷新写出缓冲区至标准输出（程序结束前必须调用）。
+ *     read(x)          — 快速读入整数，返回 bool 表示是否成功读入（EOF 返回
+ *                         false）。
+ *     readFloat(x)     — 快速读入浮点数，返回 bool 表示是否成功读入。
+ *     write(x)         — 快速写出整数。
+ *     writeFloat(x, p) — 快速写出浮点数，p 为保留小数位数。
+ *     readWord()       — 读入下一个非空白字符串，返回 std::string。
+ *     writeStr(s)      — 写出 std::string 或 const char* 字符串。
+ *     nl()             — 输出换行符 '\n'。
+ *     flush()          — 主动刷新写出缓冲区至标准输出（程序结束前必须调用）。
  *
  * Notes:
  *     1. 交互题中禁止使用基于全局缓冲区的 FIO，以免阻塞交互流。

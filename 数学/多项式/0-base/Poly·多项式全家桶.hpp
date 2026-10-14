@@ -13,7 +13,7 @@
  *
  * API:
  *     using Poly = Polynomial<>    — 预设模数 998244353 的别名。
- *     P + Q, P                     — Q, P * Q, P * k: 多项式代数四则运算。
+ *     P + Q, P - Q, P * Q, P * k   — 多项式代数四则运算。
  *     P / Q, P % Q, div_mod(Q)     — 多项式带余除法，返回 {商 Q, 余数 R}，复杂度
  *                                     O(n log n)。
  *     P.deriv(), P.integral()      — 多项式求导与不定积分。

@@ -10,8 +10,7 @@
  *       1. 取最低置位：c = x & -x。
  *       2. 连续进位：r = x + c。
  *       3. 尾部连续 1 归位至最低位：next_x = (((r ^ x) >> 2) / c) | r。
- *     - 工具：next_combination、for_each_k_subset、
- *       for_each_by_hamming_weight。
+ *     - 工具：next_combination、for_each_k_subset、for_each_by_hamming_weight。
  *
  * API:
  *     next_combination(x)              — 给定权重为 k 的掩码 x，求相同权重的字典序

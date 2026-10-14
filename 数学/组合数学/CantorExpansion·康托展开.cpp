@@ -10,7 +10,8 @@
  *      值域计数用树状数组，双向均为 O(n log n)。
  *
  * API:
- *     Cantor(n)      — 预处理 0..n 的模阶乘 (n <= 20 时额外预处理精确阶乘)；n >= 0。
+ *     Cantor(n)      — 预处理 0..n 的模阶乘 (n <= 20 时额外预处理精确阶乘)；n >=
+ *                       0。
  *     rank_of(p)     — 返回精确 0-based 序号 (i64)；要求 n <= 20。p 为 1-based，
  *                       p[1..n] 是 1..n 的排列，p[0] 未用。
  *     rank_mod_of(p) — 返回序号 mod md (int)；任意 n，使用 aizalib 的 inc / mul。

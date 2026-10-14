@@ -11,15 +11,14 @@
  *       要么跨越当前层重心 c（以 c 为端点或经过 c）。框架通过外部传入的回调函数
  *       calc(c) 统计跨越 c 的贡献，然后将 c 标记为已删除（done[c] =
  *       true）并递归分治所有相邻子块。
- *     - 工具：CentroidDecomposition 结构、solve 分治驱动、get_size 与
- *       get_centroid。
+ *     - 工具：CentroidDecomposition 结构、solve 分治驱动、get_size 与 get_centroid。
  *
  * API:
  *     CentroidDecomposition(n)   — 初始化包含 n 个节点的点分治结构体（1-based）。
  *     add_edge(u, v)             — 添加树上的无向边 (u, v)。
  *     solve(root, calc)          — 从 root 出发执行分治，对每个分治重心调用
  *                                   calc(c)。
- *     get_size(u, fa = 0)        — 计算包含 u 的未删除连通块大小。
+ *     get_size(u, fa)            — 计算包含 u 的未删除连通块大小。
  *     get_centroid(u, fa, total) — 寻找包含 u 且大小为 total 的连通块重心。
  *
  * Notes:

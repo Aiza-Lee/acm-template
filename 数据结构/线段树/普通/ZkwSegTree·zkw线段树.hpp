@@ -12,14 +12,14 @@
  *     单次操作严格 O(1) 辅助空间、0 堆内存分配，常数极小且无递归栈开销。
  *
  * API:
- *     ZkwSegTree(n)                 — 初始化长度为 n 的空线段树
- *     ZkwSegTree(init)              — 用 1-based 的 Info 数组建树
- *     void modify(ql, qr, tag)      — 区间打标记
- *     Info query(ql, qr)            — 查询区间信息
- *     Info all_info()               — 返回整棵树信息
- *     void set(pos, value)          — 单点赋值
- *     find_first(ql, qr, Pred pred) — 二分首个满足 pred(info) 为 true 的叶子位置
- *     find_last(ql, qr, Pred pred)  — 二分末个满足 pred(info) 为 true 的叶子位置
+ *     ZkwSegTree(n)            — 初始化长度为 n 的空线段树
+ *     ZkwSegTree(init)         — 用 1-based 的 Info 数组建树
+ *     modify(ql, qr, tag)      — 区间打标记
+ *     query(ql, qr)            — 查询区间信息
+ *     all_info()               — 返回整棵树信息
+ *     set(pos, value)          — 单点赋值
+ *     find_first(ql, qr, pred) — 二分首个满足 pred(info) 为 true 的叶子位置
+ *     find_last(ql, qr, pred)  — 二分末个满足 pred(info) 为 true 的叶子位置
  *
  * Notes:
  *     1. 时间复杂度: 建树 O(N)，单次 modify / query / set / find 均为 O(log N)。

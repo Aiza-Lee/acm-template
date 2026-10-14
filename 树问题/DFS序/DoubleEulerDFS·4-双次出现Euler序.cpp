@@ -15,8 +15,8 @@
  *     - 工具：DoubleEulerDFS 结构，包含 st, ed, euler, fa 序列。
  *
  * API:
- *     DoubleEulerDFS(g, root = 1) — 以 root 为根预处理双次出现欧拉序。
- *     dfs(u, p)                   — 内部遍历推进函数。
+ *     DoubleEulerDFS(g, root) — 以 root 为根预处理双次出现欧拉序。
+ *     dfs(u, p)               — 内部遍历推进函数。
  *
  * Notes:
  *     1. 下标统一为 1-based；欧拉序有效下标范围为 [1, 2n]。

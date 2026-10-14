@@ -8,10 +8,10 @@
  *     DFS 多路增广。
  *
  * API:
- *     Dinic(int n, int m = 0)                  — 初始化 n 个点、预估 m 条原图边的网络
- *     int add_edge(int u, int v, Cap w)        — 添加一条容量为 w 的有向边，返回正向边编号 id (从 2 开始)
- *     Cap solve(int s, int t, Cap limit = INF) — 返回至多增广 limit 流量后的最大流
- *     Cap edge_flow(int id) const              — 读取正向边 id 的实际流量 (等于反向边当前残量)
+ *     Dinic(n, m)        — 初始化 n 个点、预估 m 条原图边的网络
+ *     add_edge(u, v, w)  — 添加一条容量为 w 的有向边，返回正向边编号 id (从 2 开始)
+ *     solve(s, t, limit) — 返回至多增广 limit 流量后的最大流
+ *     edge_flow(id)      — 读取正向边 id 的实际流量 (等于反向边当前残量)
  *
  * Notes:
  *     模板参数: Cap (容量类型)
@@ -19,12 +19,12 @@
  *        O(E\sqrt{V})
  *     2. Space: O(V + E)
  *     3. 1-based indexing (点编号 1~n).
- *     4. 方案构造与最小割:
- *        4.1 流量方案: add_edge 返回正向边编号 id (偶数，从 2 开始)；调用 solve 后
- *            可通过 edge_flow(id) 读取该边实际推流值 (底层即 g.e[id ^ 1].w)。
- *        4.2 最小割方案: solve 结束后残量网络中 dep[u] > 0 的点属于源割集 S；
- *            若正向边满足 dep[u] > 0 且 dep[v] == 0，则该边为最小割的饱和割边。
- *     5. 用法/技巧: 二分图最大匹配可直接建模求解；部分流量限制可传入 solve(s, t, limit)。
+ *     4. 方案构造与最小割: 4.1 流量方案: add_edge 返回正向边编号 id (偶数，从 2
+ *        开始)；调用 solve 后可通过 edge_flow(id) 读取该边实际推流值 (底层即 g.e[id
+ *        ^ 1].w)。4.2 最小割方案: solve 结束后残量网络中 dep[u] > 0 的点属于源割集
+ *        S；若正向边满足 dep[u] > 0 且 dep[v] == 0，则该边为最小割的饱和割边。
+ *     5. 用法/技巧: 二分图最大匹配可直接建模求解；部分流量限制可传入 solve(s, t,
+ *        limit)。
  */
 
 template<typename Cap>

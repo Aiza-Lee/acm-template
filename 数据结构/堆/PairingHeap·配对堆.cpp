@@ -16,7 +16,7 @@
  *     top()    — 获取堆顶最小值，O(1)。
  *     pop()    — 弹出堆顶最小值，两趟配对合并子树，均摊 O(log n)。
  *     join(R)  — 将堆 R 合并到当前堆，R 被清空，均摊 O(1)。
- * 
+ *
  *     decrease_key(id, new_val)   — 降低节点 id 的权值并维护堆序，均摊 O(1)。
  *     empty() / size() / clear()  — 基础状态查询与清空。
  *     reserve(cap) / reset_pool() — 共享节点池预分配与全局重置。

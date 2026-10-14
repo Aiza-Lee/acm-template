@@ -17,7 +17,7 @@
  * API:
  *     struct Graph(n)       — 树的邻接表表示（1-based）。
  *     Graph::add_edge(u, v) — 添加无向树边 (u, v)。
- *     RMQLCA(G, root = 1)   — 预处理欧拉序与 ST 表，时间复杂度 O(N log N)。
+ *     RMQLCA(G, root)       — 预处理欧拉序与 ST 表，时间复杂度 O(N log N)。
  *     lca(u, v)             — 在线查询节点 u 和 v 的最近公共祖先，时间复杂度严格
  *                              O(1)。
  *     dist(u, v)            — 查询两点树上边数距离，时间复杂度 O(1)。

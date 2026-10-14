@@ -18,7 +18,7 @@
  *     Graph::add_edge(u, v) — 添加无向树边 (u, v)。
  *     TarjanLCA(G)          — 构造离线 LCA 求解器。
  *     add_query(u, v)       — 添加待查询的点对 (u, v)。
- *     solve(root = 1)       — 离线求解所有查询，按添加顺序返回各查询答案。
+ *     solve(root)           — 离线求解所有查询，按添加顺序返回各查询答案。
  *
  * Notes:
  *     1. 下标统一为 1-based。

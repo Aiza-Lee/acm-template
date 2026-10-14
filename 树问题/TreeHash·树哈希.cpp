@@ -18,12 +18,11 @@
  *       get_unrooted_hash。
  *
  * API:
- *     TreeHash(n, mask = DEFAULT_MASK) — 初始化包含 n 个节点的树哈希求解器。
- *     add_edge(u, v)                   — 添加无向树边（1-based）。
- *     set_mask(new_mask)               — 设置自定义随机掩码以防御卡常/Hash 碰撞。
- *     get_rooted_hash(root)            — 计算以 root 为定根的有根树哈希值，复杂度
- *                                         O(N)。
- *     get_unrooted_hash()              — 计算无根树重心归一化哈希值，复杂度 O(N)。
+ *     TreeHash(n, mask)     — 初始化包含 n 个节点的树哈希求解器。
+ *     add_edge(u, v)        — 添加无向树边（1-based）。
+ *     set_mask(new_mask)    — 设置自定义随机掩码以防御卡常/Hash 碰撞。
+ *     get_rooted_hash(root) — 计算以 root 为定根的有根树哈希值，复杂度 O(N)。
+ *     get_unrooted_hash()   — 计算无根树重心归一化哈希值，复杂度 O(N)。
  *
  * Notes:
  *     1. 下标统一为 1-based；计算前需加入恰好 n - 1 条树边。

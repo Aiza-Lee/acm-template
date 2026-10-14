@@ -10,15 +10,14 @@
  *     中，构建动态凸包的上凸壳/下凸壳包络结构。
  *
  * API:
- *     LiChaoSeg(lb, rb, line_cap = 0) — 初始化值域，line_cap 为可选预留线段数
- *     init(lb, rb, line_cap = 0)      — 重置结构
- *     add_line(k, b, id = 0)          — 插入整段直线 y = kx + b，覆盖整个值域；
- *                                        返回实际 id
- *     add_segment(l, r, k, b, id = 0) — 插入定义域为 [l, r] 的线段；返回实际 id，
- *                                        完全越界则返回 0
- *     query_line(x)                   — 查询 x 处最优线段，返回 Line；id = 0
- *                                        表示不存在
- *     query(x)                        — 查询 x 处最大值；不存在返回 lowest()
+ *     LiChaoSeg(lb, rb, line_cap) — 初始化值域，line_cap 为可选预留线段数
+ *     init(lb, rb, line_cap)      — 重置结构
+ *     add_line(k, b, id)          — 插入整段直线 y = kx + b，覆盖整个值域；
+ *                                    返回实际 id
+ *     add_segment(l, r, k, b, id) — 插入定义域为 [l, r] 的线段；返回实际 id，
+ *                                    完全越界则返回 0
+ *     query_line(x)               — 查询 x 处最优线段，返回 Line；id = 0 表示不存在
+ *     query(x)                    — 查询 x 处最大值；不存在返回 lowest()
  *
 
  * Notes:

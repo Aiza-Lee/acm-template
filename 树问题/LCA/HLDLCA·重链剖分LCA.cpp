@@ -20,7 +20,7 @@
  * API:
  *     struct Graph(n)       — 树的邻接表表示（1-based）。
  *     Graph::add_edge(u, v) — 添加无向树边 (u, v)。
- *     HLDLCA(G, root = 1)   — 两次 DFS 线性预处理重链信息，时间复杂度 O(N)。
+ *     HLDLCA(G, root)       — 两次 DFS 线性预处理重链信息，时间复杂度 O(N)。
  *     lca(u, v)             — 查询节点 u 和 v 的最近公共祖先，最坏时间复杂度 O(log
  *                              N)。
  *     dist(u, v)            — 查询两点树上边数距离，最坏时间复杂度 O(log N)。

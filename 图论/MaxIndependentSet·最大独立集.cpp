@@ -6,10 +6,9 @@
  * Overview:
  *
  * API:
- *     int solve_general(adj_masks, n) — 一般图 MIS，adj_masks[i] 为顶点 i
- *                                        的邻接掩码（u64 位）
- *     std::vector<int> get_set()      — 返回最近一次求解得到的 MIS
- *                                        顶点集（1-based）
+ *     solve_general(adj_masks, n) — 一般图 MIS，adj_masks[i] 为顶点 i
+ *                                    的邻接掩码（u64 位）
+ *     get_set()                   — 返回最近一次求解得到的 MIS 顶点集（1-based）
  *
  * Notes:
  *     1. solve_general: 时间 O(2^{n/2} * n)，适用于 n ≤ 50。邻接掩码中第 j

@@ -13,8 +13,8 @@
  *     - 工具：RMQLCAEulerDFS 预处理器，包含 euler、dep、first、fa 数组。
  *
  * API:
- *     RMQLCAEulerDFS(g, root = 1) — 以 root 为根预处理欧拉序与深度数组。
- *     dfs(u, p)                   — 内部遍历推进函数。
+ *     RMQLCAEulerDFS(g, root) — 以 root 为根预处理欧拉序与深度数组。
+ *     dfs(u, p)               — 内部遍历推进函数。
  *
  * Notes:
  *     1. 下标统一为 1-based；欧拉序有效下标范围为 [1, 2n - 1]。

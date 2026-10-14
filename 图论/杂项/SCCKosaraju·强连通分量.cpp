@@ -7,9 +7,9 @@
  *     先在原图上按后序完成第一遍 DFS，再在反图上按逆后序做第二遍 DFS 求 SCC。
  *
  * API:
- *     SCCKosaraju(Graph& g) — 构造时完成求解
- *     int scc_cnt           — 强连通分量个数
- *     std::vector<int> scc  — scc[u] 为点 u 所属的强连通分量编号
+ *     SCCKosaraju(g)       — 构造时完成求解
+ *     scc_cnt              — 强连通分量个数
+ *     std::vector<int> scc — scc[u] 为点 u 所属的强连通分量编号
  *
  * Notes:
  *     模板参数: 无

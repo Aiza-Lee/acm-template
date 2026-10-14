@@ -9,10 +9,8 @@
  *     的第 n 项系数 [x^n] G(x)，以及扩展拉格朗日反演 [x^n] H(G(x))。
  *
  * API:
- *     coeff(Poly F, int n)                     — 计算复合逆 G(x) 的第 n 项系数
- *                                                 [x^n] G(x)
- *     generalized_coeff(Poly F, Poly H, int n) — 计算复合函数 H(G(x)) 的第 n
- *                                                 项系数 [x^n] H(G(x))
+ *     coeff(F, n)                — 计算复合逆 G(x) 的第 n 项系数 [x^n] G(x)
+ *     generalized_coeff(F, H, n) — 计算复合函数 H(G(x)) 的第 n 项系数 [x^n] H(G(x))
  *
  * Notes:
  *     1. 要求 F[0] == 0 且 F[1] != 0。当 F[1] != 1 时已内置归一化系数缩放。

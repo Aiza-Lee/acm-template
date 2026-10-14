@@ -12,8 +12,8 @@
  *     IDOM 关系构成了一棵树，称为支配树。
  *
  * API:
- *     void add_edge(int u, int v) — 添加有向边 u -> v
- *     void build(int s)           — 以 s 为源点构建支配树
+ *     add_edge(u, v) — 添加有向边 u -> v
+ *     build(s)       — 以 s 为源点构建支配树
  *
  * Notes:
  *     2. 空间复杂度: O(N + M)

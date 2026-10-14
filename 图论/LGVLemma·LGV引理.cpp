@@ -9,13 +9,11 @@
  *     其中右式正是顶点不相交路径系统按置换符号的带权和。
  *
  * API:
- *     LGV(int n)                    — 初始化1..n点的DAG
- *     void add_edge(int u, int v)   — 添加有向边u->v
- *     int count_paths(int u, int v) — 计算从u到v的路径条数
- * 
- *     int solve(const vector<int>& src, const vector<int>& snk) — 计算k对源汇的不相
- *                                                                  交路径系统行列式
- *                                                                  值
+ *     LGV(n)            — 初始化1..n点的DAG
+ *     add_edge(u, v)    — 添加有向边u->v
+ *     count_paths(u, v) — 计算从u到v的路径条数
+ *
+ *     solve(src, snk) — 计算k对源汇的不相交路径系统行列式值
  *
  * Notes:
  *     1. 复杂度: solve为O(k(n+m) + k^3)，count_paths为O(n+m)

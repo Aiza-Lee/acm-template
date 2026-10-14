@@ -4,33 +4,35 @@
  * MPM·MPM最大流
  *
  * Overview:
- *     Malhotra, Pramodh-Kumar, Maheshwari (MPM) 算法，基于分层图与节点吞吐容量（势能）
- *     的高效最大流算法。每轮 BFS 建立分层图后，在 O(V^2) 时间内寻找阻塞流。
+ *     Malhotra, Pramodh-Kumar, Maheshwari (MPM) 算法，
+ *     基于分层图与节点吞吐容量（势能）的高效最大流算法。每轮 BFS 建立分层图后，在
+ *     O(V^2) 时间内寻找阻塞流。
  *
  * API:
- *     MPM(int n, int m = 0)                    — 初始化 n 个点、预估 m 条原图边的网络
- *     int add_edge(int u, int v, Cap w)        — 添加一条容量为 w 的有向边，返回正向边编号 id (从 2 开始)
- *     Cap solve(int s, int t, Cap limit = INF) — 返回至多增广 limit 流量后的最大流
- *     Cap edge_flow(int id) const              — 读取正向边 id 的实际流量 (等于反向边当前残量)
+ *     MPM(n, m)          — 初始化 n 个点、预估 m 条原图边的网络
+ *     add_edge(u, v, w)  — 添加一条容量为 w 的有向边，返回正向边编号 id (从 2 开始)
+ *     solve(s, t, limit) — 返回至多增广 limit 流量后的最大流
+ *     edge_flow(id)      — 读取正向边 id 的实际流量 (等于反向边当前残量)
  *
  * Notes:
  *     模板参数: Cap (容量类型)
- *     1. Time: 理论最坏复杂度 O(V^3)，每轮阻塞流仅需 O(V^2)。在稠密网络上明显优于 Dinic 的 O(V^2E)。
+ *     1. Time: 理论最坏复杂度 O(V^3)，每轮阻塞流仅需 O(V^2)。在稠密网络上明显优于
+ *        Dinic 的 O(V^2E)。
  *     2. Space: O(V + E)
  *     3. 1-based indexing (点编号 1~n).
- *     4. 方案构造与最小割:
- *        4.1 流量方案: add_edge 返回正向边编号 id (偶数，从 2 开始)；调用 solve 后
- *            可通过 edge_flow(id) 读取该边实际推流值 (底层即 g.e[id ^ 1].w)。
- *        4.2 最小割方案: solve 结束后残量网络中 dep[u] > 0 的点属于源割集 S；
- *            若正向边满足 dep[u] > 0 且 dep[v] == 0，则该边为最小割的饱和割边。
- *     5. 用法/技巧:
- *        5.1 节点吞吐容量 pot(u) = min(p_in(u), p_out(u))。选取最小势能点 r 作为参考节点推进流量，确保每轮至少消除一个节点。
- *        5.2 基于数组模拟双向链表维护分层图入/出边，删除饱和边与无效点达到严格 O(1)。
+ *     4. 方案构造与最小割: 4.1 流量方案: add_edge 返回正向边编号 id (偶数，从 2
+ *        开始)；调用 solve 后可通过 edge_flow(id) 读取该边实际推流值 (底层即 g.e[id
+ *        ^ 1].w)。4.2 最小割方案: solve 结束后残量网络中 dep[u] > 0 的点属于源割集
+ *        S；若正向边满足 dep[u] > 0 且 dep[v] == 0，则该边为最小割的饱和割边。
+ *     5. 用法/技巧: 5.1 节点吞吐容量 pot(u) = min(p_in(u), p_out(u))。
+ *        选取最小势能点 r 作为参考节点推进流量，确保每轮至少消除一个节点。5.2
+ *        基于数组模拟双向链表维护分层图入/出边，删除饱和边与无效点达到严格 O(1)。
  *        5.3 若只需发送部分流量，可直接传入 solve(s, t, limit)。
  *
  * Related:
  *     Dinic·分层图最大流.cpp — 基于 DFS 多路增广的分层网络最大流 (O(V^2E))
- *     HLPP·最高标号预流推进.cpp — 基于最高标号与高度标号的预流推进 (O(V^2\sqrt{E}))
+ *     HLPP·最高标号预流推进.cpp — 基于最高标号与高度标号的预流推进
+ *     (O(V^2\sqrt{E}))
  */
 
 template<typename Cap>

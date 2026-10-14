@@ -9,10 +9,14 @@
  *     节点在序列中出现的次数等于度数减 1；对应生成树母函数与加权 Cayley 公式。
  *
  * API:
- *     encode(G)                               — 将无根树 G 编码为 Prufer 序列，长度为 n - 2
- *     decode(code)                            — 将 Prufer 序列解码为无根树边列表，点数为 code.size() + 2
- *     count_trees_with_degrees(n, deg)        — 给定 1-based 度数序列 deg，计算带标号无根树数量 (mod md)
- *     count_connecting_components(n, comp_sz) — 给定 k 个连通块大小，计算添加 k - 1 条边连通全图方案数 (mod md)
+ *     encode(G)                               — 将无根树 G 编码为 Prufer 序列，
+ *                                                长度为 n - 2
+ *     decode(code)                            — 将 Prufer 序列解码为无根树边列表，
+ *                                                点数为 code.size() + 2
+ *     count_trees_with_degrees(n, deg)        — 给定 1-based 度数序列 deg，
+ *                                                计算带标号无根树数量 (mod md)
+ *     count_connecting_components(n, comp_sz) — 给定 k 个连通块大小，计算添加 k -
+ *                                                1 条边连通全图方案数 (mod md)
  *
  * Notes:
  *     模板参数: 无
@@ -20,12 +24,11 @@
  *        count_connecting_components 为 O(k + log N)
  *     2. Space: O(N)
  *     3. 1-based indexing；decode(code) 得到的树点数为 code.size() + 2
- *     4. 性质与加权 Cayley 公式:
- *        4.1 双射性质: 节点 x 出现次数等于 deg[x] - 1。
- *        4.2 Cayley 公式: n 阶完全图带标号生成树数量为 n^(n-2)。
- *        4.3 度数限制树计数: 度数序列确定时方案数为 (n-2)! / prod((deg[i]-1)!)。
- *        4.4 连通块加边连通: k 个大小为 s_i 的连通块 (sum s_i = n)，添加 k-1 条边连通
- *            全图的方案数为 n^(k-2) * prod(s_i) (k >= 2)；k = 1 时特判为 1。
+ *     4. 性质与加权 Cayley 公式: 4.1 双射性质: 节点 x 出现次数等于 deg[x] - 1。4.2
+ *        Cayley 公式: n 阶完全图带标号生成树数量为 n^(n-2)。4.3 度数限制树计数:
+ *        度数序列确定时方案数为 (n-2)! / prod((deg[i]-1)!)。4.4 连通块加边连通: k
+ *        个大小为 s_i 的连通块 (sum s_i = n)，添加 k-1 条边连通全图的方案数为
+ *        n^(k-2) * prod(s_i) (k >= 2)；k = 1 时特判为 1。
  *
  * Related:
  *     加权Cayley公式.tex — 加权 Cayley 公式、生成树母函数与有根森林推论
@@ -127,7 +130,8 @@ struct Prufer {
         return ans;
     }
 
-    // 给定 k 个连通块大小 comp_sz，总点数为 n，计算添加 k - 1 条边连通全图的方案数 (mod md)
+    // 给定 k 个连通块大小 comp_sz，总点数为 n，计算添加 k - 1 条边连通全图的方案数
+    // (mod md)
     static int count_connecting_components(int n, const std::vector<int>& comp_sz) {
         int k = (int)comp_sz.size();
         if (k <= 1) return 1;

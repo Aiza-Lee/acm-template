@@ -8,7 +8,8 @@
  *      适用于无模数或实数域多项式乘法，结果四舍五入转为整型。
  *
  * API:
- *     struct comp                           — 自定义复数结构体，支持复数加、减、乘。
+ *     struct comp                           — 自定义复数结构体，支持复数加、减、
+ *                                              乘。
  *     FFT(tmp, n, type)                     — 长度为 n (2 的幂) 的原地 FFT / IFFT
  *                                              (type = 1 为 DFT，-1 为 IDFT)。
  *                                              复杂度 O(n log n)。

@@ -26,7 +26,8 @@
  *
  * Related:
  *      数学/数论/MultiplicativeOrder·乘法阶.cpp: 元素阶的定义与计算。
- *      数学/数论/ModMultiplicativeGroup·模乘法群.cpp: 一般模数下的群结构与正交基底分解。
+ *      数学/数论/ModMultiplicativeGroup·模乘法群.cpp:
+ *      一般模数下的群结构与正交基底分解。
  */
 struct PrimitiveRoot {
     static i64 _pow_mod(i64 a, i64 b, i64 mod) {

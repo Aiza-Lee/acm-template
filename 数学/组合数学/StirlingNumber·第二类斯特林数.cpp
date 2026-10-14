@@ -10,7 +10,8 @@
  * API:
  *     StirlingS2<N>()        — 编译期/构造时 O(N^2) 递推预处理第二类斯特林数表
  *     get(n, k)              — 获取第二类斯特林数 {n over k} mod md
- *     sum_powers(n, k)       — 利用斯特林数展开在 O(k) 时间内计算 sum_{i=0}^n i^k mod md
+ *     sum_powers(n, k)       — 利用斯特林数展开在 O(k) 时间内计算 sum_{i=0}^n i^k
+ *                               mod md
  *     ordinary_to_falling(a) — 普通多项式转下降幂多项式系数
  *
  * Notes:

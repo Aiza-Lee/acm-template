@@ -11,13 +11,13 @@
  *     特别适合打字手抄与无需区间修改的场景。
  *
  * API:
- *     ZkwSegTreePoint(n)            — 初始化长度为 n 的空线段树
- *     ZkwSegTreePoint(init)         — 用 1-based 的 Info 数组建树
- *     void set(pos, value)          — 单点赋值
- *     Info query(ql, qr)            — 查询区间信息
- *     Info all_info()               — 返回整棵树信息
- *     find_first(ql, qr, Pred pred) — 二分首个满足 pred(info) 为 true 的叶子位置
- *     find_last(ql, qr, Pred pred)  — 二分末个满足 pred(info) 为 true 的叶子位置
+ *     ZkwSegTreePoint(n)       — 初始化长度为 n 的空线段树
+ *     ZkwSegTreePoint(init)    — 用 1-based 的 Info 数组建树
+ *     set(pos, value)          — 单点赋值
+ *     query(ql, qr)            — 查询区间信息
+ *     all_info()               — 返回整棵树信息
+ *     find_first(ql, qr, pred) — 二分首个满足 pred(info) 为 true 的叶子位置
+ *     find_last(ql, qr, pred)  — 二分末个满足 pred(info) 为 true 的叶子位置
  *
  * Notes:
  *     1. 时间复杂度: 建树 O(N)，单次 set / query / find 均为 O(log N)。

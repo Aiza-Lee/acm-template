@@ -21,7 +21,8 @@
  * Related:
  *      数学/数论/EulerPhi·单点欧拉函数.cpp: 计算欧拉函数 phi(n)。
  *      数学/数论/PrimitiveRoot·原根.cpp: 原根定义为阶等于 phi(m) 的元素。
- *      数学/数论/ModMultiplicativeGroup·模乘法群.cpp: 任意模数乘法群基底与坐标化求阶。
+ *      数学/数论/ModMultiplicativeGroup·模乘法群.cpp:
+ *      任意模数乘法群基底与坐标化求阶。
  */
 struct MultiplicativeOrder {
     static i64 _norm(i64 x, i64 mod) {

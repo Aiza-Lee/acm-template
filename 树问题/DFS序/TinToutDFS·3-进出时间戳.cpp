@@ -12,8 +12,8 @@
  *     - 工具：TinToutDFS 结构，包含 tin、tout、fa 属性。
  *
  * API:
- *     TinToutDFS(g, root = 1) — 以 root 为根预处理进出时间戳。
- *     dfs(u, p)               — 内部遍历推进函数。
+ *     TinToutDFS(g, root) — 以 root 为根预处理进出时间戳。
+ *     dfs(u, p)           — 内部遍历推进函数。
  *
  * Notes:
  *     1. 下标统一为 1-based；输入 g 为树的邻接表，默认以 1 为根。

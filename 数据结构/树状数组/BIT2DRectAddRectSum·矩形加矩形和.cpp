@@ -11,7 +11,7 @@
  * API:
  *     RectBitTree2D<T>(n, m) / init(n, m) — 初始化 n * m 的二维差分树状数组。
  *     RectBitTree2D<T>(a) / init(a)       — 用 1-based 矩阵 a 线性 O(nm) 建树。
- * 
+ *
  *     add(x1, y1, x2, y2, v) — 子矩形 [x1, x2] * [y1, y2] 所有元素增加 v。
  *     sum_prefix(x, y)       — 查询前缀子矩形 [1, x] * [1, y] 的元素和。
  *     sum(x1, y1, x2, y2)    — 查询子矩形 [x1, x2] * [y1, y2] 的元素和。

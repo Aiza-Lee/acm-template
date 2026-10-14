@@ -9,7 +9,7 @@
  * API:
  *     simpson(f, a, b)                       — 单段三点估计，O(1) 时间与空间；a=b
  *                                               时返回 0。
- *     integrate(f, a, b, eps = 1e-7)         — 默认深度定积分估计，绝对误差目标为
+ *     integrate(f, a, b, eps)                — 默认深度定积分估计，绝对误差目标为
  *                                               eps。
  *     integrate(f, a, b, eps, min_d, max_d)  — 指定深度范围定积分；至少二分 min_d
  *                                               层、至多二分 max_d 层。

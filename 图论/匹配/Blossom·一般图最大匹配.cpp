@@ -6,10 +6,10 @@
  *     在无向一般图中通过 blossom 收缩寻找增广路，求最大匹配。
  *
  * API:
- *     Blossom(int n)         — 初始化 1~n 点的无向图
- *     add_edge(int u, int v) — 添加一条无向边
- *     solve()                — 返回最大匹配数，并在 mate 中恢复匹配
- *     matching_edges() const — 返回一组匹配边
+ *     Blossom(n)       — 初始化 1~n 点的无向图
+ *     add_edge(u, v)   — 添加一条无向边
+ *     solve()          — 返回最大匹配数，并在 mate 中恢复匹配
+ *     matching_edges() — 返回一组匹配边
  *
  * Notes:
  *     模板参数: 无

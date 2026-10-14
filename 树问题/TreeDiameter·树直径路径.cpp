@@ -15,11 +15,11 @@
  *     - 工具：Graph 结构、TreeDiameterDPPath 求解器、solve。
  *
  * API:
- *     struct Graph<T>(n)           — 树的带权邻接表表示（1-based，边权需非负）。
- *     Graph::add_edge(u, v, w = 1) — 添加无向树边 (u, v, w)。
- *     TreeDiameterDPPath<T>(G)     — 构造树直径与路径求解器。
- *     solve(root = 1)              — 求解直径与有序点序列，返回 Result {len, u, v,
- *                                     edges, path}。
+ *     struct Graph<T>(n)       — 树的带权邻接表表示（1-based，边权需非负）。
+ *     Graph::add_edge(u, v, w) — 添加无向树边 (u, v, w)。
+ *     TreeDiameterDPPath<T>(G) — 构造树直径与路径求解器。
+ *     solve(root)              — 求解直径与有序点序列，返回 Result {len, u, v,
+ *                                 edges, path}。
  *
  * Notes:
  *     1. 下标统一为 1-based。

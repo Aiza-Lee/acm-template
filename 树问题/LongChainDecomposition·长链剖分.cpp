@@ -18,21 +18,20 @@
  *          利用倍增一步跳 2^t 步到达 x，剩余步数 rem = k - 2^t < 2^t。由于 x
  *          所在长链长度 >= 其子树深度 >= 2^t > rem，因此目标祖先必定落在 x
  *          所在长链链头的向上或向下预处理数组内，实现 O(1) 索引。
- *     - 工具：Graph 结构、LongChainDecomposition 求解器、kth_ancestor、lca、
- *       dist、jump。
+ *     - 工具：Graph 结构、LongChainDecomposition 求解器、kth_ancestor、lca、dist、
+ *       jump。
  *
  * API:
- *     struct Graph(n)                     — 树的邻接表表示（1-based）。
- *     Graph::add_edge(u, v)               — 添加无向树边 (u, v)。
- *     LongChainDecomposition(G, root = 1) — 预处理长链信息，时间复杂度 O(N log N)。
- *     kth_ancestor(u, k)                  — 在线查询节点 u 的第 k 级祖先，
- *                                            时间复杂度严格 O(1)。
- *     lca(u, v)                           — 查询节点 u 和 v 的最近公共祖先，
- *                                            时间复杂度 O(log N)。
- *     dist(u, v)                          — 查询两点树上边数距离，时间复杂度 O(log
- *                                            N)。
- *     jump(u, v, k)                       — 返回路径 u -> v 上从 u 出发第 k
- *                                            步到达的节点，越界返回 0。
+ *     struct Graph(n)                 — 树的邻接表表示（1-based）。
+ *     Graph::add_edge(u, v)           — 添加无向树边 (u, v)。
+ *     LongChainDecomposition(G, root) — 预处理长链信息，时间复杂度 O(N log N)。
+ *     kth_ancestor(u, k)              — 在线查询节点 u 的第 k 级祖先，
+ *                                        时间复杂度严格 O(1)。
+ *     lca(u, v)                       — 查询节点 u 和 v 的最近公共祖先，时间复杂度
+ *                                        O(log N)。
+ *     dist(u, v)                      — 查询两点树上边数距离，时间复杂度 O(log N)。
+ *     jump(u, v, k)                   — 返回路径 u -> v 上从 u 出发第 k
+ *                                        步到达的节点，越界返回 0。
  *
  * Notes:
  *     1. 全部下标均为 1-based，根节点深度定义为 0。

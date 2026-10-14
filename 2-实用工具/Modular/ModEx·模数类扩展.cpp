@@ -11,8 +11,8 @@
  *     - 工具：MInt<P>、ZMInt<P>、Mint、ZMint。
  *
  * API:
- *     MInt(v = 0)     — 构造标准模数。
- *     ZMInt(v = 1)    — 构造追踪零计数的扩展模数。
+ *     MInt(v)         — 构造标准模数。
+ *     ZMInt(v)        — 构造追踪零计数的扩展模数。
  *     ZMInt::val()    — 返回当前真实模值（z > 0 时为 0，否则为 non_zero_part）。
  *     ZMInt::toMInt() — 转为标准 MInt。
  *     operator*, /=   — ZMInt 专用乘除法（支持撤销乘 0）。

@@ -14,20 +14,19 @@
  *     - 工具：Graph 结构、DoublingLCA 求解器、lca、dist、kth_ancestor。
  *
  * API:
- *     struct Graph(n)          — 树的邻接表表示（1-based）。
- *     Graph::add_edge(u, v)    — 添加无向树边 (u, v)。
- *     DoublingLCA(G, root = 1) — 预处理树上倍增表，时间复杂度 O(N log N)。
- *     lca(u, v)                — 查询节点 u 和 v 的最近公共祖先，时间复杂度 O(log
- *                                 N)。
- *     dist(u, v)               — 查询两点树上简单路径边数距离，时间复杂度 O(log
- *                                 N)。
- *     kth_ancestor(u, k)       — 查询节点 u 的第 k 级祖先，越界返回 0，复杂度
- *                                 O(log N)。
+ *     struct Graph(n)       — 树的邻接表表示（1-based）。
+ *     Graph::add_edge(u, v) — 添加无向树边 (u, v)。
+ *     DoublingLCA(G, root)  — 预处理树上倍增表，时间复杂度 O(N log N)。
+ *     lca(u, v)             — 查询节点 u 和 v 的最近公共祖先，时间复杂度 O(log N)。
+ *     dist(u, v)            — 查询两点树上简单路径边数距离，时间复杂度 O(log N)。
+ *     kth_ancestor(u, k)    — 查询节点 u 的第 k 级祖先，越界返回 0，复杂度 O(log
+ *                              N)。
  *
  * Notes:
  *     1. 下标统一为 1-based，根节点 root 的深度定义为 0。
  *     2. Time: 预处理 O(N log N)，单次查询 O(log N)；Space: O(N log N)。
- *     3. 倍增表第一维为 log 层（up[LOG][N + 1]），避免 N 次小 vector 堆内存分配与碎片化。
+ *     3. 倍增表第一维为 log 层（up[LOG][N + 1]），避免 N 次小 vector
+ *        堆内存分配与碎片化。
  */
 
 struct Graph {
