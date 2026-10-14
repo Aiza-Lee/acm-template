@@ -13,7 +13,7 @@
  *                                      O(log(min(a, c)) * T_mul)
  *     solve_full(n, a, b, c, u, r)  — 求解包含 x=0 处 U^(b/c) 前缀的完整路径积,
  *                                      复杂度 O(log(min(a, c)) * T_mul)
- *     query_like_euclid(n, a, b, c) — 便捷计算 P5170 类欧三和(f, g, h),
+ *     query_like_euclid(n, a, b, c) — 便捷计算经典类欧三和(f, g, h),
  *                                      支持整型或模数类 T
  *     struct LikeEuclidNode         — 泛型类欧三和状态节点,维护 count、一次和、
  *                                      平方和及乘积交叉项
@@ -31,7 +31,7 @@
  *     EuclideanLike·类欧几里得算法.cpp: 特化的一维基础类欧几里得求和实现
  */
 
-// P5170 类欧三和状态节点:支持任意整型或模数类 T (支持 +, *)
+// 经典类欧三和状态节点:支持任意整型或模数类 T (支持 +, *)
 template<typename T = i64>
 struct LikeEuclidNode {
     T cu = 0, cr = 0, su = 0, su2 = 0, sr = 0, sru = 0;
