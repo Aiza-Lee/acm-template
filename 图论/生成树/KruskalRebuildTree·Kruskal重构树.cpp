@@ -41,7 +41,7 @@ struct KruskalReconstructionTree {
     std::vector<int> fa;
     int _n;
 
-    KruskalReconstructionTree(int n) : graph(n), fa(n + 1), _n(n) {
+    KruskalReconstructionTree(int n) : graph(n), fa(2 * n + 1), _n(n) {
         std::iota(fa.begin(), fa.end(), 0);
     }
     void add_edge(int u, int v, T w) { graph.add_edge(u, v, w); }
@@ -63,18 +63,14 @@ struct KruskalReconstructionTree {
         int cur = _n;
         std::vector<int> parent(2 * _n + 1, 0);
         std::vector<T> weight(2 * _n + 1, 0);
-        std::vector<int> repr(_n + 1);
-        std::iota(repr.begin(), repr.end(), 0);
 
         for (auto& [u, v, w] : graph.edges) {
             int ru = find(u), rv = find(v);
             if (ru != rv) {
                 cur++;
                 weight[cur] = w;
-                parent[repr[ru]] = cur;
-                parent[repr[rv]] = cur;
-                fa[ru] = rv;
-                repr[rv] = cur;
+                parent[ru] = parent[rv] = cur;
+                fa[ru] = fa[rv] = cur;
             }
         }
 
