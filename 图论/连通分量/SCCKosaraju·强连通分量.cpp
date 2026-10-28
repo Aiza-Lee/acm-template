@@ -1,5 +1,6 @@
 #include "aizalib.h"
 #include "../0-base[ignore]/Graph·图.cpp"
+
 /*
  * SCCKosaraju·强连通分量
  *
@@ -7,30 +8,30 @@
  *     先在原图上按后序完成第一遍 DFS，再在反图上按逆后序做第二遍 DFS 求 SCC。
  *
  * API:
- *     SCCKosaraju(g)       — 构造时完成求解
- *     scc_cnt              — 强连通分量个数
- *     std::vector<int> scc — scc[u] 为点 u 所属的强连通分量编号
+ *     SCCKosaraju(g) — 构造时通过两遍 DFS 完成求解，复杂度 O(V + E)
+ *     scc_cnt        — 强连通分量个数
+ *     scc            — scc[u] 为点 u 所属分量编号 (1-based)
+ *     sz             — sz[c] 为分量 c 包含的顶点数
+ *     comp           — comp[c] 为分量 c 包含的顶点列表
  *
  * Notes:
- *     模板参数: 无
- *     1. Time: O(V + E)
- *     2. Space: O(V + E)
- *     3. 1-based indexing. 对不连通图会自动逐块处理。
- *     4. 用法/技巧: 4.1 分量编号顺序取决于第二遍 DFS 的展开顺序，
- *        通常只比较是否同属一个 SCC。
+ *     1. 1-based indexing. 对不连通图会自动逐块处理。
+ *     2. 分量编号顺序取决于第二遍 DFS 的展开顺序。
  */
 
 struct SCCKosaraju {
-    Graph& g;       // 原图引用
+    Graph& g;                           // 原图引用
+    int scc_cnt;                        // 强连通分量个数
+    std::vector<int> scc;               // scc[u] 为点 u 所属分量编号
+    std::vector<int> sz;                // sz[c] 为分量 c 包含的顶点数
+    std::vector<std::vector<int>> comp; // comp[c] 为分量 c 包含的顶点列表
     std::vector<std::vector<int>> radj; // 反图
     std::vector<int> order;             // 第一遍 DFS 后序
-    std::vector<int> scc;               // scc[u] 为点 u 所属分量编号
     std::vector<char> vis;              // DFS 访问标记
-    int scc_cnt;                        // 强连通分量个数
 
     SCCKosaraju(Graph& g)
-        : g(g), radj(g.n + 1), order(), scc(g.n + 1), vis(g.n + 1),
-          scc_cnt(0) {
+        : g(g), scc_cnt(0), scc(g.n + 1), sz(1, 0), comp(1),
+          radj(g.n + 1), order(), vis(g.n + 1) {
         order.reserve(g.n);
         rep(u, 1, g.n) {
             for (int v : g.adj[u]) radj[v].emplace_back(u);
@@ -40,7 +41,10 @@ struct SCCKosaraju {
         std::reverse(order.begin(), order.end());
         for (int u : order) {
             if (vis[u]) continue;
-            _dfs2(u, ++scc_cnt);
+            ++scc_cnt;
+            comp.emplace_back();
+            _dfs2(u, scc_cnt);
+            sz.emplace_back((int)comp[scc_cnt].size());
         }
     }
 
@@ -56,6 +60,7 @@ private:
     void _dfs2(int u, int id) {
         vis[u] = 1;
         scc[u] = id;
+        comp[id].emplace_back(u);
         for (int v : radj[u]) {
             if (!vis[v]) _dfs2(v, id);
         }
