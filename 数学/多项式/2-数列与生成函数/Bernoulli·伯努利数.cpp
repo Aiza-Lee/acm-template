@@ -1,5 +1,5 @@
 #include "aizalib.h"
-#include "0-base/Poly·多项式全家桶.hpp"
+#include "0-base/2-Poly·多项式全家桶.hpp"
 
 /*
  * Bernoulli Numbers (伯努利数)
@@ -18,7 +18,7 @@
  *      2. 约定 B_1 = -1/2 (取模为 (md-1)/2)。
  *
  * Related:
- *      数学/多项式/0-base/Poly·多项式全家桶.hpp: 多项式求逆支持。
+ *      数学/多项式/0-base/2-Poly·多项式全家桶.hpp: 多项式求逆支持。
  */
 
 namespace poly_ext {

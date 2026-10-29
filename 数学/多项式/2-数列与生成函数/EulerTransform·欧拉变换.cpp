@@ -1,5 +1,5 @@
 #include "aizalib.h"
-#include "0-base/Poly·多项式全家桶.hpp"
+#include "0-base/2-Poly·多项式全家桶.hpp"
 /*
  * Euler Transform (多项式欧拉变换与无限乘积展开)
  *
@@ -21,7 +21,7 @@
  *      2. 输出多项式截断到 x^n（长度为 n + 1）。
  *
  * Related:
- *      数学/多项式/0-base/Poly·多项式全家桶.hpp: 多项式 Exp 算子。
+ *      数学/多项式/0-base/2-Poly·多项式全家桶.hpp: 多项式 Exp 算子。
  */
 
 namespace poly_ext {

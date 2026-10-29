@@ -1,5 +1,5 @@
 #include "aizalib.h"
-#include "0-base/Poly·多项式全家桶.hpp"
+#include "0-base/2-Poly·多项式全家桶.hpp"
 /*
  * Polynomial Convolutions (多项式普通卷积与差卷积)
  *
@@ -20,7 +20,7 @@
  *         d。
  *
  * Related:
- *      数学/多项式/0-base/Poly·多项式全家桶.hpp: 底层多项式类。
+ *      数学/多项式/0-base/2-Poly·多项式全家桶.hpp: 底层多项式类。
  */
 
 namespace poly_ext {

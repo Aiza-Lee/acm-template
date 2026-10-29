@@ -1,6 +1,6 @@
 #pragma once
 #include "aizalib.h"
-#include "../0-base/Poly·多项式全家桶.hpp"
+#include "../0-base/2-Poly·多项式全家桶.hpp"
 /*
  * LagrangeInversion·拉格朗日反演
  *

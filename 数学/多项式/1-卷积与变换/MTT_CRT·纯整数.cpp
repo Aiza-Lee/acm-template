@@ -1,5 +1,5 @@
 #include "aizalib.h"
-#include "../0-base/PolyCore·多项式核心.hpp"
+#include "../0-base/1-PolyCore·多项式核心.hpp"
 
 /*
  * MTT CRT Integer Merge (三模数 MTT 纯整数结果合并)
@@ -20,7 +20,8 @@
  *      2. 三模数乘积约为 10^27，能够容纳绝大多数组合与多项式卷积的系数范围。
  *
  * Related:
- *      数学/多项式/0-base/MTT·任意模数NTT.cpp: 封装完整 AnyModPoly 类的 MTT 实现。
+ *      数学/多项式/0-base/5-MTT·任意模数NTT.cpp: 封装完整 AnyModPoly 类的 MTT
+ *      实现。
  */
 namespace MTT_CRT {
     constexpr int m1 = 998244353, m2 = 1004535809, m3 = 469762049;

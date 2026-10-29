@@ -1,5 +1,5 @@
 #include "aizalib.h"
-#include "0-base/Poly·多项式全家桶.hpp"
+#include "0-base/2-Poly·多项式全家桶.hpp"
 /*
  * Divide and Conquer NTT & Semi-online Convolution (分治 NTT 与半在线卷积)
  *
@@ -23,7 +23,7 @@
  *      1. cdq_ntt 要求 g[0] = 0 以消除自环依赖。
  *
  * Related:
- *      数学/多项式/0-base/Poly·多项式全家桶.hpp: 底层多项式支持。
+ *      数学/多项式/0-base/2-Poly·多项式全家桶.hpp: 底层多项式支持。
  */
 
 namespace poly_ext {

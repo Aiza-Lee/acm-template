@@ -1,5 +1,5 @@
 #include "aizalib.h"
-#include "0-base/Poly·多项式全家桶.hpp"
+#include "0-base/2-Poly·多项式全家桶.hpp"
 
 namespace poly_ext {
 
@@ -27,7 +27,7 @@ namespace poly_ext {
  *      2. p[0] 返回根的总数 n，e[0] = 1，f 为升幂排列且最高次项系数 f[n] = 1。
  *
  * Related:
- *      数学/多项式/0-base/Poly·多项式全家桶.hpp: 多项式 Exp 与求逆。
+ *      数学/多项式/0-base/2-Poly·多项式全家桶.hpp: 多项式 Exp 与求逆。
  */
 struct NewtonIdentities {
     // E(x)=sum e_k x^k = exp(sum (-1)^{k-1} p_k x^k / k)
