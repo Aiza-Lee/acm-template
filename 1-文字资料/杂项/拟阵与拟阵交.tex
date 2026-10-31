@@ -1,0 +1,113 @@
+\textbf{拟阵与拟阵交速查}
+
+\textbf{定义与公理体系}
+有限底集 $E$ 与非空子集族 $\mathcal{I}\subseteq 2^E$ 构成的二元组 $M=(E,\mathcal{I})$ 称为\textbf{拟阵 (Matroid)}，$\mathcal{I}$ 中元素称为\textbf{独立集 (Independent Set)}，当且仅当满足以下三条公理：
+\begin{itemize}
+    \item \textbf{非空性 (I1)}：$\varnothing\in\mathcal{I}$。
+    \item \textbf{遗传性 (I2)}：若 $I\in\mathcal{I}$ 且 $J\subseteq I$，则 $J\in\mathcal{I}$。
+    \item \textbf{交换性 (I3)}：若 $I_1,I_2\in\mathcal{I}$ 且 $|I_1|<|I_2|$，则存在 $e\in I_2\setminus I_1$ 使得 $I_1\cup\{e\}\in\mathcal{I}$。
+\end{itemize}
+
+\textbf{核心术语与等价刻画}
+\begin{itemize}
+    \item \textbf{基 (Base)}：极大独立集（全体基的族记为 $\mathcal{B}$）。同一拟阵的所有基大小相等。
+    \item \textbf{基交换公理}：$B_1,B_2\in\mathcal{B},\,x\in B_1\setminus B_2 \implies \exists y\in B_2\setminus B_1$ 使 $(B_1\setminus\{x\})\cup\{y\}\in\mathcal{B}$。
+    \item \textbf{圈 (Circuit)}：极小相关集（本身不属于 $\mathcal{I}$，但删去任一元素后属于 $\mathcal{I}$）。
+    \item \textbf{基本圈 (Fundamental Circuit) 唯一性}：若 $I\in\mathcal{I}$ 但 $I\cup\{y\}\notin\mathcal{I}$，则 $I\cup\{y\}$ 中包含\textbf{唯一}的圈 $C(I,y)$；对任意 $x\in I$，有
+    \[
+    (I\setminus\{x\})\cup\{y\}\in\mathcal{I} \iff x\in C(I,y)\setminus\{y\}.
+    \]
+    \item \textbf{秩函数 (Rank)}：$r(S)=\max\{|I|\mid I\subseteq S,\,I\in\mathcal{I}\}$。满足有界性 $0\le r(S)\le |S|$、单调性 $A\subseteq B\Rightarrow r(A)\le r(B)$ 及\textbf{次模性 (Submodularity)}：
+    \[
+    r(A)+r(B)\ge r(A\cup B)+r(A\cap B),\qquad \forall A,B\subseteq E.
+    \]
+    \item \textbf{闭包 (Closure / Span)}：$\operatorname{cl}(S)=\{e\in E\mid r(S\cup\{e\})=r(S)\}$。满足 $r(\operatorname{cl}(S))=r(S)$。
+    \item \textbf{对偶拟阵 (Dual Matroid)}：$M^*=(E,\mathcal{I}^*)$，其基族为 $\mathcal{B}^*=\{E\setminus B\mid B\in\mathcal{B}\}$（即 $I\in\mathcal{I}^*\iff E\setminus I$ 包含 $M$ 的一个基，$r(E\setminus I)=r(E)$）。对偶秩函数：
+    \[
+    r^*(S)=|S|-r(E)+r(E\setminus S).
+    \]
+\end{itemize}
+
+\textbf{Rado-Edmonds 贪心定理}
+设 $(E,\mathcal{I})$ 为满足 (I1)(I2) 的遗传系统。对任意非负权函数 $w:E\to\mathbb{R}_{\ge 0}$，按权值降序贪心选取元素恒能得到最大权独立集，\textbf{当且仅当} $(E,\mathcal{I})$ 是拟阵：
+\begin{itemize}
+    \item \textbf{最大权独立集}：将元素按 $w(e)$ 从大到小排序，依次对 $w(e)>0$ 且满足 $I\cup\{e\}\in\mathcal{I}$ 的元素执行 $I\gets I\cup\{e\}$。
+    \item \textbf{最大/最小权基}：允许负权，不跳过 $w(e)\le 0$ 的元素，降序（或升序）贪心加满至基的大小 $r(E)$（Kruskal 算法即图拟阵上的特例）。
+\end{itemize}
+
+\textbf{竞赛常见拟阵与基本圈 $C(I,y)$}
+\begin{itemize}
+    \item \textbf{均匀拟阵} $U_{k,n}$：$I\in\mathcal{I}\iff |I|\le k$。当 $|I|=k$ 时 $C(I,y)=I\cup\{y\}$。
+    \item \textbf{划分/色彩拟阵 (Partition / Color Matroid)}：$E=\bigsqcup_{c} E_c$，$I\in\mathcal{I}\iff \forall c,\,|I\cap E_c|\le d_c$（色彩拟阵取 $d_c=1$）。若 $y\in E_c$ 且 $|I\cap E_c|=d_c$，则 $C(I,y)=\{y\}\cup(I\cap E_c)$。
+    \item \textbf{图拟阵 / 森林拟阵 (Graphic Matroid)}：$E$ 为无向图 $G=(V,E)$ 的边集，$I\in\mathcal{I}\iff (V,I)$ 无环。秩 $r(S)=|V|-\kappa(V,S)$（$\kappa$ 为连通分量数）。若 $y=(u,v)$ 两端点在森林 $(V,I)$ 中连通，则 $C(I,y)$ 为树上 $u$ 到 $v$ 的唯一简单路径边集并上 $\{y\}$。
+    \item \textbf{余图拟阵 / 割拟阵 (Cographic Matroid)}：图拟阵的对偶 $M^*(G)$，$I\in\mathcal{I}^*\iff \kappa(V,E\setminus I)=\kappa(V,E)$（删去 $I$ 不增加原图连通块数）。
+    \item \textbf{线性拟阵 (Linear Matroid)}：$E$ 为域 $\mathbb{F}$（常取 $\mathbb{F}_2$ 异或空间或 $\mathbb{F}_p$）上的向量集，$I\in\mathcal{I}\iff I$ 线性无关。若 $\mathbf{v}_y=\sum_{x\in I} c_x \mathbf{v}_x$，则 $C(I,y)=\{y\}\cup\{x\in I\mid c_x\neq 0\}$。
+    \item \textbf{横截拟阵 (Transversal Matroid)}：二分图 $G=(E,V;A)$ 中，$I\subseteq E$ 独立当且仅当 $I$ 可被 $G$ 的某个匹配完全覆盖。
+\end{itemize}
+
+\textbf{拟阵交定理与交换图算法}
+
+\textbf{问题与复杂度边界}
+给定同一底集 $E$ 上的两个拟阵 $M_1=(E,\mathcal{I}_1),\,M_2=(E,\mathcal{I}_2)$，求最大公共独立集 $I\in\mathcal{I}_1\cap\mathcal{I}_2$。两拟阵交多项式时间可解；\textbf{三个及以上拟阵交}可规约有向哈密顿路，为 \textbf{NP-Hard}。
+
+\textbf{Edmonds 拟阵交最大最小定理 (Min-Max Formula)}
+\[
+\max_{I\in\mathcal{I}_1\cap\mathcal{I}_2}|I|=\min_{U\subseteq E}\bigl(r_1(U)+r_2(E\setminus U)\bigr).
+\]
+
+\textbf{交换图 (Exchange Graph) $D(I)$ 构造}
+设当前公共独立集为 $I\in\mathcal{I}_1\cap\mathcal{I}_2$，定义源汇集与二分有向边集：
+\[
+X_1=\{y\in E\setminus I\mid I\cup\{y\}\in\mathcal{I}_1\},\qquad X_2=\{y\in E\setminus I\mid I\cup\{y\}\in\mathcal{I}_2\}.
+\]
+\begin{itemize}
+    \item \textbf{$M_1$ 交换边 ($I\to E\setminus I$)}：对 $y\in (E\setminus I)\setminus X_1$ 及 $x\in I$，若 $(I\setminus\{x\})\cup\{y\}\in\mathcal{I}_1$（即 $x\in C_1(I,y)\setminus\{y\}$），连有向边 $x\to y$。
+    \item \textbf{$M_2$ 交换边 ($E\setminus I\to I$)}：对 $y\in (E\setminus I)\setminus X_2$ 及 $x\in I$，若 $(I\setminus\{x\})\cup\{y\}\in\mathcal{I}_2$（即 $x\in C_2(I,y)\setminus\{y\}$），连有向边 $y\to x$。
+\end{itemize}
+
+\textbf{极短增广路定理 (Unweighted Augmentation)}
+在 $D(I)$ 中用 BFS 求从 $X_1$ 到 $X_2$ 的\textbf{边数最少}的路径 $P=(y_0,x_1,y_1,\dots,x_k,y_k)$（其中 $y_0\in X_1,\,y_k\in X_2$）：
+\begin{itemize}
+    \item 若存在此类最短路 $P$，则对称差 $I'=I\triangle V(P)$ 必满足 $I'\in\mathcal{I}_1\cap\mathcal{I}_2$ 且 $|I'|=|I|+1$。
+    \item 若 $D(I)$ 中不存在从 $X_1$ 到 $X_2$ 的有向路径，则 $I$ 已是最大公共独立集；此时令 $U$ 为 $D(I)$ 中从 $X_1$ 出发可达的全体顶点集，即取到对偶最优分割 $r_1(U)+r_2(E\setminus U)=|I|$。
+\end{itemize}
+
+\textbf{带权拟阵交 (Weighted Matroid Intersection)}
+给定元素权值 $w:E\to\mathbb{R}$，在交换图 $D(I)$ 中为顶点赋点权：
+\[
+\operatorname{val}(v)=
+\begin{cases}
+-w(v), & v\in I,\\
++w(v), & v\in E\setminus I.
+\end{cases}
+\]
+定义路径 $P$ 的权值为其经过的顶点点权之和 $\operatorname{val}(P)=\sum_{v\in V(P)}\operatorname{val}(v)=w(I\triangle V(P))-w(I)$，长度 $\operatorname{len}(P)$ 为其边数。
+\begin{itemize}
+    \item \textbf{极短最优增广 (Schrijver / Lawler 定理)}：从 $I_0=\varnothing$ 出发，每轮在 $D(I_k)$ 中用 SPFA / Bellman-Ford 求从 $X_1$ 到 $X_2$ 使双关键字 $\bigl(\operatorname{val}(P),-\operatorname{len}(P)\bigr)$ 字典序最大（即\textbf{点权和最大，同权值下边数最少}）的路径 $P$，令 $I_{k+1}=I_k\triangle V(P)$。
+    \item \textbf{最优性与上凸性}：每步得到的 $I_k$ 必为所有大小为 $k$ 的公共独立集中权值最大者；且最大权序列 $W(k)=w(I_k)$ 关于大小 $k$ 是\textbf{上凸}的（边际增益单调不增：$\Delta_1\ge\Delta_2\ge\cdots\ge\Delta_r$），同时 $D(I_k)$ 中不存在正权有向环。
+    \item \textbf{停止条件}：求任意大小最大权公共独立集时，当 $\operatorname{val}(P)\le 0$ 或无路可达时停止；求最大基或指定大小 $k$ 的最大权独立集时，增广至目标大小（求最小权可将权值取反 $w'(e)=-w(e)$ 后求最大权）。
+\end{itemize}
+
+\textbf{经典建模与拟阵并}
+\begin{itemize}
+    \item \textbf{二分图匹配}：左部点关联边集构成划分拟阵 $M_1$ $\cap$ 右部点关联边集构成划分拟阵 $M_2$。
+    \item \textbf{多彩生成森林 (Rainbow Spanning Forest)}：图拟阵 $M_1$ $\cap$ 边颜色划分拟阵 $M_2$。
+    \item \textbf{根向生成树 / 有向图树形图}：删去根 $r$ 的所有入边后，底图无向图拟阵 $M_1$ $\cap$ 每个非根点入度 $\le 1$ 的划分拟阵 $M_2$。
+    \item \textbf{拟阵并 (Matroid Union / Partition)}：给定 $k$ 个拟阵 $M_1,\dots,M_k$，其并 $M=(E,\mathcal{I})$ 定义为 $I\in\mathcal{I}\iff I=I_1\cup\dots\cup I_k\,(I_i\in\mathcal{I}_i)$。拟阵并仍是拟阵，秩函数为
+    \[
+    r(S)=\min_{U\subseteq S}\Bigl(|S\setminus U|+\sum_{i=1}^k r_i(U)\Bigr).
+    \]
+    算法上可将底集复制 $k$ 份为 $E'=E\times\{1,\dots,k\}$，规约为直和拟阵 $\bigoplus_{i=1}^k M_i$ 与“每个原元素 $e\in E$ 至多选一份”的划分拟阵之交。
+    \item \textbf{Nash-Williams 森林覆盖与填充定理}（$k$ 个相同图拟阵之并）：
+    \begin{itemize}
+        \item 边集 $E$ 可分解为 $k$ 个森林 $\iff \forall \varnothing\neq U\subseteq V,\,|E[U]|\le k(|U|-1)$。
+        \item 连通图 $G$ 含 $k$ 棵边不相交生成树 $\iff$ 对顶点集任意划分 $\mathcal{P}$，跨块边数 $e(\mathcal{P})\ge k(|\mathcal{P}|-1)$。
+    \end{itemize}
+\end{itemize}
+
+\textbf{实现要点与易错点}
+\begin{itemize}
+    \item \textbf{无弦性要求}：无论无权或带权，同权值下\textbf{必须}取边数最少（极短）的增广路，否则路径内部存在捷径（弦）会导致 $I\triangle V(P)\notin\mathcal{I}_1\cap\mathcal{I}_2$。
+    \item \textbf{源汇孤立性}：构造 $D(I)$ 时，$y\in X_1$ 不连入边（入度为 $0$），$y\in X_2$ 不连出边（出度为 $0$）。带权情形下若误给 $y\in X_1$ 连入边，路径可能经过多个 $X_1$ 元素而破坏独立性。
+    \item \textbf{基本圈加速}：设 $|E|=n$，最大交大小 $r$。每轮先对当前 $I$ 预处理（图拟阵 DFS 子树区间 $O(V+n)$，线性拟阵高斯消元维护原基掩码 $O(nB)$），即可将单次交换判定 `can\_exchange(x, y)` 降至 $O(1)$，无权总时间 $O(r^2 n)$，带权 SPFA 单轮边数 $O(rn)$。
+\end{itemize}
