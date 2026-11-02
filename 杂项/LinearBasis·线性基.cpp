@@ -16,19 +16,19 @@
  *     - 工具：LinearBasis、RawLinearBasis、TimedLinearBasis。
  *
  * API:
- *     LinearBasis<N>::insert(x)             — 尝试插入向量 x，成功插入 (线性无关)
- *                                              返回 true
- *     LinearBasis<N>::get_max()             — 返回张成空间内可达到的最大数值/字典序
- *                                              bitset
- *     RawLinearBasis<N>::insert(x)          — 插入原始向量，保留原向量序列 basis
- *     RawLinearBasis<N>::solve(v)           — 查询向量 v 是否可由基生成，
- *                                              返回是否可行及所需基的下标集合
- *     TimedLinearBasis<N>::insert(x, t)     — 插入带时间戳 t 的向量 x，
- *                                              高位优先保留大时间戳
- *     TimedLinearBasis<N>::get_max(limit_t) — 查询使用时间戳 <= limit_t
- *                                              的基向量所能达到的最大异或值
- *     TimedLinearBasis<N>::get_min(limit_t) — 查询使用时间戳 <= limit_t
- *                                              的基向量构成的最小非零异或值
+ *     LinearBasis<N>::insert(x)           — 尝试插入向量 x，成功插入 (线性无关)
+ *                                            返回 true
+ *     LinearBasis<N>::get_max()           — 返回张成空间内可达到的最大数值/字典序
+ *                                            bitset
+ *     RawLinearBasis<N>::insert(x)        — 插入原始向量，保留原向量序列 basis
+ *     RawLinearBasis<N>::solve(v)         — 查询向量 v 是否可由基生成，
+ *                                            返回是否可行及所需基的下标集合
+ *     TimedLinearBasis<N>::insert(x, t)   — 插入带时间戳 t 的向量 x，
+ *                                            高位优先保留大时间戳
+ *     TimedLinearBasis<N>::get_max(min_t) — 查询使用时间戳 >= min_t
+ *                                            的基向量所能达到的最大异或值
+ *     TimedLinearBasis<N>::get_min(min_t) — 查询使用时间戳 >= min_t
+ *                                            的基向量构成的最小非零异或值
  *
  * Notes:
  *     1. Time: 每次单向量插入与查询均为 O(N^2 / word_bits)。
@@ -131,17 +131,17 @@ struct TimedLinearBasis {
         return false;
     }
 
-    std::bitset<N> get_max(int limit_t) {
+    std::bitset<N> get_max(int min_t) const {
         std::bitset<N> res;
         per(i, N - 1, 0) {
-            if (!res[i] && p[i].any() && time[i] <= limit_t) res ^= p[i];
+            if (!res[i] && p[i].any() && time[i] >= min_t) res ^= p[i];
         }
         return res;
     }
 
-    std::bitset<N> get_min(int limit_t) {
+    std::bitset<N> get_min(int min_t) const {
         rep(i, 0, N - 1) {
-            if (p[i].any() && time[i] <= limit_t) return p[i];
+            if (p[i].any() && time[i] >= min_t) return p[i];
         }
         return {};
     }

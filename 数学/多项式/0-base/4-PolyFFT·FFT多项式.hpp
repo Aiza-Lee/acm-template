@@ -18,14 +18,14 @@
  *                                              res。复杂度 O(n log n)。
  *
  * Notes:
- *      1. 数组长度需预留足够上限 N。
+ *      1. 内部使用 std::vector 动态分配工作空间，无需预定义全局长度上限 N。
  *      2. 浮点精度在数值极大（卷积结果超 10^14）时可能产生精度误差，大整数请用 MTT。
  *
  * Related:
  *      数学/多项式/0-base/5-MTT·任意模数NTT.cpp: 任意模数防精度误差多项式乘法。
  */
 
-const double pi = acos(-1.0);
+const double pi = std::acos(-1.0);
 
 struct comp {
     double re, im;
@@ -38,19 +38,19 @@ struct comp {
 };
 
 namespace Poly {
-    void FFT(comp tmp[], int n, int type) {
-        static int rev[N];
+    inline void FFT(comp tmp[], int n, int type) {
+        std::vector<int> rev(n, 0);
         int lg = __builtin_ctz(n);
-        
+
         rep(i, 1, n - 1) {
             rev[i] = (rev[i >> 1] >> 1) | ((i & 1) << (lg - 1));
         }
-        
-        rep(i, 0, n - 1) 
+
+        rep(i, 0, n - 1)
             if (i < rev[i]) std::swap(tmp[i], tmp[rev[i]]);
-        
+
         for (int len = 2; len <= n; len <<= 1) {
-            comp w1(cos(2 * pi / len), type * sin(2 * pi / len));
+            comp w1(std::cos(2 * pi / len), type * std::sin(2 * pi / len));
             for (int i = 0; i < n; i += len) {
                 comp w(1, 0);
                 int mid = len >> 1;
@@ -61,27 +61,26 @@ namespace Poly {
                 }
             }
         }
-        
-        if (type == -1) 
+
+        if (type == -1)
             rep(i, 0, n - 1) tmp[i].re /= n;
     }
 
-    void multiply_fft(int a[], int b[], int deg_a, int deg_b, int res[]) {
+    inline void multiply_fft(const int a[], const int b[], int deg_a,
+                             int deg_b, int res[]) {
         int n = 1;
         while (n <= deg_a + deg_b) n <<= 1;
-        
-        static comp ta[N], tb[N];
+
+        std::vector<comp> ta(n), tb(n);
         rep(i, 0, deg_a) ta[i] = comp(a[i], 0);
-        rep(i, deg_a + 1, n - 1) ta[i] = comp(0, 0);
         rep(i, 0, deg_b) tb[i] = comp(b[i], 0);
-        rep(i, deg_b + 1, n - 1) tb[i] = comp(0, 0);
-        
-        FFT(ta, n, 1);
-        FFT(tb, n, 1);
+
+        FFT(ta.data(), n, 1);
+        FFT(tb.data(), n, 1);
         rep(i, 0, n - 1) ta[i] = ta[i] * tb[i];
-        FFT(ta, n, -1);
-        
-        rep(i, 0, deg_a + deg_b) 
-            res[i] = (int)(ta[i].re + 0.5);
+        FFT(ta.data(), n, -1);
+
+        rep(i, 0, deg_a + deg_b)
+            res[i] = (int)std::llround(ta[i].re);
     }
 }

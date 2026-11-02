@@ -44,7 +44,6 @@ struct Graph {
 
     void add_edge(int u, int v, T w = T{1}) {
         AST(1 <= u && u <= n && 1 <= v && v <= n);
-        AST(!(w < T{}));
         adj[u].emplace_back(v, w);
         adj[v].emplace_back(u, w);
     }

@@ -125,45 +125,44 @@ public:
         y = _merge(tr[y].l, tr[y].r);
         root[++cur_ver] = _merge(x, _merge(y, z));
     }
-    int query_value_at_rank(int ver, int k) {
+    int query_value_at_rank(int ver, int k) const {
         _check_ver(ver);
-        if (k < 1 || k > tr[root[ver]].sz) return -1;
-        last_tot = -1;
-        int x, y;
-        _split_size(root[ver], k, x, y);
-        int p = x;
-        while (tr[p].r) p = tr[p].r;
-        root[ver] = _merge(x, y);
-        return tr[p].val;
+        int p = root[ver];
+        if (k < 1 || k > tr[p].sz) return -1;
+        while (p) {
+            int lsz = tr[tr[p].l].sz;
+            if (k <= lsz) p = tr[p].l;
+            else if (k == lsz + 1) return tr[p].val;
+            else k -= lsz + 1, p = tr[p].r;
+        }
+        return -1;
     }
-    int query_rank(int ver, int v) {
+    int query_rank(int ver, int v) const {
         _check_ver(ver);
-        last_tot = -1;
-        int x, y;
-        _split_val(root[ver], v - 1, x, y);
-        int res = tr[x].sz + 1;
-        root[ver] = _merge(x, y);
+        int p = root[ver], res = 1;
+        while (p) {
+            if (tr[p].val < v) res += tr[tr[p].l].sz + 1, p = tr[p].r;
+            else p = tr[p].l;
+        }
         return res;
     }
-    int query_pre(int ver, int v) {
+    int query_pre(int ver, int v) const {
         _check_ver(ver);
-        last_tot = -1;
-        int x, y;
-        _split_val(root[ver], v - 1, x, y);
-        int p = x;
-        while (tr[p].r) p = tr[p].r;
-        root[ver] = _merge(x, y);
-        return p ? tr[p].val : NINF;
+        int p = root[ver], ans = NINF;
+        while (p) {
+            if (tr[p].val < v) ans = tr[p].val, p = tr[p].r;
+            else p = tr[p].l;
+        }
+        return ans;
     }
-    int query_suc(int ver, int v) {
+    int query_suc(int ver, int v) const {
         _check_ver(ver);
-        last_tot = -1;
-        int x, y;
-        _split_val(root[ver], v, x, y);
-        int p = y;
-        while (tr[p].l) p = tr[p].l;
-        root[ver] = _merge(x, y);
-        return p ? tr[p].val : INF;
+        int p = root[ver], ans = INF;
+        while (p) {
+            if (tr[p].val > v) ans = tr[p].val, p = tr[p].l;
+            else p = tr[p].r;
+        }
+        return ans;
     }
     int append_version(int ver) {
         _check_ver(ver);

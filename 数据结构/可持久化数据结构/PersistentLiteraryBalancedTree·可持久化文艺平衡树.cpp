@@ -115,6 +115,21 @@ private:
         }
     }
     void _check_ver(int ver) const { AST(0 <= ver && ver <= cur_ver); }
+    i64 _query_sum(int p, int l, int r, bool flip) const {
+        if (!p || l > r) return 0;
+        if (l <= 1 && tr[p].sz <= r) return tr[p].sum;
+        bool nxt = flip ^ tr[p].rev;
+        int lc = flip ? tr[p].r : tr[p].l;
+        int rc = flip ? tr[p].l : tr[p].r;
+        int lsz = tr[lc].sz;
+        i64 res = 0;
+        if (l <= lsz) res += _query_sum(lc, l, std::min(r, lsz), nxt);
+        if (l <= lsz + 1 && lsz + 1 <= r) res += tr[p].val;
+        if (r > lsz + 1) {
+            res += _query_sum(rc, std::max(1, l - lsz - 1), r - lsz - 1, nxt);
+        }
+        return res;
+    }
 
 public:
     void insert_after(int ver, int k, int v) {
@@ -153,16 +168,10 @@ public:
         }
         root[++cur_ver] = _merge(_merge(x, y), z);
     }
-    i64 query_seg_sum(int ver, int l, int r) {
+    i64 query_seg_sum(int ver, int l, int r) const {
         _check_ver(ver);
         if (l > r || l < 1 || r > tr[root[ver]].sz) return 0;
-        last_tot = -1;
-        int x, y, z;
-        _split(root[ver], l - 1, x, y);
-        _split(y, r - l + 1, y, z);
-        i64 res = tr[y].sum;
-        root[ver] = _merge(_merge(x, y), z);
-        return res;
+        return _query_sum(root[ver], l, r, false);
     }
     std::vector<int> get_inorder(int ver) const {
         _check_ver(ver);

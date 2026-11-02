@@ -35,6 +35,11 @@ struct StirlingS2 {
         }
     }
 
+    int get(int n, int k) const {
+        if (k < 0 || k > n) return 0;
+        return S[n][k];
+    }
+
     // 计算 sum_{x=0}^{n} x^k
     int sum_powers(i64 n, int k) {
         if (k == 0) return (n + 1) % md;
