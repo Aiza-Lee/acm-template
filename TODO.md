@@ -104,7 +104,7 @@
 - [ ] **3.5 网络流、二分图匹配、最短路与行列式计数**
   - `图论/网络流/LowerUpperBoundFlow·上下界网络流.cpp`：改为 `#include "Dinic·分层图最大流.cpp"` 消除内联复制的 75 行 `Dinic`；为 `Dinic` 补充 **最小割源点侧点集提取** 与 **最大权闭合子图** 建模示例。
   - `图论/匹配/`：清理 `KM` 中未使用的 6 个死成员数组；补充从二分图匹配导出 **König 最小点覆盖、最大独立集、DAG 最小路径覆盖** 的应用函数。
-  - `图论/CongruenceShortestPath·同余最短路.cpp`：补齐最高频考点 **区间 $[L, R]$ 内可表出整数个数统计 `count_achievable`**。
+  - [x] `图论/CongruenceShortestPath·同余最短路.cpp`：补齐最高频考点 **区间 $[L, R]$ 内可表出整数个数统计 `count_achievable`** 与 **转圈技巧 `solve_cycle`**。
   - `图论/最短路/`：为 `SPFA` 补充负环顶点序列提取 `extract_negative_cycle`；为 `DifferenceConstraints` 补充超级源点求最大解/最小解说明。
   - `图论/LGVLemma`、`MatrixTree`、`BESTTheorem`：消除三处重复的高斯消元求行列式代码；解耦 `LGVLemma` 的 DAG DP 与行列式计算；为 `ChordalGraph` 补充 PEO 贪心求最大独立集。
 
