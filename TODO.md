@@ -30,8 +30,8 @@
     - 应用 2：后缀链接 `last` 预处理与 $O(|T|\sqrt{\sum|P|})$ 根号暴力在线匹配枚举与划分 DP。
     - 应用 3：AC 自动机状态图上的禁忌模式串计数 DP。
     - 应用 4：Fail 树 DFS 序 + 树状数组维护动态模式串匹配。
-- [ ] **1.2 回文自动机 (`PAM` & `ExtPAM`) 主干精简与应用拆分**
-  - 目标文件：`字符串/回文串/PAM·回文自动机.cpp`、`ExtPAM·扩展回文自动机.cpp` + 新增应用文件
+- [x] **1.2 回文自动机 (`PAM` & `ExtPAM`) 主干精简与应用拆分**
+  - 目标文件：`字符串/回文串/1-1-PAM·回文自动机.cpp`、`1-2-PAMApplications·回文自动机应用.cpp`、`1-3-ExtPAM·扩展回文自动机.cpp`
   - 核心瘦身：剥离 `PAM::Node` 和 `ExtPAM::Node` 中耦合的 `cnt`、`num` 及非幂等的 `count_occurrences()`；`PAM::Node` 仅保留 `{next, len, fail}`，`ExtPAM::Node` 仅保留 `{next, len, fail, diff, slink}`。
   - 应用演示：
     - 应用 1：利用天然逆拓扑序 `per(u, sz - 1, 2)` 统计各本质不同回文串出现次数、总回文子串数及各前缀结尾回文个数 `num[u]`。
@@ -44,7 +44,7 @@
 - [ ] **1.4 序列自动机、KMP 与 Manacher 优化**
   - `字符串/自动机/SequenceAutomaton·序列自动机.cpp`：补充本质不同子序列 DP、字典序第 $k$ 小子序列、两串最短非公共子序列 BFS 应用。
   - `字符串/KMP·前缀函数匹配.cpp`：剥离基础 KMP 中冗余的 `diff / anc` 数组，补充前缀出现次数逆序汇聚（`cnt[pi[i]] += cnt[i]`）与 KMP 自动机 `aut[u][c]` 构建应用。
-  - `字符串/回文串/Manacher·马拉车.cpp`：核心补充 $O(1)$ 原串区间回文判定 `is_palindrome(l, r)`，将左端点差分统计等拆至应用部分。
+  - [x] `字符串/回文串/2-Manacher·马拉车.cpp`：补充 $O(1)$ 原串区间回文判定 `is_palindrome(l, r)`、奇偶中心最长回文长度查询 `max_odd_len(i) / max_even_len(i)`，修复 `init(str)` 重置复用。
 
 ---
 
