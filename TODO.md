@@ -98,9 +98,8 @@
   - `图论/生成树/KruskalRebuildTree·Kruskal重构树.cpp`：在 `Result` 中保存重构树子节点 `ch[u][0/1]`（或邻接表），新增 `KruskalRebuildTreeApp` 演示 **倍增上跳找边权 $\le x$ 的最高祖先 + 子树叶子 DFS 序区间映射 + LCA 瓶颈路查询**。
   - `图论/DominatorTree·支配树.cpp`：清理内部暴露的中间辅助数组，修正注释，新增 **逆 DFS 序 $O(N)$ 统计各点支配点集大小 (`sz[idom[u]] += sz[u]`)** 与 **必经点判定** 应用。
   - `图论/FunctionalGraph·功能图.cpp`：解耦 $O(N\log N)$ 倍增表，新增利用拓扑序从树枝向环根汇聚 + 破环成链的 **基环树 DP（最大权独立集 / 基环树直径）** 演示。
-- [ ] **3.4 连通分量、缩点、圆方树与 2-SAT**
-  - `图论/连通分量/`：消除 `SCCCondensation`、`EDCCCondensation`、`BlockCutTree` 对 `SCCTarjan`、`EDCC`、`VDCC` 的重复 Tarjan 代码；补充 **缩点 DAG 拓扑 DP & 强连通化最少加边**、**桥树叶子配对最少加边**、**圆方树路径点双赋权统计（铁人两项模型）** 应用。
-  - `图论/连通分量/TwoSAT·2-SAT可满足性.cpp`：改用单遍 Tarjan 省去反图 `radj`，补充 **`add_at_most_one`（前缀辅助变量优化建图）** 应用。
+- [x] **3.4 连通分量、缩点、圆方树与 2-SAT**
+  - `图论/连通分量/`：精简 `SCCTarjan`、`SCCKosaraju`、`EDCC`、`VDCC` 主干（剥离 `comp`/`sz`/`v_dcc_edges` 与工作数组），`SCCCondensation` 与 `BlockCutTree` 内部直接 `#include` 核心模板消除重复 Tarjan 代码，彻底剔除繁琐浅层 Application 壳文件；`TwoSAT` 复用 `SCCTarjan` 单遍求解省去反图 `radj`，原生内置 `new_var()` 与 `add_at_most_one()` 前缀优化建图。
 - [ ] **3.5 网络流、二分图匹配、最短路与行列式计数**
   - `图论/网络流/LowerUpperBoundFlow·上下界网络流.cpp`：改为 `#include "Dinic·分层图最大流.cpp"` 消除内联复制的 75 行 `Dinic`；为 `Dinic` 补充 **最小割源点侧点集提取** 与 **最大权闭合子图** 建模示例。
   - `图论/匹配/`：清理 `KM` 中未使用的 6 个死成员数组；补充从二分图匹配导出 **König 最小点覆盖、最大独立集、DAG 最小路径覆盖** 的应用函数。
