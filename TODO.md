@@ -37,8 +37,8 @@
     - 应用 1：利用天然逆拓扑序 `per(u, sz - 1, 2)` 统计各本质不同回文串出现次数、总回文子串数及各前缀结尾回文个数 `num[u]`。
     - 应用 2：双 PAM 同步 DFS 统计两串公共回文子串对数。
     - 应用 3：利用 `ExtPAM` 的 `slink` 与 `diff` 实现 $O(N \log N)$ 最小回文划分 / 回文划分方案数 DP（完整展示 `g[u] = dp[i - (tr[tr[u].slink].len + tr[u].diff)]` 递推与偶回文限制变体）。
-- [ ] **1.3 后缀数组与后缀平衡树解耦与补齐**
-  - 目标文件：`字符串/后缀算法/2-SuffixArray·后缀数组.cpp`、`3-SuffixBalancedTree·后缀平衡树.cpp`
+- [x] **1.3 后缀数组与后缀平衡树解耦与补齐**
+  - 目标文件：`字符串/后缀算法/2-1-SuffixArray·后缀数组.cpp`、`2-2-SAApplications·后缀数组应用.cpp`、`3-SuffixBalancedTree·后缀平衡树.cpp`
   - `SuffixArray`：将倍增临时数组 `oldrk, id, cnt` 改为构造局部变量；将 `find_substring`、`compare_substrings`、`count_distinct_substrings`、`kth_distinct_substring` 拆入 `SAApp`，并新增 **`height` 单调栈/并查集统计公共前缀对数** 应用。
   - `SuffixBalancedTree`：移除死代码 `_eq`，补充 **前端删字符 `pop_front`**、**在线查询外部模式串出现次数 $O(|P|\log N)$**、**动态维护本质不同子串数** 应用。
 - [ ] **1.4 序列自动机、KMP 与 Manacher 优化**
